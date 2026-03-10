@@ -379,24 +379,104 @@ header{
 .fld-verify-hint.ok{color:var(--teal)}
 .fld-verify-hint.no{color:var(--slate2)}
 
+/* ══════════════════════════════════════════════════
+   MOBILE — 700px and below
+══════════════════════════════════════════════════ */
 @media(max-width:700px){
-  .panel{width:100%;border-right:none;height:auto;max-height:none;flex:none}
-  .body{flex-direction:column;overflow:auto}
-  .map-wrap{height:50vh;flex:none;min-height:320px}
-  .tab-body{max-height:60vh;overflow-y:auto}
-  header{padding:0 12px}
-  .logo-name{font-size:.85rem}
+  /* Header */
+  header{padding:0 12px;height:48px}
+  .logo-name{font-size:.82rem}
   .logo-sub{display:none}
-  .stats-banner{padding:6px 12px;gap:8px}
-  .stat-sep:nth-child(n+4){display:none}
-  .map-filter-bar{bottom:8px;left:8px;right:8px}
-  .mfb-input{width:140px;font-size:.74rem}
+  .member-link{font-size:.65rem;padding:3px 8px}
+
+  /* Stats banner */
+  .stats-banner{padding:5px 12px;gap:6px;font-size:.6rem}
+  .stat-sep:nth-child(n+6){display:none}
+
+  /* Body stacks vertically */
+  .body{flex-direction:column;overflow:auto;height:auto}
+
+  /* Panel takes full width, no fixed height */
+  .panel{
+    width:100%;border-right:none;
+    height:auto;max-height:none;flex:none;
+    overflow:visible;
+  }
+
+  /* Tabs larger tap targets */
+  .tab{padding:10px 16px;font-size:.8rem}
+
+  /* Tab body scrolls naturally */
+  .tab-body{max-height:none;overflow-y:visible;padding:16px}
+
+  /* Type grid stays 2-col but bigger buttons */
+  .type-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .type-btn{padding:10px 6px;font-size:.75rem}
+  .type-icon{font-size:1.1rem}
+
+  /* Form fields full width */
+  .fld input,.fld select,.fld textarea{font-size:16px} /* prevent iOS zoom */
+  .suspect-grid,.vehicle-grid{grid-template-columns:1fr 1fr}
+
+  /* Map */
+  .map-wrap{height:55vw;min-height:260px;flex:none}
+  .map-controls{top:8px;left:8px;gap:4px}
+  .map-btn{padding:5px 9px;font-size:.58rem}
+
+  /* Map filter bar */
+  .map-filter-bar{bottom:6px;left:6px;right:6px;gap:4px}
+  .mfb-input{width:120px;font-size:.74rem;padding:5px 9px}
+  .mfb-select{font-size:.72rem;padding:5px 7px}
+
+  /* Incident list cards */
+  .inc-card{padding:10px 12px}
+
+  /* Modal */
+  .overlay{padding:0;align-items:flex-end}
+  .modal{border-radius:16px 16px 0 0;max-height:92vh;width:100%}
+
+  /* Section labels */
+  .sec-label{font-size:.65rem}
+
+  /* Upload area */
+  .upload-area{padding:20px 16px}
 }
+
+/* ══════════════════════════════════════════════════
+   MOBILE — 480px and below (small phones)
+══════════════════════════════════════════════════ */
 @media(max-width:480px){
-  .panel{width:100%}
-  .type-grid{grid-template-columns:1fr 1fr}
-  .map-wrap{height:45vh}
+  header{padding:0 10px}
   .logo-shield{width:26px;height:26px;font-size:.6rem}
+  .logo-name{font-size:.78rem}
+
+  .stats-banner{gap:4px}
+  .stat-sep:nth-child(n+4){display:none}
+  .stat-pill{font-size:.6rem}
+
+  .panel{width:100%}
+  .tab{padding:9px 12px;font-size:.75rem}
+  .tab-body{padding:12px}
+
+  .type-grid{grid-template-columns:1fr 1fr;gap:6px}
+  .type-btn{padding:9px 4px;font-size:.7rem}
+  .type-icon{font-size:1rem;margin-bottom:3px}
+
+  .map-wrap{height:50vw;min-height:220px}
+
+  .fld label{font-size:.55rem}
+  .sec-label{font-size:.6rem;padding:8px 0 4px}
+
+  .submit-btn{font-size:.82rem;padding:12px}
+
+  .mfb-input{width:100px;font-size:.7rem}
+  .mfb-select{font-size:.68rem;padding:4px 5px}
+
+  /* Modal slides up from bottom */
+  .modal{border-radius:14px 14px 0 0}
+  .modal-body{padding:14px}
+  .mf-label{font-size:.55rem}
+  .mf-val{font-size:.82rem}
 }
 
 /* ── Disclaimers ──────────────────────────────────────────── */
