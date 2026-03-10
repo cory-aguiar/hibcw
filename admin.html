@@ -35,7 +35,7 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--na
 }
 .login-box{
   background:var(--navy2);border:1px solid var(--border);border-radius:12px;
-  padding:40px;width:100%;max-width:380px;
+  padding:32px 24px;width:100%;max-width:380px;
 }
 .login-logo{text-align:center;margin-bottom:28px}
 .login-shield{
@@ -149,7 +149,7 @@ main::-webkit-scrollbar-thumb{background:var(--slate2);border-radius:2px}
 .bulk-label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--teal)}
 
 /* ── Table ────────────────────────────────────────────────── */
-.table-wrap{flex:1;overflow:auto;padding:0 24px 24px}
+.table-wrap{flex:1;overflow:auto;padding:0 24px 24px;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:12px}
 thead tr{position:sticky;top:0;background:var(--navy);z-index:10}
 th{
@@ -340,6 +340,152 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
   .print-header{display:block!important}
 }
 .print-header{display:none;margin-bottom:12px;font-size:.75rem;color:#666}
+
+/* ══════════════════════════════════════════════════
+   MOBILE NAV — bottom tab bar replaces sidebar
+══════════════════════════════════════════════════ */
+.mob-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:900;
+  background:var(--navy2);border-top:1px solid var(--b2);
+  height:58px;
+}
+.mob-nav-inner{
+  display:flex;height:100%;overflow-x:auto;
+  scrollbar-width:none;
+}
+.mob-nav-inner::-webkit-scrollbar{display:none}
+.mob-nav-btn{
+  flex:1;min-width:60px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  background:none;border:none;cursor:pointer;
+  color:var(--slate);font-size:.52rem;font-family:'IBM Plex Mono',monospace;
+  letter-spacing:.04em;text-transform:uppercase;padding:6px 4px;
+  border-top:2px solid transparent;transition:all .15s;white-space:nowrap;
+}
+.mob-nav-btn .mni{font-size:1.1rem;line-height:1}
+.mob-nav-btn:hover{color:var(--white)}
+.mob-nav-btn.on{color:var(--teal);border-top-color:var(--teal)}
+.mob-nav-btn .mob-badge{
+  background:var(--gold);color:#0b1524;
+  font-size:.45rem;border-radius:8px;padding:1px 4px;
+  font-weight:700;min-width:14px;text-align:center;
+  position:absolute;top:6px;right:calc(50% - 18px);
+}
+
+/* ══════════════════════════════════════════════════
+   MOBILE BREAKPOINT — 768px
+══════════════════════════════════════════════════ */
+@media(max-width:768px){
+
+  /* Hide desktop sidebar, show mobile nav */
+  .sidebar{display:none}
+  .mob-nav{display:block}
+
+  /* Body no longer needs to accommodate sidebar */
+  .body{overflow:auto;height:auto}
+
+  /* Main scrolls naturally, add bottom padding for nav bar */
+  main{overflow-y:auto;padding-bottom:66px}
+
+  /* Header compact */
+  header{padding:0 12px;height:48px}
+  .hd-title{font-size:.85rem}
+  .hd-sub{display:none}
+  .hd-user{display:none}
+  .logout-btn{font-size:.65rem;padding:3px 9px}
+
+  /* Page headers */
+  .page-hd{padding:14px 14px 0;flex-wrap:wrap;gap:10px}
+  .page-title{font-size:1.15rem}
+  .page-sub{font-size:.72rem}
+  .page-actions{gap:6px}
+  .btn-lg{padding:6px 12px;font-size:.72rem}
+
+  /* Toolbar */
+  .toolbar{padding:10px 14px;gap:6px}
+  .tb-search{min-width:120px}
+
+  /* Table — make it horizontally scrollable */
+  .table-wrap{padding:0 14px 80px}
+  table{font-size:.76rem}
+  th{font-size:.55rem;padding:8px 8px}
+  td{padding:8px 8px}
+  .td-desc{max-width:140px}
+  .td-addr{max-width:120px}
+  .row-actions{flex-direction:column;gap:3px}
+  .row-actions .btn{font-size:.62rem;padding:4px 8px;width:100%}
+
+  /* Prevent iOS input zoom */
+  input,select,textarea{font-size:16px!important}
+
+  /* Filter panel */
+  .filter-panel.open{max-height:500px}
+  .filter-grid{grid-template-columns:1fr}
+
+  /* Stats grid */
+  .stats-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:14px}
+  .stat-num{font-size:1.5rem}
+  .stat-card{padding:14px}
+
+  /* Type breakdown */
+  .type-breakdown{padding:0 14px 80px}
+  .type-row-label{width:120px;font-size:.72rem}
+
+  /* Modal — slides up from bottom */
+  .overlay{padding:0;align-items:flex-end}
+  .modal{
+    border-radius:16px 16px 0 0;
+    max-height:92vh;width:100%;
+    max-width:100%;
+  }
+  .modal-hd{padding:14px 16px}
+  .modal-body{padding:14px 16px}
+  .modal-actions{padding:12px 16px;gap:6px}
+  .modal-actions .btn{flex:1;text-align:center}
+  .mf-val{font-size:.82rem}
+  .mf-label{font-size:.55rem}
+
+  /* Member grid */
+  .member-grid{grid-template-columns:1fr;padding:14px}
+  .member-add-bar{padding:12px 14px 0;flex-direction:column;align-items:stretch}
+  .member-input{min-width:unset;width:100%}
+
+  /* Application grid */
+  .app-grid{grid-template-columns:1fr;padding:14px}
+  .app-filter-bar{padding:10px 14px 0}
+
+  /* Map view */
+  #view-map{flex-direction:column}
+  .map-panel{height:55vw;min-height:260px}
+  .map-sidebar{width:100%;height:200px;border-left:none;border-top:1px solid var(--b2)}
+  .map-sidebar-list{display:flex;flex-direction:row;gap:8px;padding:8px;overflow-x:auto;overflow-y:hidden}
+  .map-sidebar-list::-webkit-scrollbar{height:3px}
+  .map-inc-card{min-width:200px;flex-shrink:0;margin-bottom:0}
+
+  /* Bulk bar */
+  .bulk-bar{padding:8px 14px;flex-wrap:wrap}
+  .bulk-label{font-size:.65rem}
+
+  /* Chips */
+  .filter-chips{padding:6px 14px}
+
+  /* Toast */
+  .toast{bottom:70px;right:12px;left:12px;min-width:unset;max-width:unset}
+}
+
+/* ══════════════════════════════════════════════════
+   MOBILE — 480px small phones
+══════════════════════════════════════════════════ */
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .stat-num{font-size:1.3rem}
+  .page-title{font-size:1rem}
+  .mob-nav-btn{font-size:.48rem;min-width:52px}
+  .mob-nav-btn .mni{font-size:1rem}
+  .hd-shield{width:24px;height:24px;font-size:.55rem}
+  .hd-title{font-size:.78rem}
+  .table-wrap{padding:0 10px 80px}
+}
 
 /* ── Map view ──────────────────────────────────────────────── */
 #view-map{display:none;flex-direction:row;flex:1;overflow:hidden}
@@ -799,6 +945,34 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
 
     </main>
   </div>
+
+  <!-- MOBILE BOTTOM NAV (hidden on desktop) -->
+  <nav class="mob-nav">
+    <div class="mob-nav-inner">
+      <button class="mob-nav-btn on" id="mob-active"   onclick="showView('active')">
+        <span class="mni">🟢</span>Active
+      </button>
+      <button class="mob-nav-btn"    id="mob-archived" onclick="showView('archived')">
+        <span class="mni">📦</span>Archived
+      </button>
+      <button class="mob-nav-btn"    id="mob-all"      onclick="showView('all')">
+        <span class="mni">☰</span>All
+      </button>
+      <button class="mob-nav-btn"    id="mob-stats"    onclick="showView('stats')">
+        <span class="mni">📊</span>Stats
+      </button>
+      <button class="mob-nav-btn"    id="mob-map"      onclick="showView('map')">
+        <span class="mni">🗺</span>Map
+      </button>
+      <button class="mob-nav-btn"    id="mob-apps"     onclick="showView('apps')" style="position:relative">
+        <span class="mni">📋</span>Apps
+        <span class="mob-badge" id="mob-apps-badge" style="display:none"></span>
+      </button>
+      <button class="mob-nav-btn"    id="mob-members"  onclick="showView('members')">
+        <span class="mni">✅</span>Members
+      </button>
+    </div>
+  </nav>
 </div>
 
 <!-- DETAIL MODAL -->
@@ -952,8 +1126,12 @@ function showView(v) {
   currentView = v;
   document.querySelectorAll('.view').forEach(el => el.classList.remove('on'));
   document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('on'));
+  document.querySelectorAll('.mob-nav-btn').forEach(el => el.classList.remove('on'));
   document.getElementById(`view-${v}`).classList.add('on');
-  document.getElementById(`nav-${v}`).classList.add('on');
+  document.getElementById(`nav-${v}`)?.classList.add('on');
+  document.getElementById(`mob-${v}`)?.classList.add('on');
+  // Scroll main to top on mobile
+  if (window.innerWidth <= 768) document.querySelector('main')?.scrollTo(0,0);
   clearSelection();
   if (v === 'map') {
     initAdminMap();
@@ -1584,6 +1762,14 @@ function updateAppCount() {
   // Highlight nav btn if there are pending apps
   const btn = document.getElementById('nav-apps');
   if (btn) btn.style.color = pending > 0 ? 'var(--gold)' : '';
+  // Mobile badge
+  const mobBadge = document.getElementById('mob-apps-badge');
+  if (mobBadge) {
+    mobBadge.style.display = pending > 0 ? 'block' : 'none';
+    mobBadge.textContent = pending;
+  }
+  const mobBtn = document.getElementById('mob-apps');
+  if (mobBtn) mobBtn.style.color = pending > 0 ? 'var(--gold)' : '';
 }
 
 function renderApps() {
