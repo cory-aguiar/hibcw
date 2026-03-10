@@ -1421,12 +1421,22 @@ let memberList = [];
 
 async function loadMembers() {
   if (!sb) return;
-  const {data, error} = await sb.from('member_emails').select('*').order('created_at', {ascending:false});
-  if (error) { showToast('⚠️', 'Could not load members: ' + error.message, 'err'); return; }
-  memberList = data || [];
-  renderMembers();
-  const nc = document.getElementById('nc-members');
-  if (nc) nc.textContent = memberList.length;
+  try {
+    const {data, error} = await sb.from('member_emails').select('*').order('created_at', {ascending:false});
+    if (error) {
+      // Table may not exist yet — fail silently so login still works
+      console.warn('member_emails table not found:', error.message);
+      memberList = [];
+      return;
+    }
+    memberList = data || [];
+    renderMembers();
+    const nc = document.getElementById('nc-members');
+    if (nc) nc.textContent = memberList.length;
+  } catch(e) {
+    console.warn('loadMembers error:', e);
+    memberList = [];
+  }
 }
 
 function renderMembers() {
