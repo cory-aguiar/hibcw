@@ -1576,12 +1576,14 @@ let admHeatLayer = null;
 let admMarkers = {};
 let admClusterOn = true;
 let admHeatOn = false;
-
-const admStreetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19});
-const admSatLayer    = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});
+let admStreetLayer = null;
+let admSatLayer    = null;
 
 function initAdminMap() {
   if (admMap) return; // already initialised
+  // Create tile layers here — Leaflet is guaranteed loaded by this point
+  admStreetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19});
+  admSatLayer    = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});
   admMap = L.map('adminMap', {center:[19.7024,-155.0824], zoom:13});
   admStreetLayer.addTo(admMap);
   admClusterGroup = L.markerClusterGroup({
