@@ -796,14 +796,26 @@ let selectedIds  = new Set();
 /* ════════════════════════════════════════════════════
    LOGIN
 ════════════════════════════════════════════════════ */
-function doLogin() {
+async function doLogin() {
   const pw = document.getElementById('pwInput').value;
   if (pw === ADMIN_PASSWORD) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appShell').classList.add('visible');
-    initApp();
+    try {
+      await initApp();
+    } catch(e) {
+      // Show the error visibly on screen so we can diagnose
+      document.getElementById('appShell').classList.remove('visible');
+      document.getElementById('loginScreen').style.display = 'flex';
+      const err = document.getElementById('loginErr');
+      err.textContent = 'Login error: ' + e.message;
+      err.style.display = 'block';
+      console.error('initApp error:', e);
+    }
   } else {
-    document.getElementById('loginErr').style.display = 'block';
+    const err = document.getElementById('loginErr');
+    err.textContent = 'Incorrect password. Try again.';
+    err.style.display = 'block';
     document.getElementById('pwInput').value = '';
     document.getElementById('pwInput').focus();
   }
@@ -821,7 +833,7 @@ document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key=
 ════════════════════════════════════════════════════ */
 async function initApp() {
   if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
-    showToast('⚙️','Set your Supabase credentials in config.js','err'); return;
+    throw new Error('Supabase credentials not set in config.js');
   }
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   await loadAll();
