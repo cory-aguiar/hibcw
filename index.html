@@ -284,10 +284,98 @@ header{
 .map-marker:hover{transform:rotate(-45deg) scale(1.15)}
 .map-marker-inner{transform:rotate(45deg);font-size:1rem;line-height:1}
 
+/* ── Stats banner ──────────────────────────────────────── */
+.stats-banner{
+  flex-shrink:0;
+  background:linear-gradient(90deg,rgba(0,201,167,.07),rgba(0,201,167,.03));
+  border-bottom:1px solid var(--border);
+  padding:7px 16px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  font-family:'IBM Plex Mono',monospace;font-size:.62rem;
+}
+.stat-pill{
+  display:flex;align-items:center;gap:5px;
+  color:var(--slate);white-space:nowrap;
+}
+.stat-pill strong{color:var(--white)}
+.stat-pill.hi strong{color:var(--teal)}
+.stat-sep{color:var(--slate2);margin:0 2px}
+
+/* ── Map filter bar ────────────────────────────────────── */
+.map-filter-bar{
+  position:absolute;bottom:12px;left:12px;right:12px;z-index:500;
+  display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+  pointer-events:none;
+}
+.map-filter-bar > *{pointer-events:auto}
+.mfb-input{
+  background:rgba(11,21,36,.88);backdrop-filter:blur(8px);
+  border:1px solid var(--border);border-radius:4px;
+  padding:6px 11px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;
+  font-size:.78rem;outline:none;width:180px;transition:border-color .2s;
+}
+.mfb-input:focus{border-color:var(--teal)}
+.mfb-input::placeholder{color:var(--slate2)}
+.mfb-select{
+  background:rgba(11,21,36,.88);backdrop-filter:blur(8px);
+  border:1px solid var(--border);border-radius:4px;
+  padding:6px 10px;color:var(--white);font-size:.75rem;outline:none;cursor:pointer;
+}
+.mfb-select option{background:var(--navy2)}
+.mfb-clear{
+  background:rgba(11,21,36,.88);backdrop-filter:blur(8px);
+  border:1px solid rgba(232,65,90,.3);border-radius:4px;
+  padding:6px 10px;color:var(--red);font-size:.72rem;cursor:pointer;
+  display:none;transition:all .2s;
+}
+.mfb-clear.show{display:block}
+.mfb-clear:hover{background:rgba(232,65,90,.12)}
+.mfb-count{
+  background:rgba(0,201,167,.12);backdrop-filter:blur(8px);
+  border:1px solid var(--border);border-radius:4px;
+  padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);
+  display:none;
+}
+.mfb-count.show{display:block}
+
+/* ── Age indicator ─────────────────────────────────────── */
+.age-tag{
+  font-family:'IBM Plex Mono',monospace;font-size:.58rem;
+  border-radius:3px;padding:1px 6px;white-space:nowrap;
+}
+.age-fresh{background:rgba(232,65,90,.15);color:var(--red);border:1px solid rgba(232,65,90,.25)}
+.age-recent{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.2)}
+.age-old{background:rgba(122,143,166,.08);color:var(--slate);border:1px solid rgba(122,143,166,.15)}
+
+/* ── Recurring flag ────────────────────────────────────── */
+.recurring-flag{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);
+  border-radius:3px;padding:1px 7px;font-size:.65rem;color:var(--gold);
+  font-family:'IBM Plex Mono',monospace;
+}
+.fld-check{display:flex;align-items:center;gap:8px;padding:6px 0}
+.fld-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0;cursor:pointer}
+.fld-check label{font-size:.8rem;color:var(--slate);cursor:pointer;line-height:1.4}
+
 @media(max-width:700px){
-  .panel{width:100%;border-right:none;max-height:55vh}
-  .body{flex-direction:column}
-  .map-wrap{min-height:45vh}
+  .panel{width:100%;border-right:none;height:auto;max-height:none;flex:none}
+  .body{flex-direction:column;overflow:auto}
+  .map-wrap{height:50vh;flex:none;min-height:320px}
+  .tab-body{max-height:60vh;overflow-y:auto}
+  header{padding:0 12px}
+  .logo-name{font-size:.85rem}
+  .logo-sub{display:none}
+  .stats-banner{padding:6px 12px;gap:8px}
+  .stat-sep:nth-child(n+4){display:none}
+  .map-filter-bar{bottom:8px;left:8px;right:8px}
+  .mfb-input{width:140px;font-size:.74rem}
+}
+@media(max-width:480px){
+  .panel{width:100%}
+  .type-grid{grid-template-columns:1fr 1fr}
+  .map-wrap{height:45vh}
+  .logo-shield{width:26px;height:26px;font-size:.6rem}
 }
 
 /* ── Disclaimers ──────────────────────────────────────────── */
@@ -350,6 +438,19 @@ header{
       <div class="count-badge" id="countBadge">0 incidents</div>
     </div>
   </header>
+
+  <!-- STATS BANNER -->
+  <div class="stats-banner" id="statsBanner">
+    <div class="stat-pill hi"><strong id="sbTotal">—</strong> total</div>
+    <span class="stat-sep">·</span>
+    <div class="stat-pill"><strong id="sbMonth">—</strong> this month</div>
+    <span class="stat-sep">·</span>
+    <div class="stat-pill"><strong id="sbWeek">—</strong> this week</div>
+    <span class="stat-sep">·</span>
+    <div class="stat-pill"><strong id="sbToday">—</strong> today</div>
+    <span class="stat-sep">·</span>
+    <div class="stat-pill" id="sbLastPill">Last report: <strong id="sbLast">—</strong></div>
+  </div>
 
   <div class="body">
 
@@ -427,6 +528,10 @@ header{
           <div class="fld">
             <label>Police Report # (if filed)</label>
             <input type="text" id="fPolice" placeholder="e.g. HPD-2024-00000">
+          </div>
+          <div class="fld-check">
+            <input type="checkbox" id="fRecurring">
+            <label for="fRecurring">🔁 This type of incident has occurred here before (recurring)</label>
           </div>
         </div>
 
@@ -590,6 +695,27 @@ header{
         <button class="map-btn"    id="btnSat"     onclick="setLayer('sat')">SATELLITE</button>
         <button class="map-btn on" id="btnCluster" onclick="toggleCluster()" title="Toggle clustering">CLUSTER</button>
         <button class="map-btn"    id="btnHeat"    onclick="toggleHeat()"    title="Toggle heatmap">HEATMAP</button>
+      </div>
+      <!-- Map filter bar -->
+      <div class="map-filter-bar">
+        <input class="mfb-input" type="text" id="mapSearch" placeholder="🔍 Search incidents…" oninput="applyMapFilter()">
+        <select class="mfb-select" id="mapTypeFilter" onchange="applyMapFilter()">
+          <option value="">All Types</option>
+          <option>Robbery</option><option>Burglary</option><option>Assault</option>
+          <option>Drug Activity</option><option>Theft / Shoplifting</option>
+          <option>Vandalism</option><option>Vehicle Break-In</option><option>Fraud / Scam</option>
+          <option>Trespassing</option><option>Suspicious Activity</option>
+          <option>Graffiti</option><option>Other</option>
+        </select>
+        <select class="mfb-select" id="mapDateFilter" onchange="applyMapFilter()">
+          <option value="">All Time</option>
+          <option value="1">Last 24 Hours</option>
+          <option value="7">Last 7 Days</option>
+          <option value="30">Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+        </select>
+        <button class="mfb-clear" id="mapClearBtn" onclick="clearMapFilter()">✕ Clear</button>
+        <div class="mfb-count" id="mapFilterCount"></div>
       </div>
     </div>
 
@@ -869,7 +995,8 @@ async function submitReport() {
       address:       document.getElementById('fAddr').value.trim(),
       description:   document.getElementById('fDesc').value.trim(),
       reporter_name: document.getElementById('fName').value.trim() || null,
-      police_report: document.getElementById('fPolice').value.trim() || null,
+      police_report:  document.getElementById('fPolice').value.trim() || null,
+      is_recurring:   document.getElementById('fRecurring').checked,
       suspect_height:   document.getElementById('sSuspectHeight').value  || null,
       suspect_build:    document.getElementById('sSuspectBuild').value   || null,
       suspect_age:      document.getElementById('sSuspectAge').value     || null,
@@ -917,6 +1044,7 @@ async function submitReport() {
     addMarker(inc);
     incidents.unshift(inc);
     updateCount();
+    updateStats();
     resetForm();
     setTimeout(()=>showTab('list'),1200);
 
@@ -939,6 +1067,7 @@ function flashSubmit(msg) {
 function resetForm() {
   selType=''; selColor='';
   document.querySelectorAll('.type-btn').forEach(b=>b.className='type-btn');
+  document.getElementById('fRecurring').checked = false;
   ['fAddr','fDesc','fName','fPolice','sSuspectRace','sSuspectClothing','sSuspectOther','sVehicleMake','sVehicleModel','sVehicleColor','sVehicleYear','sVehiclePlate','sVehicleNotes'].forEach(id=>document.getElementById(id).value='');
   ['sSuspectHeight','sSuspectBuild','sSuspectAge','sSuspectGender'].forEach(id=>document.getElementById(id).selectedIndex=0);
   const now=new Date(), off=now.getTimezoneOffset()*60000;
@@ -960,6 +1089,7 @@ async function loadIncidents() {
   incidents = data || [];
   incidents.forEach(addMarker);
   updateCount();
+  updateStats();
   renderList('','');
 }
 
@@ -992,7 +1122,7 @@ function renderList(q='', filter='') {
     d.innerHTML=`
       <div class="card-row">
         <span class="badge ${bc}">${inc.type}</span>
-        <span class="card-time">${fmt(inc.occurred_at)}</span>
+        ${ageTag(inc.occurred_at)}
       </div>
       <div class="card-addr">📍 ${inc.address}</div>
       <div class="card-desc">${inc.description}</div>
@@ -1000,6 +1130,7 @@ function renderList(q='', filter='') {
         ${mc?`<span class="meta-tag">📎 ${mc} file${mc>1?'s':''}</span>`:''}
         ${inc.police_report?`<span class="meta-tag">📋 ${inc.police_report}</span>`:''}
         ${inc.lat?`<span class="meta-tag">📍 Pinned</span>`:''}
+        ${inc.is_recurring?`<span class="recurring-flag">🔁 Recurring</span>`:''}
       </div>`;
     d.onclick=()=>{ openModal(inc.id); hlCard(inc.id); if(inc.lat) map.flyTo([inc.lat,inc.lng],16,{duration:.8}); };
     el.appendChild(d);
@@ -1028,9 +1159,10 @@ function openModal(id) {
   document.getElementById('mBadge').innerHTML = `<span class="badge ${bc}">${inc.type}</span>`;
   const media = inc.incident_media||[];
   document.getElementById('mBody').innerHTML = `
-    <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)}</div></div>
-    <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${inc.address}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">GPS ${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span>`:''}</div></div>
+    <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)} &nbsp;${ageTag(inc.occurred_at)}</div></div>
+    <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${inc.address}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">GPS ${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span> &nbsp;<a href="https://www.google.com/maps?q=&layer=c&cbll=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none">🔭 Street View</a>`:''}</div></div>
     <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${inc.description}</div></div>
+    ${inc.is_recurring?`<div class="mf-row"><span class="recurring-flag">🔁 Reported as Recurring Incident</span></div>`:''}
     ${inc.police_report?`<div class="mf-row"><div class="mf-label">Police Report #</div><div class="mf-val">${inc.police_report}</div></div>`:''}
     ${(inc.suspect_height||inc.suspect_build||inc.suspect_age||inc.suspect_gender||inc.suspect_race||inc.suspect_clothing||inc.suspect_other)?`
     <div class="mf-row" style="background:rgba(232,65,90,.05);border:1px solid rgba(232,65,90,.15);border-radius:5px;padding:10px 12px;">
@@ -1097,6 +1229,85 @@ function showToast(ico, body, type='') {
 ════════════════════════════════════════════════════ */
 function fmt(iso){ return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); }
 function fmtLong(iso){ return new Date(iso).toLocaleString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'}); }
+function ageTag(iso){
+  const mins = (Date.now() - new Date(iso)) / 60000;
+  if (mins < 60)   return `<span class="age-tag age-fresh">${Math.round(mins)}m ago</span>`;
+  if (mins < 1440) return `<span class="age-tag age-fresh">${Math.round(mins/60)}h ago</span>`;
+  if (mins < 10080)return `<span class="age-tag age-recent">${Math.round(mins/1440)}d ago</span>`;
+  return `<span class="age-tag age-old">${Math.round(mins/10080)}w ago</span>`;
+}
+
+/* ════════════════════════════════════════════════════
+   STATS BANNER
+════════════════════════════════════════════════════ */
+function updateStats() {
+  const now = Date.now();
+  const total = incidents.length;
+  const month = incidents.filter(i => now - new Date(i.occurred_at) < 30*864e5).length;
+  const week  = incidents.filter(i => now - new Date(i.occurred_at) < 7*864e5).length;
+  const today = incidents.filter(i => now - new Date(i.occurred_at) < 864e5).length;
+  document.getElementById('sbTotal').textContent = total;
+  document.getElementById('sbMonth').textContent = month;
+  document.getElementById('sbWeek').textContent  = week;
+  document.getElementById('sbToday').textContent = today;
+  if (incidents.length) {
+    const latest = incidents.reduce((a,b) => new Date(a.occurred_at) > new Date(b.occurred_at) ? a : b);
+    document.getElementById('sbLast').textContent = ageTag(latest.occurred_at).replace(/<[^>]+>/g,'');
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   MAP FILTER
+════════════════════════════════════════════════════ */
+function applyMapFilter() {
+  const q      = (document.getElementById('mapSearch')?.value || '').toLowerCase().trim();
+  const type   = document.getElementById('mapTypeFilter')?.value || '';
+  const days   = parseInt(document.getElementById('mapDateFilter')?.value) || 0;
+  const hasFilter = q || type || days;
+
+  // Show/hide clear + count
+  document.getElementById('mapClearBtn').classList.toggle('show', !!hasFilter);
+
+  let visible = 0;
+  incidents.forEach(inc => {
+    const m = markers[inc.id];
+    if (!m) return;
+    let show = true;
+    if (q    && ![inc.type,inc.address,inc.description].join(' ').toLowerCase().includes(q)) show=false;
+    if (type && inc.type !== type) show=false;
+    if (days && (Date.now()-new Date(inc.occurred_at)) > days*864e5) show=false;
+    if (show) {
+      visible++;
+      if (!clusterOn) { if (!map.hasLayer(m)) m.addTo(map); }
+      else { if (!clusterGroup.hasLayer(m)) clusterGroup.addLayer(m); }
+    } else {
+      clusterGroup.removeLayer(m);
+      map.removeLayer(m);
+    }
+  });
+
+  const countEl = document.getElementById('mapFilterCount');
+  if (hasFilter) {
+    countEl.textContent = `${visible} shown`;
+    countEl.classList.add('show');
+  } else {
+    countEl.classList.remove('show');
+  }
+}
+
+function clearMapFilter() {
+  document.getElementById('mapSearch').value = '';
+  document.getElementById('mapTypeFilter').selectedIndex = 0;
+  document.getElementById('mapDateFilter').selectedIndex = 0;
+  applyMapFilter();
+  // Restore all markers
+  incidents.forEach(inc => {
+    const m = markers[inc.id];
+    if (!m) return;
+    if (clusterOn) { if (!clusterGroup.hasLayer(m)) clusterGroup.addLayer(m); }
+    else { if (!map.hasLayer(m)) m.addTo(map); }
+  });
+}
 
 /* ════════════════════════════════════════════════════
    INIT
