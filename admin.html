@@ -8,9 +8,6 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <style>
@@ -798,24 +795,29 @@ let selectedIds  = new Set();
 ════════════════════════════════════════════════════ */
 async function doLogin() {
   const pw = document.getElementById('pwInput').value;
+  const errEl = document.getElementById('loginErr');
+
+  // Safety check — if ADMIN_PASSWORD didn't load, tell the user clearly
+  if (typeof ADMIN_PASSWORD === 'undefined') {
+    errEl.textContent = 'Error: config.js not loaded. Check Vercel deployment.';
+    errEl.style.display = 'block';
+    return;
+  }
+
   if (pw === ADMIN_PASSWORD) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appShell').classList.add('visible');
     try {
       await initApp();
     } catch(e) {
-      // Show the error visibly on screen so we can diagnose
       document.getElementById('appShell').classList.remove('visible');
       document.getElementById('loginScreen').style.display = 'flex';
-      const err = document.getElementById('loginErr');
-      err.textContent = 'Login error: ' + e.message;
-      err.style.display = 'block';
-      console.error('initApp error:', e);
+      errEl.textContent = 'App error: ' + e.message;
+      errEl.style.display = 'block';
     }
   } else {
-    const err = document.getElementById('loginErr');
-    err.textContent = 'Incorrect password. Try again.';
-    err.style.display = 'block';
+    errEl.textContent = 'Incorrect password. Try again.';
+    errEl.style.display = 'block';
     document.getElementById('pwInput').value = '';
     document.getElementById('pwInput').focus();
   }
@@ -1724,5 +1726,9 @@ function admToggleHeat() {
   }
 }
 </script>
+<!-- Leaflet loaded last so it never blocks login -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 </body>
 </html>
