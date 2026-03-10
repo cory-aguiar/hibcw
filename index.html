@@ -275,12 +275,14 @@ header{
 
 /* ── Map marker icon ──────────────────────────────────────── */
 .map-marker{
-  width:28px;height:28px;border-radius:50% 50% 50% 0;
-  transform:rotate(-45deg);border:2px solid rgba(255,255,255,.3);
+  width:36px;height:36px;border-radius:50% 50% 50% 0;
+  transform:rotate(-45deg);border:2px solid rgba(255,255,255,.45);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 8px rgba(0,0,0,.4);
+  box-shadow:0 3px 10px rgba(0,0,0,.5);
+  transition:transform .15s;
 }
-.map-marker-inner{transform:rotate(45deg);font-size:.7rem}
+.map-marker:hover{transform:rotate(-45deg) scale(1.15)}
+.map-marker-inner{transform:rotate(45deg);font-size:1rem;line-height:1}
 
 @media(max-width:700px){
   .panel{width:100%;border-right:none;max-height:55vh}
@@ -750,18 +752,35 @@ map.on('click', e => {
 });
 
 // Incident marker maker
-function makeMarker(color) {
+// Emoji for each incident type
+const TYPE_EMOJI = {
+  'Robbery':              '🔫',
+  'Burglary':             '🏠',
+  'Assault':              '🤜',
+  'Drug Activity':        '💊',
+  'Theft / Shoplifting':  '🛍',
+  'Vandalism':            '🔨',
+  'Vehicle Break-In':     '🚗',
+  'Fraud / Scam':         '💳',
+  'Trespassing':          '🚫',
+  'Suspicious Activity':  '👁',
+  'Graffiti':             '🎨',
+  'Other':                '📋',
+};
+
+function makeMarker(color, type) {
   const c = color==='red'?'#e8415a':color==='gold'?'#f5a623':'#00c9a7';
+  const emoji = TYPE_EMOJI[type] || '📍';
   return L.divIcon({
     className:'',
-    html:`<div class="map-marker" style="background:${c}"><div class="map-marker-inner">!</div></div>`,
-    iconSize:[28,28], iconAnchor:[14,28], popupAnchor:[0,-28]
+    html:`<div class="map-marker" style="background:${c}"><div class="map-marker-inner">${emoji}</div></div>`,
+    iconSize:[36,36], iconAnchor:[18,36], popupAnchor:[0,-36]
   });
 }
 
 function addMarker(inc) {
   if (!inc.lat || !inc.lng) return;
-  const m = L.marker([inc.lat,inc.lng], {icon:makeMarker(inc.type_color)})
+  const m = L.marker([inc.lat,inc.lng], {icon:makeMarker(inc.type_color, inc.type)})
     .bindPopup(`
       <div class="pu-type" style="color:${inc.type_color==='red'?'#e8415a':inc.type_color==='gold'?'#f5a623':'#00c9a7'}">${inc.type.toUpperCase()}</div>
       <div class="pu-addr">📍 ${inc.address}</div>
