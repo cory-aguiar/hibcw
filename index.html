@@ -357,6 +357,19 @@ header{
 .fld-check{display:flex;align-items:center;gap:8px;padding:6px 0}
 .fld-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0;cursor:pointer}
 .fld-check label{font-size:.8rem;color:var(--slate);cursor:pointer;line-height:1.4}
+.verified-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);
+  border-radius:3px;padding:1px 7px;
+  font-size:.65rem;color:var(--teal);font-family:'IBM Plex Mono',monospace;
+  white-space:nowrap;
+}
+.fld-verify-hint{
+  font-size:.7rem;color:var(--slate2);font-family:'IBM Plex Mono',monospace;
+  margin-top:4px;min-height:16px;transition:color .2s;
+}
+.fld-verify-hint.ok{color:var(--teal)}
+.fld-verify-hint.no{color:var(--slate2)}
 
 @media(max-width:700px){
   .panel{width:100%;border-right:none;height:auto;max-height:none;flex:none}
@@ -524,6 +537,11 @@ header{
           <div class="fld">
             <label>Your Name (optional)</label>
             <input type="text" id="fName" placeholder="Name or leave blank for anonymous">
+          </div>
+          <div class="fld">
+            <label>Your Email (optional)</label>
+            <input type="email" id="fEmail" placeholder="e.g. name@email.com" oninput="checkMemberEmail(this.value)">
+            <div class="fld-verify-hint" id="emailHint">KIAA members will receive a verified badge on their report.</div>
           </div>
           <div class="fld">
             <label>Police Report # (if filed)</label>
@@ -771,6 +789,8 @@ let pendingPin = null;
 let selType = '';
 let selColor = '';
 let mediaFiles = [];
+let verifiedEmail = null;   // set when a member email is confirmed
+let memberCheckTimer = null;
 
 /* ════════════════════════════════════════════════════
    SUPABASE INIT
@@ -908,7 +928,7 @@ function addMarker(inc) {
   if (!inc.lat || !inc.lng) return;
   const m = L.marker([inc.lat,inc.lng], {icon:makeMarker(inc.type_color, inc.type)})
     .bindPopup(`
-      <div class="pu-type" style="color:${inc.type_color==='red'?'#e8415a':inc.type_color==='gold'?'#f5a623':'#00c9a7'}">${inc.type.toUpperCase()}</div>
+      <div class="pu-type" style="color:${inc.type_color==='red'?'#e8415a':inc.type_color==='gold'?'#f5a623':'#00c9a7'}">${inc.type.toUpperCase()}${inc.is_verified_member?' <span style="font-size:.6rem;background:rgba(0,201,167,.15);border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:1px 5px;color:#00c9a7;font-family:IBM Plex Mono,monospace">✅ Member</span>':''}</div>
       <div class="pu-addr">📍 ${inc.address}</div>
       <div class="pu-time">${fmt(inc.occurred_at)}</div>
       <button class="pu-btn" onclick="openModal('${inc.id}')">View Details</button>
@@ -969,6 +989,44 @@ function removeFile(i) {
 }
 
 /* ════════════════════════════════════════════════════
+   MEMBER EMAIL VERIFICATION
+════════════════════════════════════════════════════ */
+async function checkMemberEmail(val) {
+  const hint = document.getElementById('emailHint');
+  const email = val.trim().toLowerCase();
+  verifiedEmail = null;
+
+  clearTimeout(memberCheckTimer);
+  if (!email || !email.includes('@')) {
+    hint.textContent = 'KIAA members will receive a verified badge on their report.';
+    hint.className = 'fld-verify-hint';
+    return;
+  }
+
+  hint.textContent = 'Checking…';
+  hint.className = 'fld-verify-hint';
+
+  // Debounce — wait 600ms after user stops typing
+  memberCheckTimer = setTimeout(async () => {
+    if (!sb) return;
+    const {data, error} = await sb
+      .from('member_emails')
+      .select('email')
+      .eq('email', email)
+      .maybeSingle();
+    if (!error && data) {
+      verifiedEmail = email;
+      hint.textContent = '✅ Verified KIAA Member — your report will show a member badge.';
+      hint.className = 'fld-verify-hint ok';
+    } else {
+      verifiedEmail = null;
+      hint.textContent = 'Email not found in KIAA member list — report will be submitted anonymously.';
+      hint.className = 'fld-verify-hint no';
+    }
+  }, 600);
+}
+
+/* ════════════════════════════════════════════════════
    SUBMIT
 ════════════════════════════════════════════════════ */
 async function submitReport() {
@@ -994,9 +1052,11 @@ async function submitReport() {
       occurred_at:   new Date(document.getElementById('fTime').value).toISOString(),
       address:       document.getElementById('fAddr').value.trim(),
       description:   document.getElementById('fDesc').value.trim(),
-      reporter_name: document.getElementById('fName').value.trim() || null,
-      police_report:  document.getElementById('fPolice').value.trim() || null,
-      is_recurring:   document.getElementById('fRecurring').checked,
+      reporter_name:      document.getElementById('fName').value.trim() || null,
+      reporter_email:     document.getElementById('fEmail').value.trim().toLowerCase() || null,
+      is_verified_member: verifiedEmail === document.getElementById('fEmail').value.trim().toLowerCase() && verifiedEmail !== null,
+      police_report:      document.getElementById('fPolice').value.trim() || null,
+      is_recurring:       document.getElementById('fRecurring').checked,
       suspect_height:   document.getElementById('sSuspectHeight').value  || null,
       suspect_build:    document.getElementById('sSuspectBuild').value   || null,
       suspect_age:      document.getElementById('sSuspectAge').value     || null,
@@ -1068,7 +1128,10 @@ function resetForm() {
   selType=''; selColor='';
   document.querySelectorAll('.type-btn').forEach(b=>b.className='type-btn');
   document.getElementById('fRecurring').checked = false;
-  ['fAddr','fDesc','fName','fPolice','sSuspectRace','sSuspectClothing','sSuspectOther','sVehicleMake','sVehicleModel','sVehicleColor','sVehicleYear','sVehiclePlate','sVehicleNotes'].forEach(id=>document.getElementById(id).value='');
+  verifiedEmail = null;
+  document.getElementById('emailHint').textContent = 'KIAA members will receive a verified badge on their report.';
+  document.getElementById('emailHint').className = 'fld-verify-hint';
+  ['fAddr','fDesc','fName','fEmail','fPolice','sSuspectRace','sSuspectClothing','sSuspectOther','sVehicleMake','sVehicleModel','sVehicleColor','sVehicleYear','sVehiclePlate','sVehicleNotes'].forEach(id=>document.getElementById(id).value='');
   ['sSuspectHeight','sSuspectBuild','sSuspectAge','sSuspectGender'].forEach(id=>document.getElementById(id).selectedIndex=0);
   const now=new Date(), off=now.getTimezoneOffset()*60000;
   document.getElementById('fTime').value=new Date(now-off).toISOString().slice(0,16);
@@ -1131,6 +1194,7 @@ function renderList(q='', filter='') {
         ${inc.police_report?`<span class="meta-tag">📋 ${inc.police_report}</span>`:''}
         ${inc.lat?`<span class="meta-tag">📍 Pinned</span>`:''}
         ${inc.is_recurring?`<span class="recurring-flag">🔁 Recurring</span>`:''}
+        ${inc.is_verified_member?`<span class="verified-badge">✅ KIAA Member</span>`:''}
       </div>`;
     d.onclick=()=>{ openModal(inc.id); hlCard(inc.id); if(inc.lat) map.flyTo([inc.lat,inc.lng],16,{duration:.8}); };
     el.appendChild(d);
@@ -1163,6 +1227,7 @@ function openModal(id) {
     <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${inc.address}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">GPS ${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span> &nbsp;<a href="https://www.google.com/maps?q=&layer=c&cbll=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none">🔭 Street View</a>`:''}</div></div>
     <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${inc.description}</div></div>
     ${inc.is_recurring?`<div class="mf-row"><span class="recurring-flag">🔁 Reported as Recurring Incident</span></div>`:''}
+    ${inc.is_verified_member?`<div class="mf-row"><span class="verified-badge" style="font-size:.72rem;padding:3px 10px">✅ Submitted by a Verified KIAA Member</span></div>`:''}
     ${inc.police_report?`<div class="mf-row"><div class="mf-label">Police Report #</div><div class="mf-val">${inc.police_report}</div></div>`:''}
     ${(inc.suspect_height||inc.suspect_build||inc.suspect_age||inc.suspect_gender||inc.suspect_race||inc.suspect_clothing||inc.suspect_other)?`
     <div class="mf-row" style="background:rgba(232,65,90,.05);border:1px solid rgba(232,65,90,.15);border-radius:5px;padding:10px 12px;">
