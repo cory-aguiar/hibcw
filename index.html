@@ -667,10 +667,10 @@ const satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/servic
   attribution:'© Esri', maxZoom:19 });
 streetLayer.addTo(map);
 
-// Dark tint on street tiles
+// Map tile styles
 const tint = document.createElement('style');
 tint.textContent = `
-  .leaflet-tile{filter:brightness(.82) saturate(.6) hue-rotate(195deg)}
+  .leaflet-tile{filter:none}
   .marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(0,201,167,.2)!important}
   .marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{
     background:rgba(0,201,167,.6)!important;color:#0b1524!important;
