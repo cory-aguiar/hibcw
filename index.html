@@ -1012,7 +1012,6 @@ function openModal(id) {
     <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)}</div></div>
     <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${inc.address}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">GPS ${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span>`:''}</div></div>
     <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${inc.description}</div></div>
-    <div class="mf-row"><div class="mf-label">Reported By</div><div class="mf-val">${inc.reporter_name||'Anonymous'}</div></div>
     ${inc.police_report?`<div class="mf-row"><div class="mf-label">Police Report #</div><div class="mf-val">${inc.police_report}</div></div>`:''}
     ${(inc.suspect_height||inc.suspect_build||inc.suspect_age||inc.suspect_gender||inc.suspect_race||inc.suspect_clothing||inc.suspect_other)?`
     <div class="mf-row" style="background:rgba(232,65,90,.05);border:1px solid rgba(232,65,90,.15);border-radius:5px;padding:10px 12px;">
