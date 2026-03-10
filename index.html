@@ -61,6 +61,14 @@ header{
 .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,201,167,.5)}50%{box-shadow:0 0 0 5px rgba(0,201,167,0)}}
 .count-badge{background:rgba(0,201,167,.1);border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)}
+.member-link{
+  background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);
+  border-radius:4px;padding:4px 11px;
+  font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--gold);
+  text-decoration:none;transition:all .2s;white-space:nowrap;
+}
+.member-link:hover{background:rgba(245,166,35,.2);border-color:rgba(245,166,35,.4)}
 
 /* ── Body split ───────────────────────────────────────────── */
 .body{display:flex;flex:1;overflow:hidden}
@@ -449,6 +457,7 @@ header{
     <div class="header-right">
       <div class="live-dot"><span class="dot"></span>LIVE</div>
       <div class="count-badge" id="countBadge">0 incidents</div>
+      <a href="apply.html" class="member-link">✅ Join</a>
     </div>
   </header>
 
@@ -744,7 +753,8 @@ header{
     For emergencies call <a href="tel:911">911</a> &nbsp;·&nbsp;
     HPD non-emergency <a href="tel:8089353311">(808) 935-3311</a> &nbsp;·&nbsp;
     Crime Stoppers <a href="tel:8089618300">(808) 961-8300</a> &nbsp;·&nbsp;
-    <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a>
+    <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a> &nbsp;·&nbsp;
+    <a href="apply.html">✅ Become a Member</a>
   </div>
 </div><!-- /app -->
 
