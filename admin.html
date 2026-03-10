@@ -796,19 +796,12 @@ let selectedIds  = new Set();
 async function doLogin() {
   const pw = document.getElementById('pwInput').value;
   const errEl = document.getElementById('loginErr');
-
-  if (typeof ADMIN_PASSWORD === 'undefined') {
-    errEl.textContent = 'Error: config.js not loaded.';
-    errEl.style.display = 'block';
-    return;
-  }
-
   if (pw === ADMIN_PASSWORD) {
-    // Let initApp handle showing/hiding screens and all error display
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').classList.add('visible');
     await initApp();
   } else {
     errEl.textContent = 'Incorrect password. Try again.';
-    errEl.style.color = '#e8415a';
     errEl.style.display = 'block';
     document.getElementById('pwInput').value = '';
     document.getElementById('pwInput').focus();
@@ -826,48 +819,13 @@ document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key=
    INIT
 ════════════════════════════════════════════════════ */
 async function initApp() {
-  // Run entirely inside login screen so errors always show
-  const errEl = document.getElementById('loginErr');
-
-  function showStep(msg, isError) {
-    errEl.textContent = msg;
-    errEl.style.display = 'block';
-    errEl.style.color = isError ? '#e8415a' : '#00c9a7';
+  if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
+    showToast('⚙️', 'Set your Supabase credentials in config.js', 'err'); return;
   }
-
-  try {
-    showStep('Step 1: checking config…');
-    if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
-      showStep('ERROR: Supabase URL not set in config.js', true); return;
-    }
-
-    showStep('Step 2: checking Supabase library…');
-    if (typeof supabase === 'undefined') {
-      showStep('ERROR: Supabase library failed to load — check internet connection', true); return;
-    }
-
-    showStep('Step 3: connecting to Supabase…');
-    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    showStep('Step 4: loading incidents…');
-    await loadAll();
-
-    showStep('Step 5: loading members…');
-    await loadMembers();
-
-    showStep('Step 6: starting realtime…');
-    startRealtime();
-
-    // All good — show the app
-    errEl.style.display = 'none';
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appShell').classList.add('visible');
-
-  } catch(e) {
-    showStep('ERROR at step: ' + errEl.textContent + ' — ' + e.message, true);
-    document.getElementById('appShell').classList.remove('visible');
-    document.getElementById('loginScreen').style.display = 'flex';
-  }
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  await loadAll();
+  await loadMembers();
+  startRealtime();
 }
 
 async function loadAll() {
@@ -1524,8 +1482,7 @@ async function handleMemberCSV(input) {
   const file = input.files[0];
   if (!file) return;
   const text = await file.text();
-  const emails = text.split(/[
-,]+/)
+  const emails = text.split(/[\r\n,]+/)
     .map(e => e.trim().toLowerCase().replace(/^["']|["']$/g,''))
     .filter(e => e.includes('@') && e.includes('.'));
   if (!emails.length) { showToast('⚠️', 'No valid emails found in file.', 'err'); return; }
