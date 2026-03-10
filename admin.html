@@ -797,26 +797,18 @@ async function doLogin() {
   const pw = document.getElementById('pwInput').value;
   const errEl = document.getElementById('loginErr');
 
-  // Safety check — if ADMIN_PASSWORD didn't load, tell the user clearly
   if (typeof ADMIN_PASSWORD === 'undefined') {
-    errEl.textContent = 'Error: config.js not loaded. Check Vercel deployment.';
+    errEl.textContent = 'Error: config.js not loaded.';
     errEl.style.display = 'block';
     return;
   }
 
   if (pw === ADMIN_PASSWORD) {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appShell').classList.add('visible');
-    try {
-      await initApp();
-    } catch(e) {
-      document.getElementById('appShell').classList.remove('visible');
-      document.getElementById('loginScreen').style.display = 'flex';
-      errEl.textContent = 'App error: ' + e.message;
-      errEl.style.display = 'block';
-    }
+    // Let initApp handle showing/hiding screens and all error display
+    await initApp();
   } else {
     errEl.textContent = 'Incorrect password. Try again.';
+    errEl.style.color = '#e8415a';
     errEl.style.display = 'block';
     document.getElementById('pwInput').value = '';
     document.getElementById('pwInput').focus();
@@ -834,32 +826,48 @@ document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key=
    INIT
 ════════════════════════════════════════════════════ */
 async function initApp() {
+  // Run entirely inside login screen so errors always show
   const errEl = document.getElementById('loginErr');
-  function step(msg) {
-    errEl.textContent = 'Loading: ' + msg;
+
+  function showStep(msg, isError) {
+    errEl.textContent = msg;
     errEl.style.display = 'block';
-    errEl.style.color = '#00c9a7';
+    errEl.style.color = isError ? '#e8415a' : '#00c9a7';
   }
 
-  step('checking config…');
-  if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
-    throw new Error('Supabase credentials not set in config.js');
+  try {
+    showStep('Step 1: checking config…');
+    if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
+      showStep('ERROR: Supabase URL not set in config.js', true); return;
+    }
+
+    showStep('Step 2: checking Supabase library…');
+    if (typeof supabase === 'undefined') {
+      showStep('ERROR: Supabase library failed to load — check internet connection', true); return;
+    }
+
+    showStep('Step 3: connecting to Supabase…');
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    showStep('Step 4: loading incidents…');
+    await loadAll();
+
+    showStep('Step 5: loading members…');
+    await loadMembers();
+
+    showStep('Step 6: starting realtime…');
+    startRealtime();
+
+    // All good — show the app
+    errEl.style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').classList.add('visible');
+
+  } catch(e) {
+    showStep('ERROR at step: ' + errEl.textContent + ' — ' + e.message, true);
+    document.getElementById('appShell').classList.remove('visible');
+    document.getElementById('loginScreen').style.display = 'flex';
   }
-
-  step('connecting to Supabase…');
-  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  step('loading incidents…');
-  await loadAll();
-
-  step('loading members…');
-  await loadMembers();
-
-  step('starting realtime…');
-  startRealtime();
-
-  // All good — hide the status message
-  errEl.style.display = 'none';
 }
 
 async function loadAll() {
