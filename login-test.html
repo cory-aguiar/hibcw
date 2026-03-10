@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login Test</title>
+<script src="config.js"></script>
+<style>
+  body{font-family:sans-serif;background:#0b1524;color:white;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+  .box{background:#111e30;padding:30px;border-radius:8px;width:320px;text-align:center}
+  input{width:100%;padding:10px;margin:12px 0;border-radius:4px;border:1px solid #333;background:#1a2a3a;color:white;font-size:1rem}
+  button{width:100%;padding:10px;background:#00c9a7;border:none;border-radius:4px;font-size:1rem;cursor:pointer;font-weight:bold}
+  .msg{margin-top:12px;padding:8px;border-radius:4px;display:none}
+  .err{background:rgba(232,65,90,.2);border:1px solid #e8415a;color:#e8415a}
+  .ok{background:rgba(0,201,167,.2);border:1px solid #00c9a7;color:#00c9a7}
+  pre{text-align:left;font-size:.7rem;color:#7a8fa6;margin-top:16px;white-space:pre-wrap;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2 style="margin-bottom:16px">Login Test</h2>
+  <input type="password" id="pw" placeholder="Enter password">
+  <button onclick="test()">Test Login</button>
+  <div class="msg err" id="err"></div>
+  <div class="msg ok"  id="ok"></div>
+  <pre id="info"></pre>
+</div>
+<script>
+function test() {
+  const info = document.getElementById('info');
+  const errEl = document.getElementById('err');
+  const okEl  = document.getElementById('ok');
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  // Check config loaded
+  const configLoaded = typeof ADMIN_PASSWORD !== 'undefined';
+  const supaLoaded   = typeof SUPABASE_URL   !== 'undefined';
+
+  info.textContent =
+    'config.js loaded: ' + configLoaded + '\n' +
+    'ADMIN_PASSWORD defined: ' + configLoaded + '\n' +
+    'SUPABASE_URL defined: ' + supaLoaded + '\n' +
+    'SUPABASE_URL value: ' + (supaLoaded ? SUPABASE_URL.substring(0,30)+'...' : 'MISSING') + '\n' +
+    'Password entered length: ' + document.getElementById('pw').value.length;
+
+  if (!configLoaded) {
+    errEl.textContent = 'config.js failed to load — ADMIN_PASSWORD is undefined';
+    errEl.style.display = 'block'; return;
+  }
+
+  const pw = document.getElementById('pw').value;
+  if (pw === ADMIN_PASSWORD) {
+    okEl.textContent = '✅ Password correct! Login logic works fine.';
+    okEl.style.display = 'block';
+  } else {
+    errEl.textContent = '❌ Wrong password. Expected length: ' + ADMIN_PASSWORD.length + ' chars, got: ' + pw.length;
+    errEl.style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
