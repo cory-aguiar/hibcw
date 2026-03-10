@@ -291,6 +291,38 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
 .member-input:focus{border-color:var(--teal)}
 .member-empty{padding:40px 24px;text-align:center;color:var(--slate);font-size:.82rem;line-height:1.8}
 
+/* ── Applications ─────────────────────────────────────────── */
+.app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:20px 24px}
+.app-card{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:8px;
+  padding:18px 20px;display:flex;flex-direction:column;gap:10px;
+}
+.app-card.pending{border-left:3px solid var(--gold)}
+.app-card.approved{border-left:3px solid var(--teal);opacity:.75}
+.app-card.rejected{border-left:3px solid var(--red);opacity:.6}
+.app-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.04em}
+.app-biz{font-size:.82rem;color:var(--teal);margin-top:1px}
+.app-detail{font-size:.78rem;color:var(--slate);line-height:1.7}
+.app-detail span{color:var(--white)}
+.app-notes{font-size:.75rem;color:var(--slate2);font-style:italic;border-top:1px solid var(--b2);padding-top:8px;line-height:1.5}
+.app-actions{display:flex;gap:7px;flex-wrap:wrap;padding-top:4px}
+.app-status{
+  display:inline-flex;align-items:center;gap:4px;
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;
+  border-radius:3px;padding:2px 8px;
+}
+.app-status.pending{background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.25)}
+.app-status.approved{background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25)}
+.app-status.rejected{background:rgba(232,65,90,.1);color:var(--red);border:1px solid rgba(232,65,90,.25)}
+.app-meta{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2)}
+.app-filter-bar{padding:12px 24px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.app-filter-select{
+  background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;
+  padding:6px 10px;color:var(--white);font-size:.78rem;outline:none;cursor:pointer;
+}
+.app-filter-select option{background:var(--navy2)}
+.app-empty{padding:60px 24px;text-align:center;color:var(--slate);font-size:.85rem;line-height:1.8}
+
 /* ── Print styles ──────────────────────────────────────────── */
 @media print {
   body{background:#fff!important;color:#000!important}
@@ -490,6 +522,7 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
       <button class="nav-btn"    id="nav-map"      onclick="showView('map')">🗺 Map View</button>
       <div class="nav-section">Settings</div>
       <button class="nav-btn"    id="nav-members"  onclick="showView('members')">✅ Members <span class="nav-count" id="nc-members">—</span></button>
+      <button class="nav-btn"    id="nav-apps"     onclick="showView('apps')">📋 Applications <span class="nav-count" id="nc-apps">—</span></button>
     </nav>
 
     <main>
@@ -707,6 +740,24 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
         <div style="padding:0 24px 8px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)">Incidents by Type (Active)</div></div>
         <div class="type-breakdown" id="typeBreakdown"></div>
       </div>
+      <!-- ── APPLICATIONS VIEW ── -->
+      <div class="view" id="view-apps">
+        <div class="page-hd">
+          <div><div class="page-title">Membership Applications</div><div class="page-sub">Review and approve applicants for the Crime Watch network</div></div>
+          <div class="page-actions">
+            <select class="app-filter-select" id="appStatusFilter" onchange="renderApps()">
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="">All Applications</option>
+            </select>
+          </div>
+        </div>
+        <div class="app-grid" id="appGrid">
+          <div class="app-empty">Loading applications…</div>
+        </div>
+      </div>
+
       <!-- ── MEMBERS VIEW ── -->
       <div class="view" id="view-members">
         <div class="page-hd">
@@ -825,6 +876,7 @@ async function initApp() {
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   await loadAll();
   await loadMembers();
+  await loadApplications();
   startRealtime();
 }
 
@@ -908,6 +960,8 @@ function showView(v) {
     admRefreshMarkers();
   } else if (v === 'members') {
     loadMembers();
+  } else if (v === 'apps') {
+    loadApplications();
   } else {
     renderCurrentView();
   }
@@ -1495,6 +1549,139 @@ async function handleMemberCSV(input) {
   await loadMembers();
   showToast('✅', `${newEmails.length} member${newEmails.length>1?'s':''} imported.`);
   input.value = '';
+}
+
+/* ════════════════════════════════════════════════════
+   MEMBERSHIP APPLICATIONS
+════════════════════════════════════════════════════ */
+let allApplications = [];
+
+async function loadApplications() {
+  if (!sb) return;
+  try {
+    const {data, error} = await sb
+      .from('member_applications')
+      .select('*')
+      .order('created_at', {ascending: false});
+    if (error) {
+      console.warn('member_applications table not found:', error.message);
+      allApplications = [];
+      return;
+    }
+    allApplications = data || [];
+    renderApps();
+    updateAppCount();
+  } catch(e) {
+    console.warn('loadApplications error:', e);
+    allApplications = [];
+  }
+}
+
+function updateAppCount() {
+  const pending = allApplications.filter(a => a.status === 'pending').length;
+  const nc = document.getElementById('nc-apps');
+  if (nc) nc.textContent = pending || '—';
+  // Highlight nav btn if there are pending apps
+  const btn = document.getElementById('nav-apps');
+  if (btn) btn.style.color = pending > 0 ? 'var(--gold)' : '';
+}
+
+function renderApps() {
+  const grid = document.getElementById('appGrid');
+  if (!grid) return;
+  const filter = document.getElementById('appStatusFilter')?.value || 'pending';
+  const rows = filter ? allApplications.filter(a => a.status === filter) : allApplications;
+  if (!rows.length) {
+    const labels = {pending:'pending applications',approved:'approved applications',rejected:'rejected applications','':'applications'};
+    grid.innerHTML = `<div class="app-empty">No ${labels[filter] || 'applications'} found.</div>`;
+    return;
+  }
+  grid.innerHTML = rows.map(a => `
+    <div class="app-card ${a.status}" id="appcard-${a.id}">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
+          <div class="app-name">${esc(a.full_name)}</div>
+          <span class="app-status ${a.status}">${a.status === 'pending' ? '⏳ Pending' : a.status === 'approved' ? '✅ Approved' : '❌ Rejected'}</span>
+        </div>
+        <div class="app-biz">🏢 ${esc(a.business_name)}</div>
+      </div>
+      <div class="app-detail">
+        <div>📍 <span>${esc(a.business_address)}</span></div>
+        <div>✉️ <span>${esc(a.email)}</span></div>
+        <div>📞 <span>${esc(a.phone)}</span></div>
+      </div>
+      ${a.notes ? `<div class="app-notes">"${esc(a.notes)}"</div>` : ''}
+      <div class="app-meta">Submitted ${fmt(a.created_at)}</div>
+      <div class="app-actions">
+        ${a.status === 'pending' ? `
+          <button class="btn btn-teal" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">✅ Approve</button>
+          <button class="btn btn-red"  onclick="rejectApp('${a.id}')">❌ Reject</button>
+        ` : ''}
+        ${a.status === 'approved' ? `
+          <button class="btn btn-ghost" onclick="rejectApp('${a.id}')">Revoke</button>
+        ` : ''}
+        ${a.status === 'rejected' ? `
+          <button class="btn btn-teal" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">Re-approve</button>
+        ` : ''}
+        <button class="btn btn-ghost" onclick="deleteApp('${a.id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+async function approveApp(id, email, name) {
+  if (!confirm(`Approve ${name} and add ${email} to the verified members list?`)) return;
+  // 1. Update application status
+  const {error: appErr} = await sb
+    .from('member_applications')
+    .update({status: 'approved'})
+    .eq('id', id);
+  if (appErr) { showToast('⚠️', appErr.message, 'err'); return; }
+
+  // 2. Add email to member_emails (ignore if already exists)
+  const {error: memErr} = await sb
+    .from('member_emails')
+    .upsert({email: email.toLowerCase()}, {onConflict: 'email', ignoreDuplicates: true});
+  if (memErr) { showToast('⚠️', 'Application approved but could not add to members: ' + memErr.message, 'err'); }
+
+  // 3. Refresh both lists
+  const app = allApplications.find(a => a.id === id);
+  if (app) app.status = 'approved';
+  await loadMembers();
+  renderApps();
+  updateAppCount();
+  showToast('✅', `${name} approved and added to verified members.`);
+}
+
+async function rejectApp(id) {
+  const app = allApplications.find(a => a.id === id);
+  const label = app?.status === 'approved' ? "Revoke this member's approval?" : 'Reject this application?';
+  if (!confirm(label)) return;
+  const {error} = await sb
+    .from('member_applications')
+    .update({status: 'rejected'})
+    .eq('id', id);
+  if (error) { showToast('⚠️', error.message, 'err'); return; }
+
+  // If revoking an approved member, also remove from member_emails
+  if (app?.status === 'approved' && app?.email) {
+    await sb.from('member_emails').delete().eq('email', app.email.toLowerCase());
+    await loadMembers();
+  }
+  if (app) app.status = 'rejected';
+  renderApps();
+  updateAppCount();
+  showToast('🗑', 'Application rejected.');
+}
+
+async function deleteApp(id) {
+  if (!confirm('Permanently delete this application?')) return;
+  const {error} = await sb.from('member_applications').delete().eq('id', id);
+  if (!error) {
+    allApplications = allApplications.filter(a => a.id !== id);
+    renderApps();
+    updateAppCount();
+    showToast('🗑', 'Application deleted.');
+  } else showToast('⚠️', error.message, 'err');
 }
 
 /* ════════════════════════════════════════════════════
