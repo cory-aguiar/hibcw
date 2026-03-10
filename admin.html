@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HIBCW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:  #0b1524;
+  --navy2: #111e30;
+  --navy3: #18293f;
+  --teal:  #00c9a7;
+  --gold:  #f5a623;
+  --red:   #e8415a;
+  --green: #2ecc71;
+  --slate: #7a8fa6;
+  --slate2:#4a6070;
+  --white: #eef3f8;
+  --border:rgba(0,201,167,.15);
+  --b2:    rgba(255,255,255,.07);
+}
+html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
+
+/* ── Login screen ─────────────────────────────────────────── */
+#loginScreen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 40% 40%,#112240 0%,#0b1524 70%);
+}
+.login-box{
+  background:var(--navy2);border:1px solid var(--border);border-radius:12px;
+  padding:40px;width:100%;max-width:380px;
+}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-shield{
+  width:52px;height:52px;margin:0 auto 12px;
+  background:linear-gradient(160deg,#002266,#001133);
+  border:2px solid var(--gold);
+  clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--gold);
+}
+.login-title{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:.08em;color:var(--white)}
+.login-sub{font-size:.75rem;color:var(--slate);margin-top:4px}
+.login-field{margin-bottom:16px}
+.login-field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:6px}
+.login-field input{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b2);
+  border-radius:5px;padding:10px 13px;color:var(--white);font-size:.9rem;outline:none;transition:border-color .2s;
+}
+.login-field input:focus{border-color:var(--teal)}
+.login-btn{
+  width:100%;padding:11px;border:none;border-radius:5px;cursor:pointer;
+  background:linear-gradient(135deg,var(--teal),#00a589);
+  color:#0b1524;font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;transition:filter .2s;margin-top:4px;
+}
+.login-btn:hover{filter:brightness(1.1)}
+.login-err{color:var(--red);font-size:.78rem;text-align:center;margin-top:10px;display:none}
+
+/* ── App shell ────────────────────────────────────────────── */
+#appShell{display:none;height:100vh;flex-direction:column}
+#appShell.visible{display:flex}
+
+/* ── Header ───────────────────────────────────────────────── */
+header{
+  height:54px;flex-shrink:0;
+  background:linear-gradient(90deg,#0b1524,#111e30);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+}
+.hd-left{display:flex;align-items:center;gap:10px}
+.hd-shield{
+  width:30px;height:30px;flex-shrink:0;
+  background:linear-gradient(160deg,#002266,#001133);
+  border:1.5px solid var(--gold);
+  clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani',sans-serif;font-size:.65rem;font-weight:700;color:var(--gold);
+}
+.hd-title{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.08em}
+.hd-sub{font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--teal);letter-spacing:.1em}
+.hd-right{display:flex;align-items:center;gap:12px}
+.hd-user{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate)}
+.logout-btn{background:none;border:1px solid var(--b2);border-radius:4px;padding:4px 12px;color:var(--slate);font-size:.72rem;cursor:pointer;transition:all .2s}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* ── Body ─────────────────────────────────────────────────── */
+.body{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar ──────────────────────────────────────────────── */
+.sidebar{
+  width:200px;flex-shrink:0;background:var(--navy2);
+  border-right:1px solid var(--b2);padding:16px 0;overflow-y:auto;
+}
+.nav-section{font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:var(--slate2);padding:12px 18px 6px}
+.nav-btn{
+  display:flex;align-items:center;gap:10px;width:100%;padding:9px 18px;
+  background:none;border:none;border-left:3px solid transparent;cursor:pointer;
+  font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;color:var(--slate);
+  text-align:left;transition:all .18s;
+}
+.nav-btn:hover{color:var(--white);background:rgba(255,255,255,.03)}
+.nav-btn.on{color:var(--teal);border-left-color:var(--teal);background:rgba(0,201,167,.06);font-weight:500}
+.nav-count{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:rgba(0,201,167,.12);color:var(--teal);padding:1px 6px;border-radius:10px}
+
+/* ── Main ─────────────────────────────────────────────────── */
+main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+main::-webkit-scrollbar{width:4px}
+main::-webkit-scrollbar-thumb{background:var(--slate2);border-radius:2px}
+.view{display:none;flex-direction:column;flex:1}
+.view.on{display:flex}
+
+/* ── Page header ──────────────────────────────────────────── */
+.page-hd{
+  padding:20px 24px 0;display:flex;align-items:flex-start;
+  justify-content:space-between;gap:16px;flex-wrap:wrap;flex-shrink:0;
+}
+.page-title{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:.05em}
+.page-sub{font-size:.78rem;color:var(--slate);margin-top:2px}
+.page-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* ── Toolbar ──────────────────────────────────────────────── */
+.toolbar{padding:14px 24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0}
+.tb-search{
+  flex:1;min-width:180px;background:rgba(255,255,255,.04);border:1px solid var(--b2);
+  border-radius:4px;padding:7px 11px;color:var(--white);font-size:.82rem;outline:none;transition:border-color .2s;
+}
+.tb-search:focus{border-color:var(--teal)}
+.tb-select{
+  background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;
+  padding:7px 10px;color:var(--white);font-size:.78rem;outline:none;cursor:pointer;
+}
+.tb-select option{background:var(--navy2)}
+
+/* ── Bulk bar ─────────────────────────────────────────────── */
+.bulk-bar{
+  display:none;background:rgba(0,201,167,.08);border-bottom:1px solid var(--border);
+  padding:8px 24px;align-items:center;gap:12px;flex-shrink:0;
+}
+.bulk-bar.show{display:flex}
+.bulk-label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--teal)}
+
+/* ── Table ────────────────────────────────────────────────── */
+.table-wrap{flex:1;overflow:auto;padding:0 24px 24px}
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:12px}
+thead tr{position:sticky;top:0;background:var(--navy);z-index:10}
+th{
+  padding:9px 12px;text-align:left;border-bottom:1px solid var(--b2);
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--slate2);white-space:nowrap;
+}
+td{padding:10px 12px;border-bottom:1px solid var(--b2);vertical-align:top}
+tr:hover td{background:rgba(255,255,255,.02)}
+.td-type{white-space:nowrap}
+.td-addr{max-width:180px;color:var(--slate);font-size:.78rem}
+.td-desc{max-width:260px;color:rgba(238,243,248,.75);font-size:.78rem;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.td-time{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);white-space:nowrap}
+.badge{padding:2px 8px;border-radius:3px;font-size:.65rem;font-weight:600;font-family:'Rajdhani',sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.b-red{background:rgba(232,65,90,.15);color:var(--red);border:1px solid rgba(232,65,90,.3)}
+.b-gold{background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
+.b-teal{background:rgba(0,201,167,.12);color:var(--teal);border:1px solid rgba(0,201,167,.25)}
+.b-arch{background:rgba(122,143,166,.1);color:var(--slate);border:1px solid rgba(122,143,166,.2)}
+.media-pill{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--gold)}
+.row-actions{display:flex;gap:5px;flex-wrap:wrap}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn{border:none;border-radius:4px;padding:5px 11px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;white-space:nowrap}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--slate);border:1px solid var(--b2)}
+.btn-ghost:hover{background:rgba(255,255,255,.1);color:var(--white)}
+.btn-teal{background:rgba(0,201,167,.15);color:var(--teal);border:1px solid rgba(0,201,167,.3)}
+.btn-teal:hover{background:rgba(0,201,167,.25)}
+.btn-gold{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.25)}
+.btn-gold:hover{background:rgba(245,166,35,.22)}
+.btn-red{background:rgba(232,65,90,.12);color:var(--red);border:1px solid rgba(232,65,90,.25)}
+.btn-red:hover{background:rgba(232,65,90,.22)}
+.btn-green{background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.25)}
+.btn-green:hover{background:rgba(46,204,113,.22)}
+.btn-lg{padding:8px 18px;font-size:.8rem}
+
+/* ── Stats ────────────────────────────────────────────────── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;padding:20px 24px}
+.stat-card{background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:18px 20px}
+.stat-num{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--white)}
+.stat-lbl{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-top:4px}
+.stat-card.accent{border-color:var(--border)}
+.stat-card.accent .stat-num{color:var(--teal)}
+
+.type-breakdown{padding:0 24px 24px}
+.type-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.type-row-label{font-size:.78rem;color:var(--white);width:160px;flex-shrink:0}
+.type-bar-wrap{flex:1;height:8px;background:var(--b2);border-radius:4px;overflow:hidden}
+.type-bar{height:100%;border-radius:4px;transition:width .5s ease}
+.type-count{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate);width:30px;text-align:right;flex-shrink:0}
+
+/* ── Empty state ──────────────────────────────────────────── */
+.empty-state{padding:60px 24px;text-align:center}
+.empty-icon{font-size:2.5rem;margin-bottom:10px}
+.empty-text{font-size:.85rem;color:var(--slate);line-height:1.8}
+
+/* ── Detail modal ─────────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--navy2);border:1px solid var(--b2);border-radius:10px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto}
+.modal::-webkit-scrollbar{width:4px}
+.modal::-webkit-scrollbar-thumb{background:var(--slate2);border-radius:2px}
+.modal-hd{padding:18px 20px;border-bottom:1px solid var(--b2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--navy2);z-index:1}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700}
+.modal-close{background:none;border:none;color:var(--slate);font-size:1.2rem;cursor:pointer}
+.modal-close:hover{color:var(--white)}
+.modal-body{padding:20px}
+.mf-row{margin-bottom:14px}
+.mf-label{font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px}
+.mf-val{font-size:.85rem;color:var(--white);line-height:1.6}
+.modal-media{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.modal-media-item{width:80px;height:80px;border-radius:5px;overflow:hidden;cursor:pointer;border:1px solid var(--b2)}
+.modal-media-item:hover{border-color:var(--teal)}
+.modal-media-item img,.modal-media-item video{width:100%;height:100%;object-fit:cover}
+.modal-actions{padding:16px 20px;border-top:1px solid var(--b2);display:flex;gap:8px;flex-wrap:wrap}
+
+/* Lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:2000;display:none;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img,.lightbox video{max-width:90vw;max-height:90vh;border-radius:6px}
+.lb-close{position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:1.8rem;cursor:pointer}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;z-index:3000;background:var(--navy3);border:1px solid var(--b2);border-radius:8px;padding:12px 16px;display:flex;gap:10px;min-width:260px;max-width:340px;transform:translateY(100px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err-toast{border-color:rgba(232,65,90,.4)}
+.toast-ico{font-size:1rem;flex-shrink:0}
+.toast-msg{flex:1;font-size:.78rem;color:var(--slate)}
+.toast-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.82rem;color:var(--white);margin-bottom:2px}
+
+/* Checkbox */
+input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
+
+/* ── Filter panel ──────────────────────────────────────────── */
+.filter-panel{
+  background:var(--navy3);border-bottom:1px solid var(--b2);
+  padding:0 24px;overflow:hidden;
+  max-height:0;transition:max-height .3s ease, padding .3s ease;
+  flex-shrink:0;
+}
+.filter-panel.open{max-height:260px;padding:16px 24px}
+.filter-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:12px;align-items:end;
+}
+@media(max-width:1100px){.filter-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.filter-grid{grid-template-columns:1fr}}
+.fg-label{
+  font-family:'IBM Plex Mono',monospace;font-size:.58rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--slate);
+  margin-bottom:5px;
+}
+.fg-row{display:flex;gap:6px;align-items:center}
+.tb-input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b2);
+  border-radius:4px;padding:7px 10px;color:var(--white);font-size:.8rem;
+  outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;
+}
+.tb-input:focus{border-color:var(--teal)}
+.tb-input[type="date"]{color-scheme:dark}
+.tb-input::placeholder{color:var(--slate2)}
+.filter-chips{
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding:8px 24px;flex-shrink:0;
+  border-bottom:1px solid var(--b2);
+  min-height:0;
+}
+.filter-chips:empty{padding:0;border:none}
+.chip{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.25);
+  border-radius:12px;padding:3px 10px;
+  font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);
+}
+.chip-x{background:none;border:none;color:var(--teal);cursor:pointer;font-size:.75rem;line-height:1;padding:0 0 0 2px}
+.chip-x:hover{color:var(--white)}
+.geocode-btn{
+  background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.25);
+  border-radius:4px;padding:7px 11px;color:var(--teal);cursor:pointer;
+  font-size:.75rem;white-space:nowrap;transition:all .2s;flex-shrink:0;
+}
+.geocode-btn:hover{background:rgba(0,201,167,.2)}
+.geocode-btn:disabled{opacity:.4;cursor:not-allowed}
+.filter-toggle-btn{
+  background:rgba(255,255,255,.04);border:1px solid var(--b2);
+  border-radius:4px;padding:7px 13px;color:var(--slate);cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.06em;
+  display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;
+}
+.filter-toggle-btn:hover{border-color:var(--teal);color:var(--teal)}
+.filter-toggle-btn.active{border-color:var(--teal);color:var(--teal);background:rgba(0,201,167,.06)}
+.result-count{
+  font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate2);
+  padding:6px 24px 0;flex-shrink:0;
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-shield">HIBCW</div>
+      <div class="login-title">HIBCW Admin</div>
+      <div class="login-sub">Hawaii Island Business Crime Watch</div>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="pwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div class="login-err" id="loginErr">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <header>
+    <div class="hd-left">
+      <div class="hd-shield">HIBCW</div>
+      <div>
+        <div class="hd-title">HIBCW Admin</div>
+        <div class="hd-sub">Hawaii Island Business Crime Watch</div>
+      </div>
+    </div>
+    <div class="hd-right">
+      <div class="hd-user">👤 Admin</div>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="body">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="nav-section">Incidents</div>
+      <button class="nav-btn on" id="nav-active"   onclick="showView('active')">🟢 Active <span class="nav-count" id="nc-active">—</span></button>
+      <button class="nav-btn"    id="nav-archived" onclick="showView('archived')">📦 Archived <span class="nav-count" id="nc-archived">—</span></button>
+      <button class="nav-btn"    id="nav-all"      onclick="showView('all')">☰ All <span class="nav-count" id="nc-all">—</span></button>
+      <div class="nav-section">Reports</div>
+      <button class="nav-btn"    id="nav-stats"    onclick="showView('stats')">📊 Statistics</button>
+    </nav>
+
+    <main>
+      <!-- ── ACTIVE ── -->
+      <div class="view on" id="view-active">
+        <div class="page-hd">
+          <div><div class="page-title">Active Incidents</div><div class="page-sub">Live incidents visible on the public map</div></div>
+          <div class="page-actions">
+            <button class="filter-toggle-btn" id="ftbtn-active" onclick="toggleFilters('active')">⚙ Filters <span id="fcount-active"></span></button>
+            <button class="btn btn-ghost btn-lg" onclick="exportCSV('active')">⬇ Export CSV</button>
+          </div>
+        </div>
+        <!-- Filter panel -->
+        <div class="filter-panel" id="fpanel-active">
+          <div class="filter-grid">
+            <div>
+              <div class="fg-label">Keyword Search</div>
+              <input class="tb-input tb-search" type="text" placeholder="Type, address, description…" oninput="applyFilters('active')">
+            </div>
+            <div>
+              <div class="fg-label">Incident Type</div>
+              <select class="tb-input tb-select" id="type-active" onchange="applyFilters('active')">
+                <option value="">All Types</option>
+            <option>Robbery</option><option>Burglary</option><option>Assault</option><option>Drug Activity</option>
+            <option>Theft / Shoplifting</option><option>Vandalism</option><option>Vehicle Break-In</option>
+            <option>Fraud / Scam</option><option>Trespassing</option><option>Suspicious Activity</option>
+            <option>Graffiti</option><option>Other</option>
+              </select>
+            </div>
+            <div>
+              <div class="fg-label">Date Range</div>
+              <div class="fg-row">
+                <input class="tb-input" type="date" id="date-from-active" onchange="applyFilters('active')" placeholder="From">
+                <span style="color:var(--slate2);flex-shrink:0">→</span>
+                <input class="tb-input" type="date" id="date-to-active" onchange="applyFilters('active')" placeholder="To">
+              </div>
+            </div>
+            <div>
+              <div class="fg-label">Specific Address</div>
+              <input class="tb-input" type="text" id="addr-exact-active" placeholder="e.g. 820 Piilani St" oninput="applyFilters('active')">
+            </div>
+            <div style="grid-column:1/-1">
+              <div class="fg-label">Radius Filter — Enter address then click Geocode</div>
+              <div class="fg-row" style="gap:8px;flex-wrap:wrap">
+                <input class="tb-input" type="text" id="radius-addr-active" placeholder="Center address (e.g. Hilo Post Office)" style="flex:1;min-width:180px">
+                <button class="geocode-btn" id="geocode-btn-active" onclick="geocodeRadius('active')">📍 Geocode</button>
+                <select class="tb-input" id="radius-mi-active" onchange="applyFilters('active')" style="width:110px">
+                  <option value="">No limit</option>
+                  <option value="0.25">¼ mile</option>
+                  <option value="0.5">½ mile</option>
+                  <option value="1">1 mile</option>
+                  <option value="2">2 miles</option>
+                  <option value="5">5 miles</option>
+                  <option value="10">10 miles</option>
+                </select>
+                <button class="geocode-btn" onclick="clearRadius('active')" style="background:rgba(232,65,90,.08);border-color:rgba(232,65,90,.2);color:var(--red)">✕ Clear</button>
+              </div>
+              <div id="radius-status-active" style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);margin-top:5px;min-height:16px"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;justify-content:flex-end">
+            <button class="btn btn-ghost" onclick="clearFilters('active')">✕ Clear All Filters</button>
+          </div>
+        </div>
+        <!-- Active filter chips -->
+        <div class="filter-chips" id="chips-active"></div>
+        <div class="result-count" id="rcount-active"></div>
+        <div class="bulk-bar" id="bulk-active">
+          <span class="bulk-label" id="bulk-label-active">0 selected</span>
+          <button class="btn btn-gold" onclick="bulkArchive()">📦 Archive Selected</button>
+          <button class="btn btn-red"  onclick="bulkDelete()">🗑 Delete Selected</button>
+          <button class="btn btn-ghost" onclick="clearSelection()">Cancel</button>
+        </div>
+        <div class="table-wrap"><div id="table-active"></div></div>
+      </div>
+      <!-- ── ARCHIVED ── -->
+      <div class="view " id="view-archived">
+        <div class="page-hd">
+          <div><div class="page-title">Archived Incidents</div><div class="page-sub">Removed from public map — kept for records</div></div>
+          <div class="page-actions">
+            <button class="filter-toggle-btn" id="ftbtn-archived" onclick="toggleFilters('archived')">⚙ Filters <span id="fcount-archived"></span></button>
+            <button class="btn btn-ghost btn-lg" onclick="exportCSV('archived')">⬇ Export CSV</button>
+          </div>
+        </div>
+        <!-- Filter panel -->
+        <div class="filter-panel" id="fpanel-archived">
+          <div class="filter-grid">
+            <div>
+              <div class="fg-label">Keyword Search</div>
+              <input class="tb-input tb-search" type="text" placeholder="Type, address, description…" oninput="applyFilters('archived')">
+            </div>
+            <div>
+              <div class="fg-label">Incident Type</div>
+              <select class="tb-input tb-select" id="type-archived" onchange="applyFilters('archived')">
+                <option value="">All Types</option>
+            <option>Robbery</option><option>Burglary</option><option>Assault</option><option>Drug Activity</option>
+            <option>Theft / Shoplifting</option><option>Vandalism</option><option>Vehicle Break-In</option>
+            <option>Fraud / Scam</option><option>Trespassing</option><option>Suspicious Activity</option>
+            <option>Graffiti</option><option>Other</option>
+              </select>
+            </div>
+            <div>
+              <div class="fg-label">Date Range</div>
+              <div class="fg-row">
+                <input class="tb-input" type="date" id="date-from-archived" onchange="applyFilters('archived')" placeholder="From">
+                <span style="color:var(--slate2);flex-shrink:0">→</span>
+                <input class="tb-input" type="date" id="date-to-archived" onchange="applyFilters('archived')" placeholder="To">
+              </div>
+            </div>
+            <div>
+              <div class="fg-label">Specific Address</div>
+              <input class="tb-input" type="text" id="addr-exact-archived" placeholder="e.g. 820 Piilani St" oninput="applyFilters('archived')">
+            </div>
+            <div style="grid-column:1/-1">
+              <div class="fg-label">Radius Filter — Enter address then click Geocode</div>
+              <div class="fg-row" style="gap:8px;flex-wrap:wrap">
+                <input class="tb-input" type="text" id="radius-addr-archived" placeholder="Center address (e.g. Hilo Post Office)" style="flex:1;min-width:180px">
+                <button class="geocode-btn" id="geocode-btn-archived" onclick="geocodeRadius('archived')">📍 Geocode</button>
+                <select class="tb-input" id="radius-mi-archived" onchange="applyFilters('archived')" style="width:110px">
+                  <option value="">No limit</option>
+                  <option value="0.25">¼ mile</option>
+                  <option value="0.5">½ mile</option>
+                  <option value="1">1 mile</option>
+                  <option value="2">2 miles</option>
+                  <option value="5">5 miles</option>
+                  <option value="10">10 miles</option>
+                </select>
+                <button class="geocode-btn" onclick="clearRadius('archived')" style="background:rgba(232,65,90,.08);border-color:rgba(232,65,90,.2);color:var(--red)">✕ Clear</button>
+              </div>
+              <div id="radius-status-archived" style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);margin-top:5px;min-height:16px"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;justify-content:flex-end">
+            <button class="btn btn-ghost" onclick="clearFilters('archived')">✕ Clear All Filters</button>
+          </div>
+        </div>
+        <!-- Active filter chips -->
+        <div class="filter-chips" id="chips-archived"></div>
+        <div class="result-count" id="rcount-archived"></div>
+        <div class="table-wrap"><div id="table-archived"></div></div>
+      </div>
+      <!-- ── ALL ── -->
+      <div class="view " id="view-all">
+        <div class="page-hd">
+          <div><div class="page-title">All Records</div><div class="page-sub">Every incident regardless of status</div></div>
+          <div class="page-actions">
+            <button class="filter-toggle-btn" id="ftbtn-all" onclick="toggleFilters('all')">⚙ Filters <span id="fcount-all"></span></button>
+            <button class="btn btn-ghost btn-lg" onclick="exportCSV('all')">⬇ Export CSV</button>
+          </div>
+        </div>
+        <!-- Filter panel -->
+        <div class="filter-panel" id="fpanel-all">
+          <div class="filter-grid">
+            <div>
+              <div class="fg-label">Keyword Search</div>
+              <input class="tb-input tb-search" type="text" placeholder="Type, address, description…" oninput="applyFilters('all')">
+            </div>
+            <div>
+              <div class="fg-label">Incident Type</div>
+              <select class="tb-input tb-select" id="type-all" onchange="applyFilters('all')">
+                <option value="">All Types</option>
+            <option>Robbery</option><option>Burglary</option><option>Assault</option><option>Drug Activity</option>
+            <option>Theft / Shoplifting</option><option>Vandalism</option><option>Vehicle Break-In</option>
+            <option>Fraud / Scam</option><option>Trespassing</option><option>Suspicious Activity</option>
+            <option>Graffiti</option><option>Other</option>
+              </select>
+            </div>
+            <div>
+              <div class="fg-label">Date Range</div>
+              <div class="fg-row">
+                <input class="tb-input" type="date" id="date-from-all" onchange="applyFilters('all')" placeholder="From">
+                <span style="color:var(--slate2);flex-shrink:0">→</span>
+                <input class="tb-input" type="date" id="date-to-all" onchange="applyFilters('all')" placeholder="To">
+              </div>
+            </div>
+            <div>
+              <div class="fg-label">Specific Address</div>
+              <input class="tb-input" type="text" id="addr-exact-all" placeholder="e.g. 820 Piilani St" oninput="applyFilters('all')">
+            </div>
+            <div style="grid-column:1/-1">
+              <div class="fg-label">Radius Filter — Enter address then click Geocode</div>
+              <div class="fg-row" style="gap:8px;flex-wrap:wrap">
+                <input class="tb-input" type="text" id="radius-addr-all" placeholder="Center address (e.g. Hilo Post Office)" style="flex:1;min-width:180px">
+                <button class="geocode-btn" id="geocode-btn-all" onclick="geocodeRadius('all')">📍 Geocode</button>
+                <select class="tb-input" id="radius-mi-all" onchange="applyFilters('all')" style="width:110px">
+                  <option value="">No limit</option>
+                  <option value="0.25">¼ mile</option>
+                  <option value="0.5">½ mile</option>
+                  <option value="1">1 mile</option>
+                  <option value="2">2 miles</option>
+                  <option value="5">5 miles</option>
+                  <option value="10">10 miles</option>
+                </select>
+                <button class="geocode-btn" onclick="clearRadius('all')" style="background:rgba(232,65,90,.08);border-color:rgba(232,65,90,.2);color:var(--red)">✕ Clear</button>
+              </div>
+              <div id="radius-status-all" style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);margin-top:5px;min-height:16px"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;justify-content:flex-end">
+            <button class="btn btn-ghost" onclick="clearFilters('all')">✕ Clear All Filters</button>
+          </div>
+        </div>
+        <!-- Active filter chips -->
+        <div class="filter-chips" id="chips-all"></div>
+        <div class="result-count" id="rcount-all"></div>
+        <div class="table-wrap"><div id="table-all"></div></div>
+      </div>
+
+      <!-- ── STATS ── -->
+      <div class="view" id="view-stats">
+        <div class="page-hd">
+          <div><div class="page-title">Statistics</div><div class="page-sub">Incident summary and type breakdown</div></div>
+        </div>
+        <div class="stats-grid" id="statsGrid"></div>
+        <div style="padding:0 24px 8px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)">Incidents by Type (Active)</div></div>
+        <div class="type-breakdown" id="typeBreakdown"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="mTitle"></div>
+        <div id="mBadge" style="margin-top:4px"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+    <div class="modal-actions" id="mActions"></div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lbImg" src="" alt="" style="display:none">
+  <video id="lbVid" src="" controls style="display:none"></video>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-ico" id="toastIco">✅</div>
+  <div class="toast-msg">
+    <div class="toast-title" id="toastTitle"></div>
+    <div id="toastBody"></div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════ */
+let sb = null;
+let allIncidents = [];      // all incidents from DB
+let currentView  = 'active';
+let selectedIds  = new Set();
+
+/* ════════════════════════════════════════════════════
+   LOGIN
+════════════════════════════════════════════════════ */
+function doLogin() {
+  const pw = document.getElementById('pwInput').value;
+  if (pw === ADMIN_PASSWORD) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').classList.add('visible');
+    initApp();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+function logout() {
+  document.getElementById('appShell').classList.remove('visible');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('pwInput').value = '';
+  allIncidents = [];
+}
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+
+/* ════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════ */
+async function initApp() {
+  if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
+    showToast('⚙️','Set your Supabase credentials in config.js','err'); return;
+  }
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  await loadAll();
+}
+
+async function loadAll() {
+  if (!sb) return;
+  const { data, error } = await sb
+    .from('incidents')
+    .select('*, incident_media(*)')
+    .order('occurred_at', { ascending: false });
+  if (error) { showToast('⚠️', 'Load failed: ' + error.message, 'err'); return; }
+  allIncidents = data || [];
+  updateCounts();
+  renderCurrentView();
+  renderStats();
+}
+
+/* ════════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════════ */
+function showView(v) {
+  currentView = v;
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('on'));
+  document.getElementById(`view-${v}`).classList.add('on');
+  document.getElementById(`nav-${v}`).classList.add('on');
+  clearSelection();
+  renderCurrentView();
+}
+
+function renderCurrentView() {
+  if (currentView === 'stats') { renderStats(); return; }
+  applyFilters(currentView);
+}
+
+/* ════════════════════════════════════════════════════
+   FILTER STATE (per view)
+════════════════════════════════════════════════════ */
+const filterState = {
+  active:   { radiusLat: null, radiusLng: null },
+  archived: { radiusLat: null, radiusLng: null },
+  all:      { radiusLat: null, radiusLng: null },
+};
+
+/* ── Haversine distance (miles) ──────────────────── */
+function distMiles(lat1, lng1, lat2, lng2) {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+/* ── Geocode a radius address via Nominatim ─────── */
+async function geocodeRadius(view) {
+  const addrEl  = document.getElementById(`radius-addr-${view}`);
+  const statusEl = document.getElementById(`radius-status-${view}`);
+  const btn     = document.getElementById(`geocode-btn-${view}`);
+  const addr    = addrEl.value.trim();
+  if (!addr) { statusEl.textContent = 'Enter an address first.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Geocoding…';
+  statusEl.textContent = '';
+
+  try {
+    const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr)}&format=json&limit=1&countrycodes=us`);
+    const data = await res.json();
+    if (!data.length) { statusEl.textContent = '⚠ Address not found — try being more specific.'; return; }
+    const { lat, lon, display_name } = data[0];
+    filterState[view].radiusLat = parseFloat(lat);
+    filterState[view].radiusLng = parseFloat(lon);
+    statusEl.textContent = `📍 ${display_name.split(',').slice(0,3).join(',')}`;
+    applyFilters(view);
+  } catch(e) {
+    statusEl.textContent = '⚠ Geocode failed — check internet connection.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📍 Geocode';
+  }
+}
+
+function clearRadius(view) {
+  filterState[view].radiusLat = null;
+  filterState[view].radiusLng = null;
+  document.getElementById(`radius-addr-${view}`).value = '';
+  document.getElementById(`radius-mi-${view}`).value = '';
+  document.getElementById(`radius-status-${view}`).textContent = '';
+  applyFilters(view);
+}
+
+/* ── Read all filter inputs for a view ──────────── */
+function getFilters(view) {
+  return {
+    q:          (document.querySelector(`#fpanel-${view} .tb-search`)?.value || '').toLowerCase().trim(),
+    type:       document.getElementById(`type-${view}`)?.value || '',
+    dateFrom:   document.getElementById(`date-from-${view}`)?.value || '',
+    dateTo:     document.getElementById(`date-to-${view}`)?.value || '',
+    addrExact:  (document.getElementById(`addr-exact-${view}`)?.value || '').toLowerCase().trim(),
+    radiusMi:   parseFloat(document.getElementById(`radius-mi-${view}`)?.value) || 0,
+    radiusLat:  filterState[view].radiusLat,
+    radiusLng:  filterState[view].radiusLng,
+  };
+}
+
+/* ── Count how many filters are active ──────────── */
+function activeFilterCount(f) {
+  return [f.q, f.type, f.dateFrom, f.dateTo, f.addrExact, f.radiusMi && f.radiusLat ? 1 : 0]
+    .filter(Boolean).length;
+}
+
+/* ── Apply filters and re-render ─────────────────── */
+function applyFilters(view) {
+  const f = getFilters(view);
+  let rows = allIncidents;
+
+  // Status scope
+  if (view === 'active')   rows = rows.filter(i => i.status === 'active');
+  if (view === 'archived') rows = rows.filter(i => i.status === 'archived');
+
+  // Keyword search
+  if (f.q) rows = rows.filter(i =>
+    [i.type, i.address, i.description, i.reporter_name||'', i.police_report||'']
+      .join(' ').toLowerCase().includes(f.q));
+
+  // Incident type
+  if (f.type) rows = rows.filter(i => i.type === f.type);
+
+  // Date range (compared against occurred_at)
+  if (f.dateFrom) rows = rows.filter(i => new Date(i.occurred_at) >= new Date(f.dateFrom));
+  if (f.dateTo)   rows = rows.filter(i => new Date(i.occurred_at) <= new Date(f.dateTo + 'T23:59:59'));
+
+  // Specific address substring match
+  if (f.addrExact) rows = rows.filter(i => i.address.toLowerCase().includes(f.addrExact));
+
+  // Radius (only applies to incidents that have a GPS pin)
+  if (f.radiusMi && f.radiusLat !== null) {
+    rows = rows.filter(i => {
+      if (!i.lat || !i.lng) return false;
+      return distMiles(f.radiusLat, f.radiusLng, i.lat, i.lng) <= f.radiusMi;
+    });
+  }
+
+  // Update chips
+  renderChips(view, f);
+
+  // Update result count
+  const rcEl = document.getElementById(`rcount-${view}`);
+  if (rcEl) rcEl.textContent = rows.length === allIncidents.filter(i => view==='active'?i.status==='active':view==='archived'?i.status==='archived':true).length
+    ? '' : `${rows.length} result${rows.length!==1?'s':''} match current filters`;
+
+  // Update filter button badge
+  const n = activeFilterCount(f);
+  const fcEl = document.getElementById(`fcount-${view}`);
+  if (fcEl) fcEl.textContent = n ? `(${n})` : '';
+  document.getElementById(`ftbtn-${view}`)?.classList.toggle('active', n > 0);
+
+  renderTable(rows, `table-${view}`, view);
+}
+
+/* ── Render active filter chips ──────────────────── */
+function renderChips(view, f) {
+  const el = document.getElementById(`chips-${view}`);
+  if (!el) return;
+  const chips = [];
+  if (f.q)        chips.push({ label: `Search: "${f.q}"`,        clear: () => { document.querySelector(`#fpanel-${view} .tb-search`).value=''; applyFilters(view); } });
+  if (f.type)     chips.push({ label: `Type: ${f.type}`,          clear: () => { document.getElementById(`type-${view}`).value=''; applyFilters(view); } });
+  if (f.dateFrom) chips.push({ label: `From: ${f.dateFrom}`,      clear: () => { document.getElementById(`date-from-${view}`).value=''; applyFilters(view); } });
+  if (f.dateTo)   chips.push({ label: `To: ${f.dateTo}`,          clear: () => { document.getElementById(`date-to-${view}`).value=''; applyFilters(view); } });
+  if (f.addrExact)chips.push({ label: `Address: "${f.addrExact}"`,clear: () => { document.getElementById(`addr-exact-${view}`).value=''; applyFilters(view); } });
+  if (f.radiusMi && f.radiusLat) chips.push({ label: `Within ${f.radiusMi}mi of pin`, clear: () => clearRadius(view) });
+
+  el.innerHTML = chips.map((c,i) =>
+    `<div class="chip">${c.label}<button class="chip-x" onclick="chipClear(${JSON.stringify(view)},${i})">✕</button></div>`
+  ).join('');
+  // store clearers for onclick
+  el._clearers = chips.map(c => c.clear);
+}
+
+function chipClear(view, i) {
+  const el = document.getElementById(`chips-${view}`);
+  if (el._clearers?.[i]) el._clearers[i]();
+}
+
+/* ── Clear all filters for a view ────────────────── */
+function clearFilters(view) {
+  const panel = document.getElementById(`fpanel-${view}`);
+  panel.querySelectorAll('input').forEach(el => el.value = '');
+  panel.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+  clearRadius(view);
+  applyFilters(view);
+}
+
+/* ── Toggle filter panel open/closed ─────────────── */
+function toggleFilters(view) {
+  const panel = document.getElementById(`fpanel-${view}`);
+  panel.classList.toggle('open');
+  document.getElementById(`ftbtn-${view}`).classList.toggle('active',
+    panel.classList.contains('open') || activeFilterCount(getFilters(view)) > 0);
+}
+
+/* Legacy shim — renderCurrentView still calls this */
+function filteredRows(view, q, typeFilter) {
+  let rows = allIncidents;
+  if (view === 'active')   rows = rows.filter(i => i.status === 'active');
+  if (view === 'archived') rows = rows.filter(i => i.status === 'archived');
+  return rows;
+}
+
+function filterTable(view, q, typeFilter) {
+  applyFilters(view);
+}
+
+function updateCounts() {
+  const active   = allIncidents.filter(i=>i.status==='active').length;
+  const archived = allIncidents.filter(i=>i.status==='archived').length;
+  document.getElementById('nc-active').textContent   = active;
+  document.getElementById('nc-archived').textContent = archived;
+  document.getElementById('nc-all').textContent      = allIncidents.length;
+}
+
+/* ════════════════════════════════════════════════════
+   RENDER TABLE
+════════════════════════════════════════════════════ */
+function renderTable(rows, containerId, view) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No incidents found.</div></div>`;
+    return;
+  }
+  const showCb     = view === 'active';
+  const showStatus = view === 'all';
+  wrap.innerHTML = `
+    <table>
+      <thead><tr>
+        ${showCb ? '<th><input type="checkbox" id="cbAll" onchange="toggleAll(this)"></th>' : ''}
+        <th>Type</th><th>Date &amp; Time</th><th>Location</th><th>Description</th>
+        <th>Reporter</th><th>Media</th>
+        ${showStatus ? '<th>Status</th>' : ''}
+        <th>Actions</th>
+      </tr></thead>
+      <tbody>${rows.map(inc => renderRow(inc, showCb, showStatus)).join('')}</tbody>
+    </table>`;
+}
+
+function renderRow(inc, showCb, showStatus) {
+  const bc = inc.type_color==='red'?'b-red':inc.type_color==='gold'?'b-gold':'b-teal';
+  const mc = inc.incident_media?.length || 0;
+  const archived = inc.status === 'archived';
+  return `
+    <tr id="row-${inc.id}" style="${archived?'opacity:.65':''}">
+      ${showCb ? `<td><input type="checkbox" class="row-cb" data-id="${inc.id}" onchange="toggleRow('${inc.id}',this.checked)" ${selectedIds.has(inc.id)?'checked':''}></td>` : ''}
+      <td class="td-type"><span class="badge ${bc}">${inc.type}</span></td>
+      <td class="td-time">${fmt(inc.occurred_at)}</td>
+      <td class="td-addr" title="${esc(inc.address)}">${esc(inc.address)}</td>
+      <td class="td-desc" title="${esc(inc.description)}">${esc(inc.description)}</td>
+      <td style="font-size:.75rem;color:var(--slate)">${esc(inc.reporter_name||'—')}</td>
+      <td>${mc ? `<span class="media-pill">📎 ${mc}</span>` : '<span style="color:var(--slate2)">—</span>'}</td>
+      ${showStatus ? `<td><span class="badge ${archived?'b-arch':'b-teal'}">${inc.status}</span></td>` : ''}
+      <td>
+        <div class="row-actions">
+          <button class="btn btn-ghost" onclick="openDetail('${inc.id}')">View</button>
+          ${!archived
+            ? `<button class="btn btn-gold" onclick="archiveOne('${inc.id}')">Archive</button>`
+            : `<button class="btn btn-green" onclick="restoreOne('${inc.id}')">Restore</button>`}
+          <button class="btn btn-red" onclick="deleteOne('${inc.id}')">Delete</button>
+        </div>
+      </td>
+    </tr>`;
+}
+
+/* ════════════════════════════════════════════════════
+   ACTIONS
+════════════════════════════════════════════════════ */
+async function archiveOne(id) {
+  if (!confirm('Archive this incident? It will be removed from the public map.')) return;
+  const {error} = await sb.from('incidents').update({status:'archived'}).eq('id',id);
+  if (!error) { mutate(id,'status','archived'); showToast('📦','Incident archived.'); }
+  else showToast('⚠️',error.message,'err');
+}
+
+async function restoreOne(id) {
+  const {error} = await sb.from('incidents').update({status:'active'}).eq('id',id);
+  if (!error) { mutate(id,'status','active'); showToast('✅','Incident restored to active.'); }
+  else showToast('⚠️',error.message,'err');
+}
+
+async function deleteOne(id) {
+  if (!confirm('Permanently delete this incident and all its media? This cannot be undone.')) return;
+  const inc = allIncidents.find(i=>i.id===id);
+  // Delete storage files
+  if (inc?.incident_media?.length) {
+    const paths = inc.incident_media.map(m=>m.file_path);
+    await sb.storage.from('incident-media').remove(paths);
+  }
+  const {error} = await sb.from('incidents').delete().eq('id',id);
+  if (!error) {
+    allIncidents = allIncidents.filter(i=>i.id!==id);
+    updateCounts(); renderCurrentView(); renderStats();
+    showToast('🗑','Incident deleted.');
+  } else showToast('⚠️',error.message,'err');
+}
+
+// Optimistic local mutation — no full reload needed
+function mutate(id, key, val) {
+  const inc = allIncidents.find(i=>i.id===id);
+  if (inc) inc[key] = val;
+  updateCounts(); renderCurrentView(); renderStats();
+}
+
+/* ════════════════════════════════════════════════════
+   SELECTION (bulk)
+════════════════════════════════════════════════════ */
+function toggleAll(cb) {
+  document.querySelectorAll('.row-cb').forEach(el => {
+    el.checked = cb.checked;
+    cb.checked ? selectedIds.add(el.dataset.id) : selectedIds.delete(el.dataset.id);
+  });
+  updateBulkBar();
+}
+function toggleRow(id, checked) {
+  checked ? selectedIds.add(id) : selectedIds.delete(id);
+  updateBulkBar();
+}
+function updateBulkBar() {
+  const bar = document.getElementById('bulk-active');
+  const lbl = document.getElementById('bulk-label-active');
+  const n = selectedIds.size;
+  bar.classList.toggle('show', n > 0);
+  if (lbl) lbl.textContent = `${n} selected`;
+}
+function clearSelection() {
+  selectedIds.clear();
+  document.querySelectorAll('.row-cb').forEach(el=>el.checked=false);
+  const cb = document.getElementById('cbAll');
+  if (cb) cb.checked = false;
+  updateBulkBar();
+}
+
+async function bulkArchive() {
+  if (!selectedIds.size) return;
+  if (!confirm(`Archive ${selectedIds.size} incident(s)?`)) return;
+  const ids = [...selectedIds];
+  const {error} = await sb.from('incidents').update({status:'archived'}).in('id',ids);
+  if (!error) { ids.forEach(id=>mutate(id,'status','archived')); clearSelection(); showToast('📦',`${ids.length} incidents archived.`); }
+  else showToast('⚠️',error.message,'err');
+}
+
+async function bulkDelete() {
+  if (!selectedIds.size) return;
+  if (!confirm(`Permanently delete ${selectedIds.size} incident(s)? This cannot be undone.`)) return;
+  const ids = [...selectedIds];
+  for (const id of ids) {
+    const inc = allIncidents.find(i=>i.id===id);
+    if (inc?.incident_media?.length) await sb.storage.from('incident-media').remove(inc.incident_media.map(m=>m.file_path));
+    await sb.from('incidents').delete().eq('id',id);
+  }
+  allIncidents = allIncidents.filter(i=>!ids.includes(i.id));
+  clearSelection(); updateCounts(); renderCurrentView(); renderStats();
+  showToast('🗑',`${ids.length} incidents deleted.`);
+}
+
+/* ════════════════════════════════════════════════════
+   DETAIL MODAL
+════════════════════════════════════════════════════ */
+function openDetail(id) {
+  const inc = allIncidents.find(i=>i.id===id);
+  if (!inc) return;
+  const bc = inc.type_color==='red'?'b-red':inc.type_color==='gold'?'b-gold':'b-teal';
+  document.getElementById('mTitle').textContent = inc.type;
+  document.getElementById('mBadge').innerHTML = `<span class="badge ${bc}">${inc.type}</span>`;
+  const media = inc.incident_media||[];
+  document.getElementById('mBody').innerHTML = `
+    <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)}</div></div>
+    <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${esc(inc.address)}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span>`:''}</div></div>
+    <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${esc(inc.description)}</div></div>
+    <div class="mf-row"><div class="mf-label">Reported By</div><div class="mf-val">${esc(inc.reporter_name||'Anonymous')}</div></div>
+    ${inc.police_report?`<div class="mf-row"><div class="mf-label">Police Report #</div><div class="mf-val">${esc(inc.police_report)}</div></div>`:''}
+    ${(inc.suspect_height||inc.suspect_build||inc.suspect_age||inc.suspect_gender||inc.suspect_race||inc.suspect_clothing||inc.suspect_other)?`
+    <div class="mf-row" style="background:rgba(232,65,90,.05);border:1px solid rgba(232,65,90,.15);border-radius:5px;padding:10px 12px;">
+      <div class="mf-label" style="color:var(--red);margin-bottom:8px">Suspect Description</div>
+      <div class="mf-val" style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:.78rem">
+        ${inc.suspect_gender?`<span><span style="color:var(--slate)">Gender:</span> ${esc(inc.suspect_gender)}</span>`:''}
+        ${inc.suspect_age?`<span><span style="color:var(--slate)">Age:</span> ${esc(inc.suspect_age)}</span>`:''}
+        ${inc.suspect_height?`<span><span style="color:var(--slate)">Height:</span> ${esc(inc.suspect_height)}</span>`:''}
+        ${inc.suspect_build?`<span><span style="color:var(--slate)">Build:</span> ${esc(inc.suspect_build)}</span>`:''}
+        ${inc.suspect_race?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Race/Ethnicity:</span> ${esc(inc.suspect_race)}</span>`:''}
+        ${inc.suspect_clothing?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Clothing:</span> ${esc(inc.suspect_clothing)}</span>`:''}
+        ${inc.suspect_other?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Other:</span> ${esc(inc.suspect_other)}</span>`:''}
+      </div>
+    </div>`:``}
+    ${(inc.vehicle_make||inc.vehicle_model||inc.vehicle_color||inc.vehicle_plate)?`
+    <div class="mf-row" style="background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.15);border-radius:5px;padding:10px 12px;">
+      <div class="mf-label" style="color:var(--gold);margin-bottom:8px">Vehicle Description</div>
+      <div class="mf-val" style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:.78rem">
+        ${inc.vehicle_color?`<span><span style="color:var(--slate)">Color:</span> ${esc(inc.vehicle_color)}</span>`:''}
+        ${inc.vehicle_year?`<span><span style="color:var(--slate)">Year:</span> ${esc(inc.vehicle_year)}</span>`:''}
+        ${inc.vehicle_make?`<span><span style="color:var(--slate)">Make:</span> ${esc(inc.vehicle_make)}</span>`:''}
+        ${inc.vehicle_model?`<span><span style="color:var(--slate)">Model:</span> ${esc(inc.vehicle_model)}</span>`:''}
+        ${inc.vehicle_plate?`<span style="grid-column:1/-1"><span style="color:var(--slate)">License Plate:</span> <strong style="color:var(--gold)">${esc(inc.vehicle_plate)}</strong></span>`:''}
+        ${inc.vehicle_notes?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Notes:</span> ${esc(inc.vehicle_notes)}</span>`:''}
+      </div>
+    </div>`:``}
+    ${media.length?`<div class="mf-row"><div class="mf-label">Media (${media.length})</div>
+      <div class="modal-media">${media.map(m=>`
+        <div class="modal-media-item" onclick="openLightbox('${m.public_url}','${m.file_type}')">
+          ${m.file_type==='image'?`<img src="${m.public_url}" alt="">`:`<video src="${m.public_url}" muted></video>`}
+        </div>`).join('')}
+      </div></div>`:''}
+    <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">Submitted ${fmtLong(inc.created_at)}</div>`;
+  document.getElementById('mActions').innerHTML = `
+    ${inc.status==='active'
+      ? `<button class="btn btn-gold" onclick="archiveOne('${id}');closeModal()">📦 Archive</button>`
+      : `<button class="btn btn-green" onclick="restoreOne('${id}');closeModal()">↩ Restore</button>`}
+    <button class="btn btn-red" onclick="deleteOne('${id}');closeModal()">🗑 Delete</button>
+    <button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+
+/* ════════════════════════════════════════════════════
+   LIGHTBOX
+════════════════════════════════════════════════════ */
+function openLightbox(url,type) {
+  const img=document.getElementById('lbImg'), vid=document.getElementById('lbVid');
+  if(type==='image'){img.src=url;img.style.display='block';vid.style.display='none';}
+  else{vid.src=url;vid.style.display='block';img.style.display='none';}
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+
+/* ════════════════════════════════════════════════════
+   STATS
+════════════════════════════════════════════════════ */
+function renderStats() {
+  const active   = allIncidents.filter(i=>i.status==='active');
+  const archived = allIncidents.filter(i=>i.status==='archived');
+  const withPin  = allIncidents.filter(i=>i.lat);
+  const withMedia= allIncidents.filter(i=>i.incident_media?.length);
+  const last30   = allIncidents.filter(i=>new Date(i.occurred_at)>=new Date(Date.now()-30*864e5));
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card accent"><div class="stat-num">${active.length}</div><div class="stat-lbl">Active</div></div>
+    <div class="stat-card"><div class="stat-num">${archived.length}</div><div class="stat-lbl">Archived</div></div>
+    <div class="stat-card"><div class="stat-num">${allIncidents.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card"><div class="stat-num">${last30.length}</div><div class="stat-lbl">Last 30 Days</div></div>
+    <div class="stat-card"><div class="stat-num">${withPin.length}</div><div class="stat-lbl">With GPS Pin</div></div>
+    <div class="stat-card"><div class="stat-num">${withMedia.length}</div><div class="stat-lbl">With Media</div></div>`;
+
+  // Type breakdown bars
+  const counts = {};
+  active.forEach(i => counts[i.type]=(counts[i.type]||0)+1);
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1] || 1;
+  const colors = {red:'#e8415a',gold:'#f5a623',teal:'#00c9a7'};
+  const typeColor = {};
+  allIncidents.forEach(i=>typeColor[i.type]=i.type_color);
+
+  document.getElementById('typeBreakdown').innerHTML = sorted.map(([type,count])=>`
+    <div class="type-row">
+      <div class="type-row-label">${type}</div>
+      <div class="type-bar-wrap">
+        <div class="type-bar" style="width:${(count/max*100).toFixed(1)}%;background:${colors[typeColor[type]]||'#00c9a7'}"></div>
+      </div>
+      <div class="type-count">${count}</div>
+    </div>`).join('') || '<div style="padding:10px;color:var(--slate2);font-size:.8rem">No active incidents.</div>';
+}
+
+/* ════════════════════════════════════════════════════
+   CSV EXPORT
+════════════════════════════════════════════════════ */
+function exportCSV(view) {
+  let rows = allIncidents;
+  if (view==='active')   rows = rows.filter(i=>i.status==='active');
+  if (view==='archived') rows = rows.filter(i=>i.status==='archived');
+  const header = ['ID','Type','Status','Date/Time','Address','Description','Reporter','Police Report',
+    'Suspect Height','Suspect Build','Suspect Age','Suspect Gender','Suspect Race','Suspect Clothing','Suspect Other',
+    'Vehicle Make','Vehicle Model','Vehicle Color','Vehicle Year','Vehicle Plate','Vehicle Notes',
+    'Lat','Lng','Media Count','Submitted'];
+  const csv = [header, ...rows.map(i=>[
+    i.id, i.type, i.status,
+    new Date(i.occurred_at).toLocaleString(),
+    i.address, `"${(i.description||'').replace(/"/g,'""')}"`,
+    i.reporter_name||'', i.police_report||'',
+    i.suspect_height||'', i.suspect_build||'', i.suspect_age||'', i.suspect_gender||'',
+    i.suspect_race||'', i.suspect_clothing||'', i.suspect_other||'',
+    i.vehicle_make||'', i.vehicle_model||'', i.vehicle_color||'', i.vehicle_year||'',
+    i.vehicle_plate||'', i.vehicle_notes||'',
+    i.lat||'', i.lng||'',
+    i.incident_media?.length||0,
+    new Date(i.created_at).toLocaleString()
+  ])].map(r=>r.join(',')).join('\n');
+
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `HIBCW_${view}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+/* ════════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════ */
+let toastTimer;
+function showToast(ico,body,type='') {
+  const t=document.getElementById('toast');
+  document.getElementById('toastIco').textContent=ico;
+  document.getElementById('toastTitle').textContent=type==='err'?'Error':'Done';
+  document.getElementById('toastBody').textContent=body;
+  t.classList.toggle('err-toast',type==='err');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3800);
+}
+
+/* ════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════ */
+function fmt(iso){ return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); }
+function fmtLong(iso){ return new Date(iso).toLocaleString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'}); }
+function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+</script>
+</body>
+</html>
