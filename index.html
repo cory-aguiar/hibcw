@@ -287,6 +287,48 @@ header{
   .body{flex-direction:column}
   .map-wrap{min-height:45vh}
 }
+
+/* ── Disclaimers ──────────────────────────────────────────── */
+.disc-emergency{
+  background:linear-gradient(135deg,rgba(232,65,90,.12),rgba(232,65,90,.06));
+  border:1px solid rgba(232,65,90,.35);border-radius:6px;
+  padding:11px 14px;margin-bottom:16px;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.disc-emergency .disc-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.disc-emergency .disc-text{font-size:.75rem;line-height:1.55;color:rgba(238,243,248,.9)}
+.disc-emergency .disc-text strong{color:#ff6b7a}
+.disc-notice{
+  background:rgba(255,255,255,.03);border:1px solid var(--border2);
+  border-radius:5px;padding:9px 12px;margin-bottom:10px;
+  font-size:.7rem;line-height:1.55;color:var(--slate);
+  display:flex;gap:8px;align-items:flex-start;
+}
+.disc-notice .disc-icon{flex-shrink:0;font-size:.85rem;margin-top:1px}
+.disc-notice a{color:var(--teal);text-decoration:none}
+.disc-notice a:hover{text-decoration:underline}
+.disc-suspect-note{
+  background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.15);
+  border-radius:5px;padding:9px 12px;margin-bottom:12px;
+  font-size:.7rem;line-height:1.55;color:var(--slate);
+  display:flex;gap:8px;align-items:flex-start;
+}
+.disc-suspect-note .disc-icon{flex-shrink:0;font-size:.85rem;margin-top:1px}
+.disc-privacy{
+  background:rgba(0,201,167,.04);border:1px solid rgba(0,201,167,.12);
+  border-radius:5px;padding:9px 12px;margin-bottom:12px;
+  font-size:.7rem;line-height:1.55;color:var(--slate);
+  display:flex;gap:8px;align-items:flex-start;
+}
+.disc-privacy .disc-icon{flex-shrink:0;font-size:.85rem;margin-top:1px}
+.page-footer{
+  flex-shrink:0;border-top:1px solid var(--border2);
+  padding:10px 16px;
+  font-size:.62rem;line-height:1.65;color:var(--slate2);
+  text-align:center;font-family:'IBM Plex Mono',monospace;
+}
+.page-footer a{color:var(--slate);text-decoration:none}
+.page-footer a:hover{color:var(--teal)}
 </style>
 </head>
 <body>
@@ -318,6 +360,15 @@ header{
 
       <!-- REPORT TAB -->
       <div class="tab-body" id="body-report">
+
+        <!-- Emergency disclaimer -->
+        <div class="disc-emergency">
+          <div class="disc-icon">🚨</div>
+          <div class="disc-text">
+            <strong>For emergencies, call 911 immediately.</strong>
+            This tool is for non-emergency community reporting only. Do not use this form if a crime is in progress or there is an immediate threat to life or safety.
+          </div>
+        </div>
 
         <!-- Incident type -->
         <div class="section">
@@ -377,9 +428,19 @@ header{
           </div>
         </div>
 
+        <!-- Privacy disclaimer -->
+        <div class="disc-privacy">
+          <div class="disc-icon">🔒</div>
+          <div>Your name is optional and will not be displayed publicly. Submitted reports and any uploaded media may be reviewed by KIAA staff and shared with law enforcement upon request. Do not include sensitive personal information such as Social Security numbers or financial details in your description.</div>
+        </div>
+
         <!-- Suspect Description -->
         <div class="section">
           <div class="sec-label">05 · Suspect Description <span style="font-family:'IBM Plex Sans',sans-serif;font-weight:300;letter-spacing:0;text-transform:none;color:var(--slate2)">(if applicable)</span></div>
+          <div class="disc-suspect-note">
+            <div class="disc-icon">⚠️</div>
+            <div>Suspect descriptions are provided solely to assist in identification and should be based only on direct observation. Incomplete or assumed descriptions can cause harm — please only include what you personally witnessed.</div>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div class="fld">
               <label>Height</label>
@@ -485,8 +546,20 @@ header{
         </div>
 
         <button class="submit-btn" id="submitBtn" onclick="submitReport()">⊕ Submit Incident Report</button>
-        <div style="height:20px"></div>
 
+        <!-- No law enforcement disclaimer -->
+        <div class="disc-notice" style="margin-top:12px">
+          <div class="disc-icon">📋</div>
+          <div>Submitting a report here <strong style="color:var(--white)">does not constitute an official police report</strong> and does not notify the Hilo Police Department. To file an official report, contact HPD at <a href="tel:8089353311">(808) 935-3311</a> or visit <a href="https://www.hawaiipolice.com" target="_blank">hawaiipolice.com</a>. For anonymous tips, call Crime Stoppers at <a href="tel:8089618300">(808) 961-8300</a>.</div>
+        </div>
+
+        <!-- Content moderation notice -->
+        <div class="disc-notice">
+          <div class="disc-icon">ℹ️</div>
+          <div>Reports are submitted by community members and have not been independently verified. KIAA reserves the right to remove or archive any report found to be false, misleading, or submitted in bad faith.</div>
+        </div>
+
+        <div style="height:16px"></div>
       </div><!-- /body-report -->
 
       <!-- LIST TAB -->
@@ -519,6 +592,14 @@ header{
     </div>
 
   </div><!-- /body -->
+  <!-- Page footer -->
+  <div class="page-footer">
+    Reports are for community awareness only and are not verified by KIAA or law enforcement. &nbsp;·&nbsp;
+    For emergencies call <a href="tel:911">911</a> &nbsp;·&nbsp;
+    HPD non-emergency <a href="tel:8089353311">(808) 935-3311</a> &nbsp;·&nbsp;
+    Crime Stoppers <a href="tel:8089618300">(808) 961-8300</a> &nbsp;·&nbsp;
+    <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a>
+  </div>
 </div><!-- /app -->
 
 <!-- INCIDENT DETAIL MODAL -->
