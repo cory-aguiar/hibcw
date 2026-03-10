@@ -834,13 +834,32 @@ document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key=
    INIT
 ════════════════════════════════════════════════════ */
 async function initApp() {
+  const errEl = document.getElementById('loginErr');
+  function step(msg) {
+    errEl.textContent = 'Loading: ' + msg;
+    errEl.style.display = 'block';
+    errEl.style.color = '#00c9a7';
+  }
+
+  step('checking config…');
   if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
     throw new Error('Supabase credentials not set in config.js');
   }
+
+  step('connecting to Supabase…');
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  step('loading incidents…');
   await loadAll();
+
+  step('loading members…');
   await loadMembers();
+
+  step('starting realtime…');
   startRealtime();
+
+  // All good — hide the status message
+  errEl.style.display = 'none';
 }
 
 async function loadAll() {
