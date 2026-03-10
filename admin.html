@@ -268,6 +268,32 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
 .note-submit{background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);border-radius:4px;padding:7px 14px;color:var(--teal);cursor:pointer;font-size:.78rem;white-space:nowrap;transition:all .2s}
 .note-submit:hover{background:rgba(0,201,167,.22)}
 
+/* ── Verified member badge ─────────────────────────────────── */
+.verified-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);
+  border-radius:3px;padding:1px 7px;
+  font-size:.65rem;color:var(--teal);font-family:'IBM Plex Mono',monospace;
+  white-space:nowrap;
+}
+
+/* ── Member management ─────────────────────────────────────── */
+.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding:20px 24px}
+.member-card{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:7px;
+  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.member-email{font-size:.82rem;color:var(--white);word-break:break-all}
+.member-since{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);margin-top:3px}
+.member-add-bar{padding:16px 24px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.member-input{
+  flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid var(--b2);
+  border-radius:4px;padding:8px 12px;color:var(--white);font-size:.82rem;outline:none;
+  transition:border-color .2s;
+}
+.member-input:focus{border-color:var(--teal)}
+.member-empty{padding:40px 24px;text-align:center;color:var(--slate);font-size:.82rem;line-height:1.8}
+
 /* ── Print styles ──────────────────────────────────────────── */
 @media print {
   body{background:#fff!important;color:#000!important}
@@ -465,6 +491,8 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
       <div class="nav-section">Reports</div>
       <button class="nav-btn"    id="nav-stats"    onclick="showView('stats')">📊 Statistics</button>
       <button class="nav-btn"    id="nav-map"      onclick="showView('map')">🗺 Map View</button>
+      <div class="nav-section">Settings</div>
+      <button class="nav-btn"    id="nav-members"  onclick="showView('members')">✅ Members <span class="nav-count" id="nc-members">—</span></button>
     </nav>
 
     <main>
@@ -682,6 +710,25 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
         <div style="padding:0 24px 8px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)">Incidents by Type (Active)</div></div>
         <div class="type-breakdown" id="typeBreakdown"></div>
       </div>
+      <!-- ── MEMBERS VIEW ── -->
+      <div class="view" id="view-members">
+        <div class="page-hd">
+          <div><div class="page-title">Member Emails</div><div class="page-sub">Verified KIAA members — incidents submitted with these emails get a ✅ badge</div></div>
+        </div>
+        <div class="member-add-bar">
+          <input class="member-input" type="email" id="newMemberEmail" placeholder="Enter member email address…" onkeydown="if(event.key==='Enter')addMember()">
+          <button class="btn btn-teal btn-lg" onclick="addMember()">＋ Add Member</button>
+          <button class="btn btn-ghost btn-lg" onclick="importMemberCSV()">⬆ Import CSV</button>
+          <input type="file" id="memberCSVInput" accept=".csv" style="display:none" onchange="handleMemberCSV(this)">
+        </div>
+        <div style="padding:8px 24px 0;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
+          To import multiple emails at once, upload a CSV with one email per line or per row in the first column.
+        </div>
+        <div class="member-grid" id="memberGrid">
+          <div class="member-empty">Loading members…</div>
+        </div>
+      </div>
+
       <!-- ── MAP VIEW ── -->
       <div id="view-map">
         <div class="map-panel">
@@ -778,6 +825,7 @@ async function initApp() {
   }
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   await loadAll();
+  await loadMembers();
   startRealtime();
 }
 
@@ -859,6 +907,8 @@ function showView(v) {
   if (v === 'map') {
     initAdminMap();
     admRefreshMarkers();
+  } else if (v === 'members') {
+    loadMembers();
   } else {
     renderCurrentView();
   }
@@ -1088,7 +1138,7 @@ function renderRow(inc, showCb, showStatus) {
   return `
     <tr id="row-${inc.id}" style="${archived?'opacity:.65':''}">
       ${showCb ? `<td><input type="checkbox" class="row-cb" data-id="${inc.id}" onchange="toggleRow('${inc.id}',this.checked)" ${selectedIds.has(inc.id)?'checked':''}></td>` : ''}
-      <td class="td-type"><span class="badge ${bc}">${inc.type}</span>${inc.is_recurring?'<br><span class="recurring-flag" style="margin-top:3px">🔁 Recurring</span>':''}</td>
+      <td class="td-type"><span class="badge ${bc}">${inc.type}</span>${inc.is_recurring?'<br><span class="recurring-flag" style="margin-top:3px">🔁 Recurring</span>':''} ${inc.is_verified_member?'<br><span class="verified-badge" style="margin-top:3px">✅ Member</span>':''}</td>
       <td class="td-time">${fmt(inc.occurred_at)}<br>${ageTag(inc.occurred_at)}</td>
       <td class="td-addr" title="${esc(inc.address)}">${esc(inc.address)}</td>
       <td class="td-desc" title="${esc(inc.description)}">${esc(inc.description)}</td>
@@ -1215,6 +1265,7 @@ function openDetail(id) {
     <div class="mf-row"><div class="mf-label">Reported By</div><div class="mf-val">${esc(inc.reporter_name||'Anonymous')}</div></div>
     ${inc.police_report?`<div class="mf-row"><div class="mf-label">Police Report #</div><div class="mf-val">${esc(inc.police_report)}</div></div>`:''}
     ${inc.is_recurring?`<div class="mf-row"><span class="recurring-flag">🔁 Reported as Recurring Incident</span></div>`:''}
+    ${inc.is_verified_member?`<div class="mf-row"><span class="verified-badge" style="font-size:.72rem;padding:3px 10px">✅ Submitted by a Verified KIAA Member</span></div>`:''}
     ${(inc.suspect_height||inc.suspect_build||inc.suspect_age||inc.suspect_gender||inc.suspect_race||inc.suspect_clothing||inc.suspect_other)?`
     <div class="mf-row" style="background:rgba(232,65,90,.05);border:1px solid rgba(232,65,90,.15);border-radius:5px;padding:10px 12px;">
       <div class="mf-label" style="color:var(--red);margin-bottom:8px">Suspect Description</div>
@@ -1361,6 +1412,81 @@ function showToast(ico,body,type='') {
   t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>t.classList.remove('show'),3800);
+}
+
+/* ════════════════════════════════════════════════════
+   MEMBER MANAGEMENT
+════════════════════════════════════════════════════ */
+let memberList = [];
+
+async function loadMembers() {
+  if (!sb) return;
+  const {data, error} = await sb.from('member_emails').select('*').order('created_at', {ascending:false});
+  if (error) { showToast('⚠️', 'Could not load members: ' + error.message, 'err'); return; }
+  memberList = data || [];
+  renderMembers();
+  const nc = document.getElementById('nc-members');
+  if (nc) nc.textContent = memberList.length;
+}
+
+function renderMembers() {
+  const grid = document.getElementById('memberGrid');
+  if (!grid) return;
+  if (!memberList.length) {
+    grid.innerHTML = `<div class="member-empty">No members yet.<br>Add emails above to start verifying submissions.</div>`;
+    return;
+  }
+  grid.innerHTML = memberList.map(m => `
+    <div class="member-card" id="mc-${m.id}">
+      <div>
+        <div class="member-email">✅ ${esc(m.email)}</div>
+        <div class="member-since">Added ${fmt(m.created_at)}</div>
+      </div>
+      <button class="btn btn-red" onclick="removeMember('${m.id}')">Remove</button>
+    </div>`).join('');
+}
+
+async function addMember() {
+  const input = document.getElementById('newMemberEmail');
+  const email = input.value.trim().toLowerCase();
+  if (!email || !email.includes('@')) { showToast('⚠️', 'Enter a valid email address.', 'err'); return; }
+  if (memberList.find(m => m.email === email)) { showToast('ℹ️', 'That email is already in the list.'); return; }
+  const {error} = await sb.from('member_emails').insert({email});
+  if (error) { showToast('⚠️', error.message, 'err'); return; }
+  input.value = '';
+  await loadMembers();
+  showToast('✅', `${email} added to member list.`);
+}
+
+async function removeMember(id) {
+  if (!confirm('Remove this member? Their past verified reports will keep the badge.')) return;
+  const {error} = await sb.from('member_emails').delete().eq('id', id);
+  if (!error) { await loadMembers(); showToast('🗑', 'Member removed.'); }
+  else showToast('⚠️', error.message, 'err');
+}
+
+function importMemberCSV() {
+  document.getElementById('memberCSVInput').click();
+}
+
+async function handleMemberCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const text = await file.text();
+  const emails = text.split(/[
+,]+/)
+    .map(e => e.trim().toLowerCase().replace(/^["']|["']$/g,''))
+    .filter(e => e.includes('@') && e.includes('.'));
+  if (!emails.length) { showToast('⚠️', 'No valid emails found in file.', 'err'); return; }
+  const existing = new Set(memberList.map(m => m.email));
+  const newEmails = emails.filter(e => !existing.has(e));
+  if (!newEmails.length) { showToast('ℹ️', 'All emails already in the list.'); return; }
+  const rows = newEmails.map(email => ({email}));
+  const {error} = await sb.from('member_emails').insert(rows);
+  if (error) { showToast('⚠️', error.message, 'err'); return; }
+  await loadMembers();
+  showToast('✅', `${newEmails.length} member${newEmails.length>1?'s':''} imported.`);
+  input.value = '';
 }
 
 /* ════════════════════════════════════════════════════
