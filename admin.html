@@ -870,7 +870,19 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
           <input type="file" id="memberCSVInput" accept=".csv" style="display:none" onchange="handleMemberCSV(this)">
         </div>
         <div class="member-toolbar">
-          <input class="member-search" type="text" id="memberSearch" placeholder="🔍  Search emails…" oninput="renderMembers()">
+          <input class="member-search" type="text" id="memberSearch" placeholder="🔍  Search name, email, business…" oninput="renderMembers()">
+          <select class="member-search" id="memberDistrictFilter" onchange="renderMembers()" style="max-width:220px;cursor:pointer">
+            <option value="">All Districts</option>
+            <option value="hamakua">District 1 - Hāmākua</option>
+            <option value="north-hilo">District 2 - North Hilo</option>
+            <option value="south-hilo">District 3 - South Hilo</option>
+            <option value="lower-puna">District 4 - Lower Puna</option>
+            <option value="upper-puna">District 5 - Upper Puna</option>
+            <option value="kau">District 6 - Kaʻū</option>
+            <option value="south-kona">District 7 - South Kona</option>
+            <option value="north-kona">District 8 - North Kona</option>
+            <option value="north-kohala">District 9 - North Kohala</option>
+          </select>
           <div class="member-count" id="memberCountLabel">— members</div>
         </div>
         <div class="member-table-wrap">
@@ -1222,6 +1234,11 @@ function showView(v) {
     initAdminMap();
     admRefreshMarkers();
   } else if (v === 'members') {
+    // Pre-filter to captain's district when they view members
+    if (currentRole === 'captain' && captainDistrict) {
+      const df = document.getElementById('memberDistrictFilter');
+      if (df) df.value = captainDistrict;
+    }
     loadMembers();
   } else if (v === 'apps') {
     loadApplications();
@@ -1784,28 +1801,32 @@ function renderMembers() {
   const tbody = document.getElementById('memberGrid');
   if (!tbody) return;
 
-  const q = (document.getElementById('memberSearch')?.value || '').toLowerCase().trim();
-  const filtered = q ? memberList.filter(m =>
-    (m.email         || '').toLowerCase().includes(q) ||
-    (m.full_name     || '').toLowerCase().includes(q) ||
-    (m.business_name || '').toLowerCase().includes(q) ||
-    (m.phone         || '').toLowerCase().includes(q) ||
+  const q        = (document.getElementById('memberSearch')?.value || '').toLowerCase().trim();
+  const distFilter = document.getElementById('memberDistrictFilter')?.value || '';
+
+  const byDistrict = distFilter ? memberList.filter(m => m.district === distFilter) : memberList;
+  const filtered   = q ? byDistrict.filter(m =>
+    (m.email            || '').toLowerCase().includes(q) ||
+    (m.full_name        || '').toLowerCase().includes(q) ||
+    (m.business_name    || '').toLowerCase().includes(q) ||
+    (m.phone            || '').toLowerCase().includes(q) ||
     (m.business_address || '').toLowerCase().includes(q) ||
     (m.business_city    || '').toLowerCase().includes(q) ||
     (m.business_state   || '').toLowerCase().includes(q) ||
-    (m.business_zip     || '').toLowerCase().includes(q) ||
-    (districtLabel(m.district)).toLowerCase().includes(q)
-  ) : memberList;
+    (m.business_zip     || '').toLowerCase().includes(q)
+  ) : byDistrict;
 
   // Update count label
   const label = document.getElementById('memberCountLabel');
-  if (label) label.textContent = q
+  const isFiltered = q || distFilter;
+  if (label) label.textContent = isFiltered
     ? `${filtered.length} of ${memberList.length} member${memberList.length !== 1 ? 's' : ''}`
     : `${memberList.length} member${memberList.length !== 1 ? 's' : ''}`;
 
   if (!filtered.length) {
-    tbody.innerHTML = q
-      ? `<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--slate)">No members match "${esc(q)}"</td></tr>`
+    const distLabel = distFilter ? (DISTRICTS.find(([v]) => v === distFilter)?.[1] || distFilter) : '';
+    tbody.innerHTML = (q || distFilter)
+      ? `<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--slate)">No members match${distFilter ? ' in ' + esc(distLabel) : ''}${q ? ' for "' + esc(q) + '"' : ''}.</td></tr>`
       : `<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--slate);line-height:1.8">No members yet.<br>Add emails above to start verifying submissions.</td></tr>`;
     return;
   }
