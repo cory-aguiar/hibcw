@@ -1395,91 +1395,97 @@ function updateStats() {
    MAP FILTER
 ════════════════════════════════════════════════════ */
 /* ════════════════════════════════════════════════════
-   DISTRICT OVERLAY
+   DISTRICT OVERLAY — Official Hawaii County Council Districts
+   Source: Hawaii Statewide GIS Program / geoportal.hawaii.gov
+   Dataset: 893e0ad0b7d04ebbbd49daa31f474b8e (Council Districts 2022)
 ════════════════════════════════════════════════════ */
-const DISTRICT_GEO = [
-  { id:"north-kohala", label:"North Kohala", color:"#10b981", center:[20.210,-155.950],
-    coords:[
-      [20.264,-155.869],[20.264,-155.960],[20.200,-156.000],
-      [20.036,-155.960],[20.036,-155.833],
-      [20.090,-155.885],[20.145,-155.942],[20.178,-155.899],[20.235,-155.912],
-      [20.264,-155.869]
-    ]},
-  { id:"south-kohala", label:"South Kohala", color:"#06b6d4", center:[19.960,-155.770],
-    coords:[
-      [20.264,-155.869],[20.264,-155.960],[20.200,-156.000],
-      [20.036,-155.960],[19.962,-156.045],[19.895,-155.998],
-      [19.835,-155.918],[19.786,-155.840],[19.726,-155.700],
-      [19.726,-155.380],
-      [20.035,-155.295],[20.072,-155.390],[20.118,-155.584],
-      [20.202,-155.732],[20.228,-155.745],[20.250,-155.790],
-      [20.264,-155.869]
-    ]},
-  { id:"hamakua", label:"Hāmākua", color:"#84cc16", center:[20.000,-155.370],
-    coords:[
-      [20.202,-155.732],[20.148,-155.665],[20.075,-155.570],
-      [19.960,-155.200],[19.897,-155.126],
-      [19.726,-155.380],
-      [20.035,-155.295],[20.072,-155.390],[20.118,-155.584],
-      [20.202,-155.732]
-    ]},
-  { id:"north-hilo", label:"North Hilo", color:"#3b82f6", center:[19.820,-155.135],
-    coords:[
-      [19.897,-155.126],[19.868,-155.095],[19.838,-155.080],
-      [19.800,-155.068],[19.762,-155.074],[19.729,-155.088],
-      [19.726,-155.380],[19.897,-155.126]
-    ]},
-  { id:"south-hilo", label:"South Hilo", color:"#00c9a7", center:[19.610,-155.180],
-    coords:[
-      [19.762,-155.380],
-      [19.729,-155.088],
-      [19.710,-155.042],
-      [19.680,-155.036],
-      [19.645,-155.046],
-      [19.590,-155.065],
-      [19.520,-155.105],
-      [19.480,-155.130],
-      [19.480,-155.270],
-      [19.762,-155.380]
-    ]},
-  { id:"puna", label:"Puna", color:"#a855f7", center:[19.380,-154.980],
-    coords:[
-      [19.520,-155.105],[19.460,-155.090],[19.390,-155.050],
-      [19.320,-154.995],[19.511,-154.806],
-      [19.435,-154.885],[19.370,-154.950],[19.330,-155.000],
-      [19.285,-155.070],[19.250,-155.140],[19.215,-155.260],
-      [19.300,-155.310],[19.400,-155.305],[19.455,-155.270],
-      [19.480,-155.165],[19.510,-155.280],[19.520,-155.105]
-    ]},
-  { id:"north-kona", label:"North Kona", color:"#f97316", center:[19.680,-156.005],
-    coords:[
-      [19.726,-156.050],[19.835,-155.918],[19.786,-155.840],
-      [19.726,-155.700],[19.726,-155.380],
-      [19.510,-155.280],[19.508,-155.478],[19.488,-155.648],
-      [19.478,-155.842],[19.498,-155.988],[19.542,-156.068],
-      [19.638,-156.082],[19.726,-156.050]
-    ]},
-  { id:"south-kona", label:"South Kona", color:"#f59e0b", center:[19.335,-155.930],
-    coords:[
-      [19.508,-155.478],[19.415,-155.458],[19.322,-155.478],
-      [19.238,-155.515],[19.162,-155.648],[19.098,-155.838],
-      [19.193,-155.920],[19.278,-155.962],[19.385,-155.998],
-      [19.478,-156.058],[19.726,-156.050],[19.638,-156.082],
-      [19.542,-156.068],[19.498,-155.988],[19.478,-155.842],
-      [19.488,-155.648],[19.508,-155.478]
-    ]},
-  { id:"kau", label:"Kaʻū", color:"#ef4444", center:[19.150,-155.420],
-    coords:[
-      [19.726,-155.380],[19.510,-155.280],[19.480,-155.165],
-      [19.455,-155.270],[19.400,-155.305],[19.300,-155.310],
-      [19.215,-155.260],[19.250,-155.140],[19.285,-155.070],
-      [19.330,-155.000],[19.160,-155.230],[19.062,-155.338],
-      [18.962,-155.488],[18.911,-155.682],
-      [19.098,-155.838],[19.162,-155.648],[19.238,-155.515],
-      [19.322,-155.478],[19.415,-155.458],[19.508,-155.478],
-      [19.726,-155.380]
-    ]},
+
+// Style info for each of Hawaii County's 9 traditional districts
+// The GIS dataset uses "Council 1" through "Council 9" as distname values
+// Mapping based on Hawaii County Council official district descriptions (2022)
+const COUNCIL_DISTRICT_INFO = {
+  1: { id:'south-hilo',   label:'South Hilo',   color:'#00c9a7', center:[19.680,-155.100] },
+  2: { id:'puna',         label:'Puna',          color:'#a855f7', center:[19.380,-154.980] },
+  3: { id:'kau',          label:'Kaʻū',          color:'#ef4444', center:[19.150,-155.420] },
+  4: { id:'south-kona',   label:'South Kona',   color:'#f59e0b', center:[19.335,-155.930] },
+  5: { id:'north-kona',   label:'North Kona',   color:'#f97316', center:[19.680,-156.005] },
+  6: { id:'south-kohala', label:'South Kohala', color:'#06b6d4', center:[19.960,-155.770] },
+  7: { id:'north-kohala', label:'North Kohala', color:'#10b981', center:[20.210,-155.950] },
+  8: { id:'hamakua',      label:'Hāmākua',      color:'#84cc16', center:[20.000,-155.370] },
+  9: { id:'north-hilo',   label:'North Hilo',   color:'#3b82f6', center:[19.820,-155.220] }
+};
+
+// Fallback simplified coords used if GIS fetch fails
+const DISTRICT_GEO_FALLBACK = [
+  { id:'north-kohala',  label:'North Kohala',  color:'#10b981', center:[20.210,-155.950], coords:[[20.264,-155.869],[20.264,-155.960],[20.200,-156.000],[20.036,-155.960],[20.036,-155.833],[20.090,-155.885],[20.145,-155.942],[20.178,-155.899],[20.235,-155.912],[20.264,-155.869]] },
+  { id:'south-kohala',  label:'South Kohala',  color:'#06b6d4', center:[19.960,-155.770], coords:[[20.264,-155.869],[20.264,-155.960],[20.200,-156.000],[20.036,-155.960],[19.962,-156.045],[19.895,-155.998],[19.835,-155.918],[19.786,-155.840],[19.726,-155.700],[19.726,-155.380],[20.035,-155.295],[20.072,-155.390],[20.118,-155.584],[20.202,-155.732],[20.228,-155.745],[20.250,-155.790],[20.264,-155.869]] },
+  { id:'hamakua',       label:'Hāmākua',       color:'#84cc16', center:[20.000,-155.370], coords:[[20.202,-155.732],[20.148,-155.665],[20.075,-155.570],[19.960,-155.200],[19.897,-155.126],[19.726,-155.380],[20.035,-155.295],[20.072,-155.390],[20.118,-155.584],[20.202,-155.732]] },
+  { id:'north-hilo',    label:'North Hilo',    color:'#3b82f6', center:[19.820,-155.135], coords:[[19.897,-155.126],[19.868,-155.095],[19.838,-155.080],[19.800,-155.068],[19.762,-155.074],[19.729,-155.088],[19.726,-155.380],[19.897,-155.126]] },
+  { id:'south-hilo',    label:'South Hilo',    color:'#00c9a7', center:[19.610,-155.180], coords:[[19.762,-155.380],[19.729,-155.088],[19.710,-155.042],[19.680,-155.036],[19.645,-155.046],[19.590,-155.065],[19.520,-155.105],[19.480,-155.130],[19.480,-155.270],[19.762,-155.380]] },
+  { id:'puna',          label:'Puna',          color:'#a855f7', center:[19.380,-154.980], coords:[[19.520,-155.105],[19.460,-155.090],[19.390,-155.050],[19.320,-154.995],[19.511,-154.806],[19.435,-154.885],[19.370,-154.950],[19.330,-155.000],[19.285,-155.070],[19.250,-155.140],[19.215,-155.260],[19.300,-155.310],[19.400,-155.305],[19.455,-155.270],[19.480,-155.165],[19.510,-155.280],[19.520,-155.105]] },
+  { id:'north-kona',    label:'North Kona',    color:'#f97316', center:[19.680,-156.005], coords:[[19.726,-156.050],[19.835,-155.918],[19.786,-155.840],[19.726,-155.700],[19.726,-155.380],[19.510,-155.280],[19.508,-155.478],[19.488,-155.648],[19.478,-155.842],[19.498,-155.988],[19.542,-156.068],[19.638,-156.082],[19.726,-156.050]] },
+  { id:'south-kona',    label:'South Kona',    color:'#f59e0b', center:[19.335,-155.930], coords:[[19.508,-155.478],[19.415,-155.458],[19.322,-155.478],[19.238,-155.515],[19.162,-155.648],[19.098,-155.838],[19.193,-155.920],[19.278,-155.962],[19.385,-155.998],[19.478,-156.058],[19.726,-156.050],[19.638,-156.082],[19.542,-156.068],[19.498,-155.988],[19.478,-155.842],[19.488,-155.648],[19.508,-155.478]] },
+  { id:'kau',           label:'Kaʻū',          color:'#ef4444', center:[19.150,-155.420], coords:[[19.726,-155.380],[19.510,-155.280],[19.480,-155.165],[19.455,-155.270],[19.400,-155.305],[19.300,-155.310],[19.215,-155.260],[19.250,-155.140],[19.285,-155.070],[19.330,-155.000],[19.160,-155.230],[19.062,-155.338],[18.962,-155.488],[18.911,-155.682],[19.098,-155.838],[19.162,-155.648],[19.238,-155.515],[19.322,-155.478],[19.415,-155.458],[19.508,-155.478],[19.726,-155.380]] },
 ];
+
+// Active district data — populated from GIS fetch or fallback
+let DISTRICT_GEO = JSON.parse(JSON.stringify(DISTRICT_GEO_FALLBACK));
+
+// Douglas-Peucker simplification for performance
+function dpSimplify(pts, tol) {
+  if (pts.length <= 2) return pts;
+  let dmax = 0, idx = 0;
+  const [ax,ay]=pts[0],[bx,by]=pts[pts.length-1],dx=bx-ax,dy=by-ay,len2=dx*dx+dy*dy;
+  for (let i=1;i<pts.length-1;i++){
+    const [px,py]=pts[i];
+    let d=len2===0?Math.sqrt((px-ax)**2+(py-ay)**2):(()=>{const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/len2));return Math.sqrt((px-ax-t*dx)**2+(py-ay-t*dy)**2);})();
+    if(d>dmax){dmax=d;idx=i;}
+  }
+  if(dmax>=tol){const r1=dpSimplify(pts.slice(0,idx+1),tol),r2=dpSimplify(pts.slice(idx),tol);return r1.slice(0,-1).concat(r2);}
+  return [pts[0],pts[pts.length-1]];
+}
+
+// Fetch official boundaries from Hawaii State GIS at runtime
+(async function loadOfficialDistricts() {
+  const GIS_URL = 'https://hub.arcgis.com/api/v3/datasets/893e0ad0b7d04ebbbd49daa31f474b8e_10/downloads/data?format=geojson&spatialRefId=4326&where=1%3D1';
+  try {
+    const resp = await fetch(GIS_URL, { cache: 'force-cache' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const gj = await resp.json();
+    const loaded = [];
+    for (const feat of gj.features) {
+      // distname is "Council 1" through "Council 9"
+      const num = parseInt((feat.properties.distname || '').replace(/\D/g,''));
+      const info = COUNCIL_DISTRICT_INFO[num];
+      if (!info || !feat.geometry) continue;
+      const geom = feat.geometry;
+      let rings = geom.type==='Polygon' ? [geom.coordinates[0]] :
+                  geom.type==='MultiPolygon' ? geom.coordinates.map(p=>p[0]) : [];
+      // Use largest ring, convert [lng,lat] → [lat,lng], simplify
+      let best = [];
+      for (const ring of rings) {
+        const pts = dpSimplify(ring.map(([lng,lat])=>[lat,lng]), 0.0003);
+        if (pts.length > best.length) best = pts;
+      }
+      if (best.length >= 3) loaded.push({ ...info, coords: best });
+    }
+    if (loaded.length >= 6) {
+      DISTRICT_GEO = loaded;
+      console.log('[HIBCW] ✅ Loaded', loaded.length, 'official council district boundaries from Hawaii State GIS');
+      // Refresh overlay if it's currently on
+      if (districtOverlayOn && window._activeDistrictMap) {
+        districtLayers.forEach(l => window._activeDistrictMap.removeLayer(l));
+        districtLayers = [];
+        districtOverlayOn = false;
+        toggleDistrictOverlay(window._activeDistrictMap, window._activeDistrictBtn);
+      }
+    } else {
+      throw new Error('Too few districts returned: ' + loaded.length);
+    }
+  } catch(e) {
+    console.warn('[HIBCW] GIS fetch failed, using built-in boundaries:', e.message);
+  }
+})();
 
 let districtLayers = [];
 let districtOverlayOn = false;
@@ -1506,6 +1512,8 @@ function getDistrictForPoint(lat, lng) {
 }
 
 function toggleDistrictOverlay(mapObj, btn) {
+  window._activeDistrictMap = mapObj;
+  window._activeDistrictBtn = btn;
   districtOverlayOn = !districtOverlayOn;
   if (districtOverlayOn) {
     districtLayers = DISTRICT_GEO.map(d => {
