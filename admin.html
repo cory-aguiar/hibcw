@@ -2269,35 +2269,42 @@ function dpSimplify(pts, tol) {
       const geom = feat.geometry;
       let rings = geom.type==='Polygon' ? [geom.coordinates[0]] :
                   geom.type==='MultiPolygon' ? geom.coordinates.map(p=>p[0]) : [];
-      let best = [];
-      for (const ring of rings) {
-        const pts = dpSimplify(ring.map(([lng,lat])=>[lat,lng]), 0.0003);
-        if (pts.length > best.length) best = pts;
-      }
-      if (best.length < 3) continue;
-      const centLat = best.reduce((s,p)=>s+p[0],0)/best.length;
-      const centLng = best.reduce((s,p)=>s+p[1],0)/best.length;
-      const info = matchDistrictByLocation(centLat, centLng, best);
+      // Convert ALL rings to [lat,lng] — use full precision for PIP matching
+      const fullRings = rings.map(ring => ring.map(([lng,lat]) => [lat,lng]));
+      // Find the largest ring
+      const fullBest = fullRings.reduce((a,b) => b.length > a.length ? b : a, []);
+      if (fullBest.length < 3) continue;
+      // Match district using PIP on FULL (unsimplified) polygon — accurate
+      const centLat = fullBest.reduce((s,p)=>s+p[0],0)/fullBest.length;
+      const centLng = fullBest.reduce((s,p)=>s+p[1],0)/fullBest.length;
+      const info = matchDistrictByLocation(centLat, centLng, fullBest);
       if (!info) continue;
-      const existing = loaded.find(d=>d.id===info.id);
-      if (existing && existing.coords.length >= best.length) continue;
+      // NOW simplify for display performance
+      const simplified = dpSimplify(fullBest, 0.0003);
+      const coords = simplified.length >= 3 ? simplified : fullBest;
+      // Avoid duplicates — keep largest polygon per district
       const idx = loaded.findIndex(d=>d.id===info.id);
-      const entry = { ...info, coords: best };
-      if (idx >= 0) loaded[idx] = entry; else loaded.push(entry);
+      const entry = { ...info, coords };
+      if (idx >= 0) {
+        if (coords.length > loaded[idx].coords.length) loaded[idx] = entry;
+      } else {
+        loaded.push(entry);
+      }
     }
     if (loaded.length >= 6) {
       DISTRICT_GEO = loaded;
-      console.log('[HIBCW Admin] ✅ Loaded', loaded.length, 'official districts (centroid-matched) from Hawaii State GIS');
-      if (districtOverlayOn && window._adminDistrictMap) {
-        removeDistrictOverlay(window._adminDistrictMap);
+      console.log('[HIBCW] ✅ Loaded', loaded.length, 'districts from Hawaii State GIS:', loaded.map(d=>d.id).join(', '));
+      if (districtOverlayOn && window._activeDistrictMap) {
+        districtLayers.forEach(l => window._activeDistrictMap.removeLayer(l));
+        districtLayers = [];
         districtOverlayOn = false;
-        toggleDistrictOverlay(window._adminDistrictMap, window._adminDistrictBtn);
+        toggleDistrictOverlay(window._activeDistrictMap, window._activeDistrictBtn);
       }
     } else {
-      throw new Error('Too few: ' + loaded.length);
+      throw new Error('Too few districts: ' + loaded.length + ' — ' + loaded.map(d=>d.id).join(', '));
     }
   } catch(e) {
-    console.warn('[HIBCW Admin] GIS fetch failed, using built-in coords:', e.message);
+    console.warn('[HIBCW] GIS fetch failed, using built-in boundaries:', e.message);
   }
 })();
 
