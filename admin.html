@@ -1209,15 +1209,9 @@ function applyFilters(view) {
   // Incident type
   if (f.type) rows = rows.filter(i => i.type === f.type);
 
-  // District — match via reporter email -> member district
+  // District — filter directly on incident.district field
   if (f.district) {
-    const districtMembers = new Set(
-      memberList.filter(m => String(m.district) === f.district)
-                .map(m => (m.email||'').toLowerCase())
-    );
-    rows = rows.filter(i =>
-      i.reporter_email && districtMembers.has(i.reporter_email.toLowerCase())
-    );
+    rows = rows.filter(i => i.district === f.district);
   }
 
   // Date range (compared against occurred_at)
@@ -1347,7 +1341,7 @@ function renderRow(inc, showCb, showStatus) {
       ${showCb ? `<td><input type="checkbox" class="row-cb" data-id="${inc.id}" onchange="toggleRow('${inc.id}',this.checked)" ${selectedIds.has(inc.id)?'checked':''}></td>` : ''}
       <td class="td-type"><span class="badge ${bc}">${inc.type}</span>${inc.is_recurring?'<br><span class="recurring-flag" style="margin-top:3px">🔁 Recurring</span>':''} ${inc.is_verified_member?'<br><span class="verified-badge" style="margin-top:3px">✅ Member</span>':''}</td>
       <td class="td-time">${fmt(inc.occurred_at)}<br>${ageTag(inc.occurred_at)}</td>
-      <td class="td-addr" title="${esc(inc.address)}">${esc(inc.address)}</td>
+      <td class="td-addr" title="${esc(inc.address)}">${esc(inc.address)}${inc.district ? `<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:#00c9a7;letter-spacing:.03em">${DISTRICT_GEO.find(d=>d.id===inc.district)?.label||inc.district}</span>` : ''}</td>
       <td class="td-desc" title="${esc(inc.description)}">${esc(inc.description)}</td>
       <td style="font-size:.75rem;color:var(--slate)">${esc(inc.reporter_name||'—')}</td>
       <td>${mc ? `<span class="media-pill">📎 ${mc}</span>` : '<span style="color:var(--slate2)">—</span>'}</td>
@@ -1467,6 +1461,7 @@ function openDetail(id) {
   const media = inc.incident_media||[];
   document.getElementById('mBody').innerHTML = `
     <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)} &nbsp;${ageTag(inc.occurred_at)}</div></div>
+    ${inc.district ? `<div class="mf-row"><div class="mf-label">District</div><div class="mf-val"><span class="teal-badge">${DISTRICT_GEO.find(d=>d.id===inc.district)?.label||inc.district}</span></div></div>` : ''}
     <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${esc(inc.address)}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span> &nbsp;<a href="https://www.google.com/maps?q=&layer=c&cbll=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none">🔭 Street View ↗</a>`:''}</div></div>
     <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${esc(inc.description)}</div></div>
     <div class="mf-row"><div class="mf-label">Reported By</div><div class="mf-val">${esc(inc.reporter_name||'Anonymous')}</div></div>
@@ -2249,6 +2244,27 @@ const DISTRICT_GEO = [
 
 let districtLayers = [];
 let districtOverlayOn = false;
+
+/* ── Point-in-polygon (ray casting) ───────────────────────── */
+function pointInPolygon(lat, lng, coords) {
+  let inside = false;
+  for (let i = 0, j = coords.length - 1; i < coords.length; j = i++) {
+    const xi = coords[i][0], yi = coords[i][1];
+    const xj = coords[j][0], yj = coords[j][1];
+    const intersect = ((yi > lng) !== (yj > lng)) &&
+                      (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function getDistrictForPoint(lat, lng) {
+  if (lat == null || lng == null) return null;
+  for (const d of DISTRICT_GEO) {
+    if (pointInPolygon(lat, lng, d.coords)) return d;
+  }
+  return null;
+}
 
 function toggleDistrictOverlay(map, btn) {
   districtOverlayOn = !districtOverlayOn;
