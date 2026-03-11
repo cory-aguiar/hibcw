@@ -808,6 +808,9 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
                 <th>Phone</th>
                 <th>Business Name</th>
                 <th>Business Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Zip</th>
                 <th>Date Added</th>
                 <th>Days Active</th>
                 <th style="width:90px">Action</th>
@@ -1528,7 +1531,7 @@ async function loadMembers() {
     // Fetch approved applications to enrich with full profile info
     const {data: apps} = await sb
       .from('member_applications')
-      .select('email,full_name,phone,business_name,business_address')
+      .select('email,full_name,phone,business_name,business_address,business_city,business_state,business_zip')
       .eq('status','approved');
 
     // Build lookup map: email -> application data
@@ -1560,7 +1563,10 @@ function renderMembers() {
     (m.full_name     || '').toLowerCase().includes(q) ||
     (m.business_name || '').toLowerCase().includes(q) ||
     (m.phone         || '').toLowerCase().includes(q) ||
-    (m.business_address || '').toLowerCase().includes(q)
+    (m.business_address || '').toLowerCase().includes(q) ||
+    (m.business_city    || '').toLowerCase().includes(q) ||
+    (m.business_state   || '').toLowerCase().includes(q) ||
+    (m.business_zip     || '').toLowerCase().includes(q)
   ) : memberList;
 
   // Update count label
@@ -1571,8 +1577,8 @@ function renderMembers() {
 
   if (!filtered.length) {
     tbody.innerHTML = q
-      ? `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--slate)">No members match "${esc(q)}"</td></tr>`
-      : `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--slate);line-height:1.8">No members yet.<br>Add emails above to start verifying submissions.</td></tr>`;
+      ? `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--slate)">No members match "${esc(q)}"</td></tr>`
+      : `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--slate);line-height:1.8">No members yet.<br>Add emails above to start verifying submissions.</td></tr>`;
     return;
   }
 
@@ -1591,6 +1597,9 @@ function renderMembers() {
       <td class="mem-date" style="white-space:nowrap">${m.phone ? esc(m.phone) : na}</td>
       <td style="white-space:nowrap">${m.business_name ? esc(m.business_name) : na}</td>
       <td style="color:var(--slate);font-size:.78rem">${m.business_address ? esc(m.business_address) : na}</td>
+      <td class="mem-date" style="white-space:nowrap">${m.business_city  ? esc(m.business_city)  : na}</td>
+      <td class="mem-date" style="white-space:nowrap">${m.business_state ? esc(m.business_state) : na}</td>
+      <td class="mem-date" style="white-space:nowrap">${m.business_zip   ? esc(m.business_zip)   : na}</td>
       <td class="mem-date">${dateStr}</td>
       <td class="mem-date">${daysStr}</td>
       <td style="white-space:nowrap;display:flex;gap:5px">
@@ -1603,7 +1612,7 @@ function renderMembers() {
 
 function exportMembersCSV() {
   if (!memberList.length) { showToast('ℹ️', 'No members to export.'); return; }
-  const rows = [['#','Full Name','Email','Phone','Business Name','Business Address','Date Added','Days Active']];
+  const rows = [['#','Full Name','Email','Phone','Business Name','Business Address','City','State','Zip','Date Added','Days Active']];
   memberList.forEach((m, i) => {
     const added   = new Date(m.created_at);
     const dateStr = added.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
@@ -1615,6 +1624,9 @@ function exportMembersCSV() {
       m.phone            || '',
       m.business_name    || '',
       m.business_address || '',
+      m.business_city    || '',
+      m.business_state   || '',
+      m.business_zip     || '',
       dateStr,
       days === 0 ? 'Today' : days === 1 ? '1 day' : `${days} days`
     ]);
@@ -1649,6 +1661,9 @@ function openEditMember(id) {
   document.getElementById('mePhone').value      = m.phone            || '';
   document.getElementById('meBizName').value    = m.business_name    || '';
   document.getElementById('meBizAddr').value    = m.business_address || '';
+  document.getElementById('meBizCity').value    = m.business_city    || '';
+  document.getElementById('meBizState').value   = m.business_state   || '';
+  document.getElementById('meBizZip').value     = m.business_zip     || '';
   document.getElementById('memEditTitle').textContent = m.full_name || m.email;
   document.getElementById('memberEditOverlay').style.display = 'flex';
 }
@@ -1665,6 +1680,9 @@ async function saveMemberEdit() {
   const phone     = document.getElementById('mePhone').value.trim();
   const bizName   = document.getElementById('meBizName').value.trim();
   const bizAddr   = document.getElementById('meBizAddr').value.trim();
+  const bizCity   = document.getElementById('meBizCity').value.trim();
+  const bizState  = document.getElementById('meBizState').value.trim().toUpperCase();
+  const bizZip    = document.getElementById('meBizZip').value.trim();
 
   if (!newEmail || !newEmail.includes('@')) {
     showToast('⚠️', 'A valid email address is required.', 'err'); return;
@@ -1688,6 +1706,9 @@ async function saveMemberEdit() {
     phone:            phone     || null,
     business_name:    bizName   || null,
     business_address: bizAddr   || null,
+    business_city:    bizCity   || null,
+    business_state:   bizState  || null,
+    business_zip:     bizZip    || null,
     status:           'approved'
   };
 
@@ -2118,8 +2139,22 @@ function admToggleHeat() {
         <input class="tb-search" id="meBizName" type="text" placeholder="Business name" style="width:100%">
       </div>
       <div class="mf-group">
-        <div class="mf-label">Business Address</div>
-        <input class="tb-search" id="meBizAddr" type="text" placeholder="Street address, Hilo, HI" style="width:100%">
+        <div class="mf-label">Business Street Address</div>
+        <input class="tb-search" id="meBizAddr" type="text" placeholder="123 Kamehameha Ave" style="width:100%">
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px">
+        <div class="mf-group">
+          <div class="mf-label">City</div>
+          <input class="tb-search" id="meBizCity" type="text" placeholder="Hilo" style="width:100%">
+        </div>
+        <div class="mf-group">
+          <div class="mf-label">State</div>
+          <input class="tb-search" id="meBizState" type="text" placeholder="HI" maxlength="2" style="width:100%">
+        </div>
+        <div class="mf-group">
+          <div class="mf-label">Zip Code</div>
+          <input class="tb-search" id="meBizZip" type="text" placeholder="96720" maxlength="10" style="width:100%">
+        </div>
       </div>
       <input type="hidden" id="meId">
       <input type="hidden" id="meOrigEmail">
