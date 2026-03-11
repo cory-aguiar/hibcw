@@ -232,6 +232,22 @@ header{
     </div>
 
     <div class="fld">
+      <label>Business District <span class="req">*</span></label>
+      <select id="aDistrict" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:10px 13px;color:var(--white);font-size:.88rem;outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;-webkit-appearance:none">
+              <option value="">— Select your district…</option>
+              <option value="1">District 1 — Downtown Hilo / Bayfront</option>
+              <option value="2">District 2 — Hilo Commercial Corridor</option>
+              <option value="3">District 3 — Puna (Pahoa / Keaau)</option>
+              <option value="4">District 4 — Ka'u / Volcano</option>
+              <option value="5">District 5 — South Kona / Captain Cook</option>
+              <option value="6">District 6 — Kailua-Kona</option>
+              <option value="7">District 7 — South Kohala / Waikoloa / Waimea</option>
+              <option value="8">District 8 — North Kohala / Hawi</option>
+              <option value="9">District 9 — Hamakua / Honokaa</option>
+      </select>
+    </div>
+
+    <div class="fld">
       <label>Additional Notes (optional)</label>
       <textarea id="aNotes" placeholder="Anything else you'd like KIAA to know…"></textarea>
     </div>
@@ -281,11 +297,12 @@ async function submitApplication() {
   const bizCity  = document.getElementById('aBizCity').value.trim();
   const bizState = document.getElementById('aBizState').value.trim().toUpperCase();
   const bizZip   = document.getElementById('aBizZip').value.trim();
+  const district = document.getElementById('aDistrict').value.trim();
   const notes    = document.getElementById('aNotes').value.trim();
 
   // Validate
   let ok = true;
-  [['aName',name],['aEmail',email],['aPhone',phone],['aBizName',bizName],['aBizAddr',bizAddr],['aBizCity',bizCity],['aBizState',bizState],['aBizZip',bizZip]]
+  [['aName',name],['aEmail',email],['aPhone',phone],['aBizName',bizName],['aBizAddr',bizAddr],['aBizCity',bizCity],['aBizState',bizState],['aBizZip',bizZip],['aDistrict',district]]
     .forEach(([id,val]) => {
       const el = document.getElementById(id);
       if (!val) { el.classList.add('err'); ok = false; }
@@ -315,6 +332,7 @@ async function submitApplication() {
     business_city:    bizCity  || null,
     business_state:   bizState || null,
     business_zip:     bizZip   || null,
+    district:         district || null,
     notes:            notes    || null,
     status:       'pending'
   });
