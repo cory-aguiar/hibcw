@@ -544,7 +544,8 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
       <button class="nav-btn"    id="nav-map"      onclick="showView('map')">🗺 Map View</button>
       <div class="nav-section">Settings</div>
       <button class="nav-btn"    id="nav-members"  onclick="showView('members')">✅ Members <span class="nav-count" id="nc-members">—</span></button>
-      <button class="nav-btn"    id="nav-apps"     onclick="showView('apps')">📋 Applications <span class="nav-count" id="nc-apps">—</span></button>
+      <button class="nav-btn"    id="nav-apps"      onclick="showView('apps')">📋 Applications <span class="nav-count" id="nc-apps">—</span></button>
+      <button class="nav-btn"    id="nav-captains"  onclick="showView('captains')">🗺 Districts</button>
     </nav>
 
     <main>
@@ -606,7 +607,13 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
             </div>
           </div>
           <div style="margin-top:12px;display:flex;justify-content:flex-end">
-            <button class="btn btn-ghost" onclick="clearFilters('active')">✕ Clear All Filters</button>
+            <div class="filter-group">
+              <label class="filter-label">District</label>
+              <select class="tb-input tb-select" id="district-active" onchange="applyFilters('active')">
+                <option value="">All Districts</option>
+              </select>
+            </div>
+                        <button class="btn btn-ghost" onclick="clearFilters('active')">✕ Clear All Filters</button>
           </div>
         </div>
         <!-- Active filter chips -->
@@ -678,7 +685,13 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
             </div>
           </div>
           <div style="margin-top:12px;display:flex;justify-content:flex-end">
-            <button class="btn btn-ghost" onclick="clearFilters('archived')">✕ Clear All Filters</button>
+            <div class="filter-group">
+              <label class="filter-label">District</label>
+              <select class="tb-input tb-select" id="district-archived" onchange="applyFilters('archived')">
+                <option value="">All Districts</option>
+              </select>
+            </div>
+                        <button class="btn btn-ghost" onclick="clearFilters('archived')">✕ Clear All Filters</button>
           </div>
         </div>
         <!-- Active filter chips -->
@@ -744,7 +757,13 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
             </div>
           </div>
           <div style="margin-top:12px;display:flex;justify-content:flex-end">
-            <button class="btn btn-ghost" onclick="clearFilters('all')">✕ Clear All Filters</button>
+            <div class="filter-group">
+              <label class="filter-label">District</label>
+              <select class="tb-input tb-select" id="district-all" onchange="applyFilters('all')">
+                <option value="">All Districts</option>
+              </select>
+            </div>
+                        <button class="btn btn-ghost" onclick="clearFilters('all')">✕ Clear All Filters</button>
           </div>
         </div>
         <!-- Active filter chips -->
@@ -762,6 +781,20 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
         <div style="padding:0 24px 8px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)">Incidents by Type (Active)</div></div>
         <div class="type-breakdown" id="typeBreakdown"></div>
       </div>
+      <!-- ── DISTRICT CAPTAINS VIEW ── -->
+      <div class="view" id="view-captains">
+        <div class="page-hd">
+          <div>
+            <div class="page-title">🗺 District Captains</div>
+            <div class="page-sub">Overview of all 9 HIBCW districts — assigned captains and member counts</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-ghost btn-lg" onclick="showView('members')">✏️ Manage Members</button>
+          </div>
+        </div>
+        <div id="captainsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:20px 24px"></div>
+      </div>
+
       <!-- ── APPLICATIONS VIEW ── -->
       <div class="view" id="view-apps">
         <div class="page-hd">
@@ -811,6 +844,8 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
                 <th>City</th>
                 <th>State</th>
                 <th>Zip</th>
+                <th>District</th>
+                <th>Captain</th>
                 <th>Date Added</th>
                 <th>Days Active</th>
                 <th style="width:90px">Action</th>
@@ -889,6 +924,37 @@ let allIncidents = [];      // all incidents from DB
 let currentView  = 'active';
 let selectedIds  = new Set();
 
+const DISTRICTS = [
+  ["1", "D1 — Downtown Hilo / Bayfront"],
+  ["2", "D2 — Hilo Commercial Corridor"],
+  ["3", "D3 — Puna (Pahoa / Keaau)"],
+  ["4", "D4 — Ka'u / Volcano"],
+  ["5", "D5 — South Kona / Captain Cook"],
+  ["6", "D6 — Kailua-Kona"],
+  ["7", "D7 — S. Kohala / Waikoloa / Waimea"],
+  ["8", "D8 — N. Kohala / Hawi"],
+  ["9", "D9 — Hamakua / Honokaa"]
+];
+function districtLabel(v) {
+  if (!v) return '—';
+  const d = DISTRICTS.find(d => d[0] === String(v));
+  return d ? d[1] : v;
+}
+function districtOptions(sel) {
+  sel = String(sel || '');
+  return '<option value="">All Districts</option>' +
+    DISTRICTS.map(([v,l]) =>
+      '<option value="' + v + '"' + (sel===v?' selected':'') + '>' + l + '</option>'
+    ).join('');
+}
+function districtSelect(sel) {
+  sel = String(sel || '');
+  return '<option value="">— Assign district…</option>' +
+    DISTRICTS.map(([v,l]) =>
+      '<option value="' + v + '"' + (sel===v?' selected':'') + '>' + l + '</option>'
+    ).join('');
+}
+
 /* ════════════════════════════════════════════════════
    LOGIN
 ════════════════════════════════════════════════════ */
@@ -925,6 +991,12 @@ async function initApp() {
   await loadAll();
   await loadMembers();
   await loadApplications();
+  // Populate district filter selects
+  ['active','archived','all'].forEach(v => {
+    const el = document.getElementById('district-' + v);
+    if (el) el.innerHTML = '<option value="">All Districts</option>' +
+      DISTRICTS.map(([val, lbl]) => '<option value="' + val + '">' + lbl + '</option>').join('');
+  });
   startRealtime();
 }
 
@@ -1010,6 +1082,8 @@ function showView(v) {
     loadMembers();
   } else if (v === 'apps') {
     loadApplications();
+  } else if (v === 'captains') {
+    renderCaptains();
   } else {
     renderCurrentView();
   }
@@ -1074,6 +1148,8 @@ function clearRadius(view) {
   document.getElementById(`radius-addr-${view}`).value = '';
   document.getElementById(`radius-mi-${view}`).value = '';
   document.getElementById(`radius-status-${view}`).textContent = '';
+  const dEl = document.getElementById(`district-${view}`);
+  if (dEl) dEl.value = '';
   applyFilters(view);
 }
 
@@ -1088,12 +1164,13 @@ function getFilters(view) {
     radiusMi:   parseFloat(document.getElementById(`radius-mi-${view}`)?.value) || 0,
     radiusLat:  filterState[view].radiusLat,
     radiusLng:  filterState[view].radiusLng,
+    district:   document.getElementById(`district-${view}`)?.value || '',
   };
 }
 
 /* ── Count how many filters are active ──────────── */
 function activeFilterCount(f) {
-  return [f.q, f.type, f.dateFrom, f.dateTo, f.addrExact, f.radiusMi && f.radiusLat ? 1 : 0]
+  return [f.q, f.type, f.dateFrom, f.dateTo, f.addrExact, f.radiusMi && f.radiusLat ? 1 : 0, f.district]
     .filter(Boolean).length;
 }
 
@@ -1113,6 +1190,17 @@ function applyFilters(view) {
 
   // Incident type
   if (f.type) rows = rows.filter(i => i.type === f.type);
+
+  // District — match via reporter email -> member district
+  if (f.district) {
+    const districtMembers = new Set(
+      memberList.filter(m => String(m.district) === f.district)
+                .map(m => (m.email||'').toLowerCase())
+    );
+    rows = rows.filter(i =>
+      i.reporter_email && districtMembers.has(i.reporter_email.toLowerCase())
+    );
+  }
 
   // Date range (compared against occurred_at)
   if (f.dateFrom) rows = rows.filter(i => new Date(i.occurred_at) >= new Date(f.dateFrom));
@@ -1531,7 +1619,7 @@ async function loadMembers() {
     // Fetch approved applications to enrich with full profile info
     const {data: apps} = await sb
       .from('member_applications')
-      .select('email,full_name,phone,business_name,business_address,business_city,business_state,business_zip')
+      .select('email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district')
       .eq('status','approved');
 
     // Build lookup map: email -> application data
@@ -1566,7 +1654,8 @@ function renderMembers() {
     (m.business_address || '').toLowerCase().includes(q) ||
     (m.business_city    || '').toLowerCase().includes(q) ||
     (m.business_state   || '').toLowerCase().includes(q) ||
-    (m.business_zip     || '').toLowerCase().includes(q)
+    (m.business_zip     || '').toLowerCase().includes(q) ||
+    (districtLabel(m.district)).toLowerCase().includes(q)
   ) : memberList;
 
   // Update count label
@@ -1577,8 +1666,8 @@ function renderMembers() {
 
   if (!filtered.length) {
     tbody.innerHTML = q
-      ? `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--slate)">No members match "${esc(q)}"</td></tr>`
-      : `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--slate);line-height:1.8">No members yet.<br>Add emails above to start verifying submissions.</td></tr>`;
+      ? `<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--slate)">No members match "${esc(q)}"</td></tr>`
+      : `<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--slate);line-height:1.8">No members yet.<br>Add emails above to start verifying submissions.</td></tr>`;
     return;
   }
 
@@ -1600,6 +1689,16 @@ function renderMembers() {
       <td class="mem-date" style="white-space:nowrap">${m.business_city  ? esc(m.business_city)  : na}</td>
       <td class="mem-date" style="white-space:nowrap">${m.business_state ? esc(m.business_state) : na}</td>
       <td class="mem-date" style="white-space:nowrap">${m.business_zip   ? esc(m.business_zip)   : na}</td>
+      <td>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;
+          background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);
+          border-radius:3px;padding:2px 7px;color:var(--teal);white-space:nowrap">
+          ${m.district ? districtLabel(m.district) : na}
+        </span>
+      </td>
+      <td style="font-size:.78rem;color:var(--slate);white-space:nowrap">
+        ${m.captain_name ? esc(m.captain_name) : na}
+      </td>
       <td class="mem-date">${dateStr}</td>
       <td class="mem-date">${daysStr}</td>
       <td style="white-space:nowrap;display:flex;gap:5px">
@@ -1612,7 +1711,7 @@ function renderMembers() {
 
 function exportMembersCSV() {
   if (!memberList.length) { showToast('ℹ️', 'No members to export.'); return; }
-  const rows = [['#','Full Name','Email','Phone','Business Name','Business Address','City','State','Zip','Date Added','Days Active']];
+  const rows = [['#','Full Name','Email','Phone','Business Name','Business Address','City','State','Zip','District','Captain','Date Added','Days Active']];
   memberList.forEach((m, i) => {
     const added   = new Date(m.created_at);
     const dateStr = added.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
@@ -1627,6 +1726,8 @@ function exportMembersCSV() {
       m.business_city    || '',
       m.business_state   || '',
       m.business_zip     || '',
+      m.district ? districtLabel(m.district) : '',
+      m.captain_name || '',
       dateStr,
       days === 0 ? 'Today' : days === 1 ? '1 day' : `${days} days`
     ]);
@@ -1665,6 +1766,13 @@ function openEditMember(id) {
   document.getElementById('meBizState').value   = m.business_state   || '';
   document.getElementById('meBizZip').value     = m.business_zip     || '';
   document.getElementById('memEditTitle').textContent = m.full_name || m.email;
+  // Populate district select dynamically
+  const dSel = document.getElementById('meDistrict');
+  dSel.innerHTML = '<option value="">— Assign district…</option>' +
+    DISTRICTS.map(([v,l]) =>
+      '<option value="' + v + '"' + (String(m.district||'')===v?' selected':'') + '>' + l + '</option>'
+    ).join('');
+  document.getElementById('meCaptain').value  = m.captain_name || '';
   document.getElementById('memberEditOverlay').style.display = 'flex';
 }
 
@@ -1683,6 +1791,8 @@ async function saveMemberEdit() {
   const bizCity   = document.getElementById('meBizCity').value.trim();
   const bizState  = document.getElementById('meBizState').value.trim().toUpperCase();
   const bizZip    = document.getElementById('meBizZip').value.trim();
+  const district  = document.getElementById('meDistrict').value.trim();
+  const captainName = document.getElementById('meCaptain').value.trim();
 
   if (!newEmail || !newEmail.includes('@')) {
     showToast('⚠️', 'A valid email address is required.', 'err'); return;
@@ -1709,6 +1819,8 @@ async function saveMemberEdit() {
     business_city:    bizCity   || null,
     business_state:   bizState  || null,
     business_zip:     bizZip    || null,
+    district:         district  || null,
+    captain_name:     captainName || null,
     status:           'approved'
   };
 
@@ -1761,6 +1873,85 @@ async function handleMemberCSV(input) {
   await loadMembers();
   showToast('✅', `${newEmails.length} member${newEmails.length>1?'s':''} imported.`);
   input.value = '';
+}
+
+/* ════════════════════════════════════════════════════
+   DISTRICT CAPTAINS
+════════════════════════════════════════════════════ */
+function renderCaptains() {
+  const grid = document.getElementById('captainsGrid');
+  if (!grid) return;
+
+  // Build lookup: district -> {captain, members:[]}
+  const distMap = {};
+  DISTRICTS.forEach(([v]) => { distMap[v] = {captain: null, members: []}; });
+  memberList.forEach(m => {
+    if (m.district && distMap[m.district]) {
+      distMap[m.district].members.push(m);
+      if (m.captain_name && !distMap[m.district].captain) {
+        distMap[m.district].captain = m.captain_name;
+      }
+    }
+  });
+
+  // Count incidents per district (match member emails to incidents)
+  const memberEmailSet = new Set(memberList.map(m => (m.email||'').toLowerCase()));
+  const incidentsByDistrict = {};
+  DISTRICTS.forEach(([v]) => { incidentsByDistrict[v] = 0; });
+  allIncidents.forEach(inc => {
+    if (inc.reporter_email) {
+      const mem = memberList.find(m =>
+        (m.email||'').toLowerCase() === inc.reporter_email.toLowerCase()
+      );
+      if (mem && mem.district) incidentsByDistrict[mem.district] = (incidentsByDistrict[mem.district]||0) + 1;
+    }
+  });
+
+  grid.innerHTML = DISTRICTS.map(([v, fullLabel]) => {
+    const info       = distMap[v] || {captain:null, members:[]};
+    const captain    = info.captain;
+    const memCount   = info.members.length;
+    const incCount   = incidentsByDistrict[v] || 0;
+    const hasCaptain = !!captain;
+
+    // List up to 3 member names
+    const memberPreview = info.members.slice(0, 3).map(m =>
+      '<div style="font-size:.72rem;color:var(--slate);margin-top:2px">• ' +
+      esc(m.full_name || m.email) + (m.business_name ? ' <span style="color:var(--slate2)">(' + esc(m.business_name) + ')</span>' : '') +
+      '</div>'
+    ).join('');
+    const moreCount = info.members.length > 3 ? info.members.length - 3 : 0;
+
+    return '<div style="background:var(--navy2);border:1px solid ' + (hasCaptain ? 'rgba(0,201,167,.25)' : 'var(--b2)') + ';border-left:3px solid ' + (hasCaptain ? 'var(--teal)' : 'var(--slate2)') + ';border-radius:8px;padding:18px 20px">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px">' +
+        '<div>' +
+          '<div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.04em">' + esc(fullLabel.replace('\u2014', '\u2014')) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:5px;flex-shrink:0">' +
+          '<span style="font-family:IBM Plex Mono,monospace;font-size:.6rem;border-radius:3px;padding:2px 7px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);color:var(--teal)">' + memCount + ' member' + (memCount!==1?'s':'') + '</span>' +
+          '<span style="font-family:IBM Plex Mono,monospace;font-size:.6rem;border-radius:3px;padding:2px 7px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);color:var(--gold)">' + incCount + ' incident' + (incCount!==1?'s':'') + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-bottom:10px">' +
+        '<div style="font-family:IBM Plex Mono,monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">District Captain</div>' +
+        (hasCaptain
+          ? '<div style="font-size:.88rem;font-weight:500;color:var(--white)">👮 ' + esc(captain) + '</div>'
+          : '<div style="font-size:.8rem;color:var(--slate2);font-style:italic">No captain assigned yet</div>'
+        ) +
+      '</div>' +
+      (memCount > 0
+        ? '<div style="border-top:1px solid var(--b2);padding-top:10px">' +
+            '<div style="font-family:IBM Plex Mono,monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Members</div>' +
+            memberPreview +
+            (moreCount > 0 ? '<div style="font-size:.7rem;color:var(--slate2);margin-top:3px">+ ' + moreCount + ' more…</div>' : '') +
+          '</div>'
+        : '<div style="font-size:.75rem;color:var(--slate2);font-style:italic;border-top:1px solid var(--b2);padding-top:10px">No members in this district yet</div>'
+      ) +
+      '<div style="margin-top:12px">' +
+        '<button class="btn btn-ghost" style="font-size:.7rem;padding:4px 10px;width:100%" onclick="showView(\'members\')">✏️ Assign / Edit Members</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
 }
 
 /* ════════════════════════════════════════════════════
@@ -2155,6 +2346,16 @@ function admToggleHeat() {
           <div class="mf-label">Zip Code</div>
           <input class="tb-search" id="meBizZip" type="text" placeholder="96720" maxlength="10" style="width:100%">
         </div>
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">Business District</div>
+        <select class="tb-search" id="meDistrict" style="width:100%">
+          <option value="">— Assign district…</option>
+        </select>
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">District Captain Name</div>
+        <input class="tb-search" id="meCaptain" type="text" placeholder="Captain's full name" style="width:100%">
       </div>
       <input type="hidden" id="meId">
       <input type="hidden" id="meOrigEmail">
