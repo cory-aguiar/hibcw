@@ -2191,28 +2191,17 @@ let admSatLayer    = null;
    Dataset: 893e0ad0b7d04ebbbd49daa31f474b8e (Council Districts 2022)
 ════════════════════════════════════════════════════ */
 
-// KIAA district definitions — identified by geographic anchor points, NOT council numbers.
-const KIAA_DISTRICTS = [
-  { id:'south-hilo',   label:'South Hilo',   color:'#00c9a7', anchor:[19.700,-155.090] },
-  { id:'north-hilo',   label:'North Hilo',   color:'#3b82f6', anchor:[19.855,-155.130] },
-  { id:'hamakua',      label:'Hāmākua',      color:'#84cc16', anchor:[20.020,-155.350] },
-  { id:'north-kohala', label:'North Kohala', color:'#10b981', anchor:[20.200,-155.830] },
-  { id:'south-kohala', label:'South Kohala', color:'#06b6d4', anchor:[19.980,-155.750] },
-  { id:'north-kona',   label:'North Kona',   color:'#f97316', anchor:[19.680,-156.020] },
-  { id:'south-kona',   label:'South Kona',   color:'#f59e0b', anchor:[19.420,-155.890] },
-  { id:'kau',          label:'Kaʻū',          color:'#ef4444', anchor:[19.100,-155.580] },
-  { id:'upper-puna',   label:'Upper Puna',   color:'#a855f7', anchor:[19.510,-154.970] },
-  { id:'lower-puna',   label:'Lower Puna',   color:'#c084fc', anchor:[19.300,-154.960] },
-];
-
-function matchDistrictByLocation(centLat, centLng) {
-  let best = null, bestDist = Infinity;
-  for (const d of KIAA_DISTRICTS) {
-    const dist = Math.hypot(centLat - d.anchor[0], centLng - d.anchor[1]);
-    if (dist < bestDist) { bestDist = dist; best = d; }
-  }
-  return best;
-}
+const COUNCIL_DISTRICT_INFO = {
+  1: { id:'hamakua',      label:'Hāmākua',      color:'#84cc16', center:[19.680,-155.100] },
+  2: { id:'north-hilo',   label:'North Hilo',   color:'#3b82f6', center:[19.380,-154.980] },
+  3: { id:'south-hilo',   label:'South Hilo',   color:'#00c9a7', center:[19.150,-155.420] },
+  4: { id:'lower-puna',   label:'Lower Puna',   color:'#a855f7', center:[19.335,-155.930] },
+  5: { id:'upper-puna',   label:'Upper Puna',   color:'#c084fc', center:[19.680,-156.005] },
+  6: { id:'kau',          label:'Kaʻū',          color:'#ef4444', center:[19.960,-155.770] },
+  7: { id:'south-kona',   label:'South Kona',   color:'#f59e0b', center:[20.210,-155.950] },
+  8: { id:'north-kona',   label:'North Kona',   color:'#f97316', center:[20.000,-155.370] },
+  9: { id:'north-kohala', label:'North Kohala', color:'#10b981', center:[19.820,-155.220] }
+};
 
 const DISTRICT_GEO_FALLBACK = [
   { id:'north-kohala', label:'North Kohala', color:'#10b981', center:[20.210,-155.950], coords:[[20.264,-155.869],[20.264,-155.960],[20.200,-156.000],[20.036,-155.960],[20.036,-155.833],[20.090,-155.885],[20.145,-155.942],[20.178,-155.899],[20.235,-155.912],[20.264,-155.869]] },
@@ -2249,7 +2238,9 @@ function dpSimplify(pts, tol) {
     const gj = await resp.json();
     const loaded = [];
     for (const feat of gj.features) {
-      if (!feat.geometry) continue;
+      const num = parseInt((feat.properties.distname || '').replace(/\D/g,''));
+      const info = COUNCIL_DISTRICT_INFO[num];
+      if (!info || !feat.geometry) continue;
       const geom = feat.geometry;
       let rings = geom.type==='Polygon' ? [geom.coordinates[0]] :
                   geom.type==='MultiPolygon' ? geom.coordinates.map(p=>p[0]) : [];
@@ -2258,20 +2249,11 @@ function dpSimplify(pts, tol) {
         const pts = dpSimplify(ring.map(([lng,lat])=>[lat,lng]), 0.0003);
         if (pts.length > best.length) best = pts;
       }
-      if (best.length < 3) continue;
-      const centLat = best.reduce((s,p)=>s+p[0],0)/best.length;
-      const centLng = best.reduce((s,p)=>s+p[1],0)/best.length;
-      const info = matchDistrictByLocation(centLat, centLng);
-      if (!info) continue;
-      const existing = loaded.find(d=>d.id===info.id);
-      if (existing && existing.coords.length >= best.length) continue;
-      const idx = loaded.findIndex(d=>d.id===info.id);
-      const entry = { ...info, coords: best };
-      if (idx >= 0) loaded[idx] = entry; else loaded.push(entry);
+      if (best.length >= 3) loaded.push({ ...info, coords: best });
     }
     if (loaded.length >= 6) {
       DISTRICT_GEO = loaded;
-      console.log('[HIBCW Admin] ✅ Loaded', loaded.length, 'official districts (centroid-matched) from Hawaii State GIS');
+      console.log('[HIBCW Admin] ✅ Loaded', loaded.length, 'official council districts from Hawaii State GIS');
       if (districtOverlayOn && window._adminDistrictMap) {
         removeDistrictOverlay(window._adminDistrictMap);
         districtOverlayOn = false;
