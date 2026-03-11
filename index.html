@@ -1401,21 +1401,19 @@ function updateStats() {
 ════════════════════════════════════════════════════ */
 
 // Style info for each of Hawaii County's 9 traditional districts
-// KIAA district definitions — identified by geographic anchor points, NOT council numbers.
-// Each anchor is a well-known lat/lng that definitively falls inside that district.
-// When GIS polygons are fetched, we compute each polygon's centroid and match it to the
-// nearest anchor — this avoids any dependence on council number ordering.
+// KIAA district definitions — matched to Hawaii County Council districts by geographic centroid.
+// Anchors are well-known coordinates inside each district. There are exactly 9 council districts;
+// south-kohala is NOT a separate council district so it is intentionally excluded here.
 const KIAA_DISTRICTS = [
-  { id:'south-hilo',   label:'District 3 - South Hilo',   color:'#00c9a7', anchor:[19.700,-155.090] },
-  { id:'north-hilo',   label:'District 2 - North Hilo',   color:'#3b82f6', anchor:[19.855,-155.130] },
-  { id:'hamakua',      label:'District 1 - Hāmākua',      color:'#84cc16', anchor:[20.020,-155.350] },
-  { id:'north-kohala', label:'District 9 - North Kohala', color:'#10b981', anchor:[20.200,-155.830] },
-  { id:'south-kohala', label:'South Kohala', color:'#06b6d4', anchor:[19.980,-155.750] },
-  { id:'north-kona',   label:'District 8 - North Kona',   color:'#f97316', anchor:[19.680,-156.020] },
-  { id:'south-kona',   label:'District 7 - South Kona',   color:'#f59e0b', anchor:[19.420,-155.890] },
-  { id:'kau',          label:'District 6 - Kaʻū',          color:'#ef4444', anchor:[19.100,-155.580] },
-  { id:'upper-puna',   label:'District 5 - Upper Puna',   color:'#a855f7', anchor:[19.510,-154.970] },
-  { id:'lower-puna',   label:'District 4 - Lower Puna',   color:'#c084fc', anchor:[19.300,-154.960] },
+  { id:'hamakua',      label:'District 1 - Hāmākua',      color:'#84cc16', anchor:[20.100,-155.500] },
+  { id:'north-hilo',   label:'District 2 - North Hilo',   color:'#3b82f6', anchor:[19.730,-155.090] },
+  { id:'south-hilo',   label:'District 3 - South Hilo',   color:'#00c9a7', anchor:[19.620,-155.060] },
+  { id:'lower-puna',   label:'District 4 - Lower Puna',   color:'#c084fc', anchor:[19.250,-154.990] },
+  { id:'upper-puna',   label:'District 5 - Upper Puna',   color:'#a855f7', anchor:[19.480,-155.020] },
+  { id:'kau',          label:'District 6 - Kaʻū',          color:'#ef4444', anchor:[19.050,-155.600] },
+  { id:'south-kona',   label:'District 7 - South Kona',   color:'#f59e0b', anchor:[19.400,-155.840] },
+  { id:'north-kona',   label:'District 8 - North Kona',   color:'#f97316', anchor:[19.640,-155.990] },
+  { id:'north-kohala', label:'District 9 - North Kohala', color:'#10b981', anchor:[20.020,-155.670] },
 ];
 
 // Match a fetched polygon (by its centroid) to the nearest KIAA district anchor
