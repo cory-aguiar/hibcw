@@ -3,37 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HIBCW — Incident Reporter</title>
+<title>HIBCW Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <style>
-/* ── Reset & Base ─────────────────────────────────────────── */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --navy:    #0b1524;
-  --navy2:   #111e30;
-  --navy3:   #18293f;
-  --teal:    #00c9a7;
-  --teal2:   #00a589;
-  --gold:    #f5a623;
-  --red:     #e8415a;
-  --slate:   #7a8fa6;
-  --slate2:  #4a6070;
-  --white:   #eef3f8;
-  --border:  rgba(0,201,167,.15);
-  --border2: rgba(255,255,255,.07);
+  --navy:  #0b1524;
+  --navy2: #111e30;
+  --navy3: #18293f;
+  --teal:  #00c9a7;
+  --gold:  #f5a623;
+  --red:   #e8415a;
+  --green: #2ecc71;
+  --slate: #7a8fa6;
+  --slate2:#4a6070;
+  --white: #eef3f8;
+  --border:rgba(0,201,167,.15);
+  --b2:    rgba(255,255,255,.07);
 }
-html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
+html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
 
-/* ── Layout ───────────────────────────────────────────────── */
-.app{display:flex;flex-direction:column;height:100vh}
+/* ── Login screen ─────────────────────────────────────────── */
+#loginScreen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 40% 40%,#112240 0%,#0b1524 70%);
+}
+.login-box{
+  background:var(--navy2);border:1px solid var(--border);border-radius:12px;
+  padding:40px;width:100%;max-width:380px;
+}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-shield{
+  width:52px;height:52px;margin:0 auto 12px;
+  background:linear-gradient(160deg,#002266,#001133);
+  border:2px solid var(--gold);
+  clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--gold);
+}
+.login-title{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:.08em;color:var(--white)}
+.login-sub{font-size:.75rem;color:var(--slate);margin-top:4px}
+.login-field{margin-bottom:16px}
+.login-field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:6px}
+.login-field input{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b2);
+  border-radius:5px;padding:10px 13px;color:var(--white);font-size:.9rem;outline:none;transition:border-color .2s;
+}
+.login-field input:focus{border-color:var(--teal)}
+.login-btn{
+  width:100%;padding:11px;border:none;border-radius:5px;cursor:pointer;
+  background:linear-gradient(135deg,var(--teal),#00a589);
+  color:#0b1524;font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;transition:filter .2s;margin-top:4px;
+}
+.login-btn:hover{filter:brightness(1.1)}
+.login-err{color:var(--red);font-size:.78rem;text-align:center;margin-top:10px;display:none}
+
+/* ── App shell ────────────────────────────────────────────── */
+#appShell{display:none;height:100vh;flex-direction:column}
+#appShell.visible{display:flex}
 
 /* ── Header ───────────────────────────────────────────────── */
 header{
@@ -41,338 +74,198 @@ header{
   background:linear-gradient(90deg,#0b1524,#111e30);
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;z-index:100;
+  padding:0 20px;
 }
-.logo{display:flex;align-items:center;gap:10px}
-.logo-shield{
-  width:32px;height:32px;flex-shrink:0;
+.hd-left{display:flex;align-items:center;gap:10px}
+.hd-shield{
+  width:30px;height:30px;flex-shrink:0;
   background:linear-gradient(160deg,#002266,#001133);
   border:1.5px solid var(--gold);
   clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);
   display:flex;align-items:center;justify-content:center;
-  font-family:'Rajdhani',sans-serif;font-size:.7rem;font-weight:700;color:var(--gold);
-  letter-spacing:.04em;
+  font-family:'Rajdhani',sans-serif;font-size:.65rem;font-weight:700;color:var(--gold);
 }
-.logo-text{line-height:1.2}
-.logo-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--white)}
-.logo-sub{font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--teal);letter-spacing:.12em;text-transform:uppercase}
-.header-right{display:flex;align-items:center;gap:12px}
-.live-dot{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);letter-spacing:.08em}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,201,167,.5)}50%{box-shadow:0 0 0 5px rgba(0,201,167,0)}}
-.count-badge{background:rgba(0,201,167,.1);border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)}
-.member-link{
-  background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);
-  border-radius:4px;padding:4px 11px;
-  font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;color:var(--gold);
-  text-decoration:none;transition:all .2s;white-space:nowrap;
-}
-.member-link:hover{background:rgba(245,166,35,.2);border-color:rgba(245,166,35,.4)}
-.donate-link{
-  background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);
-  border-radius:4px;padding:4px 11px;
-  font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;color:var(--teal);
-  text-decoration:none;transition:all .2s;white-space:nowrap;
-}
-.donate-link:hover{background:rgba(0,201,167,.22);border-color:rgba(0,201,167,.5)}
+.hd-title{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.08em}
+.hd-sub{font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--teal);letter-spacing:.1em}
+.hd-right{display:flex;align-items:center;gap:12px}
+.hd-user{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate)}
+.logout-btn{background:none;border:1px solid var(--b2);border-radius:4px;padding:4px 12px;color:var(--slate);font-size:.72rem;cursor:pointer;transition:all .2s}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
 
-/* ── Body split ───────────────────────────────────────────── */
+/* ── Body ─────────────────────────────────────────────────── */
 .body{display:flex;flex:1;overflow:hidden}
 
-/* ── Left panel ───────────────────────────────────────────── */
-.panel{
-  width:380px;flex-shrink:0;
-  background:var(--navy2);
-  border-right:1px solid var(--border2);
-  display:flex;flex-direction:column;overflow:hidden;
+/* ── Sidebar ──────────────────────────────────────────────── */
+.sidebar{
+  width:200px;flex-shrink:0;background:var(--navy2);
+  border-right:1px solid var(--b2);padding:16px 0;overflow-y:auto;
 }
-
-/* ── Tabs ─────────────────────────────────────────────────── */
-.tabs{display:flex;border-bottom:1px solid var(--border2);flex-shrink:0}
-.tab{
-  flex:1;padding:12px 8px;
-  background:none;border:none;cursor:pointer;
-  font-family:'Rajdhani',sans-serif;font-size:.78rem;font-weight:600;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--slate);
-  border-bottom:2px solid transparent;transition:all .2s;
+.nav-section{font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:var(--slate2);padding:12px 18px 6px}
+.nav-btn{
+  display:flex;align-items:center;gap:10px;width:100%;padding:9px 18px;
+  background:none;border:none;border-left:3px solid transparent;cursor:pointer;
+  font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;color:var(--slate);
+  text-align:left;transition:all .18s;
 }
-.tab:hover{color:var(--white)}
-.tab.on{color:var(--teal);border-bottom-color:var(--teal)}
+.nav-btn:hover{color:var(--white);background:rgba(255,255,255,.03)}
+.nav-btn.on{color:var(--teal);border-left-color:var(--teal);background:rgba(0,201,167,.06);font-weight:500}
+.nav-count{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:rgba(0,201,167,.12);color:var(--teal);padding:1px 6px;border-radius:10px}
 
-/* ── Scrollable tab content ───────────────────────────────── */
-.tab-body{flex:1;overflow-y:auto;padding:20px}
-.tab-body::-webkit-scrollbar{width:4px}
-.tab-body::-webkit-scrollbar-track{background:transparent}
-.tab-body::-webkit-scrollbar-thumb{background:var(--slate2);border-radius:2px}
+/* ── Main ─────────────────────────────────────────────────── */
+main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+main::-webkit-scrollbar{width:4px}
+main::-webkit-scrollbar-thumb{background:var(--slate2);border-radius:2px}
+.view{display:none;flex-direction:column;flex:1}
+.view.on{display:flex}
 
-/* ── Form ─────────────────────────────────────────────────── */
-.section{margin-bottom:20px}
-.sec-label{
-  font-family:'IBM Plex Mono',monospace;font-size:.6rem;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--slate);
-  margin-bottom:8px;display:flex;align-items:center;gap:8px;
+/* ── Page header ──────────────────────────────────────────── */
+.page-hd{
+  padding:20px 24px 0;display:flex;align-items:flex-start;
+  justify-content:space-between;gap:16px;flex-wrap:wrap;flex-shrink:0;
 }
-.sec-label::after{content:'';flex:1;height:1px;background:var(--border2)}
+.page-title{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:.05em}
+.page-sub{font-size:.78rem;color:var(--slate);margin-top:2px}
+.page-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
-/* Incident type grid */
-.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.type-btn{
-  background:rgba(255,255,255,.03);border:1px solid var(--border2);
-  border-radius:5px;padding:8px 6px;cursor:pointer;transition:all .18s;
-  font-family:'IBM Plex Sans',sans-serif;font-size:.75rem;color:var(--slate);
-  display:flex;align-items:center;gap:6px;
+/* ── Toolbar ──────────────────────────────────────────────── */
+.toolbar{padding:14px 24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0}
+.tb-search{
+  flex:1;min-width:180px;background:rgba(255,255,255,.04);border:1px solid var(--b2);
+  border-radius:4px;padding:7px 11px;color:var(--white);font-size:.82rem;outline:none;transition:border-color .2s;
 }
-.type-btn:hover{border-color:var(--slate2);color:var(--white)}
-.type-btn.sel-red{background:rgba(232,65,90,.12);border-color:var(--red);color:var(--red)}
-.type-btn.sel-gold{background:rgba(245,166,35,.12);border-color:var(--gold);color:var(--gold)}
-.type-btn.sel-teal{background:rgba(0,201,167,.12);border-color:var(--teal);color:var(--teal)}
-.type-icon{font-size:1rem;flex-shrink:0}
-
-/* Fields */
-.fld{margin-bottom:12px}
-.fld label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:5px}
-.fld input,.fld textarea,.fld select{
-  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);
-  border-radius:4px;padding:8px 11px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;
-  outline:none;transition:border-color .18s;
+.tb-search:focus{border-color:var(--teal)}
+.tb-select{
+  background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;
+  padding:7px 10px;color:var(--white);font-size:.78rem;outline:none;cursor:pointer;
 }
-.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--teal)}
-.fld input.err,.fld textarea.err{border-color:var(--red)}
-.fld textarea{min-height:80px;resize:vertical}
-.fld select option{background:var(--navy2)}
-.fld input[type="datetime-local"]{color-scheme:dark}
+.tb-select option{background:var(--navy2)}
 
-/* Pin hint */
-.pin-hint{
-  background:rgba(0,201,167,.06);border:1px solid var(--border);
-  border-radius:4px;padding:8px 11px;margin-bottom:12px;
-  font-size:.75rem;color:var(--teal);display:flex;align-items:center;gap:7px;
+/* ── Bulk bar ─────────────────────────────────────────────── */
+.bulk-bar{
+  display:none;background:rgba(0,201,167,.08);border-bottom:1px solid var(--border);
+  padding:8px 24px;align-items:center;gap:12px;flex-shrink:0;
 }
-.coords{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);margin-top:4px;display:none}
+.bulk-bar.show{display:flex}
+.bulk-label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--teal)}
 
-/* Drop zone */
-.dropzone{
-  border:1.5px dashed var(--border2);border-radius:6px;padding:20px;
-  text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px;
-  background:rgba(255,255,255,.02);
+/* ── Table ────────────────────────────────────────────────── */
+.table-wrap{flex:1;overflow:auto;padding:0 24px 24px}
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:12px}
+thead tr{position:sticky;top:0;background:var(--navy);z-index:10}
+th{
+  padding:9px 12px;text-align:left;border-bottom:1px solid var(--b2);
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--slate2);white-space:nowrap;
 }
-.dropzone:hover{border-color:var(--teal);background:rgba(0,201,167,.04)}
-.dropzone input{display:none}
-.dz-label{font-size:.78rem;color:var(--slate);line-height:1.6}
-.dz-label strong{color:var(--white)}
-.previews{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.prev-item{position:relative;width:64px;height:64px;border-radius:4px;overflow:hidden;border:1px solid var(--border2)}
-.prev-item img,.prev-item video{width:100%;height:100%;object-fit:cover}
-.prev-del{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.7);border:none;border-radius:50%;width:16px;height:16px;cursor:pointer;color:#fff;font-size:.6rem;display:flex;align-items:center;justify-content:center}
-
-/* Upload progress */
-.uprog{display:none;margin-bottom:10px}
-.uprog.show{display:block}
-.uprog-label{font-size:.72rem;color:var(--slate);margin-bottom:4px;font-family:'IBM Plex Mono',monospace}
-.uprog-bar{height:3px;background:var(--border2);border-radius:2px;overflow:hidden}
-.uprog-fill{height:100%;background:var(--teal);width:0;transition:width .3s}
-
-/* Submit btn */
-.submit-btn{
-  width:100%;padding:12px;border:none;border-radius:5px;cursor:pointer;
-  background:linear-gradient(135deg,var(--teal),var(--teal2));
-  color:#0b1524;font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;transition:all .2s;margin-top:4px;
-}
-.submit-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
-.submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-
-/* Incident list */
-.list-toolbar{display:flex;gap:8px;margin-bottom:14px}
-.srch{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:4px;padding:8px 11px;color:var(--white);font-size:.8rem;outline:none}
-.srch:focus{border-color:var(--teal)}
-.filt{background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:4px;padding:8px;color:var(--white);font-size:.75rem;outline:none;cursor:pointer}
-.filt option{background:var(--navy2)}
-.inc-card{
-  background:rgba(255,255,255,.03);border:1px solid var(--border2);
-  border-radius:6px;padding:12px;margin-bottom:8px;cursor:pointer;
-  transition:all .18s;border-left:3px solid transparent;
-}
-.inc-card:hover{background:rgba(255,255,255,.05);border-left-color:var(--teal)}
-.inc-card.hl{border-left-color:var(--teal);background:rgba(0,201,167,.06)}
-.card-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+td{padding:10px 12px;border-bottom:1px solid var(--b2);vertical-align:top}
+tr:hover td{background:rgba(255,255,255,.02)}
+.td-type{white-space:nowrap}
+.td-addr{max-width:180px;color:var(--slate);font-size:.78rem}
+.td-desc{max-width:260px;color:rgba(238,243,248,.75);font-size:.78rem;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.td-time{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);white-space:nowrap}
 .badge{padding:2px 8px;border-radius:3px;font-size:.65rem;font-weight:600;font-family:'Rajdhani',sans-serif;letter-spacing:.06em;text-transform:uppercase}
 .b-red{background:rgba(232,65,90,.15);color:var(--red);border:1px solid rgba(232,65,90,.3)}
 .b-gold{background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
 .b-teal{background:rgba(0,201,167,.12);color:var(--teal);border:1px solid rgba(0,201,167,.25)}
-.card-time{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate)}
-.card-addr{font-size:.75rem;color:var(--slate);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-desc{font-size:.78rem;color:rgba(238,243,248,.7);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card-meta{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap}
-.meta-tag{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2)}
-.empty{padding:40px 0;text-align:center}
-.empty-icon{font-size:2rem;margin-bottom:8px}
-.empty-txt{font-size:.82rem;color:var(--slate);line-height:1.7}
+.b-arch{background:rgba(122,143,166,.1);color:var(--slate);border:1px solid rgba(122,143,166,.2)}
+.media-pill{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--gold)}
+.row-actions{display:flex;gap:5px;flex-wrap:wrap}
 
-/* ── Map ──────────────────────────────────────────────────── */
-.map-wrap{flex:1;position:relative}
-#map{width:100%;height:100%}
-.map-controls{
-  position:absolute;top:12px;right:12px;z-index:500;
-  display:flex;gap:6px;
-}
-.map-btn{
-  background:var(--navy2);border:1px solid var(--border2);
-  border-radius:4px;padding:6px 12px;cursor:pointer;
-  font-family:'IBM Plex Mono',monospace;font-size:.62rem;
-  color:var(--slate);letter-spacing:.08em;transition:all .2s;
-}
-.map-btn:hover{border-color:var(--teal);color:var(--teal)}
-.map-btn.on{border-color:var(--teal);color:var(--teal);background:rgba(0,201,167,.08)}
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn{border:none;border-radius:4px;padding:5px 11px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;white-space:nowrap}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--slate);border:1px solid var(--b2)}
+.btn-ghost:hover{background:rgba(255,255,255,.1);color:var(--white)}
+.btn-teal{background:rgba(0,201,167,.15);color:var(--teal);border:1px solid rgba(0,201,167,.3)}
+.btn-teal:hover{background:rgba(0,201,167,.25)}
+.btn-gold{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.25)}
+.btn-gold:hover{background:rgba(245,166,35,.22)}
+.btn-red{background:rgba(232,65,90,.12);color:var(--red);border:1px solid rgba(232,65,90,.25)}
+.btn-red:hover{background:rgba(232,65,90,.22)}
+.btn-green{background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.25)}
+.btn-green:hover{background:rgba(46,204,113,.22)}
+.btn-lg{padding:8px 18px;font-size:.8rem}
 
-/* ── Modal ────────────────────────────────────────────────── */
-.overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;
-  display:none;align-items:center;justify-content:center;padding:20px;
-}
+/* ── Stats ────────────────────────────────────────────────── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;padding:20px 24px}
+.stat-card{background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:18px 20px}
+.stat-num{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--white)}
+.stat-lbl{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-top:4px}
+.stat-card.accent{border-color:var(--border)}
+.stat-card.accent .stat-num{color:var(--teal)}
+
+.type-breakdown{padding:0 24px 24px}
+.type-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.type-row-label{font-size:.78rem;color:var(--white);width:160px;flex-shrink:0}
+.type-bar-wrap{flex:1;height:8px;background:var(--b2);border-radius:4px;overflow:hidden}
+.type-bar{height:100%;border-radius:4px;transition:width .5s ease}
+.type-count{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate);width:30px;text-align:right;flex-shrink:0}
+
+/* ── Empty state ──────────────────────────────────────────── */
+.empty-state{padding:60px 24px;text-align:center}
+.empty-icon{font-size:2.5rem;margin-bottom:10px}
+.empty-text{font-size:.85rem;color:var(--slate);line-height:1.8}
+
+/* ── Detail modal ─────────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
-.modal{
-  background:var(--navy2);border:1px solid var(--border2);
-  border-radius:10px;width:100%;max-width:520px;max-height:90vh;
-  overflow-y:auto;
-}
+.modal{background:var(--navy2);border:1px solid var(--b2);border-radius:10px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto}
 .modal::-webkit-scrollbar{width:4px}
 .modal::-webkit-scrollbar-thumb{background:var(--slate2);border-radius:2px}
-.modal-hd{
-  padding:18px 20px;border-bottom:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;background:var(--navy2);z-index:1;
-}
-.modal-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.05em}
-.modal-close{background:none;border:none;color:var(--slate);font-size:1.2rem;cursor:pointer;line-height:1}
+.modal-hd{padding:18px 20px;border-bottom:1px solid var(--b2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--navy2);z-index:1}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700}
+.modal-close{background:none;border:none;color:var(--slate);font-size:1.2rem;cursor:pointer}
 .modal-close:hover{color:var(--white)}
 .modal-body{padding:20px}
 .mf-row{margin-bottom:14px}
 .mf-label{font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px}
 .mf-val{font-size:.85rem;color:var(--white);line-height:1.6}
 .modal-media{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.modal-media-item{width:80px;height:80px;border-radius:5px;overflow:hidden;cursor:pointer;border:1px solid var(--border2);transition:border-color .18s}
+.modal-media-item{width:80px;height:80px;border-radius:5px;overflow:hidden;cursor:pointer;border:1px solid var(--b2)}
 .modal-media-item:hover{border-color:var(--teal)}
 .modal-media-item img,.modal-media-item video{width:100%;height:100%;object-fit:cover}
+.modal-actions{padding:16px 20px;border-top:1px solid var(--b2);display:flex;gap:8px;flex-wrap:wrap}
 
-/* ── Lightbox ─────────────────────────────────────────────── */
+/* Lightbox */
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:2000;display:none;align-items:center;justify-content:center}
 .lightbox.open{display:flex}
 .lightbox img,.lightbox video{max-width:90vw;max-height:90vh;border-radius:6px}
-.lb-close{position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:1.8rem;cursor:pointer;line-height:1}
+.lb-close{position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:1.8rem;cursor:pointer}
 
-/* ── Popup ────────────────────────────────────────────────── */
-.leaflet-popup-content-wrapper{background:var(--navy2);border:1px solid var(--border);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.5)}
-.leaflet-popup-content{margin:12px 14px;font-family:'IBM Plex Sans',sans-serif}
-.leaflet-popup-tip{background:var(--navy2)}
-.pu-type{font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
-.pu-addr{font-size:.75rem;color:var(--slate);margin-bottom:3px}
-.pu-time{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate2);margin-bottom:8px}
-.pu-btn{background:var(--teal);border:none;border-radius:3px;padding:5px 12px;cursor:pointer;color:#0b1524;font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;width:100%}
-.pu-btn:hover{filter:brightness(1.1)}
-
-/* ── Toast ────────────────────────────────────────────────── */
-.toast{
-  position:fixed;bottom:24px;right:24px;z-index:3000;
-  background:var(--navy3);border:1px solid var(--border2);border-radius:8px;
-  padding:14px 18px;display:flex;align-items:flex-start;gap:12px;
-  min-width:280px;max-width:360px;transform:translateY(120px);
-  opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;
-  box-shadow:0 8px 32px rgba(0,0,0,.4);
-}
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;z-index:3000;background:var(--navy3);border:1px solid var(--b2);border-radius:8px;padding:12px 16px;display:flex;gap:10px;min-width:260px;max-width:340px;transform:translateY(100px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.4)}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.err-toast{border-color:rgba(232,65,90,.4)}
-.toast-ico{font-size:1.1rem;flex-shrink:0;margin-top:1px}
-.toast-msg{flex:1}
-.toast-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.05em;margin-bottom:2px}
-.toast-body{font-size:.75rem;color:var(--slate);line-height:1.5}
+.toast-ico{font-size:1rem;flex-shrink:0}
+.toast-msg{flex:1;font-size:.78rem;color:var(--slate)}
+.toast-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.82rem;color:var(--white);margin-bottom:2px}
 
-/* ── Map marker icon ──────────────────────────────────────── */
-.map-marker{
-  width:36px;height:36px;border-radius:50% 50% 50% 0;
-  transform:rotate(-45deg);border:2px solid rgba(255,255,255,.45);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 3px 10px rgba(0,0,0,.5);
-  transition:transform .15s;
-}
-.map-marker:hover{transform:rotate(-45deg) scale(1.15)}
-.map-marker-inner{transform:rotate(45deg);font-size:1rem;line-height:1}
+/* Checkbox */
+input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
 
-/* ── Stats banner ──────────────────────────────────────── */
-.stats-banner{
-  flex-shrink:0;
-  background:linear-gradient(90deg,rgba(0,201,167,.07),rgba(0,201,167,.03));
-  border-bottom:1px solid var(--border);
-  padding:7px 16px;
-  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-  font-family:'IBM Plex Mono',monospace;font-size:.62rem;
-}
-.stat-pill{
-  display:flex;align-items:center;gap:5px;
-  color:var(--slate);white-space:nowrap;
-}
-.stat-pill strong{color:var(--white)}
-.stat-pill.hi strong{color:var(--teal)}
-.stat-sep{color:var(--slate2);margin:0 2px}
-
-/* ── Map filter bar ────────────────────────────────────── */
-.map-filter-bar{
-  position:absolute;bottom:12px;left:12px;right:12px;z-index:500;
-  display:flex;gap:6px;flex-wrap:wrap;align-items:center;
-  pointer-events:none;
-}
-.map-filter-bar > *{pointer-events:auto}
-.mfb-input{
-  background:rgba(11,21,36,.88);backdrop-filter:blur(8px);
-  border:1px solid var(--border);border-radius:4px;
-  padding:6px 11px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;
-  font-size:.78rem;outline:none;width:180px;transition:border-color .2s;
-}
-.mfb-input:focus{border-color:var(--teal)}
-.mfb-input::placeholder{color:var(--slate2)}
-.mfb-select{
-  background:rgba(11,21,36,.88);backdrop-filter:blur(8px);
-  border:1px solid var(--border);border-radius:4px;
-  padding:6px 10px;color:var(--white);font-size:.75rem;outline:none;cursor:pointer;
-}
-.mfb-select option{background:var(--navy2)}
-.mfb-clear{
-  background:rgba(11,21,36,.88);backdrop-filter:blur(8px);
-  border:1px solid rgba(232,65,90,.3);border-radius:4px;
-  padding:6px 10px;color:var(--red);font-size:.72rem;cursor:pointer;
-  display:none;transition:all .2s;
-}
-.mfb-clear.show{display:block}
-.mfb-clear:hover{background:rgba(232,65,90,.12)}
-.mfb-count{
-  background:rgba(0,201,167,.12);backdrop-filter:blur(8px);
-  border:1px solid var(--border);border-radius:4px;
-  padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);
-  display:none;
-}
-.mfb-count.show{display:block}
-
-/* ── Age indicator ─────────────────────────────────────── */
-.age-tag{
-  font-family:'IBM Plex Mono',monospace;font-size:.58rem;
-  border-radius:3px;padding:1px 6px;white-space:nowrap;
-}
+/* ── Age tags ──────────────────────────────────────────────── */
+.age-tag{font-family:'IBM Plex Mono',monospace;font-size:.58rem;border-radius:3px;padding:1px 6px;white-space:nowrap}
 .age-fresh{background:rgba(232,65,90,.15);color:var(--red);border:1px solid rgba(232,65,90,.25)}
 .age-recent{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.2)}
 .age-old{background:rgba(122,143,166,.08);color:var(--slate);border:1px solid rgba(122,143,166,.15)}
 
-/* ── Recurring flag ────────────────────────────────────── */
-.recurring-flag{
-  display:inline-flex;align-items:center;gap:4px;
-  background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);
-  border-radius:3px;padding:1px 7px;font-size:.65rem;color:var(--gold);
-  font-family:'IBM Plex Mono',monospace;
-}
-.fld-check{display:flex;align-items:center;gap:8px;padding:6px 0}
-.fld-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0;cursor:pointer}
-.fld-check label{font-size:.8rem;color:var(--slate);cursor:pointer;line-height:1.4}
+/* ── Recurring flag ────────────────────────────────────────── */
+.recurring-flag{display:inline-flex;align-items:center;gap:4px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;font-size:.65rem;color:var(--gold);font-family:'IBM Plex Mono',monospace}
+
+/* ── Notes log ─────────────────────────────────────────────── */
+.notes-section{margin-top:4px}
+.note-item{background:rgba(255,255,255,.03);border:1px solid var(--b2);border-radius:4px;padding:9px 12px;margin-bottom:7px}
+.note-meta{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);margin-bottom:4px;display:flex;justify-content:space-between}
+.note-text{font-size:.8rem;color:var(--white);line-height:1.5}
+.note-del{background:none;border:none;color:var(--slate2);cursor:pointer;font-size:.7rem;transition:color .15s}
+.note-del:hover{color:var(--red)}
+.note-form{display:flex;gap:7px;margin-top:8px}
+.note-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;padding:7px 10px;color:var(--white);font-size:.8rem;outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif}
+.note-input:focus{border-color:var(--teal)}
+.note-submit{background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);border-radius:4px;padding:7px 14px;color:var(--teal);cursor:pointer;font-size:.78rem;white-space:nowrap;transition:all .2s}
+.note-submit:hover{background:rgba(0,201,167,.22)}
+
+/* ── Verified member badge ─────────────────────────────────── */
 .verified-badge{
   display:inline-flex;align-items:center;gap:4px;
   background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);
@@ -380,426 +273,636 @@ header{
   font-size:.65rem;color:var(--teal);font-family:'IBM Plex Mono',monospace;
   white-space:nowrap;
 }
-.fld-verify-hint{
-  font-size:.7rem;color:var(--slate2);font-family:'IBM Plex Mono',monospace;
-  margin-top:4px;min-height:16px;transition:color .2s;
-}
-.fld-verify-hint.ok{color:var(--teal)}
-.fld-verify-hint.no{color:var(--slate2)}
 
-@media(max-width:700px){
-  .panel{width:100%;border-right:none;height:auto;max-height:none;flex:none}
-  .body{flex-direction:column;overflow:auto}
-  .map-wrap{height:50vh;flex:none;min-height:320px}
-  .tab-body{max-height:60vh;overflow-y:auto}
-  header{padding:0 12px}
-  .logo-name{font-size:.85rem}
-  .logo-sub{display:none}
-  .stats-banner{padding:6px 12px;gap:8px}
-  .stat-sep:nth-child(n+4){display:none}
-  .map-filter-bar{bottom:8px;left:8px;right:8px}
-  .mfb-input{width:140px;font-size:.74rem}
+/* ── Member management ─────────────────────────────────────── */
+.member-add-bar{padding:16px 24px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.member-input{
+  flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid var(--b2);
+  border-radius:4px;padding:8px 12px;color:var(--white);font-size:.82rem;outline:none;
+  transition:border-color .2s;
 }
-@media(max-width:480px){
-  .panel{width:100%}
-  .type-grid{grid-template-columns:1fr 1fr}
-  .map-wrap{height:45vh}
-  .logo-shield{width:26px;height:26px;font-size:.6rem}
+.member-input:focus{border-color:var(--teal)}
+.member-toolbar{padding:12px 24px 0;display:flex;align-items:center;gap:10px}
+.member-search{
+  background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;
+  padding:7px 12px;color:var(--white);font-size:.82rem;outline:none;width:260px;transition:border-color .2s;
 }
+.member-search:focus{border-color:var(--teal)}
+.member-search::placeholder{color:var(--slate2)}
+.member-count{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate);margin-left:auto}
+.member-table-wrap{padding:14px 24px 40px;overflow-x:auto}
+.member-table{width:100%;border-collapse:collapse}
+.member-table th{
+  font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--slate);padding:10px 14px;
+  border-bottom:1px solid var(--b2);text-align:left;white-space:nowrap;
+  background:var(--navy2);position:sticky;top:0;z-index:1;
+}
+.member-table td{
+  padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);
+  font-size:.82rem;vertical-align:middle;
+}
+.member-table tbody tr:hover td{background:rgba(255,255,255,.03)}
+.member-table tbody tr:last-child td{border-bottom:none}
+.mem-email{
+  display:flex;align-items:center;gap:8px;
+  font-family:'IBM Plex Mono',monospace;font-size:.77rem;color:var(--white);
+}
+.mem-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.mem-date{font-family:'IBM Plex Mono',monospace;font-size:.71rem;color:var(--slate);white-space:nowrap}
+.mem-num{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--slate2)}
+.member-empty{padding:48px 24px;text-align:center;color:var(--slate);font-size:.82rem;line-height:1.8}
 
-/* ── District overlay labels ─────────────────────────────── */
+/* ── Applications ─────────────────────────────────────────── */
+.app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:20px 24px}
+.app-card{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:8px;
+  padding:18px 20px;display:flex;flex-direction:column;gap:10px;
+}
+.app-card.pending{border-left:3px solid var(--gold)}
+.app-card.approved{border-left:3px solid var(--teal);opacity:.75}
+.app-card.rejected{border-left:3px solid var(--red);opacity:.6}
+.app-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.04em}
+.app-biz{font-size:.82rem;color:var(--teal);margin-top:1px}
+.app-detail{font-size:.78rem;color:var(--slate);line-height:1.7}
+.app-detail span{color:var(--white)}
+.app-notes{font-size:.75rem;color:var(--slate2);font-style:italic;border-top:1px solid var(--b2);padding-top:8px;line-height:1.5}
+.app-actions{display:flex;gap:7px;flex-wrap:wrap;padding-top:4px}
+.app-status{
+  display:inline-flex;align-items:center;gap:4px;
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;
+  border-radius:3px;padding:2px 8px;
+}
+.app-status.pending{background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.25)}
+.app-status.approved{background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25)}
+.app-status.rejected{background:rgba(232,65,90,.1);color:var(--red);border:1px solid rgba(232,65,90,.25)}
+.app-meta{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2)}
+.app-filter-bar{padding:12px 24px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.app-filter-select{
+  background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;
+  padding:6px 10px;color:var(--white);font-size:.78rem;outline:none;cursor:pointer;
+}
+.app-filter-select option{background:var(--navy2)}
+.app-empty{padding:60px 24px;text-align:center;color:var(--slate);font-size:.85rem;line-height:1.8}
+
+/* ── District label tooltips ──────────────────────────────── */
 .district-label {
   background: rgba(11,21,36,.82) !important;
   border: 1px solid rgba(255,255,255,.15) !important;
   border-radius: 4px !important;
   color: #eef3f8 !important;
   font-family: 'Rajdhani', sans-serif !important;
-  font-size: .7rem !important;
+  font-size: .72rem !important;
   font-weight: 600 !important;
   letter-spacing: .04em !important;
-  padding: 2px 7px !important;
+  padding: 3px 8px !important;
   white-space: nowrap !important;
   pointer-events: none !important;
   box-shadow: 0 2px 8px rgba(0,0,0,.5) !important;
 }
 .district-label::before { display: none !important; }
 
-/* ── Disclaimers ──────────────────────────────────────────── */
-.disc-emergency{
-  background:linear-gradient(135deg,rgba(232,65,90,.12),rgba(232,65,90,.06));
-  border:1px solid rgba(232,65,90,.35);border-radius:6px;
-  padding:11px 14px;margin-bottom:16px;
-  display:flex;gap:10px;align-items:flex-start;
+/* ── Print styles ──────────────────────────────────────────── */
+@media print {
+  body{background:#fff!important;color:#000!important}
+  #loginScreen,header,.sidebar,.modal-actions,.modal-close,
+  .map-panel,.map-sidebar,.filter-panel,.bulk-bar,.toolbar,
+  .filter-chips,.result-count,nav{display:none!important}
+  .overlay{position:static!important;background:none!important;padding:0!important}
+  .modal{max-height:none!important;border:none!important;box-shadow:none!important;background:#fff!important}
+  .mf-label{color:#555!important}
+  .mf-val,.note-text{color:#000!important}
+  .modal-hd{border-bottom:2px solid #000!important;background:#fff!important}
+  .modal-title{color:#000!important;font-size:1.3rem!important}
+  .note-item{border:1px solid #ccc!important;background:#f9f9f9!important}
+  .note-meta{color:#666!important}
+  .print-header{display:block!important}
 }
-.disc-emergency .disc-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
-.disc-emergency .disc-text{font-size:.75rem;line-height:1.55;color:rgba(238,243,248,.9)}
-.disc-emergency .disc-text strong{color:#ff6b7a}
-.disc-notice{
-  background:rgba(255,255,255,.03);border:1px solid var(--border2);
-  border-radius:5px;padding:9px 12px;margin-bottom:10px;
-  font-size:.7rem;line-height:1.55;color:var(--slate);
-  display:flex;gap:8px;align-items:flex-start;
+.print-header{display:none;margin-bottom:12px;font-size:.75rem;color:#666}
+
+/* ── Map view ──────────────────────────────────────────────── */
+#view-map{display:none;flex-direction:row;flex:1;overflow:hidden}
+#view-map.on{display:flex}
+.map-panel{flex:1;position:relative;min-height:0}
+#adminMap{width:100%;height:100%}
+.map-sidebar{
+  width:300px;flex-shrink:0;background:var(--navy2);
+  border-left:1px solid var(--b2);display:flex;flex-direction:column;overflow:hidden;
 }
-.disc-notice .disc-icon{flex-shrink:0;font-size:.85rem;margin-top:1px}
-.disc-notice a{color:var(--teal);text-decoration:none}
-.disc-notice a:hover{text-decoration:underline}
-.disc-suspect-note{
-  background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.15);
-  border-radius:5px;padding:9px 12px;margin-bottom:12px;
-  font-size:.7rem;line-height:1.55;color:var(--slate);
-  display:flex;gap:8px;align-items:flex-start;
+.map-sidebar-hd{
+  padding:14px 16px;border-bottom:1px solid var(--b2);flex-shrink:0;
+  font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.06em;
+  display:flex;align-items:center;justify-content:space-between;
 }
-.disc-suspect-note .disc-icon{flex-shrink:0;font-size:.85rem;margin-top:1px}
-.disc-privacy{
-  background:rgba(0,201,167,.04);border:1px solid rgba(0,201,167,.12);
-  border-radius:5px;padding:9px 12px;margin-bottom:12px;
-  font-size:.7rem;line-height:1.55;color:var(--slate);
-  display:flex;gap:8px;align-items:flex-start;
+.map-sidebar-count{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)}
+.map-sidebar-list{flex:1;overflow-y:auto;padding:8px}
+.map-sidebar-list::-webkit-scrollbar{width:3px}
+.map-sidebar-list::-webkit-scrollbar-thumb{background:var(--slate2);border-radius:2px}
+.map-inc-card{
+  background:rgba(255,255,255,.03);border:1px solid var(--b2);border-radius:5px;
+  padding:10px 11px;margin-bottom:6px;cursor:pointer;transition:all .15s;
+  border-left:3px solid transparent;
 }
-.disc-privacy .disc-icon{flex-shrink:0;font-size:.85rem;margin-top:1px}
-.page-footer{
-  flex-shrink:0;border-top:1px solid var(--border2);
-  padding:10px 16px;
-  font-size:.62rem;line-height:1.65;color:var(--slate2);
-  text-align:center;font-family:'IBM Plex Mono',monospace;
+.map-inc-card:hover{background:rgba(255,255,255,.06)}
+.map-inc-card.hl{border-left-color:var(--teal);background:rgba(0,201,167,.06)}
+.map-card-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.map-card-addr{font-size:.72rem;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.map-card-desc{font-size:.74rem;color:rgba(238,243,248,.7);line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.map-card-time{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2)}
+.map-controls{
+  position:absolute;top:12px;left:12px;z-index:500;display:flex;gap:6px;flex-wrap:wrap;
 }
-.page-footer a{color:var(--slate);text-decoration:none}
-.page-footer a:hover{color:var(--teal)}
+.map-btn{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:4px;
+  padding:6px 12px;cursor:pointer;font-family:'IBM Plex Mono',monospace;
+  font-size:.62rem;color:var(--slate);letter-spacing:.08em;transition:all .2s;
+}
+.map-btn:hover{border-color:var(--teal);color:var(--teal)}
+.map-btn.on{border-color:var(--teal);color:var(--teal);background:rgba(0,201,167,.08)}
+.map-empty{padding:40px 16px;text-align:center;color:var(--slate);font-size:.8rem;line-height:1.7}
+/* Popup styling */
+.leaflet-popup-content-wrapper{background:var(--navy2);border:1px solid rgba(0,201,167,.2);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.leaflet-popup-content{margin:12px 14px;font-family:'IBM Plex Sans',sans-serif}
+.leaflet-popup-tip{background:var(--navy2)}
+.pu-type{font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.pu-addr{font-size:.75rem;color:var(--slate);margin-bottom:3px}
+.pu-time{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate2);margin-bottom:8px}
+.pu-btn{background:var(--teal);border:none;border-radius:3px;padding:5px 12px;cursor:pointer;color:#0b1524;font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;width:100%}
+.pu-btn:hover{filter:brightness(1.1)}
+/* Cluster colors */
+.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(0,201,167,.2)!important}
+.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{
+  background:rgba(0,201,167,.6)!important;color:#0b1524!important;
+  font-weight:700;font-family:'Rajdhani',sans-serif;font-size:.8rem
+}
+/* Pin shape */
+.adm-marker{
+  width:36px;height:36px;border-radius:50% 50% 50% 0;
+  transform:rotate(-45deg);border:2px solid rgba(255,255,255,.45);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.5);
+}
+.adm-marker-inner{transform:rotate(45deg);font-size:1rem;line-height:1}
+
+/* ── Filter panel ──────────────────────────────────────────── */
+.filter-panel{
+  background:var(--navy3);border-bottom:1px solid var(--b2);
+  padding:0 24px;overflow:hidden;
+  max-height:0;transition:max-height .3s ease, padding .3s ease;
+  flex-shrink:0;
+}
+.filter-panel.open{max-height:260px;padding:16px 24px}
+.filter-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:12px;align-items:end;
+}
+@media(max-width:1100px){.filter-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.filter-grid{grid-template-columns:1fr}}
+.fg-label{
+  font-family:'IBM Plex Mono',monospace;font-size:.58rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--slate);
+  margin-bottom:5px;
+}
+.fg-row{display:flex;gap:6px;align-items:center}
+.tb-input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b2);
+  border-radius:4px;padding:7px 10px;color:var(--white);font-size:.8rem;
+  outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;
+}
+.tb-input:focus{border-color:var(--teal)}
+.tb-input[type="date"]{color-scheme:dark}
+.tb-input::placeholder{color:var(--slate2)}
+.filter-chips{
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding:8px 24px;flex-shrink:0;
+  border-bottom:1px solid var(--b2);
+  min-height:0;
+}
+.filter-chips:empty{padding:0;border:none}
+.chip{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.25);
+  border-radius:12px;padding:3px 10px;
+  font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);
+}
+.chip-x{background:none;border:none;color:var(--teal);cursor:pointer;font-size:.75rem;line-height:1;padding:0 0 0 2px}
+.chip-x:hover{color:var(--white)}
+.geocode-btn{
+  background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.25);
+  border-radius:4px;padding:7px 11px;color:var(--teal);cursor:pointer;
+  font-size:.75rem;white-space:nowrap;transition:all .2s;flex-shrink:0;
+}
+.geocode-btn:hover{background:rgba(0,201,167,.2)}
+.geocode-btn:disabled{opacity:.4;cursor:not-allowed}
+.filter-toggle-btn{
+  background:rgba(255,255,255,.04);border:1px solid var(--b2);
+  border-radius:4px;padding:7px 13px;color:var(--slate);cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.06em;
+  display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;
+}
+.filter-toggle-btn:hover{border-color:var(--teal);color:var(--teal)}
+.filter-toggle-btn.active{border-color:var(--teal);color:var(--teal);background:rgba(0,201,167,.06)}
+.result-count{
+  font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate2);
+  padding:6px 24px 0;flex-shrink:0;
+}
 </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- HEADER -->
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-shield">HIBCW</div>
+      <div class="login-title">HIBCW Admin</div>
+      <div class="login-sub">Hawaii Island Business Crime Watch</div>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="pwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div class="login-err" id="loginErr">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
   <header>
-    <div class="logo">
-      <div class="logo-shield">HIBCW</div>
-      <div class="logo-text">
-        <div class="logo-name">Hawaii Island Business Crime Watch</div>
-        <div class="logo-sub">A Program of KIAA · kiaahilo.org</div>
+    <div class="hd-left">
+      <div class="hd-shield">HIBCW</div>
+      <div>
+        <div class="hd-title">HIBCW Admin</div>
+        <div class="hd-sub">Hawaii Island Business Crime Watch</div>
       </div>
     </div>
-    <div class="header-right">
-      <div class="live-dot"><span class="dot"></span>LIVE</div>
-      <div class="count-badge" id="countBadge">0 incidents</div>
-      <a href="https://form.jotform.com/260695751808064" target="_blank" rel="noopener" class="donate-link">💛 Donate</a>
-      <a href="apply.html" class="member-link">✅ Join</a>
+    <div class="hd-right">
+      <div style="display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal)">
+        <span id="realtimeDot" style="width:7px;height:7px;border-radius:50%;background:var(--slate2);transition:background .5s;flex-shrink:0"></span>
+        LIVE
+      </div>
+      <div class="hd-user">👤 Admin</div>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
     </div>
   </header>
 
-  <!-- STATS BANNER -->
-  <div class="stats-banner" id="statsBanner">
-    <div class="stat-pill hi"><strong id="sbTotal">—</strong> total</div>
-    <span class="stat-sep">·</span>
-    <div class="stat-pill"><strong id="sbMonth">—</strong> this month</div>
-    <span class="stat-sep">·</span>
-    <div class="stat-pill"><strong id="sbWeek">—</strong> this week</div>
-    <span class="stat-sep">·</span>
-    <div class="stat-pill"><strong id="sbToday">—</strong> today</div>
-    <span class="stat-sep">·</span>
-    <div class="stat-pill" id="sbLastPill">Last report: <strong id="sbLast">—</strong></div>
-  </div>
-
   <div class="body">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="nav-section">Incidents</div>
+      <button class="nav-btn on" id="nav-active"   onclick="showView('active')">🟢 Active <span class="nav-count" id="nc-active">—</span></button>
+      <button class="nav-btn"    id="nav-archived" onclick="showView('archived')">📦 Archived <span class="nav-count" id="nc-archived">—</span></button>
+      <button class="nav-btn"    id="nav-all"      onclick="showView('all')">☰ All <span class="nav-count" id="nc-all">—</span></button>
+      <div class="nav-section">Reports</div>
+      <button class="nav-btn"    id="nav-stats"    onclick="showView('stats')">📊 Statistics</button>
+      <button class="nav-btn"    id="nav-map"      onclick="showView('map')">🗺 Map View</button>
+      <div class="nav-section">Settings</div>
+      <button class="nav-btn"    id="nav-members"  onclick="showView('members')">✅ Members <span class="nav-count" id="nc-members">—</span></button>
+      <button class="nav-btn"    id="nav-apps"      onclick="showView('apps')">📋 Applications <span class="nav-count" id="nc-apps">—</span></button>
+      <button class="nav-btn"    id="nav-captains"  onclick="showView('captains')">🗺 Districts</button>
+    </nav>
 
-    <!-- LEFT PANEL -->
-    <div class="panel">
-      <div class="tabs">
-        <button class="tab on" id="tab-report" onclick="showTab('report')">📝 Report</button>
-        <button class="tab"    id="tab-list"   onclick="showTab('list')">📋 Incidents</button>
-      </div>
-
-      <!-- REPORT TAB -->
-      <div class="tab-body" id="body-report">
-
-        <!-- Emergency disclaimer -->
-        <div class="disc-emergency">
-          <div class="disc-icon">🚨</div>
-          <div class="disc-text">
-            <strong>For emergencies, call 911 immediately.</strong>
-            This tool is for non-emergency community reporting only. Do not use this form if a crime is in progress or there is an immediate threat to life or safety.
+    <main>
+      <!-- ── ACTIVE ── -->
+      <div class="view on" id="view-active">
+        <div class="page-hd">
+          <div><div class="page-title">Active Incidents</div><div class="page-sub">Live incidents visible on the public map</div></div>
+          <div class="page-actions">
+            <button class="filter-toggle-btn" id="ftbtn-active" onclick="toggleFilters('active')">⚙ Filters <span id="fcount-active"></span></button>
+            <button class="btn btn-ghost btn-lg" onclick="exportCSV('active')">⬇ Export CSV</button>
           </div>
         </div>
-
-        <!-- Incident type -->
-        <div class="section">
-          <div class="sec-label">01 · Incident Type</div>
-          <div class="type-grid">
-            <button class="type-btn" onclick="pickType(this,'Robbery','red')"><span class="type-icon">🔫</span>Robbery</button>
-            <button class="type-btn" onclick="pickType(this,'Burglary','red')"><span class="type-icon">🏠</span>Burglary</button>
-            <button class="type-btn" onclick="pickType(this,'Assault','red')"><span class="type-icon">🤜</span>Assault</button>
-            <button class="type-btn" onclick="pickType(this,'Drug Activity','red')"><span class="type-icon">💊</span>Drug Activity</button>
-            <button class="type-btn" onclick="pickType(this,'Theft / Shoplifting','gold')"><span class="type-icon">🛍</span>Theft / Shoplifting</button>
-            <button class="type-btn" onclick="pickType(this,'Vandalism','gold')"><span class="type-icon">🔨</span>Vandalism</button>
-            <button class="type-btn" onclick="pickType(this,'Vehicle Break-In','gold')"><span class="type-icon">🚗</span>Vehicle Break-In</button>
-            <button class="type-btn" onclick="pickType(this,'Fraud / Scam','gold')"><span class="type-icon">💳</span>Fraud / Scam</button>
-            <button class="type-btn" onclick="pickType(this,'Trespassing','teal')"><span class="type-icon">🚫</span>Trespassing</button>
-            <button class="type-btn" onclick="pickType(this,'Suspicious Activity','teal')"><span class="type-icon">👁</span>Suspicious Activity</button>
-            <button class="type-btn" onclick="pickType(this,'Graffiti','teal')"><span class="type-icon">🎨</span>Graffiti</button>
-            <button class="type-btn" onclick="pickType(this,'Other','teal')"><span class="type-icon">📋</span>Other</button>
-          </div>
-        </div>
-
-        <!-- Date/time -->
-        <div class="section">
-          <div class="sec-label">02 · When</div>
-          <div class="fld">
-            <label>Date &amp; Time *</label>
-            <input type="datetime-local" id="fTime">
-          </div>
-        </div>
-
-        <!-- Location -->
-        <div class="section">
-          <div class="sec-label">03 · Location</div>
-          <div class="fld">
-            <label>Street Address *</label>
-            <input type="text" id="fAddr" placeholder="e.g. 820 Piilani St, Hilo">
-          </div>
-          <div class="pin-hint">
-            📍 <span id="pinTxt">Click on the map to drop a pin at the exact location</span>
-          </div>
-          <div class="coords" id="coordsBar"></div>
-          <div id="districtBadge" style="display:none;margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;padding:4px 10px;border-radius:4px;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);color:#00c9a7"></div>
-        </div>
-
-        <!-- Details -->
-        <div class="section">
-          <div class="sec-label">04 · Details</div>
-          <div class="fld">
-            <label>Description *</label>
-            <textarea id="fDesc" placeholder="Describe what happened…"></textarea>
-          </div>
-          <div class="fld">
-            <label>Your Name (optional)</label>
-            <input type="text" id="fName" placeholder="Name or leave blank for anonymous">
-          </div>
-          <div class="fld">
-            <label>Your Email (optional)</label>
-            <input type="email" id="fEmail" placeholder="e.g. name@email.com" oninput="checkMemberEmail(this.value)">
-            <div class="fld-verify-hint" id="emailHint">KIAA members will receive a verified badge on their report.</div>
-          </div>
-          <div class="fld">
-            <label>Police Report # (if filed)</label>
-            <input type="text" id="fPolice" placeholder="e.g. HPD-2024-00000">
-          </div>
-          <div class="fld-check">
-            <input type="checkbox" id="fRecurring">
-            <label for="fRecurring">🔁 This type of incident has occurred here before (recurring)</label>
-          </div>
-        </div>
-
-        <!-- Privacy disclaimer -->
-        <div class="disc-privacy">
-          <div class="disc-icon">🔒</div>
-          <div>Your name is optional and will not be displayed publicly. Submitted reports and any uploaded media may be reviewed by KIAA staff and shared with law enforcement upon request. Do not include sensitive personal information such as Social Security numbers or financial details in your description.</div>
-        </div>
-
-        <!-- Suspect Description -->
-        <div class="section">
-          <div class="sec-label">05 · Suspect Description <span style="font-family:'IBM Plex Sans',sans-serif;font-weight:300;letter-spacing:0;text-transform:none;color:var(--slate2)">(if applicable)</span></div>
-          <div class="disc-suspect-note">
-            <div class="disc-icon">⚠️</div>
-            <div>Suspect descriptions are provided solely to assist in identification and should be based only on direct observation. Incomplete or assumed descriptions can cause harm — please only include what you personally witnessed.</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <div class="fld">
-              <label>Height</label>
-              <select id="sSuspectHeight">
-                <option value="">Unknown</option>
-                <option>Under 5'0"</option>
-                <option>5'0"–5'3"</option>
-                <option>5'4"–5'7"</option>
-                <option>5'8"–5'11"</option>
-                <option>6'0"–6'3"</option>
-                <option>Over 6'3"</option>
-              </select>
+        <!-- Filter panel -->
+        <div class="filter-panel" id="fpanel-active">
+          <div class="filter-grid">
+            <div>
+              <div class="fg-label">Keyword Search</div>
+              <input class="tb-input tb-search" type="text" placeholder="Type, address, description…" oninput="applyFilters('active')">
             </div>
-            <div class="fld">
-              <label>Build / Weight</label>
-              <select id="sSuspectBuild">
-                <option value="">Unknown</option>
-                <option>Thin / Slender</option>
-                <option>Average</option>
-                <option>Stocky / Heavy</option>
-                <option>Athletic / Muscular</option>
-              </select>
-            </div>
-            <div class="fld">
-              <label>Approximate Age</label>
-              <select id="sSuspectAge">
-                <option value="">Unknown</option>
-                <option>Teen (under 18)</option>
-                <option>Young Adult (18–25)</option>
-                <option>Adult (26–40)</option>
-                <option>Middle-Aged (41–60)</option>
-                <option>Senior (60+)</option>
-              </select>
-            </div>
-            <div class="fld">
-              <label>Gender</label>
-              <select id="sSuspectGender">
-                <option value="">Unknown</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other / Unsure</option>
-              </select>
-            </div>
-          </div>
-          <div class="fld">
-            <label>Race / Ethnicity</label>
-            <input type="text" id="sSuspectRace" placeholder="e.g. Asian, White, Hispanic, Black, Pacific Islander…">
-          </div>
-          <div class="fld">
-            <label>Clothing Description</label>
-            <input type="text" id="sSuspectClothing" placeholder="e.g. Red hoodie, blue jeans, black cap">
-          </div>
-          <div class="fld">
-            <label>Other Identifying Features</label>
-            <input type="text" id="sSuspectOther" placeholder="e.g. Tattoos, beard, glasses, mask…">
-          </div>
-        </div>
-
-        <!-- Vehicle Description -->
-        <div class="section">
-          <div class="sec-label">06 · Vehicle Description <span style="font-family:'IBM Plex Sans',sans-serif;font-weight:300;letter-spacing:0;text-transform:none;color:var(--slate2)">(if applicable)</span></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <div class="fld">
-              <label>Make</label>
-              <input type="text" id="sVehicleMake" placeholder="e.g. Toyota, Honda, Ford">
-            </div>
-            <div class="fld">
-              <label>Model</label>
-              <input type="text" id="sVehicleModel" placeholder="e.g. Tacoma, Civic, F-150">
-            </div>
-            <div class="fld">
-              <label>Color</label>
-              <input type="text" id="sVehicleColor" placeholder="e.g. Silver, Black, White">
-            </div>
-            <div class="fld">
-              <label>Year (approx.)</label>
-              <input type="text" id="sVehicleYear" placeholder="e.g. 2018, Early 2000s">
-            </div>
-          </div>
-          <div class="fld">
-            <label>License Plate</label>
-            <input type="text" id="sVehiclePlate" placeholder="e.g. ABC-123 (Hawaii) or partial plate">
-          </div>
-          <div class="fld">
-            <label>Additional Details</label>
-            <input type="text" id="sVehicleNotes" placeholder="e.g. Dented bumper, tinted windows, trailer hitch…">
-          </div>
-        </div>
-
-        <!-- Media -->
-        <div class="section">
-          <div class="sec-label">07 · Photos / Video</div>
-          <div class="dropzone" id="dz" onclick="document.getElementById('fileIn').click()"
-               ondragover="event.preventDefault()" ondrop="handleDrop(event)">
-            <input type="file" id="fileIn" accept="image/*,video/*" multiple onchange="addFiles(this.files)">
-            <div class="dz-label"><strong>Tap to attach</strong> or drag &amp; drop<br>Photos or video (max 50 MB each)</div>
-          </div>
-          <div class="previews" id="previews"></div>
-          <div class="uprog" id="uprog">
-            <div class="uprog-label" id="uprogLabel">Uploading…</div>
-            <div class="uprog-bar"><div class="uprog-fill" id="uprogFill"></div></div>
-          </div>
-        </div>
-
-        <button class="submit-btn" id="submitBtn" onclick="submitReport()">⊕ Submit Incident Report</button>
-
-        <!-- No law enforcement disclaimer -->
-        <div class="disc-notice" style="margin-top:12px">
-          <div class="disc-icon">📋</div>
-          <div>Submitting a report here <strong style="color:var(--white)">does not constitute an official police report</strong> and does not notify the Hilo Police Department. To file an official report, contact HPD at <a href="tel:8089353311">(808) 935-3311</a> or visit <a href="https://www.hawaiipolice.com" target="_blank">hawaiipolice.com</a>. For anonymous tips, call Crime Stoppers at <a href="tel:8089618300">(808) 961-8300</a>.</div>
-        </div>
-
-        <!-- Content moderation notice -->
-        <div class="disc-notice">
-          <div class="disc-icon">ℹ️</div>
-          <div>Reports are submitted by community members and have not been independently verified. KIAA reserves the right to remove or archive any report found to be false, misleading, or submitted in bad faith.</div>
-        </div>
-
-        <div style="height:16px"></div>
-      </div><!-- /body-report -->
-
-      <!-- LIST TAB -->
-      <div class="tab-body" id="body-list" style="display:none">
-        <div class="list-toolbar">
-          <input class="srch" type="text" placeholder="Search…" oninput="renderList(this.value,document.getElementById('filt').value)">
-          <select class="filt" id="filt" onchange="renderList(document.querySelector('.srch').value,this.value)">
-            <option value="">All Types</option>
-            <option>Robbery</option><option>Burglary</option><option>Assault</option>
-            <option>Drug Activity</option><option>Theft / Shoplifting</option>
-            <option>Vandalism</option><option>Vehicle Break-In</option><option>Fraud / Scam</option>
-            <option>Trespassing</option><option>Suspicious Activity</option>
+            <div>
+              <div class="fg-label">Incident Type</div>
+              <select class="tb-input tb-select" id="type-active" onchange="applyFilters('active')">
+                <option value="">All Types</option>
+            <option>Robbery</option><option>Burglary</option><option>Assault</option><option>Drug Activity</option>
+            <option>Theft / Shoplifting</option><option>Vandalism</option><option>Vehicle Break-In</option>
+            <option>Fraud / Scam</option><option>Trespassing</option><option>Suspicious Activity</option>
             <option>Graffiti</option><option>Other</option>
-          </select>
+              </select>
+            </div>
+            <div>
+              <div class="fg-label">Date Range</div>
+              <div class="fg-row">
+                <input class="tb-input" type="date" id="date-from-active" onchange="applyFilters('active')" placeholder="From">
+                <span style="color:var(--slate2);flex-shrink:0">→</span>
+                <input class="tb-input" type="date" id="date-to-active" onchange="applyFilters('active')" placeholder="To">
+              </div>
+            </div>
+            <div>
+              <div class="fg-label">Specific Address</div>
+              <input class="tb-input" type="text" id="addr-exact-active" placeholder="e.g. 820 Piilani St" oninput="applyFilters('active')">
+            </div>
+            <div style="grid-column:1/-1">
+              <div class="fg-label">Radius Filter — Enter address then click Geocode</div>
+              <div class="fg-row" style="gap:8px;flex-wrap:wrap">
+                <input class="tb-input" type="text" id="radius-addr-active" placeholder="Center address (e.g. Hilo Post Office)" style="flex:1;min-width:180px">
+                <button class="geocode-btn" id="geocode-btn-active" onclick="geocodeRadius('active')">📍 Geocode</button>
+                <select class="tb-input" id="radius-mi-active" onchange="applyFilters('active')" style="width:110px">
+                  <option value="">No limit</option>
+                  <option value="0.25">¼ mile</option>
+                  <option value="0.5">½ mile</option>
+                  <option value="1">1 mile</option>
+                  <option value="2">2 miles</option>
+                  <option value="5">5 miles</option>
+                  <option value="10">10 miles</option>
+                </select>
+                <button class="geocode-btn" onclick="clearRadius('active')" style="background:rgba(232,65,90,.08);border-color:rgba(232,65,90,.2);color:var(--red)">✕ Clear</button>
+              </div>
+              <div id="radius-status-active" style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);margin-top:5px;min-height:16px"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;justify-content:flex-end">
+            <div class="filter-group">
+              <label class="filter-label">District</label>
+              <select class="tb-input tb-select" id="district-active" onchange="applyFilters('active')">
+                <option value="">All Districts</option>
+              </select>
+            </div>
+                        <button class="btn btn-ghost" onclick="clearFilters('active')">✕ Clear All Filters</button>
+          </div>
         </div>
-        <div id="listEl"></div>
+        <!-- Active filter chips -->
+        <div class="filter-chips" id="chips-active"></div>
+        <div class="result-count" id="rcount-active"></div>
+        <div class="bulk-bar" id="bulk-active">
+          <span class="bulk-label" id="bulk-label-active">0 selected</span>
+          <button class="btn btn-gold" onclick="bulkArchive()">📦 Archive Selected</button>
+          <button class="btn btn-red"  onclick="bulkDelete()">🗑 Delete Selected</button>
+          <button class="btn btn-ghost" onclick="clearSelection()">Cancel</button>
+        </div>
+        <div class="table-wrap"><div id="table-active"></div></div>
+      </div>
+      <!-- ── ARCHIVED ── -->
+      <div class="view " id="view-archived">
+        <div class="page-hd">
+          <div><div class="page-title">Archived Incidents</div><div class="page-sub">Removed from public map — kept for records</div></div>
+          <div class="page-actions">
+            <button class="filter-toggle-btn" id="ftbtn-archived" onclick="toggleFilters('archived')">⚙ Filters <span id="fcount-archived"></span></button>
+            <button class="btn btn-ghost btn-lg" onclick="exportCSV('archived')">⬇ Export CSV</button>
+          </div>
+        </div>
+        <!-- Filter panel -->
+        <div class="filter-panel" id="fpanel-archived">
+          <div class="filter-grid">
+            <div>
+              <div class="fg-label">Keyword Search</div>
+              <input class="tb-input tb-search" type="text" placeholder="Type, address, description…" oninput="applyFilters('archived')">
+            </div>
+            <div>
+              <div class="fg-label">Incident Type</div>
+              <select class="tb-input tb-select" id="type-archived" onchange="applyFilters('archived')">
+                <option value="">All Types</option>
+            <option>Robbery</option><option>Burglary</option><option>Assault</option><option>Drug Activity</option>
+            <option>Theft / Shoplifting</option><option>Vandalism</option><option>Vehicle Break-In</option>
+            <option>Fraud / Scam</option><option>Trespassing</option><option>Suspicious Activity</option>
+            <option>Graffiti</option><option>Other</option>
+              </select>
+            </div>
+            <div>
+              <div class="fg-label">Date Range</div>
+              <div class="fg-row">
+                <input class="tb-input" type="date" id="date-from-archived" onchange="applyFilters('archived')" placeholder="From">
+                <span style="color:var(--slate2);flex-shrink:0">→</span>
+                <input class="tb-input" type="date" id="date-to-archived" onchange="applyFilters('archived')" placeholder="To">
+              </div>
+            </div>
+            <div>
+              <div class="fg-label">Specific Address</div>
+              <input class="tb-input" type="text" id="addr-exact-archived" placeholder="e.g. 820 Piilani St" oninput="applyFilters('archived')">
+            </div>
+            <div style="grid-column:1/-1">
+              <div class="fg-label">Radius Filter — Enter address then click Geocode</div>
+              <div class="fg-row" style="gap:8px;flex-wrap:wrap">
+                <input class="tb-input" type="text" id="radius-addr-archived" placeholder="Center address (e.g. Hilo Post Office)" style="flex:1;min-width:180px">
+                <button class="geocode-btn" id="geocode-btn-archived" onclick="geocodeRadius('archived')">📍 Geocode</button>
+                <select class="tb-input" id="radius-mi-archived" onchange="applyFilters('archived')" style="width:110px">
+                  <option value="">No limit</option>
+                  <option value="0.25">¼ mile</option>
+                  <option value="0.5">½ mile</option>
+                  <option value="1">1 mile</option>
+                  <option value="2">2 miles</option>
+                  <option value="5">5 miles</option>
+                  <option value="10">10 miles</option>
+                </select>
+                <button class="geocode-btn" onclick="clearRadius('archived')" style="background:rgba(232,65,90,.08);border-color:rgba(232,65,90,.2);color:var(--red)">✕ Clear</button>
+              </div>
+              <div id="radius-status-archived" style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);margin-top:5px;min-height:16px"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;justify-content:flex-end">
+            <div class="filter-group">
+              <label class="filter-label">District</label>
+              <select class="tb-input tb-select" id="district-archived" onchange="applyFilters('archived')">
+                <option value="">All Districts</option>
+              </select>
+            </div>
+                        <button class="btn btn-ghost" onclick="clearFilters('archived')">✕ Clear All Filters</button>
+          </div>
+        </div>
+        <!-- Active filter chips -->
+        <div class="filter-chips" id="chips-archived"></div>
+        <div class="result-count" id="rcount-archived"></div>
+        <div class="table-wrap"><div id="table-archived"></div></div>
+      </div>
+      <!-- ── ALL ── -->
+      <div class="view " id="view-all">
+        <div class="page-hd">
+          <div><div class="page-title">All Records</div><div class="page-sub">Every incident regardless of status</div></div>
+          <div class="page-actions">
+            <button class="filter-toggle-btn" id="ftbtn-all" onclick="toggleFilters('all')">⚙ Filters <span id="fcount-all"></span></button>
+            <button class="btn btn-ghost btn-lg" onclick="exportCSV('all')">⬇ Export CSV</button>
+          </div>
+        </div>
+        <!-- Filter panel -->
+        <div class="filter-panel" id="fpanel-all">
+          <div class="filter-grid">
+            <div>
+              <div class="fg-label">Keyword Search</div>
+              <input class="tb-input tb-search" type="text" placeholder="Type, address, description…" oninput="applyFilters('all')">
+            </div>
+            <div>
+              <div class="fg-label">Incident Type</div>
+              <select class="tb-input tb-select" id="type-all" onchange="applyFilters('all')">
+                <option value="">All Types</option>
+            <option>Robbery</option><option>Burglary</option><option>Assault</option><option>Drug Activity</option>
+            <option>Theft / Shoplifting</option><option>Vandalism</option><option>Vehicle Break-In</option>
+            <option>Fraud / Scam</option><option>Trespassing</option><option>Suspicious Activity</option>
+            <option>Graffiti</option><option>Other</option>
+              </select>
+            </div>
+            <div>
+              <div class="fg-label">Date Range</div>
+              <div class="fg-row">
+                <input class="tb-input" type="date" id="date-from-all" onchange="applyFilters('all')" placeholder="From">
+                <span style="color:var(--slate2);flex-shrink:0">→</span>
+                <input class="tb-input" type="date" id="date-to-all" onchange="applyFilters('all')" placeholder="To">
+              </div>
+            </div>
+            <div>
+              <div class="fg-label">Specific Address</div>
+              <input class="tb-input" type="text" id="addr-exact-all" placeholder="e.g. 820 Piilani St" oninput="applyFilters('all')">
+            </div>
+            <div style="grid-column:1/-1">
+              <div class="fg-label">Radius Filter — Enter address then click Geocode</div>
+              <div class="fg-row" style="gap:8px;flex-wrap:wrap">
+                <input class="tb-input" type="text" id="radius-addr-all" placeholder="Center address (e.g. Hilo Post Office)" style="flex:1;min-width:180px">
+                <button class="geocode-btn" id="geocode-btn-all" onclick="geocodeRadius('all')">📍 Geocode</button>
+                <select class="tb-input" id="radius-mi-all" onchange="applyFilters('all')" style="width:110px">
+                  <option value="">No limit</option>
+                  <option value="0.25">¼ mile</option>
+                  <option value="0.5">½ mile</option>
+                  <option value="1">1 mile</option>
+                  <option value="2">2 miles</option>
+                  <option value="5">5 miles</option>
+                  <option value="10">10 miles</option>
+                </select>
+                <button class="geocode-btn" onclick="clearRadius('all')" style="background:rgba(232,65,90,.08);border-color:rgba(232,65,90,.2);color:var(--red)">✕ Clear</button>
+              </div>
+              <div id="radius-status-all" style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);margin-top:5px;min-height:16px"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;justify-content:flex-end">
+            <div class="filter-group">
+              <label class="filter-label">District</label>
+              <select class="tb-input tb-select" id="district-all" onchange="applyFilters('all')">
+                <option value="">All Districts</option>
+              </select>
+            </div>
+                        <button class="btn btn-ghost" onclick="clearFilters('all')">✕ Clear All Filters</button>
+          </div>
+        </div>
+        <!-- Active filter chips -->
+        <div class="filter-chips" id="chips-all"></div>
+        <div class="result-count" id="rcount-all"></div>
+        <div class="table-wrap"><div id="table-all"></div></div>
       </div>
 
-    </div><!-- /panel -->
-
-    <!-- MAP -->
-    <div class="map-wrap">
-      <div id="map"></div>
-      <div class="map-controls">
-        <button class="map-btn on" id="btnStreet"  onclick="setLayer('street')">STREET</button>
-        <button class="map-btn"    id="btnSat"     onclick="setLayer('sat')">SATELLITE</button>
-        <button class="map-btn on" id="btnCluster" onclick="toggleCluster()" title="Toggle clustering">CLUSTER</button>
-        <button class="map-btn"    id="btnHeat"      onclick="toggleHeat()"                 title="Toggle heatmap">HEATMAP</button>
-        <button class="map-btn"    id="btnDistricts" onclick="toggleDistrictOverlay(map, this)" title="Toggle district boundaries">DISTRICTS</button>
+      <!-- ── STATS ── -->
+      <div class="view" id="view-stats">
+        <div class="page-hd">
+          <div><div class="page-title">Statistics</div><div class="page-sub">Incident summary and type breakdown</div></div>
+        </div>
+        <div class="stats-grid" id="statsGrid"></div>
+        <div style="padding:0 24px 8px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)">Incidents by Type (Active)</div></div>
+        <div class="type-breakdown" id="typeBreakdown"></div>
       </div>
-      <!-- Map filter bar -->
-      <div class="map-filter-bar">
-        <input class="mfb-input" type="text" id="mapSearch" placeholder="🔍 Search incidents…" oninput="applyMapFilter()">
-        <select class="mfb-select" id="mapTypeFilter" onchange="applyMapFilter()">
-          <option value="">All Types</option>
-          <option>Robbery</option><option>Burglary</option><option>Assault</option>
-          <option>Drug Activity</option><option>Theft / Shoplifting</option>
-          <option>Vandalism</option><option>Vehicle Break-In</option><option>Fraud / Scam</option>
-          <option>Trespassing</option><option>Suspicious Activity</option>
-          <option>Graffiti</option><option>Other</option>
-        </select>
-        <select class="mfb-select" id="mapDateFilter" onchange="applyMapFilter()">
-          <option value="">All Time</option>
-          <option value="1">Last 24 Hours</option>
-          <option value="7">Last 7 Days</option>
-          <option value="30">Last 30 Days</option>
-          <option value="90">Last 90 Days</option>
-        </select>
-        <select class="mfb-select" id="mapDistrictFilter" onchange="applyMapFilter()">
-          <option value="">All Districts</option>
-          <option value="south-hilo">South Hilo</option>
-          <option value="north-hilo">North Hilo</option>
-          <option value="puna">Puna</option>
-          <option value="hamakua">Hāmākua</option>
-          <option value="north-kohala">North Kohala</option>
-          <option value="south-kohala">South Kohala</option>
-          <option value="north-kona">North Kona</option>
-          <option value="south-kona">South Kona</option>
-          <option value="kau">Kaʻū</option>
-        </select>
-        <button class="mfb-clear" id="mapClearBtn" onclick="clearMapFilter()">✕ Clear</button>
-        <div class="mfb-count" id="mapFilterCount"></div>
+      <!-- ── DISTRICT CAPTAINS VIEW ── -->
+      <div class="view" id="view-captains">
+        <div class="page-hd">
+          <div>
+            <div class="page-title">🗺 District Captains</div>
+            <div class="page-sub">Overview of all 9 HIBCW districts — assigned captains and member counts</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-ghost btn-lg" onclick="showView('members')">✏️ Manage Members</button>
+          </div>
+        </div>
+        <div id="captainsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:20px 24px"></div>
       </div>
-    </div>
 
-  </div><!-- /body -->
-  <!-- Page footer -->
-  <div class="page-footer">
-    Reports are for community awareness only and are not verified by KIAA or law enforcement. &nbsp;·&nbsp;
-    For emergencies call <a href="tel:911">911</a> &nbsp;·&nbsp;
-    HPD non-emergency <a href="tel:8089353311">(808) 935-3311</a> &nbsp;·&nbsp;
-    Crime Stoppers <a href="tel:8089618300">(808) 961-8300</a> &nbsp;·&nbsp;
-    <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a> &nbsp;·&nbsp;
-    <a href="apply.html">✅ Become a Member</a> &nbsp;·&nbsp;
-    <a href="https://form.jotform.com/260695751808064" target="_blank" rel="noopener">💛 Donate to KIAA</a>
+      <!-- ── APPLICATIONS VIEW ── -->
+      <div class="view" id="view-apps">
+        <div class="page-hd">
+          <div><div class="page-title">Membership Applications</div><div class="page-sub">Review and approve applicants for the Crime Watch network</div></div>
+          <div class="page-actions">
+            <select class="app-filter-select" id="appStatusFilter" onchange="renderApps()">
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="">All Applications</option>
+            </select>
+          </div>
+        </div>
+        <div class="app-grid" id="appGrid">
+          <div class="app-empty">Loading applications…</div>
+        </div>
+      </div>
+
+      <!-- ── MEMBERS VIEW ── -->
+      <div class="view" id="view-members">
+        <div class="page-hd">
+          <div><div class="page-title">Verified Members</div><div class="page-sub">Incidents submitted with these emails receive a ✅ verified badge</div></div>
+          <div class="page-actions">
+            <button class="btn btn-ghost btn-lg" onclick="exportMembersCSV()">⬇ Export CSV</button>
+          </div>
+        </div>
+        <div class="member-add-bar">
+          <input class="member-input" type="email" id="newMemberEmail" placeholder="Enter email address to add…" onkeydown="if(event.key==='Enter')addMember()">
+          <button class="btn btn-teal btn-lg" onclick="addMember()">＋ Add Member</button>
+          <button class="btn btn-ghost btn-lg" onclick="importMemberCSV()">⬆ Import CSV</button>
+          <input type="file" id="memberCSVInput" accept=".csv" style="display:none" onchange="handleMemberCSV(this)">
+        </div>
+        <div class="member-toolbar">
+          <input class="member-search" type="text" id="memberSearch" placeholder="🔍  Search emails…" oninput="renderMembers()">
+          <div class="member-count" id="memberCountLabel">— members</div>
+        </div>
+        <div class="member-table-wrap">
+          <table class="member-table">
+            <thead>
+              <tr>
+                <th style="width:36px">#</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Phone</th>
+                <th>Business Name</th>
+                <th>Business Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Zip</th>
+                <th>District</th>
+                <th>Captain</th>
+                <th>Date Added</th>
+                <th>Days Active</th>
+                <th style="width:90px">Action</th>
+              </tr>
+            </thead>
+            <tbody id="memberGrid">
+              <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--slate)">Loading members…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── MAP VIEW ── -->
+      <div id="view-map">
+        <div class="map-panel">
+          <div id="adminMap"></div>
+          <div class="map-controls">
+            <button class="map-btn on" id="amb-street"    onclick="admSetLayer('street')">STREET</button>
+            <button class="map-btn"    id="amb-sat"       onclick="admSetLayer('sat')">SATELLITE</button>
+            <button class="map-btn on" id="amb-cluster"   onclick="admToggleCluster()">CLUSTER</button>
+            <button class="map-btn"    id="amb-heat"      onclick="admToggleHeat()">HEATMAP</button>
+            <button class="map-btn"    id="amb-districts" onclick="toggleDistrictOverlay(admMap, this)">DISTRICTS</button>
+          </div>
+        </div>
+        <div class="map-sidebar">
+          <div class="map-sidebar-hd">
+            Incidents
+            <span class="map-sidebar-count" id="mapSideCount">—</span>
+          </div>
+          <div class="map-sidebar-list" id="mapSideList"></div>
+        </div>
+      </div>
+
+    </main>
   </div>
-</div><!-- /app -->
 
-<!-- INCIDENT DETAIL MODAL -->
+
+</div>
+
+<!-- DETAIL MODAL -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-hd">
@@ -810,6 +913,7 @@ header{
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body" id="mBody"></div>
+    <div class="modal-actions" id="mActions"></div>
   </div>
 </div>
 
@@ -825,7 +929,7 @@ header{
   <div class="toast-ico" id="toastIco">✅</div>
   <div class="toast-msg">
     <div class="toast-title" id="toastTitle"></div>
-    <div class="toast-body"  id="toastBody"></div>
+    <div id="toastBody"></div>
   </div>
 </div>
 
@@ -834,459 +938,522 @@ header{
    STATE
 ════════════════════════════════════════════════════ */
 let sb = null;
-let incidents = [];
-let markers = {};
-let pendingPin = null;
-let selType = '';
-let selColor = '';
-let mediaFiles = [];
-let verifiedEmail = null;   // set when a member email is confirmed
-let memberCheckTimer = null;
+let allIncidents = [];      // all incidents from DB
+let currentView  = 'active';
+let selectedIds  = new Set();
+
+const DISTRICTS = [
+  ["south-hilo",   "South Hilo"],
+  ["north-hilo",   "North Hilo"],
+  ["puna",         "Puna"],
+  ["hamakua",      "Hāmākua"],
+  ["north-kohala", "North Kohala"],
+  ["south-kohala", "South Kohala"],
+  ["north-kona",   "North Kona"],
+  ["south-kona",   "South Kona"],
+  ["kau",          "Kaʻū"]
+];
+function districtLabel(v) {
+  if (!v) return '—';
+  const d = DISTRICTS.find(d => d[0] === String(v));
+  return d ? d[1] : v;
+}
+function districtOptions(sel) {
+  sel = String(sel || '');
+  return '<option value="">All Districts</option>' +
+    DISTRICTS.map(([v,l]) =>
+      '<option value="' + v + '"' + (sel===v?' selected':'') + '>' + l + '</option>'
+    ).join('');
+}
+function districtSelect(sel) {
+  sel = String(sel || '');
+  return '<option value="">— Assign district…</option>' +
+    DISTRICTS.map(([v,l]) =>
+      '<option value="' + v + '"' + (sel===v?' selected':'') + '>' + l + '</option>'
+    ).join('');
+}
 
 /* ════════════════════════════════════════════════════
-   SUPABASE INIT
+   LOGIN
 ════════════════════════════════════════════════════ */
-function initSB() {
+async function doLogin() {
+  const pw = document.getElementById('pwInput').value;
+  const errEl = document.getElementById('loginErr');
+  if (pw === ADMIN_PASSWORD) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').classList.add('visible');
+    await initApp();
+  } else {
+    errEl.textContent = 'Incorrect password. Try again.';
+    errEl.style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+function logout() {
+  document.getElementById('appShell').classList.remove('visible');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('pwInput').value = '';
+  allIncidents = [];
+}
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+
+/* ════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════ */
+async function initApp() {
   if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
-    document.getElementById('configBanner')?.style && showToast('⚙️','Set your Supabase credentials in config.js','err');
-    return false;
+    showToast('⚙️', 'Set your Supabase credentials in config.js', 'err'); return;
   }
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  return true;
+  await loadAll();
+  await loadMembers();
+  await loadApplications();
+  // Populate district filter selects
+  ['active','archived','all'].forEach(v => {
+    const el = document.getElementById('district-' + v);
+    if (el) el.innerHTML = '<option value="">All Districts</option>' +
+      DISTRICTS.map(([val, lbl]) => '<option value="' + val + '">' + lbl + '</option>').join('');
+  });
+  startRealtime();
+}
+
+async function loadAll() {
+  if (!sb) return;
+  const { data, error } = await sb
+    .from('incidents')
+    .select('*, incident_media(*)')
+    .order('occurred_at', { ascending: false });
+  if (error) { showToast('⚠️', 'Load failed: ' + error.message, 'err'); return; }
+  allIncidents = data || [];
+  updateCounts();
+  renderCurrentView();
+  renderStats();
+  if (currentView === 'map') admRefreshMarkers();
 }
 
 /* ════════════════════════════════════════════════════
-   MAP SETUP
+   REALTIME — auto-update admin panel
 ════════════════════════════════════════════════════ */
-const map = L.map('map', { center:[19.7024,-155.0824], zoom:13 });
-
-const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution:'© OpenStreetMap', maxZoom:19 });
-const satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
-  attribution:'© Esri', maxZoom:19 });
-streetLayer.addTo(map);
-
-// Map tile styles
-const tint = document.createElement('style');
-tint.textContent = `
-  .leaflet-tile{filter:none}
-  .marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(0,201,167,.2)!important}
-  .marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{
-    background:rgba(0,201,167,.6)!important;color:#0b1524!important;
-    font-weight:700;font-family:'Rajdhani',sans-serif;font-size:.8rem
-  }
-`;
-document.head.appendChild(tint);
-
-// ── Cluster group ─────────────────────────────────────────────
-const clusterGroup = L.markerClusterGroup({
-  maxClusterRadius: 50,
-  showCoverageOnHover: false,
-  zoomToBoundsOnClick: true,
-  spiderfyOnMaxZoom: true,
-});
-clusterGroup.addTo(map);
-let clusterOn = true;
-
-// ── Heatmap layer ─────────────────────────────────────────────
-let heatLayer = null;
-let heatOn = false;
-
-function toggleHeat() {
-  heatOn = !heatOn;
-  document.getElementById('btnHeat').classList.toggle('on', heatOn);
-  if (heatOn) {
-    const pts = incidents.filter(i=>i.lat).map(i=>[i.lat, i.lng, 1]);
-    if (heatLayer) map.removeLayer(heatLayer);
-    heatLayer = L.heatLayer(pts, {
-      radius: 30, blur: 22, maxZoom: 16,
-      gradient: {0.3:'#002266', 0.6:'#C8960C', 0.85:'#e8415a', 1.0:'#ffffff'}
+function startRealtime() {
+  sb.channel('admin-incidents')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'incidents' },
+      async payload => {
+        // Fetch full record with media
+        const { data } = await sb
+          .from('incidents')
+          .select('*, incident_media(*)')
+          .eq('id', payload.new.id)
+          .single();
+        if (data) {
+          allIncidents.unshift(data);
+          updateCounts();
+          renderCurrentView();
+          renderStats();
+          showToast('🔔', `New incident: ${data.type} — ${data.address}`);
+        }
+      })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'incidents' },
+      async payload => {
+        // Refresh the updated record in place
+        const { data } = await sb
+          .from('incidents')
+          .select('*, incident_media(*)')
+          .eq('id', payload.new.id)
+          .single();
+        if (data) {
+          const idx = allIncidents.findIndex(i => i.id === data.id);
+          if (idx !== -1) allIncidents[idx] = data;
+          else allIncidents.unshift(data);
+          updateCounts();
+          renderCurrentView();
+          renderStats();
+        }
+      })
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'incidents' },
+      payload => {
+        allIncidents = allIncidents.filter(i => i.id !== payload.old.id);
+        updateCounts();
+        renderCurrentView();
+        renderStats();
+      })
+    .subscribe(status => {
+      const dot = document.getElementById('realtimeDot');
+      if (dot) dot.style.background = status === 'SUBSCRIBED' ? 'var(--teal)' : 'var(--gold)';
     });
-    heatLayer.addTo(map);
+}
+
+/* ════════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════════ */
+function showView(v) {
+  currentView = v;
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('on'));
+  document.getElementById(`view-${v}`).classList.add('on');
+  document.getElementById(`nav-${v}`)?.classList.add('on');
+  clearSelection();
+  if (v === 'map') {
+    initAdminMap();
+    admRefreshMarkers();
+  } else if (v === 'members') {
+    loadMembers();
+  } else if (v === 'apps') {
+    loadApplications();
+  } else if (v === 'captains') {
+    renderCaptains();
   } else {
-    if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+    renderCurrentView();
   }
 }
 
-function toggleCluster() {
-  clusterOn = !clusterOn;
-  document.getElementById('btnCluster').classList.toggle('on', clusterOn);
-  // move all markers between cluster group and plain map
-  Object.values(markers).forEach(m => {
-    clusterGroup.removeLayer(m);
-    map.removeLayer(m);
-    if (clusterOn) clusterGroup.addLayer(m);
-    else m.addTo(map);
-  });
+function renderCurrentView() {
+  if (currentView === 'stats') { renderStats(); return; }
+  applyFilters(currentView);
 }
 
-function setLayer(t) {
-  if (t==='street') { map.addLayer(streetLayer); map.removeLayer(satLayer); }
-  else              { map.addLayer(satLayer);    map.removeLayer(streetLayer); }
-  document.getElementById('btnStreet').classList.toggle('on', t==='street');
-  document.getElementById('btnSat').classList.toggle('on', t==='sat');
-}
-
-// Pin placement marker
-let pinMarker = null;
-map.on('click', e => {
-  const {lat, lng} = e.latlng;
-  pendingPin = {lat, lng};
-  if (pinMarker) map.removeLayer(pinMarker);
-  pinMarker = L.circleMarker([lat, lng], {
-    radius:10, color:'#00c9a7', fillColor:'#00c9a7', fillOpacity:.35, weight:2
-  }).addTo(map);
-  document.getElementById('pinTxt').textContent = `Pin placed — drag to adjust`;
-  const bar = document.getElementById('coordsBar');
-  bar.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-  bar.style.display = 'block';
-
-  // reverse geocode
-  fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
-    .then(r=>r.json())
-    .then(d=>{ if(d.display_name && !document.getElementById('fAddr').value.trim()) document.getElementById('fAddr').value = d.display_name.split(',').slice(0,3).join(',').trim(); })
-    .catch(()=>{});
-
-  // Auto-detect district
-  const det = getDistrictForPoint(lat, lng);
-  const badge = document.getElementById('districtBadge');
-  if (det) {
-    badge.textContent = '📍 District: ' + det.label;
-    badge.style.display = 'inline-block';
-    pendingPin.district = det.id;
-  } else {
-    badge.textContent = '⚠️ Location outside known districts';
-    badge.style.display = 'inline-block';
-    badge.style.background = 'rgba(245,166,35,.08)';
-    badge.style.borderColor = 'rgba(245,166,35,.25)';
-    badge.style.color = '#f5a623';
-    pendingPin.district = null;
-  }
-});
-
-// Incident marker maker
-// Emoji for each incident type
-const TYPE_EMOJI = {
-  'Robbery':              '🔫',
-  'Burglary':             '🏠',
-  'Assault':              '🤜',
-  'Drug Activity':        '💊',
-  'Theft / Shoplifting':  '🛍',
-  'Vandalism':            '🔨',
-  'Vehicle Break-In':     '🚗',
-  'Fraud / Scam':         '💳',
-  'Trespassing':          '🚫',
-  'Suspicious Activity':  '👁',
-  'Graffiti':             '🎨',
-  'Other':                '📋',
+/* ════════════════════════════════════════════════════
+   FILTER STATE (per view)
+════════════════════════════════════════════════════ */
+const filterState = {
+  active:   { radiusLat: null, radiusLng: null },
+  archived: { radiusLat: null, radiusLng: null },
+  all:      { radiusLat: null, radiusLng: null },
 };
 
-function makeMarker(color, type) {
-  const c = color==='red'?'#e8415a':color==='gold'?'#f5a623':'#00c9a7';
-  const emoji = TYPE_EMOJI[type] || '📍';
-  return L.divIcon({
-    className:'',
-    html:`<div class="map-marker" style="background:${c}"><div class="map-marker-inner">${emoji}</div></div>`,
-    iconSize:[36,36], iconAnchor:[18,36], popupAnchor:[0,-36]
-  });
+/* ── Haversine distance (miles) ──────────────────── */
+function distMiles(lat1, lng1, lat2, lng2) {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-function addMarker(inc) {
-  if (!inc.lat || !inc.lng) return;
-  const m = L.marker([inc.lat,inc.lng], {icon:makeMarker(inc.type_color, inc.type)})
-    .bindPopup(`
-      <div class="pu-type" style="color:${inc.type_color==='red'?'#e8415a':inc.type_color==='gold'?'#f5a623':'#00c9a7'}">${inc.type.toUpperCase()}${inc.is_verified_member?' <span style="font-size:.6rem;background:rgba(0,201,167,.15);border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:1px 5px;color:#00c9a7;font-family:IBM Plex Mono,monospace">✅ Member</span>':''}</div>
-      <div class="pu-addr">📍 ${inc.address}</div>
-      <div class="pu-time">${fmt(inc.occurred_at)}</div>
-      <button class="pu-btn" onclick="openModal('${inc.id}')">View Details</button>
-    `);
-  m.on('click', ()=>hlCard(inc.id));
-  markers[inc.id] = m;
-  if (clusterOn) clusterGroup.addLayer(m);
-  else m.addTo(map);
-  // refresh heatmap if on
-  if (heatOn) { toggleHeat(); toggleHeat(); }
-}
+/* ── Geocode a radius address via Nominatim ─────── */
+async function geocodeRadius(view) {
+  const addrEl  = document.getElementById(`radius-addr-${view}`);
+  const statusEl = document.getElementById(`radius-status-${view}`);
+  const btn     = document.getElementById(`geocode-btn-${view}`);
+  const addr    = addrEl.value.trim();
+  if (!addr) { statusEl.textContent = 'Enter an address first.'; return; }
 
-/* ════════════════════════════════════════════════════
-   TABS
-════════════════════════════════════════════════════ */
-function showTab(t) {
-  ['report','list'].forEach(id => {
-    document.getElementById(`tab-${id}`).classList.toggle('on', id===t);
-    document.getElementById(`body-${id}`).style.display = id===t ? 'block' : 'none';
-  });
-}
-
-/* ════════════════════════════════════════════════════
-   TYPE SELECTION
-════════════════════════════════════════════════════ */
-function pickType(btn, type, color) {
-  document.querySelectorAll('.type-btn').forEach(b => b.className='type-btn');
-  btn.classList.add(`sel-${color}`);
-  selType = type;
-  selColor = color;
-}
-
-/* ════════════════════════════════════════════════════
-   MEDIA
-════════════════════════════════════════════════════ */
-function handleDrop(e) {
-  e.preventDefault();
-  addFiles(e.dataTransfer.files);
-}
-function addFiles(files) {
-  Array.from(files).forEach(f => {
-    if (mediaFiles.find(m=>m.file.name===f.name && m.file.size===f.size)) return;
-    const type = f.type.startsWith('image') ? 'image' : 'video';
-    mediaFiles.push({file:f, type});
-    const url = URL.createObjectURL(f);
-    const div = document.createElement('div');
-    div.className = 'prev-item';
-    div.id = `prev-${mediaFiles.length-1}`;
-    div.innerHTML = type==='image'
-      ? `<img src="${url}"><button class="prev-del" onclick="removeFile(${mediaFiles.length-1})">✕</button>`
-      : `<video src="${url}" muted><button class="prev-del" onclick="removeFile(${mediaFiles.length-1})">✕</button></video>`;
-    document.getElementById('previews').appendChild(div);
-  });
-}
-function removeFile(i) {
-  mediaFiles.splice(i,1);
-  document.getElementById(`prev-${i}`)?.remove();
-}
-
-/* ════════════════════════════════════════════════════
-   MEMBER EMAIL VERIFICATION
-════════════════════════════════════════════════════ */
-async function checkMemberEmail(val) {
-  const hint = document.getElementById('emailHint');
-  const email = val.trim().toLowerCase();
-  verifiedEmail = null;
-
-  clearTimeout(memberCheckTimer);
-  if (!email || !email.includes('@')) {
-    hint.textContent = 'KIAA members will receive a verified badge on their report.';
-    hint.className = 'fld-verify-hint';
-    return;
-  }
-
-  hint.textContent = 'Checking…';
-  hint.className = 'fld-verify-hint';
-
-  // Debounce — wait 600ms after user stops typing
-  memberCheckTimer = setTimeout(async () => {
-    if (!sb) return;
-    const {data, error} = await sb
-      .from('member_emails')
-      .select('email')
-      .eq('email', email)
-      .maybeSingle();
-    if (!error && data) {
-      verifiedEmail = email;
-      hint.textContent = '✅ Verified KIAA Member — your report will show a member badge.';
-      hint.className = 'fld-verify-hint ok';
-    } else {
-      verifiedEmail = null;
-      hint.textContent = 'Email not found in KIAA member list — report will be submitted anonymously.';
-      hint.className = 'fld-verify-hint no';
-    }
-  }, 600);
-}
-
-/* ════════════════════════════════════════════════════
-   SUBMIT
-════════════════════════════════════════════════════ */
-async function submitReport() {
-  if (!sb) { showToast('⚙️','Configure Supabase credentials in config.js','err'); return; }
-
-  // Validate
-  let ok = true;
-  ['fTime','fAddr','fDesc'].forEach(id => document.getElementById(id).classList.remove('err'));
-  if (!selType)                                   { flashSubmit('Select an incident type'); return; }
-  if (!document.getElementById('fTime').value)    { document.getElementById('fTime').classList.add('err'); ok=false; }
-  if (!document.getElementById('fAddr').value.trim()) { document.getElementById('fAddr').classList.add('err'); ok=false; }
-  if (!document.getElementById('fDesc').value.trim()) { document.getElementById('fDesc').classList.add('err'); ok=false; }
-  if (!ok) { flashSubmit('Fill in the required fields'); return; }
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.textContent = '⏳ Submitting…';
+  btn.disabled = true;
+  btn.textContent = '⏳ Geocoding…';
+  statusEl.textContent = '';
 
   try {
-    // 1. Insert incident
-    const {data:inc, error:incErr} = await sb.from('incidents').insert({
-      type:          selType,
-      type_color:    selColor,
-      occurred_at:   new Date(document.getElementById('fTime').value).toISOString(),
-      address:       document.getElementById('fAddr').value.trim(),
-      description:   document.getElementById('fDesc').value.trim(),
-      reporter_name:      document.getElementById('fName').value.trim() || null,
-      reporter_email:     document.getElementById('fEmail').value.trim().toLowerCase() || null,
-      is_verified_member: verifiedEmail === document.getElementById('fEmail').value.trim().toLowerCase() && verifiedEmail !== null,
-      police_report:      document.getElementById('fPolice').value.trim() || null,
-      is_recurring:       document.getElementById('fRecurring').checked,
-      suspect_height:   document.getElementById('sSuspectHeight').value  || null,
-      suspect_build:    document.getElementById('sSuspectBuild').value   || null,
-      suspect_age:      document.getElementById('sSuspectAge').value     || null,
-      suspect_gender:   document.getElementById('sSuspectGender').value  || null,
-      suspect_race:     document.getElementById('sSuspectRace').value.trim()     || null,
-      suspect_clothing: document.getElementById('sSuspectClothing').value.trim() || null,
-      suspect_other:    document.getElementById('sSuspectOther').value.trim()    || null,
-      vehicle_make:     document.getElementById('sVehicleMake').value.trim()     || null,
-      vehicle_model:    document.getElementById('sVehicleModel').value.trim()    || null,
-      vehicle_color:    document.getElementById('sVehicleColor').value.trim()    || null,
-      vehicle_year:     document.getElementById('sVehicleYear').value.trim()     || null,
-      vehicle_plate:    document.getElementById('sVehiclePlate').value.trim()    || null,
-      vehicle_notes:    document.getElementById('sVehicleNotes').value.trim()    || null,
-      lat:      pendingPin?.lat ?? null,
-      lng:      pendingPin?.lng ?? null,
-      district: pendingPin?.district ?? null,
-    }).select().single();
-    if (incErr) throw incErr;
-
-    // 2. Upload media
-    if (mediaFiles.length > 0) {
-      const prog = document.getElementById('uprog');
-      const fill = document.getElementById('uprogFill');
-      const lbl  = document.getElementById('uprogLabel');
-      prog.classList.add('show');
-      for (let i=0; i<mediaFiles.length; i++) {
-        const m = mediaFiles[i];
-        lbl.textContent = `Uploading file ${i+1} of ${mediaFiles.length}…`;
-        fill.style.width = `${Math.round(i/mediaFiles.length*100)}%`;
-        const ext  = m.file.name.split('.').pop();
-        const path = `${inc.id}/${Date.now()}_${i}.${ext}`;
-        const {error:storErr} = await sb.storage.from('incident-media').upload(path, m.file, {contentType:m.file.type});
-        if (storErr) throw storErr;
-        const {data:urlData} = sb.storage.from('incident-media').getPublicUrl(path);
-        await sb.from('incident_media').insert({
-          incident_id: inc.id, file_path:path, file_name:m.file.name,
-          file_type:m.type, mime_type:m.file.type, file_size:m.file.size,
-          public_url:urlData.publicUrl
-        });
-      }
-      fill.style.width='100%'; lbl.textContent='Upload complete ✓';
-      setTimeout(()=>prog.classList.remove('show'),1400);
-    }
-
-    showToast('✅','Incident reported successfully!');
-    addMarker(inc);
-    incidents.unshift(inc);
-    updateCount();
-    updateStats();
-    resetForm();
-    setTimeout(()=>showTab('list'),1200);
-
+    const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr)}&format=json&limit=1&countrycodes=us`);
+    const data = await res.json();
+    if (!data.length) { statusEl.textContent = '⚠ Address not found — try being more specific.'; return; }
+    const { lat, lon, display_name } = data[0];
+    filterState[view].radiusLat = parseFloat(lat);
+    filterState[view].radiusLng = parseFloat(lon);
+    statusEl.textContent = `📍 ${display_name.split(',').slice(0,3).join(',')}`;
+    applyFilters(view);
   } catch(e) {
-    console.error(e);
-    showToast('⚠️', e.message||'Submission failed', 'err');
+    statusEl.textContent = '⚠ Geocode failed — check internet connection.';
   } finally {
-    btn.disabled=false; btn.textContent='⊕ Submit Incident Report';
+    btn.disabled = false;
+    btn.textContent = '📍 Geocode';
   }
 }
 
-function flashSubmit(msg) {
-  const btn = document.getElementById('submitBtn');
-  const orig = btn.textContent;
-  btn.textContent = '⚠ ' + msg;
-  btn.style.background = 'linear-gradient(135deg,#e8415a,#c0392b)';
-  setTimeout(()=>{ btn.textContent=orig; btn.style.background=''; },2000);
+function clearRadius(view) {
+  filterState[view].radiusLat = null;
+  filterState[view].radiusLng = null;
+  document.getElementById(`radius-addr-${view}`).value = '';
+  document.getElementById(`radius-mi-${view}`).value = '';
+  document.getElementById(`radius-status-${view}`).textContent = '';
+  const dEl = document.getElementById(`district-${view}`);
+  if (dEl) dEl.value = '';
+  applyFilters(view);
 }
 
-function resetForm() {
-  selType=''; selColor='';
-  document.querySelectorAll('.type-btn').forEach(b=>b.className='type-btn');
-  document.getElementById('fRecurring').checked = false;
-  verifiedEmail = null;
-  document.getElementById('emailHint').textContent = 'KIAA members will receive a verified badge on their report.';
-  document.getElementById('emailHint').className = 'fld-verify-hint';
-  ['fAddr','fDesc','fName','fEmail','fPolice','sSuspectRace','sSuspectClothing','sSuspectOther','sVehicleMake','sVehicleModel','sVehicleColor','sVehicleYear','sVehiclePlate','sVehicleNotes'].forEach(id=>document.getElementById(id).value='');
-  ['sSuspectHeight','sSuspectBuild','sSuspectAge','sSuspectGender'].forEach(id=>document.getElementById(id).selectedIndex=0);
-  const now=new Date(), off=now.getTimezoneOffset()*60000;
-  document.getElementById('fTime').value=new Date(now-off).toISOString().slice(0,16);
-  mediaFiles=[]; document.getElementById('previews').innerHTML='';
-  pendingPin=null;
-  const db = document.getElementById('districtBadge');
-  if (db) { db.style.display='none'; db.textContent=''; db.style.background=''; db.style.borderColor=''; db.style.color=''; }
-  if(pinMarker){ map.removeLayer(pinMarker); pinMarker=null; }
-  document.getElementById('pinTxt').textContent='Click on the map to drop a pin at the exact location';
-  document.getElementById('coordsBar').style.display='none';
+/* ── Read all filter inputs for a view ──────────── */
+function getFilters(view) {
+  return {
+    q:          (document.querySelector(`#fpanel-${view} .tb-search`)?.value || '').toLowerCase().trim(),
+    type:       document.getElementById(`type-${view}`)?.value || '',
+    dateFrom:   document.getElementById(`date-from-${view}`)?.value || '',
+    dateTo:     document.getElementById(`date-to-${view}`)?.value || '',
+    addrExact:  (document.getElementById(`addr-exact-${view}`)?.value || '').toLowerCase().trim(),
+    radiusMi:   parseFloat(document.getElementById(`radius-mi-${view}`)?.value) || 0,
+    radiusLat:  filterState[view].radiusLat,
+    radiusLng:  filterState[view].radiusLng,
+    district:   document.getElementById(`district-${view}`)?.value || '',
+  };
 }
 
-/* ════════════════════════════════════════════════════
-   LOAD INCIDENTS
-════════════════════════════════════════════════════ */
-async function loadIncidents() {
-  if (!sb) return;
-  const {data,error} = await sb.from('incidents').select('*,incident_media(*)').eq('status','active').order('occurred_at',{ascending:false});
-  if (error) { console.error(error); return; }
-  incidents = data || [];
-  incidents.forEach(addMarker);
-  updateCount();
-  updateStats();
-  renderList('','');
+/* ── Count how many filters are active ──────────── */
+function activeFilterCount(f) {
+  return [f.q, f.type, f.dateFrom, f.dateTo, f.addrExact, f.radiusMi && f.radiusLat ? 1 : 0, f.district]
+    .filter(Boolean).length;
 }
 
-/* ════════════════════════════════════════════════════
-   LIST
-════════════════════════════════════════════════════ */
-function renderList(q='', filter='') {
-  const el = document.getElementById('listEl');
-  let rows = incidents.filter(i => {
-    const mq = !q || [i.type,i.address,i.description,i.reporter_name||''].join(' ').toLowerCase().includes(q.toLowerCase());
-    const mf = !filter || i.type===filter;
-    return mq && mf;
-  });
+/* ── Apply filters and re-render ─────────────────── */
+function applyFilters(view) {
+  const f = getFilters(view);
+  let rows = allIncidents;
 
-  if (!incidents.length) {
-    el.innerHTML=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-txt">No incidents yet.<br>Use the Report tab to submit the first one.</div></div>`;
-    return;
+  // Status scope
+  if (view === 'active')   rows = rows.filter(i => i.status === 'active');
+  if (view === 'archived') rows = rows.filter(i => i.status === 'archived');
+
+  // Keyword search
+  if (f.q) rows = rows.filter(i =>
+    [i.type, i.address, i.description, i.reporter_name||'', i.police_report||'']
+      .join(' ').toLowerCase().includes(f.q));
+
+  // Incident type
+  if (f.type) rows = rows.filter(i => i.type === f.type);
+
+  // District — filter directly on incident.district field
+  if (f.district) {
+    rows = rows.filter(i => i.district === f.district);
   }
+
+  // Date range (compared against occurred_at)
+  if (f.dateFrom) rows = rows.filter(i => new Date(i.occurred_at) >= new Date(f.dateFrom));
+  if (f.dateTo)   rows = rows.filter(i => new Date(i.occurred_at) <= new Date(f.dateTo + 'T23:59:59'));
+
+  // Specific address substring match
+  if (f.addrExact) rows = rows.filter(i => i.address.toLowerCase().includes(f.addrExact));
+
+  // Radius (only applies to incidents that have a GPS pin)
+  if (f.radiusMi && f.radiusLat !== null) {
+    rows = rows.filter(i => {
+      if (!i.lat || !i.lng) return false;
+      return distMiles(f.radiusLat, f.radiusLng, i.lat, i.lng) <= f.radiusMi;
+    });
+  }
+
+  // Update chips
+  renderChips(view, f);
+
+  // Update result count
+  const rcEl = document.getElementById(`rcount-${view}`);
+  if (rcEl) rcEl.textContent = rows.length === allIncidents.filter(i => view==='active'?i.status==='active':view==='archived'?i.status==='archived':true).length
+    ? '' : `${rows.length} result${rows.length!==1?'s':''} match current filters`;
+
+  // Update filter button badge
+  const n = activeFilterCount(f);
+  const fcEl = document.getElementById(`fcount-${view}`);
+  if (fcEl) fcEl.textContent = n ? `(${n})` : '';
+  document.getElementById(`ftbtn-${view}`)?.classList.toggle('active', n > 0);
+
+  renderTable(rows, `table-${view}`, view);
+}
+
+/* ── Render active filter chips ──────────────────── */
+function renderChips(view, f) {
+  const el = document.getElementById(`chips-${view}`);
+  if (!el) return;
+  const chips = [];
+  if (f.q)        chips.push({ label: `Search: "${f.q}"`,        clear: () => { document.querySelector(`#fpanel-${view} .tb-search`).value=''; applyFilters(view); } });
+  if (f.type)     chips.push({ label: `Type: ${f.type}`,          clear: () => { document.getElementById(`type-${view}`).value=''; applyFilters(view); } });
+  if (f.dateFrom) chips.push({ label: `From: ${f.dateFrom}`,      clear: () => { document.getElementById(`date-from-${view}`).value=''; applyFilters(view); } });
+  if (f.dateTo)   chips.push({ label: `To: ${f.dateTo}`,          clear: () => { document.getElementById(`date-to-${view}`).value=''; applyFilters(view); } });
+  if (f.addrExact)chips.push({ label: `Address: "${f.addrExact}"`,clear: () => { document.getElementById(`addr-exact-${view}`).value=''; applyFilters(view); } });
+  if (f.radiusMi && f.radiusLat) chips.push({ label: `Within ${f.radiusMi}mi of pin`, clear: () => clearRadius(view) });
+
+  el.innerHTML = chips.map((c,i) =>
+    `<div class="chip">${c.label}<button class="chip-x" onclick="chipClear(${JSON.stringify(view)},${i})">✕</button></div>`
+  ).join('');
+  // store clearers for onclick
+  el._clearers = chips.map(c => c.clear);
+}
+
+function chipClear(view, i) {
+  const el = document.getElementById(`chips-${view}`);
+  if (el._clearers?.[i]) el._clearers[i]();
+}
+
+/* ── Clear all filters for a view ────────────────── */
+function clearFilters(view) {
+  const panel = document.getElementById(`fpanel-${view}`);
+  panel.querySelectorAll('input').forEach(el => el.value = '');
+  panel.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+  clearRadius(view);
+  applyFilters(view);
+}
+
+/* ── Toggle filter panel open/closed ─────────────── */
+function toggleFilters(view) {
+  const panel = document.getElementById(`fpanel-${view}`);
+  panel.classList.toggle('open');
+  document.getElementById(`ftbtn-${view}`).classList.toggle('active',
+    panel.classList.contains('open') || activeFilterCount(getFilters(view)) > 0);
+}
+
+/* Legacy shim — renderCurrentView still calls this */
+function filteredRows(view, q, typeFilter) {
+  let rows = allIncidents;
+  if (view === 'active')   rows = rows.filter(i => i.status === 'active');
+  if (view === 'archived') rows = rows.filter(i => i.status === 'archived');
+  return rows;
+}
+
+function filterTable(view, q, typeFilter) {
+  applyFilters(view);
+}
+
+function updateCounts() {
+  const active   = allIncidents.filter(i=>i.status==='active').length;
+  const archived = allIncidents.filter(i=>i.status==='archived').length;
+  document.getElementById('nc-active').textContent   = active;
+  document.getElementById('nc-archived').textContent = archived;
+  document.getElementById('nc-all').textContent      = allIncidents.length;
+}
+
+/* ════════════════════════════════════════════════════
+   RENDER TABLE
+════════════════════════════════════════════════════ */
+function renderTable(rows, containerId, view) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
   if (!rows.length) {
-    el.innerHTML=`<div class="empty"><div class="empty-icon">🔍</div><div class="empty-txt">No results match your search.</div></div>`;
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No incidents found.</div></div>`;
     return;
   }
-
-  el.innerHTML = '';
-  rows.forEach(inc => {
-    const bc = inc.type_color==='red'?'b-red':inc.type_color==='gold'?'b-gold':'b-teal';
-    const mc = inc.incident_media?.length||0;
-    const d = document.createElement('div');
-    d.className='inc-card'; d.id=`card-${inc.id}`;
-    d.innerHTML=`
-      <div class="card-row">
-        <span class="badge ${bc}">${inc.type}</span>
-        ${ageTag(inc.occurred_at)}
-      </div>
-      <div class="card-addr">📍 ${inc.address}</div>
-      <div class="card-desc">${inc.description}</div>
-      <div class="card-meta">
-        ${mc?`<span class="meta-tag">📎 ${mc} file${mc>1?'s':''}</span>`:''}
-        ${inc.police_report?`<span class="meta-tag">📋 ${inc.police_report}</span>`:''}
-        ${inc.lat?`<span class="meta-tag">📍 Pinned</span>`:''}
-        ${inc.is_recurring?`<span class="recurring-flag">🔁 Recurring</span>`:''}
-        ${inc.is_verified_member?`<span class="verified-badge">✅ KIAA Member</span>`:''}
-      </div>`;
-    d.onclick=()=>{ openModal(inc.id); hlCard(inc.id); if(inc.lat) map.flyTo([inc.lat,inc.lng],16,{duration:.8}); };
-    el.appendChild(d);
-  });
+  const showCb     = view === 'active';
+  const showStatus = view === 'all';
+  wrap.innerHTML = `
+    <table>
+      <thead><tr>
+        ${showCb ? '<th><input type="checkbox" id="cbAll" onchange="toggleAll(this)"></th>' : ''}
+        <th>Type</th><th>Date &amp; Time</th><th>Location</th><th>Description</th>
+        <th>Reporter</th><th>Media</th>
+        ${showStatus ? '<th>Status</th>' : ''}
+        <th>Actions</th>
+      </tr></thead>
+      <tbody>${rows.map(inc => renderRow(inc, showCb, showStatus)).join('')}</tbody>
+    </table>`;
 }
 
-function hlCard(id) {
-  document.querySelectorAll('.inc-card').forEach(c=>c.classList.remove('hl'));
-  const c=document.getElementById(`card-${id}`);
-  if(c){ c.classList.add('hl'); c.scrollIntoView({behavior:'smooth',block:'nearest'}); }
-}
-
-function updateCount() {
-  const n = incidents.length;
-  document.getElementById('countBadge').textContent = `${n} incident${n!==1?'s':''}`;
+function renderRow(inc, showCb, showStatus) {
+  const bc = inc.type_color==='red'?'b-red':inc.type_color==='gold'?'b-gold':'b-teal';
+  const mc = inc.incident_media?.length || 0;
+  const archived = inc.status === 'archived';
+  return `
+    <tr id="row-${inc.id}" style="${archived?'opacity:.65':''}">
+      ${showCb ? `<td><input type="checkbox" class="row-cb" data-id="${inc.id}" onchange="toggleRow('${inc.id}',this.checked)" ${selectedIds.has(inc.id)?'checked':''}></td>` : ''}
+      <td class="td-type"><span class="badge ${bc}">${inc.type}</span>${inc.is_recurring?'<br><span class="recurring-flag" style="margin-top:3px">🔁 Recurring</span>':''} ${inc.is_verified_member?'<br><span class="verified-badge" style="margin-top:3px">✅ Member</span>':''}</td>
+      <td class="td-time">${fmt(inc.occurred_at)}<br>${ageTag(inc.occurred_at)}</td>
+      <td class="td-addr" title="${esc(inc.address)}">${esc(inc.address)}${inc.district ? `<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:#00c9a7;letter-spacing:.03em">${DISTRICT_GEO.find(d=>d.id===inc.district)?.label||inc.district}</span>` : ''}</td>
+      <td class="td-desc" title="${esc(inc.description)}">${esc(inc.description)}</td>
+      <td style="font-size:.75rem;color:var(--slate)">${esc(inc.reporter_name||'—')}</td>
+      <td>${mc ? `<span class="media-pill">📎 ${mc}</span>` : '<span style="color:var(--slate2)">—</span>'}</td>
+      ${showStatus ? `<td><span class="badge ${archived?'b-arch':'b-teal'}">${inc.status}</span></td>` : ''}
+      <td>
+        <div class="row-actions">
+          <button class="btn btn-ghost" onclick="openDetail('${inc.id}')">View</button>
+          ${!archived
+            ? `<button class="btn btn-gold" onclick="archiveOne('${inc.id}')">Archive</button>`
+            : `<button class="btn btn-green" onclick="restoreOne('${inc.id}')">Restore</button>`}
+          <button class="btn btn-red" onclick="deleteOne('${inc.id}')">Delete</button>
+        </div>
+      </td>
+    </tr>`;
 }
 
 /* ════════════════════════════════════════════════════
-   MODAL
+   ACTIONS
 ════════════════════════════════════════════════════ */
-function openModal(id) {
-  const inc = incidents.find(i=>i.id===id);
+async function archiveOne(id) {
+  if (!confirm('Archive this incident? It will be removed from the public map.')) return;
+  const {error} = await sb.from('incidents').update({status:'archived'}).eq('id',id);
+  if (!error) { mutate(id,'status','archived'); showToast('📦','Incident archived.'); }
+  else showToast('⚠️',error.message,'err');
+}
+
+async function restoreOne(id) {
+  const {error} = await sb.from('incidents').update({status:'active'}).eq('id',id);
+  if (!error) { mutate(id,'status','active'); showToast('✅','Incident restored to active.'); }
+  else showToast('⚠️',error.message,'err');
+}
+
+async function deleteOne(id) {
+  if (!confirm('Permanently delete this incident and all its media? This cannot be undone.')) return;
+  const inc = allIncidents.find(i=>i.id===id);
+  // Delete storage files
+  if (inc?.incident_media?.length) {
+    const paths = inc.incident_media.map(m=>m.file_path);
+    await sb.storage.from('incident-media').remove(paths);
+  }
+  const {error} = await sb.from('incidents').delete().eq('id',id);
+  if (!error) {
+    allIncidents = allIncidents.filter(i=>i.id!==id);
+    updateCounts(); renderCurrentView(); renderStats();
+    showToast('🗑','Incident deleted.');
+  } else showToast('⚠️',error.message,'err');
+}
+
+// Optimistic local mutation — no full reload needed
+function mutate(id, key, val) {
+  const inc = allIncidents.find(i=>i.id===id);
+  if (inc) inc[key] = val;
+  updateCounts(); renderCurrentView(); renderStats();
+}
+
+/* ════════════════════════════════════════════════════
+   SELECTION (bulk)
+════════════════════════════════════════════════════ */
+function toggleAll(cb) {
+  document.querySelectorAll('.row-cb').forEach(el => {
+    el.checked = cb.checked;
+    cb.checked ? selectedIds.add(el.dataset.id) : selectedIds.delete(el.dataset.id);
+  });
+  updateBulkBar();
+}
+function toggleRow(id, checked) {
+  checked ? selectedIds.add(id) : selectedIds.delete(id);
+  updateBulkBar();
+}
+function updateBulkBar() {
+  const bar = document.getElementById('bulk-active');
+  const lbl = document.getElementById('bulk-label-active');
+  const n = selectedIds.size;
+  bar.classList.toggle('show', n > 0);
+  if (lbl) lbl.textContent = `${n} selected`;
+}
+function clearSelection() {
+  selectedIds.clear();
+  document.querySelectorAll('.row-cb').forEach(el=>el.checked=false);
+  const cb = document.getElementById('cbAll');
+  if (cb) cb.checked = false;
+  updateBulkBar();
+}
+
+async function bulkArchive() {
+  if (!selectedIds.size) return;
+  if (!confirm(`Archive ${selectedIds.size} incident(s)?`)) return;
+  const ids = [...selectedIds];
+  const {error} = await sb.from('incidents').update({status:'archived'}).in('id',ids);
+  if (!error) { ids.forEach(id=>mutate(id,'status','archived')); clearSelection(); showToast('📦',`${ids.length} incidents archived.`); }
+  else showToast('⚠️',error.message,'err');
+}
+
+async function bulkDelete() {
+  if (!selectedIds.size) return;
+  if (!confirm(`Permanently delete ${selectedIds.size} incident(s)? This cannot be undone.`)) return;
+  const ids = [...selectedIds];
+  for (const id of ids) {
+    const inc = allIncidents.find(i=>i.id===id);
+    if (inc?.incident_media?.length) await sb.storage.from('incident-media').remove(inc.incident_media.map(m=>m.file_path));
+    await sb.from('incidents').delete().eq('id',id);
+  }
+  allIncidents = allIncidents.filter(i=>!ids.includes(i.id));
+  clearSelection(); updateCounts(); renderCurrentView(); renderStats();
+  showToast('🗑',`${ids.length} incidents deleted.`);
+}
+
+/* ════════════════════════════════════════════════════
+   DETAIL MODAL
+════════════════════════════════════════════════════ */
+function openDetail(id) {
+  const inc = allIncidents.find(i=>i.id===id);
   if (!inc) return;
   const bc = inc.type_color==='red'?'b-red':inc.type_color==='gold'?'b-gold':'b-teal';
   document.getElementById('mTitle').textContent = inc.type;
@@ -1294,39 +1461,64 @@ function openModal(id) {
   const media = inc.incident_media||[];
   document.getElementById('mBody').innerHTML = `
     <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)} &nbsp;${ageTag(inc.occurred_at)}</div></div>
-    <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${inc.address}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">GPS ${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span> &nbsp;<a href="https://www.google.com/maps?q=&layer=c&cbll=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none">🔭 Street View</a>`:''}</div></div>
-    <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${inc.description}</div></div>
+    ${inc.district ? `<div class="mf-row"><div class="mf-label">District</div><div class="mf-val"><span class="teal-badge">${DISTRICT_GEO.find(d=>d.id===inc.district)?.label||inc.district}</span></div></div>` : ''}
+    <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${esc(inc.address)}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span> &nbsp;<a href="https://www.google.com/maps?q=&layer=c&cbll=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none">🔭 Street View ↗</a>`:''}</div></div>
+    <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${esc(inc.description)}</div></div>
+    <div class="mf-row"><div class="mf-label">Reported By</div><div class="mf-val">${esc(inc.reporter_name||'Anonymous')}</div></div>
+    ${inc.police_report?`<div class="mf-row"><div class="mf-label">Police Report #</div><div class="mf-val">${esc(inc.police_report)}</div></div>`:''}
     ${inc.is_recurring?`<div class="mf-row"><span class="recurring-flag">🔁 Reported as Recurring Incident</span></div>`:''}
     ${inc.is_verified_member?`<div class="mf-row"><span class="verified-badge" style="font-size:.72rem;padding:3px 10px">✅ Submitted by a Verified KIAA Member</span></div>`:''}
-    ${inc.police_report?`<div class="mf-row"><div class="mf-label">Police Report #</div><div class="mf-val">${inc.police_report}</div></div>`:''}
     ${(inc.suspect_height||inc.suspect_build||inc.suspect_age||inc.suspect_gender||inc.suspect_race||inc.suspect_clothing||inc.suspect_other)?`
     <div class="mf-row" style="background:rgba(232,65,90,.05);border:1px solid rgba(232,65,90,.15);border-radius:5px;padding:10px 12px;">
       <div class="mf-label" style="color:var(--red);margin-bottom:8px">Suspect Description</div>
-      ${[
-        inc.suspect_gender && inc.suspect_age ? inc.suspect_gender+', '+inc.suspect_age : (inc.suspect_gender||inc.suspect_age||''),
-        inc.suspect_height && inc.suspect_build ? inc.suspect_height+', '+inc.suspect_build : (inc.suspect_height||inc.suspect_build||''),
-        inc.suspect_race||'',
-        inc.suspect_clothing ? '🧥 '+inc.suspect_clothing : '',
-        inc.suspect_other ? '🔍 '+inc.suspect_other : ''
-      ].filter(Boolean).map(s=>`<div class="mf-val" style="margin-bottom:3px">${s}</div>`).join('')}
+      <div class="mf-val" style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:.78rem">
+        ${inc.suspect_gender?`<span><span style="color:var(--slate)">Gender:</span> ${esc(inc.suspect_gender)}</span>`:''}
+        ${inc.suspect_age?`<span><span style="color:var(--slate)">Age:</span> ${esc(inc.suspect_age)}</span>`:''}
+        ${inc.suspect_height?`<span><span style="color:var(--slate)">Height:</span> ${esc(inc.suspect_height)}</span>`:''}
+        ${inc.suspect_build?`<span><span style="color:var(--slate)">Build:</span> ${esc(inc.suspect_build)}</span>`:''}
+        ${inc.suspect_race?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Race/Ethnicity:</span> ${esc(inc.suspect_race)}</span>`:''}
+        ${inc.suspect_clothing?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Clothing:</span> ${esc(inc.suspect_clothing)}</span>`:''}
+        ${inc.suspect_other?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Other:</span> ${esc(inc.suspect_other)}</span>`:''}
+      </div>
     </div>`:``}
     ${(inc.vehicle_make||inc.vehicle_model||inc.vehicle_color||inc.vehicle_plate)?`
     <div class="mf-row" style="background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.15);border-radius:5px;padding:10px 12px;">
       <div class="mf-label" style="color:var(--gold);margin-bottom:8px">Vehicle Description</div>
-      ${[
-        [inc.vehicle_color, inc.vehicle_year, inc.vehicle_make, inc.vehicle_model].filter(Boolean).join(' '),
-        inc.vehicle_plate ? '🪪 Plate: '+inc.vehicle_plate : '',
-        inc.vehicle_notes ? '📝 '+inc.vehicle_notes : ''
-      ].filter(Boolean).map(s=>`<div class="mf-val" style="margin-bottom:3px">${s}</div>`).join('')}
+      <div class="mf-val" style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:.78rem">
+        ${inc.vehicle_color?`<span><span style="color:var(--slate)">Color:</span> ${esc(inc.vehicle_color)}</span>`:''}
+        ${inc.vehicle_year?`<span><span style="color:var(--slate)">Year:</span> ${esc(inc.vehicle_year)}</span>`:''}
+        ${inc.vehicle_make?`<span><span style="color:var(--slate)">Make:</span> ${esc(inc.vehicle_make)}</span>`:''}
+        ${inc.vehicle_model?`<span><span style="color:var(--slate)">Model:</span> ${esc(inc.vehicle_model)}</span>`:''}
+        ${inc.vehicle_plate?`<span style="grid-column:1/-1"><span style="color:var(--slate)">License Plate:</span> <strong style="color:var(--gold)">${esc(inc.vehicle_plate)}</strong></span>`:''}
+        ${inc.vehicle_notes?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Notes:</span> ${esc(inc.vehicle_notes)}</span>`:''}
+      </div>
     </div>`:``}
     ${media.length?`<div class="mf-row"><div class="mf-label">Media (${media.length})</div>
       <div class="modal-media">${media.map(m=>`
         <div class="modal-media-item" onclick="openLightbox('${m.public_url}','${m.file_type}')">
-          ${m.file_type==='image'?`<img src="${m.public_url}" alt="${m.file_name}">`:`<video src="${m.public_url}" muted></video>`}
+          ${m.file_type==='image'?`<img src="${m.public_url}" alt="">`:`<video src="${m.public_url}" muted></video>`}
         </div>`).join('')}
       </div></div>`:''}
-    <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">Submitted ${fmtLong(inc.created_at)}</div>`;
+    <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">Submitted ${fmtLong(inc.created_at)}</div>
+    <div class="mf-row notes-section">
+      <div class="mf-label" style="margin-bottom:8px">📝 Follow-Up Notes</div>
+      <div id="notesList-${id}"><div style="font-size:.75rem;color:var(--slate2)">Loading notes…</div></div>
+      <div class="note-form">
+        <input class="note-input" type="text" id="noteInput-${id}" placeholder="Add a follow-up note…" onkeydown="if(event.key==='Enter')addNote('${id}')">
+        <button class="note-submit" onclick="addNote('${id}')">Add</button>
+      </div>
+    </div>`;
+  document.getElementById('mActions').innerHTML = `
+    <div class="print-header">Hawaii Island Business Crime Watch — Incident Report — Printed ${new Date().toLocaleDateString()}</div>
+    ${inc.status==='active'
+      ? `<button class="btn btn-gold" onclick="archiveOne('${id}');closeModal()">📦 Archive</button>`
+      : `<button class="btn btn-green" onclick="restoreOne('${id}');closeModal()">↩ Restore</button>`}
+    <button class="btn btn-red" onclick="deleteOne('${id}');closeModal()">🗑 Delete</button>
+    <button class="btn btn-teal" onclick="printIncident()">🖨 Print / PDF</button>
+    <button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
   document.getElementById('overlay').classList.add('open');
+  // Load notes async
+  loadNotes(id);
 }
 function closeModal() { document.getElementById('overlay').classList.remove('open'); }
 
@@ -1339,24 +1531,573 @@ function openLightbox(url,type) {
   else{vid.src=url;vid.style.display='block';img.style.display='none';}
   document.getElementById('lightbox').classList.add('open');
 }
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lbVid').pause?.();
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+
+/* ════════════════════════════════════════════════════
+   STATS
+════════════════════════════════════════════════════ */
+function renderStats() {
+  const active   = allIncidents.filter(i=>i.status==='active');
+  const archived = allIncidents.filter(i=>i.status==='archived');
+  const withPin  = allIncidents.filter(i=>i.lat);
+  const withMedia= allIncidents.filter(i=>i.incident_media?.length);
+  const last30   = allIncidents.filter(i=>new Date(i.occurred_at)>=new Date(Date.now()-30*864e5));
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card accent"><div class="stat-num">${active.length}</div><div class="stat-lbl">Active</div></div>
+    <div class="stat-card"><div class="stat-num">${archived.length}</div><div class="stat-lbl">Archived</div></div>
+    <div class="stat-card"><div class="stat-num">${allIncidents.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card"><div class="stat-num">${last30.length}</div><div class="stat-lbl">Last 30 Days</div></div>
+    <div class="stat-card"><div class="stat-num">${withPin.length}</div><div class="stat-lbl">With GPS Pin</div></div>
+    <div class="stat-card"><div class="stat-num">${withMedia.length}</div><div class="stat-lbl">With Media</div></div>`;
+
+  // Type breakdown bars
+  const counts = {};
+  active.forEach(i => counts[i.type]=(counts[i.type]||0)+1);
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1] || 1;
+  const colors = {red:'#e8415a',gold:'#f5a623',teal:'#00c9a7'};
+  const typeColor = {};
+  allIncidents.forEach(i=>typeColor[i.type]=i.type_color);
+
+  document.getElementById('typeBreakdown').innerHTML = sorted.map(([type,count])=>`
+    <div class="type-row">
+      <div class="type-row-label">${type}</div>
+      <div class="type-bar-wrap">
+        <div class="type-bar" style="width:${(count/max*100).toFixed(1)}%;background:${colors[typeColor[type]]||'#00c9a7'}"></div>
+      </div>
+      <div class="type-count">${count}</div>
+    </div>`).join('') || '<div style="padding:10px;color:var(--slate2);font-size:.8rem">No active incidents.</div>';
+}
+
+/* ════════════════════════════════════════════════════
+   CSV EXPORT
+════════════════════════════════════════════════════ */
+function exportCSV(view) {
+  let rows = allIncidents;
+  if (view==='active')   rows = rows.filter(i=>i.status==='active');
+  if (view==='archived') rows = rows.filter(i=>i.status==='archived');
+  const header = ['ID','Type','Status','Date/Time','Address','Description','Reporter','Police Report',
+    'Suspect Height','Suspect Build','Suspect Age','Suspect Gender','Suspect Race','Suspect Clothing','Suspect Other',
+    'Vehicle Make','Vehicle Model','Vehicle Color','Vehicle Year','Vehicle Plate','Vehicle Notes',
+    'Lat','Lng','Media Count','Submitted'];
+  const csv = [header, ...rows.map(i=>[
+    i.id, i.type, i.status,
+    new Date(i.occurred_at).toLocaleString(),
+    i.address, `"${(i.description||'').replace(/"/g,'""')}"`,
+    i.reporter_name||'', i.police_report||'',
+    i.suspect_height||'', i.suspect_build||'', i.suspect_age||'', i.suspect_gender||'',
+    i.suspect_race||'', i.suspect_clothing||'', i.suspect_other||'',
+    i.vehicle_make||'', i.vehicle_model||'', i.vehicle_color||'', i.vehicle_year||'',
+    i.vehicle_plate||'', i.vehicle_notes||'',
+    i.lat||'', i.lng||'',
+    i.incident_media?.length||0,
+    new Date(i.created_at).toLocaleString()
+  ])].map(r=>r.join(',')).join('\n');
+
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `HIBCW_${view}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
 }
 
 /* ════════════════════════════════════════════════════
    TOAST
 ════════════════════════════════════════════════════ */
 let toastTimer;
-function showToast(ico, body, type='') {
+function showToast(ico,body,type='') {
   const t=document.getElementById('toast');
   document.getElementById('toastIco').textContent=ico;
-  document.getElementById('toastTitle').textContent=type==='err'?'Error':'Success';
+  document.getElementById('toastTitle').textContent=type==='err'?'Error':'Done';
   document.getElementById('toastBody').textContent=body;
-  t.classList.toggle('err-toast', type==='err');
+  t.classList.toggle('err-toast',type==='err');
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),4000);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3800);
+}
+
+/* ════════════════════════════════════════════════════
+   MEMBER MANAGEMENT
+════════════════════════════════════════════════════ */
+let memberList = [];
+
+async function loadMembers() {
+  if (!sb) return;
+  try {
+    // Fetch verified emails
+    const {data: emails, error: eErr} = await sb
+      .from('member_emails').select('*').order('created_at', {ascending:false});
+    if (eErr) { console.warn('member_emails error:', eErr.message); memberList = []; return; }
+
+    // Fetch approved applications to enrich with full profile info
+    const {data: apps} = await sb
+      .from('member_applications')
+      .select('email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district')
+      .eq('status','approved');
+
+    // Build lookup map: email -> application data
+    const appMap = {};
+    (apps || []).forEach(a => { appMap[a.email.toLowerCase()] = a; });
+
+    // Merge — every verified email gets enriched with application data if available
+    memberList = (emails || []).map(m => ({
+      ...m,
+      ...(appMap[m.email.toLowerCase()] || {})
+    }));
+
+    renderMembers();
+    const nc = document.getElementById('nc-members');
+    if (nc) nc.textContent = memberList.length;
+  } catch(e) {
+    console.warn('loadMembers error:', e);
+    memberList = [];
+  }
+}
+
+function renderMembers() {
+  const tbody = document.getElementById('memberGrid');
+  if (!tbody) return;
+
+  const q = (document.getElementById('memberSearch')?.value || '').toLowerCase().trim();
+  const filtered = q ? memberList.filter(m =>
+    (m.email         || '').toLowerCase().includes(q) ||
+    (m.full_name     || '').toLowerCase().includes(q) ||
+    (m.business_name || '').toLowerCase().includes(q) ||
+    (m.phone         || '').toLowerCase().includes(q) ||
+    (m.business_address || '').toLowerCase().includes(q) ||
+    (m.business_city    || '').toLowerCase().includes(q) ||
+    (m.business_state   || '').toLowerCase().includes(q) ||
+    (m.business_zip     || '').toLowerCase().includes(q) ||
+    (districtLabel(m.district)).toLowerCase().includes(q)
+  ) : memberList;
+
+  // Update count label
+  const label = document.getElementById('memberCountLabel');
+  if (label) label.textContent = q
+    ? `${filtered.length} of ${memberList.length} member${memberList.length !== 1 ? 's' : ''}`
+    : `${memberList.length} member${memberList.length !== 1 ? 's' : ''}`;
+
+  if (!filtered.length) {
+    tbody.innerHTML = q
+      ? `<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--slate)">No members match "${esc(q)}"</td></tr>`
+      : `<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--slate);line-height:1.8">No members yet.<br>Add emails above to start verifying submissions.</td></tr>`;
+    return;
+  }
+
+  const na = `<span style="color:var(--slate2);font-style:italic">—</span>`;
+
+  tbody.innerHTML = filtered.map((m, i) => {
+    const added   = new Date(m.created_at);
+    const dateStr = added.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    const days    = Math.floor((Date.now() - added) / 86400000);
+    const daysStr = days === 0 ? 'Today' : days === 1 ? '1 day' : `${days} days`;
+    return `
+    <tr id="mc-${m.id}">
+      <td class="mem-num">${i + 1}</td>
+      <td style="white-space:nowrap;font-weight:500">${m.full_name ? esc(m.full_name) : na}</td>
+      <td><div class="mem-email"><span class="mem-dot"></span>${esc(m.email)}</div></td>
+      <td class="mem-date" style="white-space:nowrap">${m.phone ? esc(m.phone) : na}</td>
+      <td style="white-space:nowrap">${m.business_name ? esc(m.business_name) : na}</td>
+      <td style="color:var(--slate);font-size:.78rem">${m.business_address ? esc(m.business_address) : na}</td>
+      <td class="mem-date" style="white-space:nowrap">${m.business_city  ? esc(m.business_city)  : na}</td>
+      <td class="mem-date" style="white-space:nowrap">${m.business_state ? esc(m.business_state) : na}</td>
+      <td class="mem-date" style="white-space:nowrap">${m.business_zip   ? esc(m.business_zip)   : na}</td>
+      <td>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;
+          background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);
+          border-radius:3px;padding:2px 7px;color:var(--teal);white-space:nowrap">
+          ${m.district ? districtLabel(m.district) : na}
+        </span>
+      </td>
+      <td style="font-size:.78rem;color:var(--slate);white-space:nowrap">
+        ${m.captain_name ? esc(m.captain_name) : na}
+      </td>
+      <td class="mem-date">${dateStr}</td>
+      <td class="mem-date">${daysStr}</td>
+      <td style="white-space:nowrap;display:flex;gap:5px">
+        <button class="btn btn-ghost" style="font-size:.68rem;padding:4px 10px" onclick="openEditMember('${m.id}')">✏️ Edit</button>
+        <button class="btn btn-red"   style="font-size:.68rem;padding:4px 10px" onclick="removeMember('${m.id}')">Remove</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function exportMembersCSV() {
+  if (!memberList.length) { showToast('ℹ️', 'No members to export.'); return; }
+  const rows = [['#','Full Name','Email','Phone','Business Name','Business Address','City','State','Zip','District','Captain','Date Added','Days Active']];
+  memberList.forEach((m, i) => {
+    const added   = new Date(m.created_at);
+    const dateStr = added.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    const days    = Math.floor((Date.now() - added) / 86400000);
+    rows.push([
+      i + 1,
+      m.full_name        || '',
+      m.email            || '',
+      m.phone            || '',
+      m.business_name    || '',
+      m.business_address || '',
+      m.business_city    || '',
+      m.business_state   || '',
+      m.business_zip     || '',
+      m.district ? districtLabel(m.district) : '',
+      m.captain_name || '',
+      dateStr,
+      days === 0 ? 'Today' : days === 1 ? '1 day' : `${days} days`
+    ]);
+  });
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `HIBCW-Members-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('⬇', `${memberList.length} members exported.`);
+}
+
+async function addMember() {
+  const input = document.getElementById('newMemberEmail');
+  const email = input.value.trim().toLowerCase();
+  if (!email || !email.includes('@')) { showToast('⚠️', 'Enter a valid email address.', 'err'); return; }
+  if (memberList.find(m => m.email === email)) { showToast('ℹ️', 'That email is already in the list.'); return; }
+  const {error} = await sb.from('member_emails').insert({email});
+  if (error) { showToast('⚠️', error.message, 'err'); return; }
+  input.value = '';
+  await loadMembers();
+  showToast('✅', `${email} added to member list.`);
+}
+
+function openEditMember(id) {
+  const m = memberList.find(m => m.id === id);
+  if (!m) return;
+  document.getElementById('meId').value        = m.id;
+  document.getElementById('meOrigEmail').value  = m.email;
+  document.getElementById('meFullName').value   = m.full_name        || '';
+  document.getElementById('meEmail').value      = m.email            || '';
+  document.getElementById('mePhone').value      = m.phone            || '';
+  document.getElementById('meBizName').value    = m.business_name    || '';
+  document.getElementById('meBizAddr').value    = m.business_address || '';
+  document.getElementById('meBizCity').value    = m.business_city    || '';
+  document.getElementById('meBizState').value   = m.business_state   || '';
+  document.getElementById('meBizZip').value     = m.business_zip     || '';
+  document.getElementById('memEditTitle').textContent = m.full_name || m.email;
+  // Populate district select dynamically
+  const dSel = document.getElementById('meDistrict');
+  dSel.innerHTML = '<option value="">— Assign district…</option>' +
+    DISTRICTS.map(([v,l]) =>
+      '<option value="' + v + '"' + (String(m.district||'')===v?' selected':'') + '>' + l + '</option>'
+    ).join('');
+  document.getElementById('meCaptain').value  = m.captain_name || '';
+  document.getElementById('memberEditOverlay').style.display = 'flex';
+}
+
+function closeMemberEdit() {
+  document.getElementById('memberEditOverlay').style.display = 'none';
+}
+
+async function saveMemberEdit() {
+  const id        = document.getElementById('meId').value;
+  const origEmail = document.getElementById('meOrigEmail').value.toLowerCase();
+  const newEmail  = document.getElementById('meEmail').value.trim().toLowerCase();
+  const fullName  = document.getElementById('meFullName').value.trim();
+  const phone     = document.getElementById('mePhone').value.trim();
+  const bizName   = document.getElementById('meBizName').value.trim();
+  const bizAddr   = document.getElementById('meBizAddr').value.trim();
+  const bizCity   = document.getElementById('meBizCity').value.trim();
+  const bizState  = document.getElementById('meBizState').value.trim().toUpperCase();
+  const bizZip    = document.getElementById('meBizZip').value.trim();
+  const district  = document.getElementById('meDistrict').value.trim();
+  const captainName = document.getElementById('meCaptain').value.trim();
+
+  if (!newEmail || !newEmail.includes('@')) {
+    showToast('⚠️', 'A valid email address is required.', 'err'); return;
+  }
+
+  const btn = document.getElementById('meSaveBtn');
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+
+  // 1. Update member_emails — email may have changed
+  const emailUpdate = { email: newEmail };
+  const { error: eErr } = await sb.from('member_emails').update(emailUpdate).eq('id', id);
+  if (eErr) {
+    showToast('⚠️', 'Could not update email: ' + eErr.message, 'err');
+    btn.disabled = false; btn.textContent = '💾 Save Changes'; return;
+  }
+
+  // 2. Upsert member_applications with profile fields (match on original email)
+  const profile = {
+    email:            newEmail,
+    full_name:        fullName  || null,
+    phone:            phone     || null,
+    business_name:    bizName   || null,
+    business_address: bizAddr   || null,
+    business_city:    bizCity   || null,
+    business_state:   bizState  || null,
+    business_zip:     bizZip    || null,
+    district:         district  || null,
+    captain_name:     captainName || null,
+    status:           'approved'
+  };
+
+  // Check if an application record exists for this member
+  const { data: existing } = await sb
+    .from('member_applications')
+    .select('id')
+    .eq('email', origEmail)
+    .maybeSingle();
+
+  if (existing) {
+    await sb.from('member_applications').update(profile).eq('id', existing.id);
+  } else {
+    // No application existed (manually added member) — create one to store the profile
+    await sb.from('member_applications').insert(profile);
+  }
+
+  // 3. Refresh list and close modal
+  await loadMembers();
+  closeMemberEdit();
+  showToast('✅', `${newEmail} updated successfully.`);
+  btn.disabled = false; btn.textContent = '💾 Save Changes';
+}
+
+async function removeMember(id) {
+  if (!confirm('Remove this member? Their past verified reports will keep the badge.')) return;
+  const {error} = await sb.from('member_emails').delete().eq('id', id);
+  if (!error) { await loadMembers(); showToast('🗑', 'Member removed.'); }
+  else showToast('⚠️', error.message, 'err');
+}
+
+function importMemberCSV() {
+  document.getElementById('memberCSVInput').click();
+}
+
+async function handleMemberCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const text = await file.text();
+  const emails = text.split(/[\r\n,]+/)
+    .map(e => e.trim().toLowerCase().replace(/^["']|["']$/g,''))
+    .filter(e => e.includes('@') && e.includes('.'));
+  if (!emails.length) { showToast('⚠️', 'No valid emails found in file.', 'err'); return; }
+  const existing = new Set(memberList.map(m => m.email));
+  const newEmails = emails.filter(e => !existing.has(e));
+  if (!newEmails.length) { showToast('ℹ️', 'All emails already in the list.'); return; }
+  const rows = newEmails.map(email => ({email}));
+  const {error} = await sb.from('member_emails').insert(rows);
+  if (error) { showToast('⚠️', error.message, 'err'); return; }
+  await loadMembers();
+  showToast('✅', `${newEmails.length} member${newEmails.length>1?'s':''} imported.`);
+  input.value = '';
+}
+
+/* ════════════════════════════════════════════════════
+   DISTRICT CAPTAINS
+════════════════════════════════════════════════════ */
+function renderCaptains() {
+  const grid = document.getElementById('captainsGrid');
+  if (!grid) return;
+
+  // Build lookup: district -> {captain, members:[]}
+  const distMap = {};
+  DISTRICTS.forEach(([v]) => { distMap[v] = {captain: null, members: []}; });
+  memberList.forEach(m => {
+    if (m.district && distMap[m.district]) {
+      distMap[m.district].members.push(m);
+      if (m.captain_name && !distMap[m.district].captain) {
+        distMap[m.district].captain = m.captain_name;
+      }
+    }
+  });
+
+  // Count incidents per district (match member emails to incidents)
+  const memberEmailSet = new Set(memberList.map(m => (m.email||'').toLowerCase()));
+  const incidentsByDistrict = {};
+  DISTRICTS.forEach(([v]) => { incidentsByDistrict[v] = 0; });
+  allIncidents.forEach(inc => {
+    if (inc.reporter_email) {
+      const mem = memberList.find(m =>
+        (m.email||'').toLowerCase() === inc.reporter_email.toLowerCase()
+      );
+      if (mem && mem.district) incidentsByDistrict[mem.district] = (incidentsByDistrict[mem.district]||0) + 1;
+    }
+  });
+
+  grid.innerHTML = DISTRICTS.map(([v, fullLabel]) => {
+    const info       = distMap[v] || {captain:null, members:[]};
+    const captain    = info.captain;
+    const memCount   = info.members.length;
+    const incCount   = incidentsByDistrict[v] || 0;
+    const hasCaptain = !!captain;
+
+    // List up to 3 member names
+    const memberPreview = info.members.slice(0, 3).map(m =>
+      '<div style="font-size:.72rem;color:var(--slate);margin-top:2px">• ' +
+      esc(m.full_name || m.email) + (m.business_name ? ' <span style="color:var(--slate2)">(' + esc(m.business_name) + ')</span>' : '') +
+      '</div>'
+    ).join('');
+    const moreCount = info.members.length > 3 ? info.members.length - 3 : 0;
+
+    return '<div style="background:var(--navy2);border:1px solid ' + (hasCaptain ? 'rgba(0,201,167,.25)' : 'var(--b2)') + ';border-left:3px solid ' + (hasCaptain ? 'var(--teal)' : 'var(--slate2)') + ';border-radius:8px;padding:18px 20px">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px">' +
+        '<div>' +
+          '<div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.04em">' + esc(fullLabel.replace('\u2014', '\u2014')) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:5px;flex-shrink:0">' +
+          '<span style="font-family:IBM Plex Mono,monospace;font-size:.6rem;border-radius:3px;padding:2px 7px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);color:var(--teal)">' + memCount + ' member' + (memCount!==1?'s':'') + '</span>' +
+          '<span style="font-family:IBM Plex Mono,monospace;font-size:.6rem;border-radius:3px;padding:2px 7px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);color:var(--gold)">' + incCount + ' incident' + (incCount!==1?'s':'') + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-bottom:10px">' +
+        '<div style="font-family:IBM Plex Mono,monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">District Captain</div>' +
+        (hasCaptain
+          ? '<div style="font-size:.88rem;font-weight:500;color:var(--white)">👮 ' + esc(captain) + '</div>'
+          : '<div style="font-size:.8rem;color:var(--slate2);font-style:italic">No captain assigned yet</div>'
+        ) +
+      '</div>' +
+      (memCount > 0
+        ? '<div style="border-top:1px solid var(--b2);padding-top:10px">' +
+            '<div style="font-family:IBM Plex Mono,monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Members</div>' +
+            memberPreview +
+            (moreCount > 0 ? '<div style="font-size:.7rem;color:var(--slate2);margin-top:3px">+ ' + moreCount + ' more…</div>' : '') +
+          '</div>'
+        : '<div style="font-size:.75rem;color:var(--slate2);font-style:italic;border-top:1px solid var(--b2);padding-top:10px">No members in this district yet</div>'
+      ) +
+      '<div style="margin-top:12px">' +
+        '<button class="btn btn-ghost" style="font-size:.7rem;padding:4px 10px;width:100%" onclick="showView(\'members\')">✏️ Assign / Edit Members</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════
+   MEMBERSHIP APPLICATIONS
+════════════════════════════════════════════════════ */
+let allApplications = [];
+
+async function loadApplications() {
+  if (!sb) return;
+  try {
+    const {data, error} = await sb
+      .from('member_applications')
+      .select('*')
+      .order('created_at', {ascending: false});
+    if (error) {
+      console.warn('member_applications table not found:', error.message);
+      allApplications = [];
+      return;
+    }
+    allApplications = data || [];
+    renderApps();
+    updateAppCount();
+  } catch(e) {
+    console.warn('loadApplications error:', e);
+    allApplications = [];
+  }
+}
+
+function updateAppCount() {
+  const pending = allApplications.filter(a => a.status === 'pending').length;
+  const nc = document.getElementById('nc-apps');
+  if (nc) nc.textContent = pending || '—';
+  // Highlight nav btn if there are pending apps
+  const btn = document.getElementById('nav-apps');
+  if (btn) btn.style.color = pending > 0 ? 'var(--gold)' : '';
+}
+
+function renderApps() {
+  const grid = document.getElementById('appGrid');
+  if (!grid) return;
+  const filter = document.getElementById('appStatusFilter')?.value || 'pending';
+  const rows = filter ? allApplications.filter(a => a.status === filter) : allApplications;
+  if (!rows.length) {
+    const labels = {pending:'pending applications',approved:'approved applications',rejected:'rejected applications','':'applications'};
+    grid.innerHTML = `<div class="app-empty">No ${labels[filter] || 'applications'} found.</div>`;
+    return;
+  }
+  grid.innerHTML = rows.map(a => `
+    <div class="app-card ${a.status}" id="appcard-${a.id}">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
+          <div class="app-name">${esc(a.full_name)}</div>
+          <span class="app-status ${a.status}">${a.status === 'pending' ? '⏳ Pending' : a.status === 'approved' ? '✅ Approved' : '❌ Rejected'}</span>
+        </div>
+        <div class="app-biz">🏢 ${esc(a.business_name)}</div>
+      </div>
+      <div class="app-detail">
+        <div>📍 <span>${esc(a.business_address)}</span></div>
+        <div>✉️ <span>${esc(a.email)}</span></div>
+        <div>📞 <span>${esc(a.phone)}</span></div>
+      </div>
+      ${a.notes ? `<div class="app-notes">"${esc(a.notes)}"</div>` : ''}
+      <div class="app-meta">Submitted ${fmt(a.created_at)}</div>
+      <div class="app-actions">
+        ${a.status === 'pending' ? `
+          <button class="btn btn-teal" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">✅ Approve</button>
+          <button class="btn btn-red"  onclick="rejectApp('${a.id}')">❌ Reject</button>
+        ` : ''}
+        ${a.status === 'approved' ? `
+          <button class="btn btn-ghost" onclick="rejectApp('${a.id}')">Revoke</button>
+        ` : ''}
+        ${a.status === 'rejected' ? `
+          <button class="btn btn-teal" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">Re-approve</button>
+        ` : ''}
+        <button class="btn btn-ghost" onclick="deleteApp('${a.id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+async function approveApp(id, email, name) {
+  if (!confirm(`Approve ${name} and add ${email} to the verified members list?`)) return;
+  // 1. Update application status
+  const {error: appErr} = await sb
+    .from('member_applications')
+    .update({status: 'approved'})
+    .eq('id', id);
+  if (appErr) { showToast('⚠️', appErr.message, 'err'); return; }
+
+  // 2. Add email to member_emails (ignore if already exists)
+  const {error: memErr} = await sb
+    .from('member_emails')
+    .upsert({email: email.toLowerCase()}, {onConflict: 'email', ignoreDuplicates: true});
+  if (memErr) { showToast('⚠️', 'Application approved but could not add to members: ' + memErr.message, 'err'); }
+
+  // 3. Refresh both lists
+  const app = allApplications.find(a => a.id === id);
+  if (app) app.status = 'approved';
+  await loadMembers();
+  renderApps();
+  updateAppCount();
+  showToast('✅', `${name} approved and added to verified members.`);
+}
+
+async function rejectApp(id) {
+  const app = allApplications.find(a => a.id === id);
+  const label = app?.status === 'approved' ? "Revoke this member's approval?" : 'Reject this application?';
+  if (!confirm(label)) return;
+  const {error} = await sb
+    .from('member_applications')
+    .update({status: 'rejected'})
+    .eq('id', id);
+  if (error) { showToast('⚠️', error.message, 'err'); return; }
+
+  // If revoking an approved member, also remove from member_emails
+  if (app?.status === 'approved' && app?.email) {
+    await sb.from('member_emails').delete().eq('email', app.email.toLowerCase());
+    await loadMembers();
+  }
+  if (app) app.status = 'rejected';
+  renderApps();
+  updateAppCount();
+  showToast('🗑', 'Application rejected.');
+}
+
+async function deleteApp(id) {
+  if (!confirm('Permanently delete this application?')) return;
+  const {error} = await sb.from('member_applications').delete().eq('id', id);
+  if (!error) {
+    allApplications = allApplications.filter(a => a.id !== id);
+    renderApps();
+    updateAppCount();
+    showToast('🗑', 'Application deleted.');
+  } else showToast('⚠️', error.message, 'err');
 }
 
 /* ════════════════════════════════════════════════════
@@ -1364,35 +2105,85 @@ function showToast(ico, body, type='') {
 ════════════════════════════════════════════════════ */
 function fmt(iso){ return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); }
 function fmtLong(iso){ return new Date(iso).toLocaleString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'}); }
+function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 function ageTag(iso){
-  const mins = (Date.now() - new Date(iso)) / 60000;
-  if (mins < 60)   return `<span class="age-tag age-fresh">${Math.round(mins)}m ago</span>`;
-  if (mins < 1440) return `<span class="age-tag age-fresh">${Math.round(mins/60)}h ago</span>`;
-  if (mins < 10080)return `<span class="age-tag age-recent">${Math.round(mins/1440)}d ago</span>`;
+  const mins=(Date.now()-new Date(iso))/60000;
+  if(mins<60)   return `<span class="age-tag age-fresh">${Math.round(mins)}m ago</span>`;
+  if(mins<1440) return `<span class="age-tag age-fresh">${Math.round(mins/60)}h ago</span>`;
+  if(mins<10080)return `<span class="age-tag age-recent">${Math.round(mins/1440)}d ago</span>`;
   return `<span class="age-tag age-old">${Math.round(mins/10080)}w ago</span>`;
 }
 
 /* ════════════════════════════════════════════════════
-   STATS BANNER
+   NOTES / FOLLOW-UP LOG
 ════════════════════════════════════════════════════ */
-function updateStats() {
-  const now = Date.now();
-  const total = incidents.length;
-  const month = incidents.filter(i => now - new Date(i.occurred_at) < 30*864e5).length;
-  const week  = incidents.filter(i => now - new Date(i.occurred_at) < 7*864e5).length;
-  const today = incidents.filter(i => now - new Date(i.occurred_at) < 864e5).length;
-  document.getElementById('sbTotal').textContent = total;
-  document.getElementById('sbMonth').textContent = month;
-  document.getElementById('sbWeek').textContent  = week;
-  document.getElementById('sbToday').textContent = today;
-  if (incidents.length) {
-    const latest = incidents.reduce((a,b) => new Date(a.occurred_at) > new Date(b.occurred_at) ? a : b);
-    document.getElementById('sbLast').textContent = ageTag(latest.occurred_at).replace(/<[^>]+>/g,'');
-  }
+async function loadNotes(incidentId) {
+  if (!sb) return;
+  const el = document.getElementById(`notesList-${incidentId}`);
+  if (!el) return;
+  const {data, error} = await sb.from('incident_notes')
+    .select('*').eq('incident_id', incidentId).order('created_at', {ascending:true});
+  if (error) { el.innerHTML = `<div style="color:var(--red);font-size:.75rem">Failed to load notes.</div>`; return; }
+  if (!data.length) { el.innerHTML = `<div style="font-size:.75rem;color:var(--slate2)">No notes yet.</div>`; return; }
+  el.innerHTML = data.map(n => `
+    <div class="note-item" id="note-${n.id}">
+      <div class="note-meta">
+        <span>👤 ${esc(n.author)} — ${fmtLong(n.created_at)}</span>
+        <button class="note-del" onclick="deleteNote('${n.id}','${incidentId}')" title="Delete note">🗑</button>
+      </div>
+      <div class="note-text">${esc(n.note)}</div>
+    </div>`).join('');
+}
+
+async function addNote(incidentId) {
+  const input = document.getElementById(`noteInput-${incidentId}`);
+  const note = input?.value.trim();
+  if (!note) return;
+  input.disabled = true;
+  const {error} = await sb.from('incident_notes').insert({
+    incident_id: incidentId, note, author: 'Admin'
+  });
+  if (error) { showToast('⚠️', error.message, 'err'); }
+  else { input.value = ''; await loadNotes(incidentId); showToast('✅','Note added.'); }
+  input.disabled = false;
+  input.focus();
+}
+
+async function deleteNote(noteId, incidentId) {
+  if (!confirm('Delete this note?')) return;
+  const {error} = await sb.from('incident_notes').delete().eq('id', noteId);
+  if (!error) { await loadNotes(incidentId); showToast('🗑','Note deleted.'); }
+  else showToast('⚠️', error.message, 'err');
 }
 
 /* ════════════════════════════════════════════════════
-   MAP FILTER
+   PRINT / PDF
+════════════════════════════════════════════════════ */
+function printIncident() {
+  window.print();
+}
+
+/* ════════════════════════════════════════════════════
+   ADMIN MAP
+════════════════════════════════════════════════════ */
+const TYPE_EMOJI = {
+  'Robbery':'🔫','Burglary':'🏠','Assault':'🤜','Drug Activity':'💊',
+  'Theft / Shoplifting':'🛍','Vandalism':'🔨','Vehicle Break-In':'🚗',
+  'Fraud / Scam':'💳','Trespassing':'🚫','Suspicious Activity':'👁',
+  'Graffiti':'🎨','Other':'📋'
+};
+
+let admMap = null;
+let admClusterGroup = null;
+let admHeatLayer = null;
+let admMarkers = {};
+let admClusterOn = true;
+let admHeatOn = false;
+let admStreetLayer = null;
+let admSatLayer    = null;
+
+/* ════════════════════════════════════════════════════
+   DISTRICT OVERLAY DATA & HELPERS
 ════════════════════════════════════════════════════ */
 /* ════════════════════════════════════════════════════
    DISTRICT OVERLAY — Official Hawaii County Council Districts
@@ -1400,9 +2191,6 @@ function updateStats() {
    Dataset: 893e0ad0b7d04ebbbd49daa31f474b8e (Council Districts 2022)
 ════════════════════════════════════════════════════ */
 
-// Style info for each of Hawaii County's 9 traditional districts
-// The GIS dataset uses "Council 1" through "Council 9" as distname values
-// Mapping based on Hawaii County Council official district descriptions (2022)
 const COUNCIL_DISTRICT_INFO = {
   1: { id:'south-hilo',   label:'South Hilo',   color:'#00c9a7', center:[19.680,-155.100] },
   2: { id:'puna',         label:'Puna',          color:'#a855f7', center:[19.380,-154.980] },
@@ -1415,7 +2203,6 @@ const COUNCIL_DISTRICT_INFO = {
   9: { id:'north-hilo',   label:'North Hilo',   color:'#3b82f6', center:[19.820,-155.220] }
 };
 
-// Fallback simplified coords used if GIS fetch fails
 const DISTRICT_GEO_FALLBACK = [
   { id:'north-kohala',  label:'North Kohala',  color:'#10b981', center:[20.210,-155.950], coords:[[20.264,-155.869],[20.264,-155.960],[20.200,-156.000],[20.036,-155.960],[20.036,-155.833],[20.090,-155.885],[20.145,-155.942],[20.178,-155.899],[20.235,-155.912],[20.264,-155.869]] },
   { id:'south-kohala',  label:'South Kohala',  color:'#06b6d4', center:[19.960,-155.770], coords:[[20.264,-155.869],[20.264,-155.960],[20.200,-156.000],[20.036,-155.960],[19.962,-156.045],[19.895,-155.998],[19.835,-155.918],[19.786,-155.840],[19.726,-155.700],[19.726,-155.380],[20.035,-155.295],[20.072,-155.390],[20.118,-155.584],[20.202,-155.732],[20.228,-155.745],[20.250,-155.790],[20.264,-155.869]] },
@@ -1428,10 +2215,8 @@ const DISTRICT_GEO_FALLBACK = [
   { id:'kau',           label:'Kaʻū',          color:'#ef4444', center:[19.150,-155.420], coords:[[19.726,-155.380],[19.510,-155.280],[19.480,-155.165],[19.455,-155.270],[19.400,-155.305],[19.300,-155.310],[19.215,-155.260],[19.250,-155.140],[19.285,-155.070],[19.330,-155.000],[19.160,-155.230],[19.062,-155.338],[18.962,-155.488],[18.911,-155.682],[19.098,-155.838],[19.162,-155.648],[19.238,-155.515],[19.322,-155.478],[19.415,-155.458],[19.508,-155.478],[19.726,-155.380]] },
 ];
 
-// Active district data — populated from GIS fetch or fallback
 let DISTRICT_GEO = JSON.parse(JSON.stringify(DISTRICT_GEO_FALLBACK));
 
-// Douglas-Peucker simplification for performance
 function dpSimplify(pts, tol) {
   if (pts.length <= 2) return pts;
   let dmax = 0, idx = 0;
@@ -1445,7 +2230,6 @@ function dpSimplify(pts, tol) {
   return [pts[0],pts[pts.length-1]];
 }
 
-// Fetch official boundaries from Hawaii State GIS at runtime
 (async function loadOfficialDistricts() {
   const GIS_URL = 'https://hub.arcgis.com/api/v3/datasets/893e0ad0b7d04ebbbd49daa31f474b8e_10/downloads/data?format=geojson&spatialRefId=4326&where=1%3D1';
   try {
@@ -1454,14 +2238,12 @@ function dpSimplify(pts, tol) {
     const gj = await resp.json();
     const loaded = [];
     for (const feat of gj.features) {
-      // distname is "Council 1" through "Council 9"
       const num = parseInt((feat.properties.distname || '').replace(/\D/g,''));
       const info = COUNCIL_DISTRICT_INFO[num];
       if (!info || !feat.geometry) continue;
       const geom = feat.geometry;
       let rings = geom.type==='Polygon' ? [geom.coordinates[0]] :
                   geom.type==='MultiPolygon' ? geom.coordinates.map(p=>p[0]) : [];
-      // Use largest ring, convert [lng,lat] → [lat,lng], simplify
       let best = [];
       for (const ring of rings) {
         const pts = dpSimplify(ring.map(([lng,lat])=>[lat,lng]), 0.0003);
@@ -1471,19 +2253,17 @@ function dpSimplify(pts, tol) {
     }
     if (loaded.length >= 6) {
       DISTRICT_GEO = loaded;
-      console.log('[HIBCW] ✅ Loaded', loaded.length, 'official council district boundaries from Hawaii State GIS');
-      // Refresh overlay if it's currently on
-      if (districtOverlayOn && window._activeDistrictMap) {
-        districtLayers.forEach(l => window._activeDistrictMap.removeLayer(l));
-        districtLayers = [];
+      console.log('[HIBCW Admin] ✅ Loaded', loaded.length, 'official council districts from Hawaii State GIS');
+      if (districtOverlayOn && window._adminDistrictMap) {
+        removeDistrictOverlay(window._adminDistrictMap);
         districtOverlayOn = false;
-        toggleDistrictOverlay(window._activeDistrictMap, window._activeDistrictBtn);
+        toggleDistrictOverlay(window._adminDistrictMap, window._adminDistrictBtn);
       }
     } else {
-      throw new Error('Too few districts returned: ' + loaded.length);
+      throw new Error('Too few: ' + loaded.length);
     }
   } catch(e) {
-    console.warn('[HIBCW] GIS fetch failed, using built-in boundaries:', e.message);
+    console.warn('[HIBCW Admin] GIS fetch failed, using built-in coords:', e.message);
   }
 })();
 
@@ -1511,106 +2291,250 @@ function getDistrictForPoint(lat, lng) {
   return null;
 }
 
-function toggleDistrictOverlay(mapObj, btn) {
-  window._activeDistrictMap = mapObj;
-  window._activeDistrictBtn = btn;
+function toggleDistrictOverlay(map, btn) {
+  window._adminDistrictMap = map;
+  window._adminDistrictBtn = btn;
   districtOverlayOn = !districtOverlayOn;
   if (districtOverlayOn) {
-    districtLayers = DISTRICT_GEO.map(d => {
-      const poly = L.polygon(d.coords, {
-        color: d.color, weight: 2, opacity: 0.8,
-        fillColor: d.color, fillOpacity: 0.10, interactive: true
-      });
-      poly.bindTooltip('<strong>' + d.label + '</strong>',
-        { permanent: true, direction: 'center', className: 'district-label' });
-      poly.bindPopup(
-        '<div style="font-family:Rajdhani,sans-serif;font-size:.9rem;font-weight:700;color:' + d.color + '">' + d.label + '</div>'
-      );
-      poly.addTo(mapObj);
-      return poly;
-    });
+    drawDistrictOverlay(map);
     if (btn) { btn.classList.add('on'); btn.textContent = 'DISTRICTS ON'; }
   } else {
-    districtLayers.forEach(l => mapObj.removeLayer(l));
-    districtLayers = [];
+    removeDistrictOverlay(map);
     if (btn) { btn.classList.remove('on'); btn.textContent = 'DISTRICTS'; }
   }
 }
 
-function applyMapFilter() {
-  const q        = (document.getElementById('mapSearch')?.value || '').toLowerCase().trim();
-  const type     = document.getElementById('mapTypeFilter')?.value || '';
-  const days     = parseInt(document.getElementById('mapDateFilter')?.value) || 0;
-  const district = document.getElementById('mapDistrictFilter')?.value || '';
-  const hasFilter = q || type || days || district;
+function drawDistrictOverlay(map) {
+  removeDistrictOverlay(map);
+  districtLayers = DISTRICT_GEO.map(d => {
+    const poly = L.polygon(d.coords, {
+      color: d.color,
+      weight: 2,
+      opacity: 0.8,
+      fillColor: d.color,
+      fillOpacity: 0.12,
+      interactive: true
+    });
+    const label = L.tooltip({
+      permanent: true, direction: 'center',
+      className: 'district-label'
+    }).setContent('<strong>' + d.label + '</strong>');
+    poly.bindTooltip(label);
+    poly.bindPopup(
+      '<div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:700;color:' + d.color + '">' + d.label + '</div>' +
+      '<div style="font-size:.75rem;color:#7a8fa6;margin-top:4px">Click members tab to manage this district</div>'
+    );
+    poly.addTo(map);
+    return poly;
+  });
+}
 
-  // Show/hide clear + count
-  document.getElementById('mapClearBtn').classList.toggle('show', !!hasFilter);
+function removeDistrictOverlay(map) {
+  districtLayers.forEach(l => map.removeLayer(l));
+  districtLayers = [];
+}
 
-  let visible = 0;
-  incidents.forEach(inc => {
-    const m = markers[inc.id];
-    if (!m) return;
-    let show = true;
-    if (q        && ![inc.type,inc.address,inc.description].join(' ').toLowerCase().includes(q)) show=false;
-    if (type     && inc.type !== type) show=false;
-    if (days     && (Date.now()-new Date(inc.occurred_at)) > days*864e5) show=false;
-    if (district && inc.district !== district) show=false;
-    if (show) {
-      visible++;
-      if (!clusterOn) { if (!map.hasLayer(m)) m.addTo(map); }
-      else { if (!clusterGroup.hasLayer(m)) clusterGroup.addLayer(m); }
-    } else {
-      clusterGroup.removeLayer(m);
-      map.removeLayer(m);
-    }
+function initAdminMap() {
+  if (admMap) return; // already initialised
+  // Create tile layers here — Leaflet is guaranteed loaded by this point
+  admStreetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19});
+  admSatLayer    = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});
+  admMap = L.map('adminMap', {center:[19.7024,-155.0824], zoom:13});
+  admStreetLayer.addTo(admMap);
+  admClusterGroup = L.markerClusterGroup({
+    maxClusterRadius:50, showCoverageOnHover:false,
+    zoomToBoundsOnClick:true, spiderfyOnMaxZoom:true
+  });
+  admClusterGroup.addTo(admMap);
+  // populate with current incidents
+  admRefreshMarkers();
+  // fix tile rendering when view becomes visible
+  setTimeout(()=>admMap.invalidateSize(), 100);
+}
+
+function admMakeMarker(type, color) {
+  const c = color==='red'?'#e8415a':color==='gold'?'#f5a623':'#00c9a7';
+  const emoji = TYPE_EMOJI[type] || '📍';
+  return L.divIcon({
+    className:'',
+    html:`<div class="adm-marker" style="background:${c}"><div class="adm-marker-inner">${emoji}</div></div>`,
+    iconSize:[36,36], iconAnchor:[18,36], popupAnchor:[0,-36]
+  });
+}
+
+function admRefreshMarkers() {
+  if (!admMap) return;
+  // Clear existing
+  admClusterGroup.clearLayers();
+  Object.values(admMarkers).forEach(m => admMap.removeLayer(m));
+  admMarkers = {};
+
+  const active = allIncidents.filter(i => i.status === 'active' && i.lat && i.lng);
+
+  active.forEach(inc => {
+    const m = L.marker([inc.lat, inc.lng], {icon: admMakeMarker(inc.type, inc.type_color)});
+    m.bindPopup(`
+      <div class="pu-type" style="color:${inc.type_color==='red'?'#e8415a':inc.type_color==='gold'?'#f5a623':'#00c9a7'}">${inc.type.toUpperCase()}</div>
+      <div class="pu-addr">📍 ${esc(inc.address)}</div>
+      <div class="pu-time">${fmt(inc.occurred_at)}</div>
+      <button class="pu-btn" onclick="openDetail('${inc.id}')">View Details</button>
+    `);
+    m.on('click', () => admHlCard(inc.id));
+    admMarkers[inc.id] = m;
+    if (admClusterOn) admClusterGroup.addLayer(m);
+    else m.addTo(admMap);
   });
 
-  const countEl = document.getElementById('mapFilterCount');
-  if (hasFilter) {
-    countEl.textContent = `${visible} shown`;
-    countEl.classList.add('show');
+  // Refresh heatmap if on
+  if (admHeatOn) { admToggleHeat(); admToggleHeat(); }
+
+  // Render sidebar list
+  admRenderSidebar(active);
+}
+
+function admRenderSidebar(incidents) {
+  const el = document.getElementById('mapSideList');
+  const countEl = document.getElementById('mapSideCount');
+  if (!el) return;
+  const pinned = incidents.filter(i => i.lat && i.lng);
+  if (countEl) countEl.textContent = `${pinned.length} pinned`;
+  if (!pinned.length) {
+    el.innerHTML = '<div class="map-empty">No active incidents with GPS pins yet.</div>';
+    return;
+  }
+  el.innerHTML = pinned.map(inc => {
+    const bc = inc.type_color==='red'?'b-red':inc.type_color==='gold'?'b-gold':'b-teal';
+    const emoji = TYPE_EMOJI[inc.type] || '📍';
+    return `<div class="map-inc-card" id="mapc-${inc.id}" onclick="admCardClick('${inc.id}')">
+      <div class="map-card-row">
+        <span class="badge ${bc}">${emoji} ${inc.type}</span>
+        <span class="map-card-time">${fmt(inc.occurred_at)}</span>
+      </div>
+      <div class="map-card-addr">📍 ${esc(inc.address)}</div>
+      <div class="map-card-desc">${esc(inc.description)}</div>
+    </div>`;
+  }).join('');
+}
+
+function admCardClick(id) {
+  const inc = allIncidents.find(i => i.id === id);
+  if (!inc || !inc.lat) return;
+  admMap.flyTo([inc.lat, inc.lng], 16, {duration: 0.8});
+  admMarkers[id]?.openPopup();
+  admHlCard(id);
+}
+
+function admHlCard(id) {
+  document.querySelectorAll('.map-inc-card').forEach(c => c.classList.remove('hl'));
+  const c = document.getElementById(`mapc-${id}`);
+  if (c) { c.classList.add('hl'); c.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+}
+
+function admSetLayer(t) {
+  if (!admMap) return;
+  if (t==='street') { admMap.addLayer(admStreetLayer); admMap.removeLayer(admSatLayer); }
+  else              { admMap.addLayer(admSatLayer);    admMap.removeLayer(admStreetLayer); }
+  document.getElementById('amb-street').classList.toggle('on', t==='street');
+  document.getElementById('amb-sat').classList.toggle('on', t==='sat');
+}
+
+function admToggleCluster() {
+  if (!admMap) return;
+  admClusterOn = !admClusterOn;
+  document.getElementById('amb-cluster').classList.toggle('on', admClusterOn);
+  Object.values(admMarkers).forEach(m => {
+    admClusterGroup.removeLayer(m);
+    admMap.removeLayer(m);
+    if (admClusterOn) admClusterGroup.addLayer(m);
+    else m.addTo(admMap);
+  });
+}
+
+function admToggleHeat() {
+  if (!admMap) return;
+  admHeatOn = !admHeatOn;
+  document.getElementById('amb-heat').classList.toggle('on', admHeatOn);
+  if (admHeatOn) {
+    const pts = allIncidents.filter(i=>i.lat&&i.status==='active').map(i=>[i.lat,i.lng,1]);
+    if (admHeatLayer) admMap.removeLayer(admHeatLayer);
+    admHeatLayer = L.heatLayer(pts, {
+      radius:30, blur:22, maxZoom:16,
+      gradient:{0.3:'#002266', 0.6:'#C8960C', 0.85:'#e8415a', 1.0:'#ffffff'}
+    });
+    admHeatLayer.addTo(admMap);
   } else {
-    countEl.classList.remove('show');
+    if (admHeatLayer) { admMap.removeLayer(admHeatLayer); admHeatLayer = null; }
   }
 }
-
-function clearMapFilter() {
-  document.getElementById('mapSearch').value = '';
-  document.getElementById('mapTypeFilter').selectedIndex = 0;
-  document.getElementById('mapDateFilter').selectedIndex = 0;
-  document.getElementById('mapDistrictFilter').selectedIndex = 0;
-  applyMapFilter();
-  // Restore all markers
-  incidents.forEach(inc => {
-    const m = markers[inc.id];
-    if (!m) return;
-    if (clusterOn) { if (!clusterGroup.hasLayer(m)) clusterGroup.addLayer(m); }
-    else { if (!map.hasLayer(m)) m.addTo(map); }
-  });
-}
-
-/* ════════════════════════════════════════════════════
-   INIT
-════════════════════════════════════════════════════ */
-(async function init() {
-  const now=new Date(), off=now.getTimezoneOffset()*60000;
-  document.getElementById('fTime').value=new Date(now-off).toISOString().slice(0,16);
-  if (!initSB()) return;
-  await loadIncidents();
-
-  // Realtime — new incidents appear instantly
-  sb.channel('incidents').on('postgres_changes',{event:'INSERT',schema:'public',table:'incidents'}, async p => {
-    const {data} = await sb.from('incidents').select('*,incident_media(*)').eq('id',p.new.id).single();
-    if (data && !incidents.find(i=>i.id===data.id)) {
-      incidents.unshift(data);
-      addMarker(data);
-      updateCount();
-      renderList(document.querySelector('.srch')?.value||'', document.getElementById('filt')?.value||'');
-      showToast('🔔','New incident: '+data.type);
-    }
-  }).subscribe();
-})();
 </script>
+<!-- MEMBER EDIT MODAL -->
+<div class="overlay" id="memberEditOverlay" style="display:none" onclick="if(event.target===this)closeMemberEdit()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-type-badge" style="background:rgba(0,201,167,.12);color:var(--teal);border-color:rgba(0,201,167,.25)">✏️ Edit Member</div>
+        <div class="modal-title" id="memEditTitle" style="margin-top:6px">Edit Member</div>
+      </div>
+      <button class="modal-close" onclick="closeMemberEdit()">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+      <div class="mf-group">
+        <div class="mf-label">Full Name</div>
+        <input class="tb-search" id="meFullName" type="text" placeholder="Full name" style="width:100%">
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">Email Address <span style="color:var(--red)">*</span></div>
+        <input class="tb-search" id="meEmail" type="email" placeholder="email@example.com" style="width:100%">
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">Phone Number</div>
+        <input class="tb-search" id="mePhone" type="tel" placeholder="(808) 000-0000" style="width:100%">
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">Business Name</div>
+        <input class="tb-search" id="meBizName" type="text" placeholder="Business name" style="width:100%">
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">Business Street Address</div>
+        <input class="tb-search" id="meBizAddr" type="text" placeholder="123 Kamehameha Ave" style="width:100%">
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px">
+        <div class="mf-group">
+          <div class="mf-label">City</div>
+          <input class="tb-search" id="meBizCity" type="text" placeholder="Hilo" style="width:100%">
+        </div>
+        <div class="mf-group">
+          <div class="mf-label">State</div>
+          <input class="tb-search" id="meBizState" type="text" placeholder="HI" maxlength="2" style="width:100%">
+        </div>
+        <div class="mf-group">
+          <div class="mf-label">Zip Code</div>
+          <input class="tb-search" id="meBizZip" type="text" placeholder="96720" maxlength="10" style="width:100%">
+        </div>
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">Business District</div>
+        <select class="tb-search" id="meDistrict" style="width:100%">
+          <option value="">— Assign district…</option>
+        </select>
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">District Captain Name</div>
+        <input class="tb-search" id="meCaptain" type="text" placeholder="Captain's full name" style="width:100%">
+      </div>
+      <input type="hidden" id="meId">
+      <input type="hidden" id="meOrigEmail">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeMemberEdit()">Cancel</button>
+      <button class="btn btn-teal"  onclick="saveMemberEdit()" id="meSaveBtn">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Leaflet loaded last so it never blocks login -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 </body>
 </html>
