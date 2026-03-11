@@ -275,13 +275,6 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
 }
 
 /* ── Member management ─────────────────────────────────────── */
-.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding:20px 24px}
-.member-card{
-  background:var(--navy2);border:1px solid var(--b2);border-radius:7px;
-  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;
-}
-.member-email{font-size:.82rem;color:var(--white);word-break:break-all}
-.member-since{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);margin-top:3px}
 .member-add-bar{padding:16px 24px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .member-input{
   flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid var(--b2);
@@ -289,7 +282,36 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
   transition:border-color .2s;
 }
 .member-input:focus{border-color:var(--teal)}
-.member-empty{padding:40px 24px;text-align:center;color:var(--slate);font-size:.82rem;line-height:1.8}
+.member-toolbar{padding:12px 24px 0;display:flex;align-items:center;gap:10px}
+.member-search{
+  background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;
+  padding:7px 12px;color:var(--white);font-size:.82rem;outline:none;width:260px;transition:border-color .2s;
+}
+.member-search:focus{border-color:var(--teal)}
+.member-search::placeholder{color:var(--slate2)}
+.member-count{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate);margin-left:auto}
+.member-table-wrap{padding:14px 24px 40px;overflow-x:auto}
+.member-table{width:100%;border-collapse:collapse}
+.member-table th{
+  font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--slate);padding:10px 14px;
+  border-bottom:1px solid var(--b2);text-align:left;white-space:nowrap;
+  background:var(--navy2);position:sticky;top:0;z-index:1;
+}
+.member-table td{
+  padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);
+  font-size:.82rem;vertical-align:middle;
+}
+.member-table tbody tr:hover td{background:rgba(255,255,255,.03)}
+.member-table tbody tr:last-child td{border-bottom:none}
+.mem-email{
+  display:flex;align-items:center;gap:8px;
+  font-family:'IBM Plex Mono',monospace;font-size:.77rem;color:var(--white);
+}
+.mem-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.mem-date{font-family:'IBM Plex Mono',monospace;font-size:.71rem;color:var(--slate);white-space:nowrap}
+.mem-num{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--slate2)}
+.member-empty{padding:48px 24px;text-align:center;color:var(--slate);font-size:.82rem;line-height:1.8}
 
 /* ── Applications ─────────────────────────────────────────── */
 .app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:20px 24px}
@@ -761,19 +783,40 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
       <!-- ── MEMBERS VIEW ── -->
       <div class="view" id="view-members">
         <div class="page-hd">
-          <div><div class="page-title">Member Emails</div><div class="page-sub">Verified KIAA members — incidents submitted with these emails get a ✅ badge</div></div>
+          <div><div class="page-title">Verified Members</div><div class="page-sub">Incidents submitted with these emails receive a ✅ verified badge</div></div>
+          <div class="page-actions">
+            <button class="btn btn-ghost btn-lg" onclick="exportMembersCSV()">⬇ Export CSV</button>
+          </div>
         </div>
         <div class="member-add-bar">
-          <input class="member-input" type="email" id="newMemberEmail" placeholder="Enter member email address…" onkeydown="if(event.key==='Enter')addMember()">
+          <input class="member-input" type="email" id="newMemberEmail" placeholder="Enter email address to add…" onkeydown="if(event.key==='Enter')addMember()">
           <button class="btn btn-teal btn-lg" onclick="addMember()">＋ Add Member</button>
           <button class="btn btn-ghost btn-lg" onclick="importMemberCSV()">⬆ Import CSV</button>
           <input type="file" id="memberCSVInput" accept=".csv" style="display:none" onchange="handleMemberCSV(this)">
         </div>
-        <div style="padding:8px 24px 0;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
-          To import multiple emails at once, upload a CSV with one email per line or per row in the first column.
+        <div class="member-toolbar">
+          <input class="member-search" type="text" id="memberSearch" placeholder="🔍  Search emails…" oninput="renderMembers()">
+          <div class="member-count" id="memberCountLabel">— members</div>
         </div>
-        <div class="member-grid" id="memberGrid">
-          <div class="member-empty">Loading members…</div>
+        <div class="member-table-wrap">
+          <table class="member-table">
+            <thead>
+              <tr>
+                <th style="width:36px">#</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Phone</th>
+                <th>Business Name</th>
+                <th>Business Address</th>
+                <th>Date Added</th>
+                <th>Days Active</th>
+                <th style="width:90px">Action</th>
+              </tr>
+            </thead>
+            <tbody id="memberGrid">
+              <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--slate)">Loading members…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -1477,14 +1520,27 @@ let memberList = [];
 async function loadMembers() {
   if (!sb) return;
   try {
-    const {data, error} = await sb.from('member_emails').select('*').order('created_at', {ascending:false});
-    if (error) {
-      // Table may not exist yet — fail silently so login still works
-      console.warn('member_emails table not found:', error.message);
-      memberList = [];
-      return;
-    }
-    memberList = data || [];
+    // Fetch verified emails
+    const {data: emails, error: eErr} = await sb
+      .from('member_emails').select('*').order('created_at', {ascending:false});
+    if (eErr) { console.warn('member_emails error:', eErr.message); memberList = []; return; }
+
+    // Fetch approved applications to enrich with full profile info
+    const {data: apps} = await sb
+      .from('member_applications')
+      .select('email,full_name,phone,business_name,business_address')
+      .eq('status','approved');
+
+    // Build lookup map: email -> application data
+    const appMap = {};
+    (apps || []).forEach(a => { appMap[a.email.toLowerCase()] = a; });
+
+    // Merge — every verified email gets enriched with application data if available
+    memberList = (emails || []).map(m => ({
+      ...m,
+      ...(appMap[m.email.toLowerCase()] || {})
+    }));
+
     renderMembers();
     const nc = document.getElementById('nc-members');
     if (nc) nc.textContent = memberList.length;
@@ -1495,20 +1551,77 @@ async function loadMembers() {
 }
 
 function renderMembers() {
-  const grid = document.getElementById('memberGrid');
-  if (!grid) return;
-  if (!memberList.length) {
-    grid.innerHTML = `<div class="member-empty">No members yet.<br>Add emails above to start verifying submissions.</div>`;
+  const tbody = document.getElementById('memberGrid');
+  if (!tbody) return;
+
+  const q = (document.getElementById('memberSearch')?.value || '').toLowerCase().trim();
+  const filtered = q ? memberList.filter(m =>
+    (m.email         || '').toLowerCase().includes(q) ||
+    (m.full_name     || '').toLowerCase().includes(q) ||
+    (m.business_name || '').toLowerCase().includes(q) ||
+    (m.phone         || '').toLowerCase().includes(q) ||
+    (m.business_address || '').toLowerCase().includes(q)
+  ) : memberList;
+
+  // Update count label
+  const label = document.getElementById('memberCountLabel');
+  if (label) label.textContent = q
+    ? `${filtered.length} of ${memberList.length} member${memberList.length !== 1 ? 's' : ''}`
+    : `${memberList.length} member${memberList.length !== 1 ? 's' : ''}`;
+
+  if (!filtered.length) {
+    tbody.innerHTML = q
+      ? `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--slate)">No members match "${esc(q)}"</td></tr>`
+      : `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--slate);line-height:1.8">No members yet.<br>Add emails above to start verifying submissions.</td></tr>`;
     return;
   }
-  grid.innerHTML = memberList.map(m => `
-    <div class="member-card" id="mc-${m.id}">
-      <div>
-        <div class="member-email">✅ ${esc(m.email)}</div>
-        <div class="member-since">Added ${fmt(m.created_at)}</div>
-      </div>
-      <button class="btn btn-red" onclick="removeMember('${m.id}')">Remove</button>
-    </div>`).join('');
+
+  const na = `<span style="color:var(--slate2);font-style:italic">—</span>`;
+
+  tbody.innerHTML = filtered.map((m, i) => {
+    const added   = new Date(m.created_at);
+    const dateStr = added.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    const days    = Math.floor((Date.now() - added) / 86400000);
+    const daysStr = days === 0 ? 'Today' : days === 1 ? '1 day' : `${days} days`;
+    return `
+    <tr id="mc-${m.id}">
+      <td class="mem-num">${i + 1}</td>
+      <td style="white-space:nowrap;font-weight:500">${m.full_name ? esc(m.full_name) : na}</td>
+      <td><div class="mem-email"><span class="mem-dot"></span>${esc(m.email)}</div></td>
+      <td class="mem-date" style="white-space:nowrap">${m.phone ? esc(m.phone) : na}</td>
+      <td style="white-space:nowrap">${m.business_name ? esc(m.business_name) : na}</td>
+      <td style="color:var(--slate);font-size:.78rem">${m.business_address ? esc(m.business_address) : na}</td>
+      <td class="mem-date">${dateStr}</td>
+      <td class="mem-date">${daysStr}</td>
+      <td><button class="btn btn-red" style="font-size:.68rem;padding:4px 10px" onclick="removeMember('${m.id}')">Remove</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function exportMembersCSV() {
+  if (!memberList.length) { showToast('ℹ️', 'No members to export.'); return; }
+  const rows = [['#','Full Name','Email','Phone','Business Name','Business Address','Date Added','Days Active']];
+  memberList.forEach((m, i) => {
+    const added   = new Date(m.created_at);
+    const dateStr = added.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    const days    = Math.floor((Date.now() - added) / 86400000);
+    rows.push([
+      i + 1,
+      m.full_name        || '',
+      m.email            || '',
+      m.phone            || '',
+      m.business_name    || '',
+      m.business_address || '',
+      dateStr,
+      days === 0 ? 'Today' : days === 1 ? '1 day' : `${days} days`
+    ]);
+  });
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `HIBCW-Members-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('⬇', `${memberList.length} members exported.`);
 }
 
 async function addMember() {
