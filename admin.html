@@ -2523,7 +2523,6 @@ async function approveApp(id, email, name) {
   if (memErr) { showToast('⚠️', 'Application approved but could not add to members: ' + memErr.message, 'err'); }
 
   // 3. Refresh both lists
-  const app = allApplications.find(a => a.id === id);
   if (app) app.status = 'approved';
   await loadMembers();
   renderApps();
