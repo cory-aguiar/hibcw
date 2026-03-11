@@ -1403,60 +1403,64 @@ function updateStats() {
 // Style info for each of Hawaii County's 9 traditional districts
 // KIAA district anchor points — real town/area coordinates inside each district.
 // Used for point-in-polygon matching against the official GIS boundaries.
-const KIAA_DISTRICTS = [
-  { id:'hamakua',      label:'District 1 - Hāmākua',      color:'#84cc16', anchor:[20.10,-155.50] },  // Honokaa
-  { id:'north-hilo',   label:'District 2 - North Hilo',   color:'#3b82f6', anchor:[19.85,-155.10] },  // Papaikou
-  { id:'south-hilo',   label:'District 3 - South Hilo',   color:'#00c9a7', anchor:[19.70,-155.08] },  // Hilo town
-  { id:'lower-puna',   label:'District 4 - Lower Puna',   color:'#c084fc', anchor:[19.35,-154.97] },  // Pahoa
-  { id:'upper-puna',   label:'District 5 - Upper Puna',   color:'#a855f7', anchor:[19.47,-155.23] },  // Mountain View
-  { id:'kau',          label:'District 6 - Kaʻū',          color:'#ef4444', anchor:[19.05,-155.67] },  // Naalehu
-  { id:'south-kona',   label:'District 7 - South Kona',   color:'#f59e0b', anchor:[19.52,-155.90] },  // Captain Cook
-  { id:'north-kona',   label:'District 8 - North Kona',   color:'#f97316', anchor:[19.64,-155.99] },  // Kailua-Kona
-  { id:'north-kohala', label:'District 9 - North Kohala', color:'#10b981', anchor:[20.02,-155.66] },  // Waimea
-];
+// ═══════════════════════════════════════════════════════════════
+// DISTRICT CONFIGURATION
+// GIS source: Hawaii County Council District Boundaries 2022
+// distname field: "Council 1" through "Council 9"
+// Mapping confirmed from: hawaiicounty.gov/council/council-members-and-districts
+// ═══════════════════════════════════════════════════════════════
 
-// Match a fetched GIS polygon to a KIAA district by testing which anchor falls INSIDE it.
-// The official GIS polygons are accurate and non-overlapping, so PIP gives exact results.
-// Falls back to nearest centroid only if no anchor matches (e.g. simplified fallback coords).
-function matchDistrictByLocation(centLat, centLng, coords) {
-  for (const d of KIAA_DISTRICTS) {
-    if (pointInPolygon(d.anchor[0], d.anchor[1], coords)) return d;
-  }
-  // Centroid fallback
-  let best = null, bestDist = Infinity;
-  for (const d of KIAA_DISTRICTS) {
-    const dist = Math.hypot(centLat - d.anchor[0], centLng - d.anchor[1]);
-    if (dist < bestDist) { bestDist = dist; best = d; }
-  }
-  return best;
-}
+// Direct lookup: GIS distname → KIAA district info
+// Council 1 = Hāmākua (Honoka'a, Laupāhoehoe, Pepe'ekeo)
+// Council 2 = North Hilo (Papaikou, Pepe'ekeo, Honomu, Hakalau)
+// Council 3 = South Hilo (Downtown Hilo, Keaukaha, Kea'au)
+// Council 4 = Lower Puna (Pahoa, HPP, Leilani Estates)
+// Council 5 = Upper Puna (Mountain View, Kurtistown, Volcano)
+// Council 6 = Kaʻū (Na'alehu, Ocean View, South Point)
+// Council 7 = South Kona (Captain Cook, Kealakekua, Miloli'i)
+// Council 8 = North Kona (Kailua-Kona, Holualoa)
+// Council 9 = North Kohala + Waimea (Waikoloa, Waimea, Hāwī, Kapa'au)
+const COUNCIL_TO_DISTRICT = {
+  'Council 1': { id:'hamakua',      label:'District 1 - Hāmākua',      color:'#84cc16' },
+  'Council 2': { id:'north-hilo',   label:'District 2 - North Hilo',   color:'#3b82f6' },
+  'Council 3': { id:'south-hilo',   label:'District 3 - South Hilo',   color:'#00c9a7' },
+  'Council 4': { id:'lower-puna',   label:'District 4 - Lower Puna',   color:'#c084fc' },
+  'Council 5': { id:'upper-puna',   label:'District 5 - Upper Puna',   color:'#a855f7' },
+  'Council 6': { id:'kau',          label:'District 6 - Kaʻū',          color:'#ef4444' },
+  'Council 7': { id:'south-kona',   label:'District 7 - South Kona',   color:'#f59e0b' },
+  'Council 8': { id:'north-kona',   label:'District 8 - North Kona',   color:'#f97316' },
+  'Council 9': { id:'north-kohala', label:'District 9 - North Kohala', color:'#10b981' },
+};
 
-// Fallback simplified coords used if GIS fetch fails
+// Flat array of districts (for dropdowns, filters, etc.) — ordered 1-9
+const KIAA_DISTRICTS = Object.values(COUNCIL_TO_DISTRICT);
+
+// Fallback simplified polygons — used only if GIS fetch fails
 const DISTRICT_GEO_FALLBACK = [
-  { id:'hamakua',      label:'District 1 - Hāmākua',      color:'#84cc16', center:[20.10,-155.50],
-    coords:[[20.27,-155.07],[20.27,-155.90],[19.87,-155.65],[19.87,-155.15],[20.00,-155.10],[20.15,-155.25],[20.27,-155.07]] },
-  { id:'north-hilo',   label:'District 2 - North Hilo',   color:'#3b82f6', center:[19.85,-155.10],
-    coords:[[19.87,-155.15],[19.87,-155.65],[19.75,-155.45],[19.70,-155.25],[19.70,-155.13],[19.80,-155.09],[19.87,-155.15]] },
-  { id:'south-hilo',   label:'District 3 - South Hilo',   color:'#00c9a7', center:[19.65,-155.05],
-    coords:[[19.70,-155.13],[19.70,-155.25],[19.75,-155.45],[19.62,-155.40],[19.52,-155.13],[19.52,-155.01],[19.62,-154.96],[19.70,-155.00],[19.70,-155.13]] },
-  { id:'lower-puna',   label:'District 4 - Lower Puna',   color:'#c084fc', center:[19.35,-154.97],
-    coords:[[19.52,-155.01],[19.52,-155.13],[19.42,-155.20],[19.32,-155.22],[19.25,-154.99],[19.15,-154.81],[19.22,-154.80],[19.40,-154.88],[19.52,-155.01]] },
-  { id:'upper-puna',   label:'District 5 - Upper Puna',   color:'#a855f7', center:[19.47,-155.23],
-    coords:[[19.70,-155.25],[19.62,-155.40],[19.52,-155.13],[19.42,-155.20],[19.32,-155.22],[19.40,-154.88],[19.52,-155.01],[19.62,-154.96],[19.70,-155.00],[19.70,-155.25]] },
-  { id:'kau',          label:'District 6 - Kaʻū',          color:'#ef4444', center:[19.05,-155.67],
-    coords:[[19.32,-155.22],[19.25,-154.99],[19.15,-154.81],[19.10,-154.93],[19.03,-155.20],[18.91,-155.68],[18.95,-155.82],[19.03,-155.91],[19.10,-155.87],[19.25,-155.96],[19.32,-155.22]] },
-  { id:'south-kona',   label:'District 7 - South Kona',   color:'#f59e0b', center:[19.50,-155.92],
-    coords:[[19.87,-155.65],[19.87,-155.87],[19.75,-155.98],[19.64,-155.99],[19.58,-155.94],[19.50,-155.90],[19.42,-155.86],[19.33,-155.80],[19.25,-155.96],[19.10,-155.87],[19.03,-155.91],[18.95,-155.82],[18.91,-155.68],[19.03,-155.20],[19.25,-154.99],[19.32,-155.22],[19.87,-155.65]] },
-  { id:'north-kona',   label:'District 8 - North Kona',   color:'#f97316', center:[19.65,-156.00],
-    coords:[[19.87,-155.87],[19.90,-155.96],[19.89,-156.06],[19.84,-156.12],[19.77,-156.13],[19.70,-156.09],[19.64,-155.99],[19.75,-155.98],[19.87,-155.87]] },
-  { id:'north-kohala', label:'District 9 - North Kohala', color:'#10b981', center:[20.02,-155.66],
-    coords:[[20.27,-155.90],[20.27,-156.10],[20.10,-156.05],[20.01,-156.00],[19.94,-155.98],[19.87,-155.87],[19.90,-155.96],[19.89,-156.06],[19.84,-156.12],[19.77,-156.13],[19.70,-156.09],[19.64,-155.99],[19.75,-155.98],[19.87,-155.87],[19.87,-155.65],[20.27,-155.90]] },
+  { id:'hamakua',      label:'District 1 - Hāmākua',      color:'#84cc16',
+    coords:[[20.27,-155.07],[20.27,-155.87],[19.90,-155.65],[19.78,-155.47],[19.73,-155.32],[19.73,-155.10],[19.87,-155.08],[20.02,-155.10],[20.15,-155.25],[20.27,-155.07]] },
+  { id:'north-hilo',   label:'District 2 - North Hilo',   color:'#3b82f6',
+    coords:[[19.87,-155.08],[19.73,-155.10],[19.73,-155.18],[19.78,-155.22],[19.80,-155.12],[19.87,-155.08]] },
+  { id:'south-hilo',   label:'District 3 - South Hilo',   color:'#00c9a7',
+    coords:[[19.73,-155.10],[19.73,-155.32],[19.66,-155.30],[19.60,-155.22],[19.54,-155.08],[19.58,-155.01],[19.65,-154.99],[19.70,-155.04],[19.73,-155.10]] },
+  { id:'lower-puna',   label:'District 4 - Lower Puna',   color:'#c084fc',
+    coords:[[19.58,-155.01],[19.54,-155.08],[19.40,-155.13],[19.28,-155.04],[19.18,-154.85],[19.18,-154.79],[19.35,-154.82],[19.52,-154.93],[19.58,-155.01]] },
+  { id:'upper-puna',   label:'District 5 - Upper Puna',   color:'#a855f7',
+    coords:[[19.73,-155.32],[19.78,-155.47],[19.56,-155.45],[19.45,-155.35],[19.40,-155.13],[19.28,-155.04],[19.35,-154.82],[19.52,-154.93],[19.58,-155.01],[19.65,-154.99],[19.70,-155.04],[19.73,-155.10],[19.73,-155.32]] },
+  { id:'kau',          label:'District 6 - Kaʻū',          color:'#ef4444',
+    coords:[[19.45,-155.35],[19.40,-155.13],[19.28,-155.04],[19.18,-154.85],[19.10,-154.95],[19.02,-155.25],[18.91,-155.68],[18.95,-155.84],[19.03,-155.92],[19.18,-155.87],[19.28,-155.72],[19.45,-155.35]] },
+  { id:'south-kona',   label:'District 7 - South Kona',   color:'#f59e0b',
+    coords:[[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.45,-155.88],[19.33,-155.80],[19.28,-155.72],[19.18,-155.87],[19.03,-155.92],[18.95,-155.84],[18.91,-155.68],[19.02,-155.25],[19.28,-155.04],[19.45,-155.35],[19.78,-155.47],[19.90,-155.65]] },
+  { id:'north-kona',   label:'District 8 - North Kona',   color:'#f97316',
+    coords:[[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.60,-156.07],[19.73,-156.10],[19.85,-156.05],[19.90,-155.96],[19.90,-155.65]] },
+  { id:'north-kohala', label:'District 9 - North Kohala', color:'#10b981',
+    coords:[[20.27,-155.87],[20.27,-156.10],[20.10,-156.07],[20.01,-156.00],[19.94,-155.98],[19.85,-156.05],[19.73,-156.10],[19.60,-156.07],[19.55,-155.93],[19.63,-155.99],[19.72,-155.98],[19.87,-155.87],[19.90,-155.65],[20.27,-155.87]] },
 ];
 
-// Active district data — populated from GIS fetch or fallback
+// Active district data — starts with fallback, replaced by GIS on load
 let DISTRICT_GEO = JSON.parse(JSON.stringify(DISTRICT_GEO_FALLBACK));
 
-// Douglas-Peucker simplification for performance
+// Douglas-Peucker simplification for rendering performance
 function dpSimplify(pts, tol) {
   if (pts.length <= 2) return pts;
   let dmax = 0, idx = 0;
@@ -1470,44 +1474,35 @@ function dpSimplify(pts, tol) {
   return [pts[0],pts[pts.length-1]];
 }
 
-// Fetch official boundaries from Hawaii State GIS at runtime
+// Fetch official boundaries from Hawaii State GIS
+// Uses distname field DIRECTLY — no guessing, no anchor matching
 (async function loadOfficialDistricts() {
   const GIS_URL = 'https://hub.arcgis.com/api/v3/datasets/893e0ad0b7d04ebbbd49daa31f474b8e_10/downloads/data?format=geojson&spatialRefId=4326&where=1%3D1';
   try {
-    const resp = await fetch(GIS_URL, { cache: 'force-cache' });
+    const resp = await fetch(GIS_URL, { cache: 'no-cache' });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const gj = await resp.json();
     const loaded = [];
     for (const feat of gj.features) {
       if (!feat.geometry) continue;
+      const distname = feat.properties?.distname;
+      const info = COUNCIL_TO_DISTRICT[distname];
+      if (!info) { console.warn('[HIBCW] Unknown distname:', distname); continue; }
       const geom = feat.geometry;
-      let rings = geom.type==='Polygon' ? [geom.coordinates[0]] :
-                  geom.type==='MultiPolygon' ? geom.coordinates.map(p=>p[0]) : [];
-      // Convert ALL rings to [lat,lng] — use full precision for PIP matching
-      const fullRings = rings.map(ring => ring.map(([lng,lat]) => [lat,lng]));
-      // Find the largest ring
-      const fullBest = fullRings.reduce((a,b) => b.length > a.length ? b : a, []);
-      if (fullBest.length < 3) continue;
-      // Match district using PIP on FULL (unsimplified) polygon — accurate
-      const centLat = fullBest.reduce((s,p)=>s+p[0],0)/fullBest.length;
-      const centLng = fullBest.reduce((s,p)=>s+p[1],0)/fullBest.length;
-      const info = matchDistrictByLocation(centLat, centLng, fullBest);
-      if (!info) continue;
-      // NOW simplify for display performance
-      const simplified = dpSimplify(fullBest, 0.0003);
-      const coords = simplified.length >= 3 ? simplified : fullBest;
-      // Avoid duplicates — keep largest polygon per district
-      const idx = loaded.findIndex(d=>d.id===info.id);
-      const entry = { ...info, coords };
-      if (idx >= 0) {
-        if (coords.length > loaded[idx].coords.length) loaded[idx] = entry;
-      } else {
-        loaded.push(entry);
+      const rings = geom.type==='Polygon' ? [geom.coordinates[0]] :
+                    geom.type==='MultiPolygon' ? geom.coordinates.map(p=>p[0]) : [];
+      let best = [];
+      for (const ring of rings) {
+        const pts = ring.map(([lng,lat]) => [lat,lng]);
+        if (pts.length > best.length) best = pts;
       }
+      if (best.length < 3) continue;
+      const coords = dpSimplify(best, 0.0003);
+      loaded.push({ ...info, coords: coords.length >= 3 ? coords : best });
     }
     if (loaded.length >= 6) {
       DISTRICT_GEO = loaded;
-      console.log('[HIBCW] ✅ Loaded', loaded.length, 'districts from Hawaii State GIS:', loaded.map(d=>d.id).join(', '));
+      console.log('[HIBCW] ✅ Official GIS loaded', loaded.length, 'districts:', loaded.map(d=>d.label).join(' | '));
       if (districtOverlayOn && window._activeDistrictMap) {
         districtLayers.forEach(l => window._activeDistrictMap.removeLayer(l));
         districtLayers = [];
@@ -1515,10 +1510,10 @@ function dpSimplify(pts, tol) {
         toggleDistrictOverlay(window._activeDistrictMap, window._activeDistrictBtn);
       }
     } else {
-      throw new Error('Too few districts: ' + loaded.length + ' — ' + loaded.map(d=>d.id).join(', '));
+      throw new Error('Only ' + loaded.length + ' districts loaded: ' + loaded.map(d=>d.label).join(', '));
     }
   } catch(e) {
-    console.warn('[HIBCW] GIS fetch failed, using built-in boundaries:', e.message);
+    console.warn('[HIBCW] GIS fetch failed, using built-in fallback:', e.message);
   }
 })();
 
