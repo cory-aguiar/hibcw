@@ -399,6 +399,23 @@ header{
   .logo-shield{width:26px;height:26px;font-size:.6rem}
 }
 
+/* ── District overlay labels ─────────────────────────────── */
+.district-label {
+  background: rgba(11,21,36,.82) !important;
+  border: 1px solid rgba(255,255,255,.15) !important;
+  border-radius: 4px !important;
+  color: #eef3f8 !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: .7rem !important;
+  font-weight: 600 !important;
+  letter-spacing: .04em !important;
+  padding: 2px 7px !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.5) !important;
+}
+.district-label::before { display: none !important; }
+
 /* ── Disclaimers ──────────────────────────────────────────── */
 .disc-emergency{
   background:linear-gradient(135deg,rgba(232,65,90,.12),rgba(232,65,90,.06));
@@ -721,7 +738,8 @@ header{
         <button class="map-btn on" id="btnStreet"  onclick="setLayer('street')">STREET</button>
         <button class="map-btn"    id="btnSat"     onclick="setLayer('sat')">SATELLITE</button>
         <button class="map-btn on" id="btnCluster" onclick="toggleCluster()" title="Toggle clustering">CLUSTER</button>
-        <button class="map-btn"    id="btnHeat"    onclick="toggleHeat()"    title="Toggle heatmap">HEATMAP</button>
+        <button class="map-btn"    id="btnHeat"      onclick="toggleHeat()"                 title="Toggle heatmap">HEATMAP</button>
+        <button class="map-btn"    id="btnDistricts" onclick="toggleDistrictOverlay(map, this)" title="Toggle district boundaries">DISTRICTS</button>
       </div>
       <!-- Map filter bar -->
       <div class="map-filter-bar">
@@ -1334,6 +1352,57 @@ function updateStats() {
 /* ════════════════════════════════════════════════════
    MAP FILTER
 ════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════
+   DISTRICT OVERLAY
+════════════════════════════════════════════════════ */
+const DISTRICT_GEO = [
+  { id:"1", label:"D1 — Downtown Hilo / Bayfront",      color:"#00c9a7", center:[19.730,-155.090],
+    coords:[[19.860,-155.180],[19.860,-154.920],[19.600,-154.820],[19.550,-154.850],[19.550,-155.250],[19.700,-155.320],[19.860,-155.180]] },
+  { id:"2", label:"D2 — Hilo Commercial Corridor",       color:"#3b82f6", center:[19.980,-155.250],
+    coords:[[20.050,-155.500],[20.050,-155.080],[19.860,-155.100],[19.860,-155.180],[19.860,-155.450],[20.050,-155.500]] },
+  { id:"3", label:"D3 — Puna (Pahoa / Keaau)",           color:"#a855f7", center:[19.480,-154.980],
+    coords:[[19.550,-154.850],[19.550,-154.820],[19.280,-154.820],[19.150,-155.050],[19.350,-155.250],[19.550,-155.250],[19.550,-154.850]] },
+  { id:"4", label:"D4 — Ka'u / Volcano",                 color:"#ef4444", center:[19.100,-155.550],
+    coords:[[19.350,-155.250],[19.150,-155.050],[18.910,-155.680],[19.150,-155.920],[19.350,-155.850],[19.400,-155.550],[19.350,-155.250]] },
+  { id:"5", label:"D5 — South Kona / Captain Cook",      color:"#f59e0b", center:[19.480,-155.900],
+    coords:[[19.600,-155.800],[19.600,-155.950],[19.150,-155.920],[19.350,-155.850],[19.500,-155.750],[19.600,-155.800]] },
+  { id:"6", label:"D6 — Kailua-Kona",                    color:"#f97316", center:[19.650,-155.980],
+    coords:[[19.800,-155.950],[19.800,-156.050],[19.600,-155.950],[19.600,-155.800],[19.750,-155.850],[19.800,-155.950]] },
+  { id:"7", label:"D7 — S. Kohala / Waikoloa / Waimea", color:"#06b6d4", center:[20.020,-155.850],
+    coords:[[20.150,-155.820],[20.150,-156.050],[19.800,-156.050],[19.800,-155.950],[19.800,-155.700],[20.050,-155.650],[20.150,-155.820]] },
+  { id:"8", label:"D8 — N. Kohala / Hawi",               color:"#10b981", center:[20.220,-155.900],
+    coords:[[20.270,-155.770],[20.270,-156.080],[20.150,-156.050],[20.150,-155.820],[20.270,-155.770]] },
+  { id:"9", label:"D9 — Hamakua / Honokaa",              color:"#84cc16", center:[20.080,-155.450],
+    coords:[[20.250,-155.500],[20.250,-155.050],[20.050,-155.080],[20.050,-155.500],[20.250,-155.500]] },
+];
+
+let districtLayers = [];
+let districtOverlayOn = false;
+
+function toggleDistrictOverlay(mapObj, btn) {
+  districtOverlayOn = !districtOverlayOn;
+  if (districtOverlayOn) {
+    districtLayers = DISTRICT_GEO.map(d => {
+      const poly = L.polygon(d.coords, {
+        color: d.color, weight: 2, opacity: 0.8,
+        fillColor: d.color, fillOpacity: 0.10, interactive: true
+      });
+      poly.bindTooltip('<strong>' + d.label + '</strong>',
+        { permanent: true, direction: 'center', className: 'district-label' });
+      poly.bindPopup(
+        '<div style="font-family:Rajdhani,sans-serif;font-size:.9rem;font-weight:700;color:' + d.color + '">' + d.label + '</div>'
+      );
+      poly.addTo(mapObj);
+      return poly;
+    });
+    if (btn) { btn.classList.add('on'); btn.textContent = 'DISTRICTS ON'; }
+  } else {
+    districtLayers.forEach(l => mapObj.removeLayer(l));
+    districtLayers = [];
+    if (btn) { btn.classList.remove('on'); btn.textContent = 'DISTRICTS'; }
+  }
+}
+
 function applyMapFilter() {
   const q      = (document.getElementById('mapSearch')?.value || '').toLowerCase().trim();
   const type   = document.getElementById('mapTypeFilter')?.value || '';
