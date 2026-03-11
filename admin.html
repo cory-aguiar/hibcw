@@ -593,7 +593,7 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
           <div><div class="page-title">Active Incidents</div><div class="page-sub">Live incidents visible on the public map</div></div>
           <div class="page-actions">
             <button class="filter-toggle-btn" id="ftbtn-active" onclick="toggleFilters('active')">⚙ Filters <span id="fcount-active"></span></button>
-            <button class="btn btn-ghost btn-lg" class="captain-hidden" onclick="exportCSV('active')">⬇ Export CSV</button>
+            <button class="btn btn-ghost btn-lg captain-hidden" onclick="exportCSV('active')">⬇ Export CSV</button>
           </div>
         </div>
         <!-- Filter panel -->
@@ -671,7 +671,7 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
           <div><div class="page-title">Archived Incidents</div><div class="page-sub">Removed from public map — kept for records</div></div>
           <div class="page-actions">
             <button class="filter-toggle-btn" id="ftbtn-archived" onclick="toggleFilters('archived')">⚙ Filters <span id="fcount-archived"></span></button>
-            <button class="btn btn-ghost btn-lg" class="captain-hidden" onclick="exportCSV('archived')">⬇ Export CSV</button>
+            <button class="btn btn-ghost btn-lg captain-hidden" onclick="exportCSV('archived')">⬇ Export CSV</button>
           </div>
         </div>
         <!-- Filter panel -->
@@ -743,7 +743,7 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
           <div><div class="page-title">All Records</div><div class="page-sub">Every incident regardless of status</div></div>
           <div class="page-actions">
             <button class="filter-toggle-btn" id="ftbtn-all" onclick="toggleFilters('all')">⚙ Filters <span id="fcount-all"></span></button>
-            <button class="btn btn-ghost btn-lg" class="captain-hidden" onclick="exportCSV('all')">⬇ Export CSV</button>
+            <button class="btn btn-ghost btn-lg captain-hidden" onclick="exportCSV('all')">⬇ Export CSV</button>
           </div>
         </div>
         <!-- Filter panel -->
@@ -860,13 +860,13 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
         <div class="page-hd">
           <div><div class="page-title">Verified Members</div><div class="page-sub">Incidents submitted with these emails receive a ✅ verified badge</div></div>
           <div class="page-actions">
-            <button class="btn btn-ghost btn-lg" class="captain-hidden" onclick="exportMembersCSV()">⬇ Export CSV</button>
+            <button class="btn btn-ghost btn-lg captain-hidden" onclick="exportMembersCSV()">⬇ Export CSV</button>
           </div>
         </div>
         <div class="member-add-bar">
           <input class="captain-hidden member-input" type="email" id="newMemberEmail" placeholder="Enter email address to add…" onkeydown="if(event.key==='Enter')addMember()">
-          <button class="btn btn-teal btn-lg" class="captain-hidden" onclick="addMember()">＋ Add Member</button>
-          <button class="btn btn-ghost btn-lg" class="captain-hidden" onclick="importMemberCSV()">⬆ Import CSV</button>
+          <button class="btn btn-teal btn-lg captain-hidden" onclick="addMember()">＋ Add Member</button>
+          <button class="btn btn-ghost btn-lg captain-hidden" onclick="importMemberCSV()">⬆ Import CSV</button>
           <input type="file" id="memberCSVInput" accept=".csv" style="display:none" onchange="handleMemberCSV(this)">
         </div>
         <div class="member-toolbar">
@@ -1841,7 +1841,7 @@ function renderMembers() {
       <td class="mem-date">${dateStr}</td>
       <td class="mem-date">${daysStr}</td>
       <td style="white-space:nowrap;display:flex;gap:5px">
-        <button class="btn btn-ghost" style="font-size:.68rem;padding:4px 10px" class="captain-hidden" onclick="openEditMember('${m.id}')">✏️ Edit</button>
+        <button class="btn btn-ghost captain-hidden" style="font-size:.68rem;padding:4px 10px" onclick="openEditMember('${m.id}')">✏️ Edit</button>
         <button class="btn btn-red captain-hidden"   style="font-size:.68rem;padding:4px 10px" onclick="removeMember('${m.id}')">Remove</button>
       </td>
     </tr>`;
@@ -1892,7 +1892,8 @@ async function addMember() {
 }
 
 function openEditMember(id) {
-  const m = memberList.find(m => m.id === id);
+  // id may be numeric or string — try both numeric id match and string match
+  const m = memberList.find(m => m.id == id || String(m.id) === String(id));
   if (!m) return;
   document.getElementById('meId').value        = m.id;
   document.getElementById('meOrigEmail').value  = m.email;
@@ -2118,7 +2119,7 @@ function openDistrictModal(districtId) {
           <td style="padding:10px 12px;font-size:.8rem;font-family:IBM Plex Mono,monospace;color:var(--slate)">${m.phone ? `<a href="tel:${esc(m.phone)}" style="color:var(--slate);text-decoration:none" title="Call">${esc(m.phone)}</a>` : '—'}</td>
           <td style="padding:10px 12px;font-size:.8rem;font-family:IBM Plex Mono,monospace;color:var(--slate)">${esc(m.email || '—')}</td>
           <td style="padding:10px 12px;text-align:right">
-            <button class="btn btn-ghost" style="font-size:.65rem;padding:3px 9px" class="captain-hidden" onclick="closeDstModal();openEditMember(${m.id})">✏️ Edit</button>
+            <button class="btn btn-ghost captain-hidden" style="font-size:.65rem;padding:3px 9px" onclick="closeDstModal();openEditMember('${m.id}')">✏️ Edit</button>
           </td>
         </tr>`).join('');
 
@@ -2372,7 +2373,7 @@ function filterDstModal() {
       <td style="padding:10px 12px;font-size:.8rem;font-family:IBM Plex Mono,monospace;color:var(--slate)">${m.phone ? `<a href="tel:${esc(m.phone)}" style="color:var(--slate);text-decoration:none" title="Call">${esc(m.phone)}</a>` : '—'}</td>
       <td style="padding:10px 12px;font-size:.8rem;font-family:IBM Plex Mono,monospace;color:var(--slate)">${esc(m.email || '—')}</td>
       <td style="padding:10px 12px;text-align:right">
-        <button class="btn btn-ghost" style="font-size:.65rem;padding:3px 9px" class="captain-hidden" onclick="closeDstModal();openEditMember(${m.id})">✏️ Edit</button>
+        <button class="btn btn-ghost captain-hidden" style="font-size:.65rem;padding:3px 9px" onclick="closeDstModal();openEditMember('${m.id}')">✏️ Edit</button>
       </td>
     </tr>`).join('');
 }
