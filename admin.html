@@ -1920,6 +1920,16 @@ function closeMemberEdit() {
   document.getElementById('memberEditOverlay').style.display = 'none';
 }
 
+function autoFillCaptainFromDistrict() {
+  const district = document.getElementById('meDistrict')?.value;
+  const captainField = document.getElementById('meCaptain');
+  if (!district || !captainField) return;
+  // Only auto-fill if the field is currently empty
+  if (captainField.value.trim()) return;
+  const captain = getCaptainForDistrict(district);
+  if (captain) captainField.value = captain;
+}
+
 async function saveMemberEdit() {
   const id        = document.getElementById('meId').value;
   const origEmail = document.getElementById('meOrigEmail').value.toLowerCase();
@@ -1950,6 +1960,9 @@ async function saveMemberEdit() {
   }
 
   // 2. Upsert member_applications with profile fields (match on original email)
+  // Auto-fill captain if district is set but captain name is blank
+  const resolvedCaptain = captainName || (district ? getCaptainForDistrict(district) : null);
+
   const profile = {
     email:            newEmail,
     full_name:        fullName  || null,
@@ -1960,7 +1973,7 @@ async function saveMemberEdit() {
     business_state:   bizState  || null,
     business_zip:     bizZip    || null,
     district:         district  || null,
-    captain_name:     captainName || null,
+    captain_name:     resolvedCaptain || null,
     status:           'approved'
   };
 
@@ -2459,12 +2472,26 @@ function renderApps() {
     </div>`).join('');
 }
 
+// Returns the current captain name for a district, or null if none assigned
+function getCaptainForDistrict(districtId) {
+  if (!districtId) return null;
+  const captain = memberList.find(m =>
+    m.district === districtId && m.captain_name && m.captain_name.trim()
+  );
+  return captain ? captain.captain_name.trim() : null;
+}
+
 async function approveApp(id, email, name) {
   if (!confirm(`Approve ${name} and add ${email} to the verified members list?`)) return;
-  // 1. Update application status
+  // 1. Update application status, auto-assigning district captain if one exists
+  const app = allApplications.find(a => a.id === id);
+  const districtCaptain = app?.district ? getCaptainForDistrict(app.district) : null;
+  const approveUpdate = { status: 'approved' };
+  if (districtCaptain && !app?.captain_name) approveUpdate.captain_name = districtCaptain;
+
   const {error: appErr} = await sb
     .from('member_applications')
-    .update({status: 'approved'})
+    .update(approveUpdate)
     .eq('id', id);
   if (appErr) { showToast('⚠️', appErr.message, 'err'); return; }
 
@@ -2968,7 +2995,7 @@ function admToggleHeat() {
       </div>
       <div class="mf-group">
         <div class="mf-label">Business District</div>
-        <select class="tb-search" id="meDistrict" style="width:100%">
+        <select class="tb-search" id="meDistrict" style="width:100%" onchange="autoFillCaptainFromDistrict()">
           <option value="">— Assign district…</option>
         </select>
       </div>
