@@ -1975,14 +1975,15 @@ function openDistrictModal(districtId) {
 
   // Build modal HTML
   const rows = members.length === 0
-    ? `<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--slate2);font-style:italic">No members registered in this district yet</td></tr>`
+    ? `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--slate2);font-style:italic">No members registered in this district yet</td></tr>`
     : members.map(m => `
-        <tr>
+        <tr style="border-bottom:1px solid var(--b2)">
           <td style="padding:10px 12px">
             <div style="font-weight:500">${esc(m.full_name || '—')}</div>
             ${m.captain_name ? `<div style="font-size:.7rem;color:var(--teal);margin-top:1px">👮 Captain: ${esc(m.captain_name)}</div>` : ''}
           </td>
           <td style="padding:10px 12px;font-size:.8rem;color:var(--slate)">${esc(m.business_name || '—')}</td>
+          <td style="padding:10px 12px;font-size:.8rem;font-family:IBM Plex Mono,monospace;color:var(--slate)">${m.phone ? `<a href="tel:${esc(m.phone)}" style="color:var(--slate);text-decoration:none" title="Call">${esc(m.phone)}</a>` : '—'}</td>
           <td style="padding:10px 12px;font-size:.8rem;font-family:IBM Plex Mono,monospace;color:var(--slate)">${esc(m.email || '—')}</td>
           <td style="padding:10px 12px;text-align:right">
             <button class="btn btn-ghost" style="font-size:.65rem;padding:3px 9px" onclick="closeDstModal();openEditMember(${m.id})">✏️ Edit</button>
@@ -1999,7 +2000,7 @@ function openDistrictModal(districtId) {
   }
 
   modal.innerHTML = `
-    <div style="background:var(--navy2);border:1px solid ${distColor}44;border-radius:12px;width:100%;max-width:780px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)">
+    <div style="background:var(--navy2);border:1px solid ${distColor}44;border-radius:12px;width:100%;max-width:920px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)">
 
       <!-- Modal header -->
       <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--b2);flex-shrink:0">
@@ -2023,6 +2024,7 @@ function openDistrictModal(districtId) {
             <tr>
               <th style="padding:9px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);font-weight:400;border-bottom:1px solid var(--b2)">Name</th>
               <th style="padding:9px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);font-weight:400;border-bottom:1px solid var(--b2)">Business</th>
+              <th style="padding:9px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);font-weight:400;border-bottom:1px solid var(--b2)">Phone</th>
               <th style="padding:9px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);font-weight:400;border-bottom:1px solid var(--b2)">Email</th>
               <th style="padding:9px 12px;border-bottom:1px solid var(--b2)"></th>
             </tr>
@@ -2058,13 +2060,14 @@ function filterDstModal() {
   const filtered = q ? members.filter(m =>
     (m.full_name||'').toLowerCase().includes(q) ||
     (m.business_name||'').toLowerCase().includes(q) ||
-    (m.email||'').toLowerCase().includes(q)
+    (m.email||'').toLowerCase().includes(q) ||
+    (m.phone||'').toLowerCase().includes(q)
   ) : members;
 
   const tbody = document.getElementById('dstModalBody');
   if (!tbody) return;
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:28px;color:var(--slate2);font-style:italic">No members match "${esc(q)}"</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--slate2);font-style:italic">No members match "${esc(q)}"</td></tr>`;
     return;
   }
   tbody.innerHTML = filtered.map(m => `
@@ -2074,6 +2077,7 @@ function filterDstModal() {
         ${m.captain_name ? `<div style="font-size:.7rem;color:var(--teal);margin-top:1px">👮 ${esc(m.captain_name)}</div>` : ''}
       </td>
       <td style="padding:10px 12px;font-size:.8rem;color:var(--slate)">${esc(m.business_name || '—')}</td>
+      <td style="padding:10px 12px;font-size:.8rem;font-family:IBM Plex Mono,monospace;color:var(--slate)">${m.phone ? `<a href="tel:${esc(m.phone)}" style="color:var(--slate);text-decoration:none" title="Call">${esc(m.phone)}</a>` : '—'}</td>
       <td style="padding:10px 12px;font-size:.8rem;font-family:IBM Plex Mono,monospace;color:var(--slate)">${esc(m.email || '—')}</td>
       <td style="padding:10px 12px;text-align:right">
         <button class="btn btn-ghost" style="font-size:.65rem;padding:3px 9px" onclick="closeDstModal();openEditMember(${m.id})">✏️ Edit</button>
