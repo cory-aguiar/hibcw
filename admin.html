@@ -997,6 +997,7 @@ function logout() {
   allIncidents = [];
 }
 document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDstModal(); });
 
 /* ════════════════════════════════════════════════════
    INIT
@@ -1907,8 +1908,7 @@ function renderCaptains() {
     }
   });
 
-  // Count incidents per district (match member emails to incidents)
-  const memberEmailSet = new Set(memberList.map(m => (m.email||'').toLowerCase()));
+  // Count incidents per district
   const incidentsByDistrict = {};
   DISTRICTS.forEach(([v]) => { incidentsByDistrict[v] = 0; });
   allIncidents.forEach(inc => {
@@ -1920,51 +1920,165 @@ function renderCaptains() {
     }
   });
 
+  // District colors from KIAA_DISTRICTS
+  const distColorMap = {};
+  KIAA_DISTRICTS.forEach(d => { distColorMap[d.id] = d.color; });
+
   grid.innerHTML = DISTRICTS.map(([v, fullLabel]) => {
     const info       = distMap[v] || {captain:null, members:[]};
     const captain    = info.captain;
     const memCount   = info.members.length;
     const incCount   = incidentsByDistrict[v] || 0;
     const hasCaptain = !!captain;
+    const distColor  = distColorMap[v] || 'var(--teal)';
+    const num        = fullLabel.match(/\d+/)?.[0] || '';
 
-    // List up to 3 member names
-    const memberPreview = info.members.slice(0, 3).map(m =>
-      '<div style="font-size:.72rem;color:var(--slate);margin-top:2px">• ' +
-      esc(m.full_name || m.email) + (m.business_name ? ' <span style="color:var(--slate2)">(' + esc(m.business_name) + ')</span>' : '') +
-      '</div>'
-    ).join('');
-    const moreCount = info.members.length > 3 ? info.members.length - 3 : 0;
+    return `<div style="background:var(--navy2);border:1px solid ${hasCaptain ? 'rgba(0,201,167,.2)' : 'var(--b2)'};border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 0 0 1px ${distColor}44'" onmouseout="this.style.boxShadow='none'">
 
-    return '<div style="background:var(--navy2);border:1px solid ' + (hasCaptain ? 'rgba(0,201,167,.25)' : 'var(--b2)') + ';border-left:3px solid ' + (hasCaptain ? 'var(--teal)' : 'var(--slate2)') + ';border-radius:8px;padding:18px 20px">' +
-      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px">' +
-        '<div>' +
-          '<div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.04em">' + esc(fullLabel.replace('\u2014', '\u2014')) + '</div>' +
-        '</div>' +
-        '<div style="display:flex;gap:5px;flex-shrink:0">' +
-          '<span style="font-family:IBM Plex Mono,monospace;font-size:.6rem;border-radius:3px;padding:2px 7px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);color:var(--teal)">' + memCount + ' member' + (memCount!==1?'s':'') + '</span>' +
-          '<span style="font-family:IBM Plex Mono,monospace;font-size:.6rem;border-radius:3px;padding:2px 7px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);color:var(--gold)">' + incCount + ' incident' + (incCount!==1?'s':'') + '</span>' +
-        '</div>' +
-      '</div>' +
-      '<div style="margin-bottom:10px">' +
-        '<div style="font-family:IBM Plex Mono,monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">District Captain</div>' +
-        (hasCaptain
-          ? '<div style="font-size:.88rem;font-weight:500;color:var(--white)">👮 ' + esc(captain) + '</div>'
-          : '<div style="font-size:.8rem;color:var(--slate2);font-style:italic">No captain assigned yet</div>'
-        ) +
-      '</div>' +
-      (memCount > 0
-        ? '<div style="border-top:1px solid var(--b2);padding-top:10px">' +
-            '<div style="font-family:IBM Plex Mono,monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Members</div>' +
-            memberPreview +
-            (moreCount > 0 ? '<div style="font-size:.7rem;color:var(--slate2);margin-top:3px">+ ' + moreCount + ' more…</div>' : '') +
-          '</div>'
-        : '<div style="font-size:.75rem;color:var(--slate2);font-style:italic;border-top:1px solid var(--b2);padding-top:10px">No members in this district yet</div>'
-      ) +
-      '<div style="margin-top:12px">' +
-        '<button class="btn btn-ghost" style="font-size:.7rem;padding:4px 10px;width:100%" onclick="showView(\'members\')">✏️ Assign / Edit Members</button>' +
-      '</div>' +
-    '</div>';
+      <!-- Header row -->
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;border-radius:8px;background:${distColor}22;border:1px solid ${distColor}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:800;font-size:1rem;color:${distColor};flex-shrink:0">${num}</div>
+        <div style="min-width:0">
+          <div style="font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(fullLabel)}</div>
+          <div style="font-size:.72rem;color:var(--slate2);margin-top:1px">${hasCaptain ? '👮 ' + esc(captain) : '<span style="font-style:italic">No captain assigned</span>'}</div>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div style="display:flex;gap:8px">
+        <div style="flex:1;background:var(--navy3);border-radius:6px;padding:8px 10px;text-align:center">
+          <div style="font-family:IBM Plex Mono,monospace;font-size:1.2rem;font-weight:700;color:${distColor}">${memCount}</div>
+          <div style="font-size:.6rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.08em;margin-top:1px">Member${memCount!==1?'s':''}</div>
+        </div>
+        <div style="flex:1;background:var(--navy3);border-radius:6px;padding:8px 10px;text-align:center">
+          <div style="font-family:IBM Plex Mono,monospace;font-size:1.2rem;font-weight:700;color:var(--gold)">${incCount}</div>
+          <div style="font-size:.6rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.08em;margin-top:1px">Incident${incCount!==1?'s':''}</div>
+        </div>
+      </div>
+
+      <!-- Action button -->
+      <button class="btn btn-ghost" style="font-size:.75rem;padding:6px 12px;width:100%;border-color:${distColor}44;color:${distColor}" onclick="openDistrictModal('${v}')">
+        👥 View Members
+      </button>
+    </div>`;
   }).join('');
+}
+
+/* ─── District Members Modal ─────────────────────────────── */
+function openDistrictModal(districtId) {
+  const distEntry  = DISTRICTS.find(([v]) => v === districtId);
+  const distLabel  = distEntry ? distEntry[1] : districtId;
+  const distInfo   = KIAA_DISTRICTS.find(d => d.id === districtId);
+  const distColor  = distInfo ? distInfo.color : 'var(--teal)';
+
+  const members = memberList.filter(m => m.district === districtId);
+
+  // Build modal HTML
+  const rows = members.length === 0
+    ? `<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--slate2);font-style:italic">No members registered in this district yet</td></tr>`
+    : members.map(m => `
+        <tr>
+          <td style="padding:10px 12px">
+            <div style="font-weight:500">${esc(m.full_name || '—')}</div>
+            ${m.captain_name ? `<div style="font-size:.7rem;color:var(--teal);margin-top:1px">👮 Captain: ${esc(m.captain_name)}</div>` : ''}
+          </td>
+          <td style="padding:10px 12px;font-size:.8rem;color:var(--slate)">${esc(m.business_name || '—')}</td>
+          <td style="padding:10px 12px;font-size:.8rem;font-family:IBM Plex Mono,monospace;color:var(--slate)">${esc(m.email || '—')}</td>
+          <td style="padding:10px 12px;text-align:right">
+            <button class="btn btn-ghost" style="font-size:.65rem;padding:3px 9px" onclick="closeDstModal();openEditMember(${m.id})">✏️ Edit</button>
+          </td>
+        </tr>`).join('');
+
+  let modal = document.getElementById('districtMembersModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'districtMembersModal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,14,26,.8);backdrop-filter:blur(4px)';
+    modal.addEventListener('click', e => { if (e.target === modal) closeDstModal(); });
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div style="background:var(--navy2);border:1px solid ${distColor}44;border-radius:12px;width:100%;max-width:780px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)">
+
+      <!-- Modal header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--b2);flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:32px;height:32px;border-radius:7px;background:${distColor}22;border:1px solid ${distColor}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:800;color:${distColor}">${distLabel.match(/\d+/)?.[0]||''}</div>
+          <div>
+            <div style="font-family:Rajdhani,sans-serif;font-size:1.05rem;font-weight:700">${esc(distLabel)}</div>
+            <div style="font-size:.72rem;color:var(--slate2);margin-top:1px">${members.length} registered member${members.length!==1?'s':''}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="dstModalSearch" placeholder="🔍 Search members…" oninput="filterDstModal()" style="background:var(--navy3);border:1px solid var(--b2);border-radius:6px;padding:5px 10px;font-size:.78rem;color:var(--white);outline:none;width:180px">
+          <button onclick="closeDstModal()" style="background:none;border:none;color:var(--slate);font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1" title="Close">✕</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div style="overflow-y:auto;flex:1">
+        <table style="width:100%;border-collapse:collapse">
+          <thead style="position:sticky;top:0;background:var(--navy3);z-index:1">
+            <tr>
+              <th style="padding:9px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);font-weight:400;border-bottom:1px solid var(--b2)">Name</th>
+              <th style="padding:9px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);font-weight:400;border-bottom:1px solid var(--b2)">Business</th>
+              <th style="padding:9px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);font-weight:400;border-bottom:1px solid var(--b2)">Email</th>
+              <th style="padding:9px 12px;border-bottom:1px solid var(--b2)"></th>
+            </tr>
+          </thead>
+          <tbody id="dstModalBody" style="divide-y:var(--b2)">
+            ${rows}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer -->
+      <div style="padding:12px 22px;border-top:1px solid var(--b2);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:var(--navy3)">
+        <div style="font-size:.75rem;color:var(--slate2)">Click a member's <strong style="color:var(--slate)">Edit</strong> button to update their details or reassign districts.</div>
+        <button class="btn btn-ghost" style="font-size:.75rem" onclick="closeDstModal();showView('members')">✏️ Manage All Members</button>
+      </div>
+    </div>`;
+
+  modal.style.display = 'flex';
+  // Store members for search filtering
+  modal._members = members;
+  setTimeout(() => document.getElementById('dstModalSearch')?.focus(), 50);
+}
+
+function closeDstModal() {
+  const modal = document.getElementById('districtMembersModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function filterDstModal() {
+  const modal = document.getElementById('districtMembersModal');
+  const q = (document.getElementById('dstModalSearch')?.value || '').toLowerCase().trim();
+  const members = modal?._members || [];
+  const filtered = q ? members.filter(m =>
+    (m.full_name||'').toLowerCase().includes(q) ||
+    (m.business_name||'').toLowerCase().includes(q) ||
+    (m.email||'').toLowerCase().includes(q)
+  ) : members;
+
+  const tbody = document.getElementById('dstModalBody');
+  if (!tbody) return;
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:28px;color:var(--slate2);font-style:italic">No members match "${esc(q)}"</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(m => `
+    <tr style="border-bottom:1px solid var(--b2)">
+      <td style="padding:10px 12px">
+        <div style="font-weight:500">${esc(m.full_name || '—')}</div>
+        ${m.captain_name ? `<div style="font-size:.7rem;color:var(--teal);margin-top:1px">👮 ${esc(m.captain_name)}</div>` : ''}
+      </td>
+      <td style="padding:10px 12px;font-size:.8rem;color:var(--slate)">${esc(m.business_name || '—')}</td>
+      <td style="padding:10px 12px;font-size:.8rem;font-family:IBM Plex Mono,monospace;color:var(--slate)">${esc(m.email || '—')}</td>
+      <td style="padding:10px 12px;text-align:right">
+        <button class="btn btn-ghost" style="font-size:.65rem;padding:3px 9px" onclick="closeDstModal();openEditMember(${m.id})">✏️ Edit</button>
+      </td>
+    </tr>`).join('');
 }
 
 /* ════════════════════════════════════════════════════
