@@ -1593,7 +1593,10 @@ function renderMembers() {
       <td style="color:var(--slate);font-size:.78rem">${m.business_address ? esc(m.business_address) : na}</td>
       <td class="mem-date">${dateStr}</td>
       <td class="mem-date">${daysStr}</td>
-      <td><button class="btn btn-red" style="font-size:.68rem;padding:4px 10px" onclick="removeMember('${m.id}')">Remove</button></td>
+      <td style="white-space:nowrap;display:flex;gap:5px">
+        <button class="btn btn-ghost" style="font-size:.68rem;padding:4px 10px" onclick="openEditMember('${m.id}')">✏️ Edit</button>
+        <button class="btn btn-red"   style="font-size:.68rem;padding:4px 10px" onclick="removeMember('${m.id}')">Remove</button>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -1634,6 +1637,79 @@ async function addMember() {
   input.value = '';
   await loadMembers();
   showToast('✅', `${email} added to member list.`);
+}
+
+function openEditMember(id) {
+  const m = memberList.find(m => m.id === id);
+  if (!m) return;
+  document.getElementById('meId').value        = m.id;
+  document.getElementById('meOrigEmail').value  = m.email;
+  document.getElementById('meFullName').value   = m.full_name        || '';
+  document.getElementById('meEmail').value      = m.email            || '';
+  document.getElementById('mePhone').value      = m.phone            || '';
+  document.getElementById('meBizName').value    = m.business_name    || '';
+  document.getElementById('meBizAddr').value    = m.business_address || '';
+  document.getElementById('memEditTitle').textContent = m.full_name || m.email;
+  document.getElementById('memberEditOverlay').style.display = 'flex';
+}
+
+function closeMemberEdit() {
+  document.getElementById('memberEditOverlay').style.display = 'none';
+}
+
+async function saveMemberEdit() {
+  const id        = document.getElementById('meId').value;
+  const origEmail = document.getElementById('meOrigEmail').value.toLowerCase();
+  const newEmail  = document.getElementById('meEmail').value.trim().toLowerCase();
+  const fullName  = document.getElementById('meFullName').value.trim();
+  const phone     = document.getElementById('mePhone').value.trim();
+  const bizName   = document.getElementById('meBizName').value.trim();
+  const bizAddr   = document.getElementById('meBizAddr').value.trim();
+
+  if (!newEmail || !newEmail.includes('@')) {
+    showToast('⚠️', 'A valid email address is required.', 'err'); return;
+  }
+
+  const btn = document.getElementById('meSaveBtn');
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+
+  // 1. Update member_emails — email may have changed
+  const emailUpdate = { email: newEmail };
+  const { error: eErr } = await sb.from('member_emails').update(emailUpdate).eq('id', id);
+  if (eErr) {
+    showToast('⚠️', 'Could not update email: ' + eErr.message, 'err');
+    btn.disabled = false; btn.textContent = '💾 Save Changes'; return;
+  }
+
+  // 2. Upsert member_applications with profile fields (match on original email)
+  const profile = {
+    email:            newEmail,
+    full_name:        fullName  || null,
+    phone:            phone     || null,
+    business_name:    bizName   || null,
+    business_address: bizAddr   || null,
+    status:           'approved'
+  };
+
+  // Check if an application record exists for this member
+  const { data: existing } = await sb
+    .from('member_applications')
+    .select('id')
+    .eq('email', origEmail)
+    .maybeSingle();
+
+  if (existing) {
+    await sb.from('member_applications').update(profile).eq('id', existing.id);
+  } else {
+    // No application existed (manually added member) — create one to store the profile
+    await sb.from('member_applications').insert(profile);
+  }
+
+  // 3. Refresh list and close modal
+  await loadMembers();
+  closeMemberEdit();
+  showToast('✅', `${newEmail} updated successfully.`);
+  btn.disabled = false; btn.textContent = '💾 Save Changes';
 }
 
 async function removeMember(id) {
@@ -2014,6 +2090,47 @@ function admToggleHeat() {
   }
 }
 </script>
+<!-- MEMBER EDIT MODAL -->
+<div class="overlay" id="memberEditOverlay" style="display:none" onclick="if(event.target===this)closeMemberEdit()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-type-badge" style="background:rgba(0,201,167,.12);color:var(--teal);border-color:rgba(0,201,167,.25)">✏️ Edit Member</div>
+        <div class="modal-title" id="memEditTitle" style="margin-top:6px">Edit Member</div>
+      </div>
+      <button class="modal-close" onclick="closeMemberEdit()">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+      <div class="mf-group">
+        <div class="mf-label">Full Name</div>
+        <input class="tb-search" id="meFullName" type="text" placeholder="Full name" style="width:100%">
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">Email Address <span style="color:var(--red)">*</span></div>
+        <input class="tb-search" id="meEmail" type="email" placeholder="email@example.com" style="width:100%">
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">Phone Number</div>
+        <input class="tb-search" id="mePhone" type="tel" placeholder="(808) 000-0000" style="width:100%">
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">Business Name</div>
+        <input class="tb-search" id="meBizName" type="text" placeholder="Business name" style="width:100%">
+      </div>
+      <div class="mf-group">
+        <div class="mf-label">Business Address</div>
+        <input class="tb-search" id="meBizAddr" type="text" placeholder="Street address, Hilo, HI" style="width:100%">
+      </div>
+      <input type="hidden" id="meId">
+      <input type="hidden" id="meOrigEmail">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeMemberEdit()">Cancel</button>
+      <button class="btn btn-teal"  onclick="saveMemberEdit()" id="meSaveBtn">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- Leaflet loaded last so it never blocks login -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
