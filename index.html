@@ -1356,10 +1356,28 @@ function updateStats() {
    DISTRICT OVERLAY
 ════════════════════════════════════════════════════ */
 const DISTRICT_GEO = [
-  { id:"1", label:"D1 — Downtown Hilo / Bayfront",      color:"#00c9a7", center:[19.730,-155.090],
-    coords:[[19.860,-155.180],[19.860,-154.920],[19.600,-154.820],[19.550,-154.850],[19.550,-155.250],[19.700,-155.320],[19.860,-155.180]] },
-  { id:"2", label:"D2 — Hilo Commercial Corridor",       color:"#3b82f6", center:[19.980,-155.250],
-    coords:[[20.050,-155.500],[20.050,-155.080],[19.860,-155.100],[19.860,-155.180],[19.860,-155.450],[20.050,-155.500]] },
+  { id:"1", label:"D1 — Downtown Hilo / Bayfront",      color:"#00c9a7", center:[19.722,-155.068],
+    coords:[
+      [19.730,-155.088],  // Wailuku River mouth (NW corner)
+      [19.742,-155.068],  // Wainaku / north bay
+      [19.730,-155.041],  // Hilo Airport / east bay
+      [19.716,-155.039],  // Keaukaha coast
+      [19.700,-155.041],  // SE bay
+      [19.693,-155.058],  // Wailoa River / Banyan Drive
+      [19.693,-155.082],  // Kilauea Ave / inland edge
+      [19.710,-155.095],  // SW — upper downtown
+      [19.729,-155.088],  // back to Wailuku River
+    ]},
+  { id:"2", label:"D2 — Hilo Commercial Corridor",       color:"#3b82f6", center:[19.670,-155.065],
+    coords:[
+      [19.729,-155.088],  // N: Wailuku River / start of corridor
+      [19.729,-155.041],  // NE: airport / highway junction
+      [19.621,-155.020],  // SE: Keaau coastal edge
+      [19.600,-155.040],  // S: Keaau south boundary
+      [19.610,-155.100],  // SW: inland from Keaau
+      [19.695,-155.120],  // W: Mauna Kea lower foothills
+      [19.729,-155.088],  // back N
+    ]},
   { id:"3", label:"D3 — Puna (Pahoa / Keaau)",           color:"#a855f7", center:[19.480,-154.980],
     coords:[[19.550,-154.850],[19.550,-154.820],[19.280,-154.820],[19.150,-155.050],[19.350,-155.250],[19.550,-155.250],[19.550,-154.850]] },
   { id:"4", label:"D4 — Ka'u / Volcano",                 color:"#ef4444", center:[19.100,-155.550],
@@ -1372,8 +1390,18 @@ const DISTRICT_GEO = [
     coords:[[20.150,-155.820],[20.150,-156.050],[19.800,-156.050],[19.800,-155.950],[19.800,-155.700],[20.050,-155.650],[20.150,-155.820]] },
   { id:"8", label:"D8 — N. Kohala / Hawi",               color:"#10b981", center:[20.220,-155.900],
     coords:[[20.270,-155.770],[20.270,-156.080],[20.150,-156.050],[20.150,-155.820],[20.270,-155.770]] },
-  { id:"9", label:"D9 — Hamakua / Honokaa",              color:"#84cc16", center:[20.080,-155.450],
-    coords:[[20.250,-155.500],[20.250,-155.050],[20.050,-155.080],[20.050,-155.500],[20.250,-155.500]] },
+  { id:"9", label:"D9 — Hamakua / Honokaa",              color:"#84cc16", center:[20.020,-155.380],
+    coords:[
+      [19.897,-155.126],  // SE: Hakalau (N.Hilo/Hamakua boundary at coast)
+      [19.980,-155.237],  // coast: Laupahoehoe area
+      [20.073,-155.460],  // Honokaa town
+      [20.118,-155.584],  // Waipio Valley lookout
+      [20.150,-155.640],  // NW coast / Hamakua–Kohala border
+      [20.020,-155.680],  // N inland
+      [19.900,-155.520],  // W: Mauna Kea upper slopes
+      [19.830,-155.300],  // SW: upper mountain
+      [19.897,-155.126],  // back SE
+    ]},
 ];
 
 let districtLayers = [];
