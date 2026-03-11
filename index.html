@@ -551,6 +551,7 @@ header{
             📍 <span id="pinTxt">Click on the map to drop a pin at the exact location</span>
           </div>
           <div class="coords" id="coordsBar"></div>
+          <div id="districtBadge" style="display:none;margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;padding:4px 10px;border-radius:4px;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);color:#00c9a7"></div>
         </div>
 
         <!-- Details -->
@@ -759,6 +760,18 @@ header{
           <option value="30">Last 30 Days</option>
           <option value="90">Last 90 Days</option>
         </select>
+        <select class="mfb-select" id="mapDistrictFilter" onchange="applyMapFilter()">
+          <option value="">All Districts</option>
+          <option value="south-hilo">South Hilo</option>
+          <option value="north-hilo">North Hilo</option>
+          <option value="puna">Puna</option>
+          <option value="hamakua">Hāmākua</option>
+          <option value="north-kohala">North Kohala</option>
+          <option value="south-kohala">South Kohala</option>
+          <option value="north-kona">North Kona</option>
+          <option value="south-kona">South Kona</option>
+          <option value="kau">Kaʻū</option>
+        </select>
         <button class="mfb-clear" id="mapClearBtn" onclick="clearMapFilter()">✕ Clear</button>
         <div class="mfb-count" id="mapFilterCount"></div>
       </div>
@@ -923,6 +936,22 @@ map.on('click', e => {
     .then(r=>r.json())
     .then(d=>{ if(d.display_name && !document.getElementById('fAddr').value.trim()) document.getElementById('fAddr').value = d.display_name.split(',').slice(0,3).join(',').trim(); })
     .catch(()=>{});
+
+  // Auto-detect district
+  const det = getDistrictForPoint(lat, lng);
+  const badge = document.getElementById('districtBadge');
+  if (det) {
+    badge.textContent = '📍 District: ' + det.label;
+    badge.style.display = 'inline-block';
+    pendingPin.district = det.id;
+  } else {
+    badge.textContent = '⚠️ Location outside known districts';
+    badge.style.display = 'inline-block';
+    badge.style.background = 'rgba(245,166,35,.08)';
+    badge.style.borderColor = 'rgba(245,166,35,.25)';
+    badge.style.color = '#f5a623';
+    pendingPin.district = null;
+  }
 });
 
 // Incident marker maker
@@ -1098,8 +1127,9 @@ async function submitReport() {
       vehicle_year:     document.getElementById('sVehicleYear').value.trim()     || null,
       vehicle_plate:    document.getElementById('sVehiclePlate').value.trim()    || null,
       vehicle_notes:    document.getElementById('sVehicleNotes').value.trim()    || null,
-      lat: pendingPin?.lat ?? null,
-      lng: pendingPin?.lng ?? null,
+      lat:      pendingPin?.lat ?? null,
+      lng:      pendingPin?.lng ?? null,
+      district: pendingPin?.district ?? null,
     }).select().single();
     if (incErr) throw incErr;
 
@@ -1165,6 +1195,8 @@ function resetForm() {
   document.getElementById('fTime').value=new Date(now-off).toISOString().slice(0,16);
   mediaFiles=[]; document.getElementById('previews').innerHTML='';
   pendingPin=null;
+  const db = document.getElementById('districtBadge');
+  if (db) { db.style.display='none'; db.textContent=''; db.style.background=''; db.style.borderColor=''; db.style.color=''; }
   if(pinMarker){ map.removeLayer(pinMarker); pinMarker=null; }
   document.getElementById('pinTxt').textContent='Click on the map to drop a pin at the exact location';
   document.getElementById('coordsBar').style.display='none';
@@ -1415,6 +1447,27 @@ const DISTRICT_GEO = [
 let districtLayers = [];
 let districtOverlayOn = false;
 
+/* ── Point-in-polygon (ray casting) ───────────────────────── */
+function pointInPolygon(lat, lng, coords) {
+  let inside = false;
+  for (let i = 0, j = coords.length - 1; i < coords.length; j = i++) {
+    const xi = coords[i][0], yi = coords[i][1];
+    const xj = coords[j][0], yj = coords[j][1];
+    const intersect = ((yi > lng) !== (yj > lng)) &&
+                      (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function getDistrictForPoint(lat, lng) {
+  if (lat == null || lng == null) return null;
+  for (const d of DISTRICT_GEO) {
+    if (pointInPolygon(lat, lng, d.coords)) return d;
+  }
+  return null;
+}
+
 function toggleDistrictOverlay(mapObj, btn) {
   districtOverlayOn = !districtOverlayOn;
   if (districtOverlayOn) {
@@ -1440,10 +1493,11 @@ function toggleDistrictOverlay(mapObj, btn) {
 }
 
 function applyMapFilter() {
-  const q      = (document.getElementById('mapSearch')?.value || '').toLowerCase().trim();
-  const type   = document.getElementById('mapTypeFilter')?.value || '';
-  const days   = parseInt(document.getElementById('mapDateFilter')?.value) || 0;
-  const hasFilter = q || type || days;
+  const q        = (document.getElementById('mapSearch')?.value || '').toLowerCase().trim();
+  const type     = document.getElementById('mapTypeFilter')?.value || '';
+  const days     = parseInt(document.getElementById('mapDateFilter')?.value) || 0;
+  const district = document.getElementById('mapDistrictFilter')?.value || '';
+  const hasFilter = q || type || days || district;
 
   // Show/hide clear + count
   document.getElementById('mapClearBtn').classList.toggle('show', !!hasFilter);
@@ -1453,9 +1507,10 @@ function applyMapFilter() {
     const m = markers[inc.id];
     if (!m) return;
     let show = true;
-    if (q    && ![inc.type,inc.address,inc.description].join(' ').toLowerCase().includes(q)) show=false;
-    if (type && inc.type !== type) show=false;
-    if (days && (Date.now()-new Date(inc.occurred_at)) > days*864e5) show=false;
+    if (q        && ![inc.type,inc.address,inc.description].join(' ').toLowerCase().includes(q)) show=false;
+    if (type     && inc.type !== type) show=false;
+    if (days     && (Date.now()-new Date(inc.occurred_at)) > days*864e5) show=false;
+    if (district && inc.district !== district) show=false;
     if (show) {
       visible++;
       if (!clusterOn) { if (!map.hasLayer(m)) m.addTo(map); }
@@ -1479,6 +1534,7 @@ function clearMapFilter() {
   document.getElementById('mapSearch').value = '';
   document.getElementById('mapTypeFilter').selectedIndex = 0;
   document.getElementById('mapDateFilter').selectedIndex = 0;
+  document.getElementById('mapDistrictFilter').selectedIndex = 0;
   applyMapFilter();
   // Restore all markers
   incidents.forEach(inc => {
