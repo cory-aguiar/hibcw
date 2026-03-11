@@ -1757,7 +1757,7 @@ async function loadMembers() {
     // Fetch approved applications to enrich with full profile info
     const {data: apps} = await sb
       .from('member_applications')
-      .select('email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district')
+      .select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name')
       .eq('status','approved');
 
     // Build lookup map: email -> application data
@@ -1765,10 +1765,11 @@ async function loadMembers() {
     (apps || []).forEach(a => { appMap[a.email.toLowerCase()] = a; });
 
     // Merge — every verified email gets enriched with application data if available
-    memberList = (emails || []).map(m => ({
-      ...m,
-      ...(appMap[m.email.toLowerCase()] || {})
-    }));
+    // app_id = member_applications.id (used for captain assignment)
+    memberList = (emails || []).map(m => {
+      const app = appMap[m.email.toLowerCase()] || {};
+      return { ...m, ...app, app_id: app.id || null, id: m.id };
+    });
 
     renderMembers();
     const nc = document.getElementById('nc-members');
@@ -2212,7 +2213,7 @@ function openSetCaptainModal(districtId) {
     ? '<option value="">— No members in this district yet —</option>'
     : '<option value="">— Select a member —</option>' +
       distMembers.map(m =>
-        `<option value="${m.id}" ${currentCaptainMember?.id === m.id ? 'selected' : ''}>${esc(m.full_name)}${m.business_name ? ' · ' + esc(m.business_name) : ''}</option>`
+        `<option value="${esc(m.email)}" ${currentCaptainMember?.email === m.email ? 'selected' : ''}>${esc(m.full_name)}${m.business_name ? ' · ' + esc(m.business_name) : ''}</option>`
       ).join('');
 
   modal.innerHTML = `
@@ -2274,7 +2275,7 @@ function openSetCaptainModal(districtId) {
   // Auto-fill name when member is selected
   modal.querySelector('#captainMemberSelect').addEventListener('change', function() {
     const memberId = this.value;
-    const member = distMembers.find(m => String(m.id) === String(memberId));
+    const member = distMembers.find(m => m.email === memberId);
     if (member) {
       document.getElementById('captainNameInput').value = member.full_name || '';
     }
@@ -2292,7 +2293,8 @@ function closeSetCaptainModal() {
 async function saveDistrictCaptain(districtId) {
   if (!sb) return;
 
-  const memberId   = document.getElementById('captainMemberSelect')?.value;
+  const memberEmail = document.getElementById('captainMemberSelect')?.value;
+  const memberId = memberEmail; // email used as key
   const captainName = (document.getElementById('captainNameInput')?.value || '').trim();
   const removeCheck = document.getElementById('removeCaptainCheck')?.checked;
 
@@ -2324,13 +2326,14 @@ async function saveDistrictCaptain(districtId) {
       .update({ captain_name: null })
       .eq('district', districtId)
       .eq('status', 'approved')
-      .neq('id', memberId);
+      .neq('email', memberId);
 
-    // Set captain on the selected member
+    // Set captain on the selected member (memberId is email)
     const { error } = await sb
       .from('member_applications')
       .update({ captain_name: captainName })
-      .eq('id', memberId);
+      .eq('email', memberId)
+      .eq('status', 'approved');
     if (error) throw error;
 
     showToast('👮', captainName + ' set as captain for ' + (DISTRICTS.find(([v]) => v === districtId)?.[1] || districtId));
