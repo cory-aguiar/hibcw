@@ -213,8 +213,22 @@ header{
     </div>
 
     <div class="fld">
-      <label>Business Address <span class="req">*</span></label>
-      <input type="text" id="aBizAddr" placeholder="Street address, Hilo, HI">
+      <label>Business Street Address <span class="req">*</span></label>
+      <input type="text" id="aBizAddr" placeholder="123 Kamehameha Ave">
+    </div>
+    <div class="fld-row" style="grid-template-columns:2fr 1fr 1fr">
+      <div class="fld">
+        <label>City <span class="req">*</span></label>
+        <input type="text" id="aBizCity" placeholder="Hilo">
+      </div>
+      <div class="fld">
+        <label>State <span class="req">*</span></label>
+        <input type="text" id="aBizState" placeholder="HI" maxlength="2">
+      </div>
+      <div class="fld">
+        <label>Zip Code <span class="req">*</span></label>
+        <input type="text" id="aBizZip" placeholder="96720" maxlength="10">
+      </div>
     </div>
 
     <div class="fld">
@@ -263,12 +277,15 @@ async function submitApplication() {
   const email   = document.getElementById('aEmail').value.trim().toLowerCase();
   const phone   = document.getElementById('aPhone').value.trim();
   const bizName = document.getElementById('aBizName').value.trim();
-  const bizAddr = document.getElementById('aBizAddr').value.trim();
-  const notes   = document.getElementById('aNotes').value.trim();
+  const bizAddr  = document.getElementById('aBizAddr').value.trim();
+  const bizCity  = document.getElementById('aBizCity').value.trim();
+  const bizState = document.getElementById('aBizState').value.trim().toUpperCase();
+  const bizZip   = document.getElementById('aBizZip').value.trim();
+  const notes    = document.getElementById('aNotes').value.trim();
 
   // Validate
   let ok = true;
-  [['aName',name],['aEmail',email],['aPhone',phone],['aBizName',bizName],['aBizAddr',bizAddr]]
+  [['aName',name],['aEmail',email],['aPhone',phone],['aBizName',bizName],['aBizAddr',bizAddr],['aBizCity',bizCity],['aBizState',bizState],['aBizZip',bizZip]]
     .forEach(([id,val]) => {
       const el = document.getElementById(id);
       if (!val) { el.classList.add('err'); ok = false; }
@@ -294,8 +311,11 @@ async function submitApplication() {
     email:        email,
     phone:        phone,
     business_name: bizName,
-    business_address: bizAddr,
-    notes:        notes || null,
+    business_address: bizAddr  || null,
+    business_city:    bizCity  || null,
+    business_state:   bizState || null,
+    business_zip:     bizZip   || null,
+    notes:            notes    || null,
     status:       'pending'
   });
 
