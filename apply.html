@@ -482,7 +482,7 @@
             <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(245,166,35,.15);color:#f5a623;border:1px solid rgba(245,166,35,.35);border-radius:4px;padding:2px 7px;white-space:nowrap;margin-left:4px">PUBLIC BETA</span>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
-            <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
+            <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 12px;cursor:pointer;font-size:.65rem;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">🌙 Dark</button>
             <a href="index.html" class="back-btn">← Back to Map</a>
         </div>
     </header>
@@ -762,7 +762,7 @@
     function toggleTheme() {
         const isLight = document.body.classList.toggle('light');
         localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
-        document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+        document.getElementById('themeToggle').textContent = isLight ? '☀️ Light' : '🌙 Dark';
     }
     (function initTheme() {
         const saved = localStorage.getItem('hibcw-theme');
@@ -771,7 +771,7 @@
             document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.getElementById('themeToggle');
                 if (btn)
-                    btn.textContent = '☀️';
+                    btn.textContent = '☀️ Light';
             });
         }
     })();
