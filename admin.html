@@ -681,8 +681,8 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
         <div class="result-count" id="rcount-active"></div>
         <div class="bulk-bar" id="bulk-active">
           <span class="bulk-label" id="bulk-label-active">0 selected</span>
-          <button class="btn btn-gold" onclick="bulkArchive()">📦 Archive Selected</button>
-          <button class="btn btn-red"  onclick="bulkDelete()">🗑 Delete Selected</button>
+          <button class="btn btn-gold captain-hidden" onclick="bulkArchive()">📦 Archive Selected</button>
+          <button class="btn btn-red captain-hidden"  onclick="bulkDelete()">🗑 Delete Selected</button>
           <button class="btn btn-ghost" onclick="clearSelection()">Cancel</button>
         </div>
         <div class="table-wrap"><div id="table-active"></div></div>
@@ -1685,7 +1685,7 @@ function renderTable(rows, containerId, view) {
     wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No incidents found.</div></div>`;
     return;
   }
-  const showCb     = view === 'active';
+  const showCb     = view === 'active' && currentRole !== 'captain';
   const showStatus = view === 'all';
   wrap.innerHTML = `
     <table>
@@ -1719,8 +1719,8 @@ function renderRow(inc, showCb, showStatus) {
           <button class="btn btn-ghost" onclick="openDetail('${inc.id}')">View</button>
           ${!archived
             ? `<button class="btn btn-gold captain-hidden" onclick="archiveOne('${inc.id}')">Archive</button>`
-            : `<button class="btn btn-green" onclick="restoreOne('${inc.id}')">Restore</button>`}
-          <button class="btn btn-red" onclick="deleteOne('${inc.id}')">Delete</button>
+            : `<button class="btn btn-green captain-hidden" onclick="restoreOne('${inc.id}')">Restore</button>`}
+          <button class="btn btn-red captain-hidden" onclick="deleteOne('${inc.id}')">Delete</button>
         </div>
       </td>
     </tr>`;
@@ -1880,8 +1880,8 @@ function openDetail(id) {
     <div class="print-header">Hawaii Island Business Crime Watch — Incident Report — Printed ${new Date().toLocaleDateString()}</div>
     ${inc.status==='active'
       ? `<button class="btn btn-gold captain-hidden" onclick="archiveOne('${id}');closeModal()">📦 Archive</button>`
-      : `<button class="btn btn-green" onclick="restoreOne('${id}');closeModal()">↩ Restore</button>`}
-    <button class="btn btn-red" onclick="deleteOne('${id}');closeModal()">🗑 Delete</button>
+      : `<button class="btn btn-green captain-hidden" onclick="restoreOne('${id}');closeModal()">↩ Restore</button>`}
+    <button class="btn btn-red captain-hidden" onclick="deleteOne('${id}');closeModal()">🗑 Delete</button>
     <button class="btn btn-teal" onclick="printIncident()">🖨 Print / PDF</button>
     <button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
   document.getElementById('overlay').classList.add('open');
