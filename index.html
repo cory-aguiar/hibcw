@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b1524">
 <title>HIBCW Public Beta — Incident Reporter</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -92,8 +96,9 @@ body.light .dot{background:#007a65!important}
 
 html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
 
-/* ── Layout ───────────────────────────────────────────────── */
-.app{display:flex;flex-direction:column;height:100vh}
+/* Safe area insets for iPhone notch/home bar */
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;padding-bottom:env(safe-area-inset-bottom)}
+.tab-body{padding-bottom:max(14px,env(safe-area-inset-bottom))}
 
 /* ── Header ───────────────────────────────────────────────── */
 .disclaimer-bar{
@@ -455,24 +460,225 @@ select option{background:#1a2b45;color:#c8d8e8}
 .fld-verify-hint.ok{color:var(--teal)}
 .fld-verify-hint.no{color:var(--slate2)}
 
-@media(max-width:700px){
-  .panel{width:100%;border-right:none;height:auto;max-height:none;flex:none}
-  .body{flex-direction:column;overflow:auto}
-  .map-wrap{height:50vh;flex:none;min-height:320px}
-  .tab-body{max-height:60vh;overflow-y:auto}
-  header{padding:0 12px}
-  .logo-name{font-size:.85rem}
+/* ═══════════════════════════════════════════════════════════
+   MOBILE-FIRST RESPONSIVE — full overhaul for ≤768px
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Tablet (≤900px) — narrow panel ── */
+@media(max-width:900px){
+  .panel{width:320px}
   .logo-sub{display:none}
-  .stats-banner{padding:6px 12px;gap:8px}
-  .stat-sep:nth-child(n+4){display:none}
-  .map-filter-bar{bottom:8px;left:8px;right:8px}
-  .mfb-input{width:140px;font-size:.74rem}
+  .stat-sep:nth-child(n+8){display:none}
+  .stat-pill:nth-child(n+8){display:none}
 }
-@media(max-width:480px){
-  .panel{width:100%}
-  .type-grid{grid-template-columns:1fr 1fr}
-  .map-wrap{height:45vh}
-  .logo-shield{width:26px;height:26px;font-size:.6rem}
+
+/* ── Mobile (≤768px) — bottom-sheet layout ── */
+@media(max-width:768px){
+
+  /* Header — compact single row */
+  header{
+    height:48px;padding:0 12px;
+    position:sticky;top:0;z-index:200;
+  }
+  .logo-name{font-size:.78rem;letter-spacing:.04em}
+  .logo-sub{display:none}
+  .live-dot{display:none}
+  .count-badge{font-size:.58rem;padding:2px 7px}
+  .member-link,.donate-link{font-size:.62rem;padding:3px 8px}
+  #themeToggle{padding:3px 8px;font-size:.58rem}
+
+  /* Stats banner — single scrollable row */
+  .stats-banner{
+    padding:5px 12px;gap:6px;
+    overflow-x:auto;flex-wrap:nowrap;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .stats-banner::-webkit-scrollbar{display:none}
+  .stat-sep:nth-child(n+6){display:none}
+  .stat-pill:nth-child(n+6){display:none}
+  .stat-pill{font-size:.58rem;white-space:nowrap}
+
+  /* Body — full height stack */
+  .body{
+    flex-direction:column;
+    overflow:hidden;
+    position:relative;
+    height:calc(100dvh - 48px - 34px); /* minus header and stats */
+  }
+
+  /* Map — fills top portion, stays sticky */
+  .map-wrap{
+    flex:none;
+    height:42dvh;
+    min-height:240px;
+    position:relative;
+    z-index:1;
+  }
+
+  /* Map filter bar — tighter on mobile */
+  .map-filter-bar{bottom:60px;left:8px;right:8px;gap:4px}
+  .mfb-input{width:130px;font-size:.72rem;padding:5px 9px}
+  .mfb-select{font-size:.72rem;padding:5px 8px}
+
+  /* Bottom sheet panel */
+  .panel{
+    width:100%;
+    border-right:none;
+    border-top:1px solid var(--border);
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    position:relative;
+    border-radius:16px 16px 0 0;
+    margin-top:-16px; /* overlap map slightly */
+    z-index:50;
+    background:var(--navy2);
+    box-shadow:0 -8px 32px rgba(0,0,0,.4);
+    /* Allow sheet to be dragged up */
+    transition:flex .25s ease;
+  }
+
+  /* Sheet drag handle */
+  .panel::before{
+    content:'';
+    display:block;
+    width:36px;height:4px;
+    background:var(--border2);
+    border-radius:2px;
+    margin:10px auto 0;
+    flex-shrink:0;
+  }
+
+  /* Tabs — touch-sized */
+  .tabs{border-bottom:1px solid var(--border2);flex-shrink:0;padding:0 4px}
+  .tab{
+    padding:10px 8px;
+    font-size:.72rem;
+    min-height:44px; /* iOS touch target */
+  }
+
+  /* Tab body — scrollable */
+  .tab-body{
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:14px;
+    overscroll-behavior:contain;
+  }
+
+  /* Form elements — larger touch targets */
+  .fld input,.fld textarea,.fld select{
+    font-size:16px !important; /* prevents iOS zoom on focus */
+    padding:11px 13px;
+    min-height:44px;
+  }
+  .fld textarea{min-height:90px;font-size:16px !important}
+  .fld label{font-size:.55rem;margin-bottom:6px}
+
+  /* Type grid — 2 columns, bigger tap targets */
+  .type-grid{
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+  }
+  .type-btn{
+    padding:10px 8px;
+    font-size:.78rem;
+    min-height:48px;
+  }
+  .type-icon{font-size:1.1rem}
+
+  /* Address search button — bigger */
+  #geocodeAddrBtn{
+    padding:10px 14px !important;
+    font-size:1rem !important;
+    min-height:44px;
+  }
+
+  /* Section labels */
+  .sec-label{font-size:.58rem;margin-bottom:10px}
+
+  /* Sections */
+  .section{margin-bottom:18px}
+
+  /* Submit button — full width, thumb-friendly */
+  .submit-btn-wrap .submit-btn,
+  button[onclick="submitReport()"]{
+    min-height:52px;
+    font-size:.92rem;
+    letter-spacing:.12em;
+  }
+
+  /* Captain panel — horizontal scroll on mobile */
+  #captainsPanel .captain-scroll{
+    display:flex;flex-direction:row;
+    overflow-x:auto;gap:10px;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding-bottom:4px;
+  }
+  #captainsPanel .captain-scroll::-webkit-scrollbar{display:none}
+
+  /* Pin hint text — smaller */
+  .pin-hint{font-size:.7rem}
+
+  /* Coords bar */
+  .coords{font-size:.6rem}
+
+  /* Disclaimer boxes — compact */
+  .disc-emergency,.disc-notice,.disc-suspect-note,.disc-privacy{
+    padding:9px 11px;margin-bottom:12px;
+  }
+  .disc-emergency .disc-text,.disc-notice .disc-text{font-size:.72rem}
+
+  /* Incident list cards */
+  .card{padding:10px 12px}
+  .card-type{font-size:.72rem}
+  .card-desc{font-size:.75rem;-webkit-line-clamp:2}
+
+  /* Toast — full width bottom */
+  .toast{
+    left:12px;right:12px;bottom:16px;
+    min-width:0;max-width:none;
+    font-size:.8rem;
+  }
+
+  /* Modal — full screen on small devices */
+  .modal-overlay .modal{
+    max-width:100% !important;
+    max-height:92dvh !important;
+    border-radius:16px 16px 0 0 !important;
+    position:fixed !important;
+    bottom:0 !important;
+    left:0 !important;
+    right:0 !important;
+    margin:0 !important;
+    overflow-y:auto;
+  }
+  .modal-overlay{align-items:flex-end !important}
+
+  /* Thank you modal */
+  .ty-overlay .ty-card{
+    border-radius:16px 16px 0 0;
+    position:fixed;bottom:0;left:0;right:0;
+    max-width:100%;
+    padding:32px 20px 40px;
+  }
+  .ty-overlay{align-items:flex-end}
+
+  /* Lightbox */
+  .lightbox img,.lightbox video{max-width:100vw;max-height:85dvh}
+}
+
+/* ── Small phones (≤390px) ── */
+@media(max-width:390px){
+  .logo-name{font-size:.7rem}
+  .member-link,.donate-link{display:none} /* save space on tiny screens */
+  .map-wrap{height:38dvh;min-height:200px}
+  .type-btn{font-size:.72rem;padding:8px 6px;min-height:44px}
+  .tab{font-size:.65rem;padding:9px 4px}
+  .tab-body{padding:10px}
 }
 
 /* ── District overlay labels ─────────────────────────────── */
@@ -2119,7 +2325,27 @@ function toggleTheme() {
   }
 })();
 
-</script>
+// ── Mobile UX enhancements ──────────────────────────────────
+(function mobileUX() {
+  // Invalidate Leaflet map size when panel resizes (bottom sheet layout)
+  if (typeof ResizeObserver !== 'undefined') {
+    const panel = document.querySelector('.panel');
+    const ro = new ResizeObserver(() => {
+      if (window.map) window.map.invalidateSize();
+    });
+    if (panel) ro.observe(panel);
+  }
+  // Invalidate map on orientation change
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => { if (window.map) window.map.invalidateSize(); }, 350);
+  });
+  // Resize also triggers map invalidation
+  window.addEventListener('resize', () => {
+    setTimeout(() => { if (window.map) window.map.invalidateSize(); }, 200);
+  });
+})();
+
+
 <!-- THANK YOU MODAL -->
 <div class="overlay" id="thankYouOverlay" onclick="if(event.target===this)closeThankYou()" style="display:none;z-index:9999">
   <div class="modal" style="max-width:420px;text-align:center;padding:0;overflow:hidden">
