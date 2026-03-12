@@ -532,6 +532,24 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
 .page-footer a:hover{color:var(--teal)}
 .leaflet-dragging .leaflet-grab { cursor: grabbing !important; }
 .leaflet-marker-draggable { cursor: grab; }
+/* ── Google Translate widget overrides ── */
+.goog-te-gadget { font-family: 'IBM Plex Mono', monospace !important; font-size: 0 !important; }
+.goog-te-gadget .goog-te-combo {
+  background: rgba(0,201,167,.08) !important;
+  border: 1px solid rgba(0,201,167,.25) !important;
+  border-radius: 6px !important;
+  color: var(--teal) !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: .65rem !important;
+  padding: 4px 8px !important;
+  cursor: pointer !important;
+  outline: none !important;
+  max-width: 130px;
+}
+.goog-te-gadget .goog-te-combo:hover { background: rgba(0,201,167,.15) !important; }
+.goog-logo-link, .goog-te-gadget span { display: none !important; }
+.goog-te-banner-frame { display: none !important; }
+body { top: 0 !important; }
 </style>
 </head>
 <body>
@@ -557,6 +575,8 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
     <div class="header-right">
       <div class="live-dot"><span class="dot"></span>LIVE</div>
       <div class="count-badge" id="countBadge">0 incidents</div>
+      <!-- Google Translate widget -->
+      <div id="google_translate_element" style="display:flex;align-items:center"></div>
       <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border2)'">🌙</button>
       <a href="https://form.jotform.com/260695751808064" target="_blank" rel="noopener" class="donate-link">💛 Donate</a>
       <a href="apply.html" class="member-link">✅ Join</a>
@@ -1864,5 +1884,17 @@ function toggleTheme() {
 })();
 
 </script>
+<!-- Google Translate -->
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    includedLanguages: 'ja,tl,es,ko,zh-CN,zh-TW,chk,pon,fr,de,pt,vi,th,ar,ru',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
