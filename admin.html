@@ -525,33 +525,43 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
       <div class="login-sub">Hawaii Island Business Crime Watch</div>
     </div>
 
-    <!-- Tab switcher -->
-    <div style="display:flex;border:1px solid var(--b2);border-radius:7px;overflow:hidden;margin-bottom:18px">
-      <button id="tabAdmin" onclick="switchLoginTab('admin')" style="flex:1;padding:8px;background:var(--teal);color:var(--navy);border:none;cursor:pointer;font-family:Rajdhani,sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.04em;transition:all .2s">Admin</button>
-      <button id="tabCaptain" onclick="switchLoginTab('captain')" style="flex:1;padding:8px;background:transparent;color:var(--slate);border:none;cursor:pointer;font-family:Rajdhani,sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.04em;transition:all .2s">District Captain</button>
+    <!-- Unified login form -->
+    <div id="loginFormWrap">
+      <div class="login-field">
+        <label>Email Address</label>
+        <input type="email" id="authEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPassword').focus()">
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="authPassword" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doAuthLogin()">
+      </div>
+      <button class="login-btn" onclick="doAuthLogin()" id="loginBtn">Sign In →</button>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="showForgotPassword()" style="background:none;border:none;color:var(--slate);font-size:.75rem;cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans',sans-serif">Forgot password?</button>
+      </div>
     </div>
 
-    <!-- Admin login -->
-    <div id="loginAdmin">
+    <!-- Forgot password form -->
+    <div id="forgotWrap" style="display:none">
+      <div style="font-size:.8rem;color:var(--slate);margin-bottom:14px;line-height:1.6">Enter your email and we'll send you a link to reset your password.</div>
       <div class="login-field">
-        <label>Admin Password</label>
-        <input type="password" id="pwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+        <label>Email Address</label>
+        <input type="email" id="resetEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doPasswordReset()">
       </div>
-      <button class="login-btn" onclick="doLogin()">Sign In →</button>
+      <button class="login-btn" onclick="doPasswordReset()" id="resetBtn">Send Reset Email →</button>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="showLoginForm()" style="background:none;border:none;color:var(--slate);font-size:.75rem;cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans',sans-serif">← Back to sign in</button>
+      </div>
     </div>
 
-    <!-- Captain login -->
-    <div id="loginCaptain" style="display:none">
+    <!-- Set new password form (shown after reset link click) -->
+    <div id="setPasswordWrap" style="display:none">
+      <div style="font-size:.8rem;color:var(--teal);margin-bottom:14px;line-height:1.6">✅ You're verified. Please set your new password.</div>
       <div class="login-field">
-        <label>Your Email Address</label>
-        <input type="email" id="captainEmail" placeholder="Enter your captain email" onkeydown="if(event.key==='Enter')document.getElementById('captainPin').focus()">
+        <label>New Password</label>
+        <input type="password" id="newPasswordInput" placeholder="Choose a strong password" onkeydown="if(event.key==='Enter')doSetNewPassword()">
       </div>
-      <div class="login-field">
-        <label>Your PIN</label>
-        <input type="password" id="captainPin" placeholder="Enter your 4–6 digit PIN" maxlength="6" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')doCaptainLogin()">
-      </div>
-      <button class="login-btn" onclick="doCaptainLogin()">Sign In as Captain →</button>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);text-align:center;margin-top:10px;line-height:1.6">Your PIN is set by your HIBCW admin.<br>Contact them if you need help signing in.</div>
+      <button class="login-btn" onclick="doSetNewPassword()" id="setPasswordBtn">Set Password →</button>
     </div>
 
     <div class="login-err" id="loginErr"></div>
@@ -594,6 +604,7 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
       <button class="nav-btn admin-only"    id="nav-members"  onclick="showView('members')">✅ Members <span class="nav-count" id="nc-members">—</span></button>
       <button class="nav-btn"               id="nav-apps"      onclick="showView('apps')">📋 Applications <span class="nav-count" id="nc-apps">—</span></button>
       <button class="nav-btn"               id="nav-captain-dir" onclick="showView('captain-dir')">📇 Captains Directory</button>
+      <button class="nav-btn superadmin-only" id="nav-admins"  onclick="showView('admins')">🔐 Manage Admins</button>
       <button class="nav-btn"               id="nav-captains"  onclick="showView('captains')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="13" height="15" style="display:inline-block;vertical-align:middle;margin-right:5px;flex-shrink:0;margin-bottom:1px" aria-hidden="true"><path fill="currentColor" d="M24.21,70c0-.48-2.23-2.58-2.74-2.58-.2,0-.9-.4-1.56-.9-.86-.64-1.66-1-2.78-1.26-.87-.2-1.68-.3-1.8-.22-.12.07-.2.05-.16-.05.1-.35-.77-1.44-1.04-1.29-.14.08-.19.07-.1-.03.09-.1-.14-.6-.51-1.12-.94-1.31-1.13-2.14-.89-3.83.11-.78.31-2.29.45-3.36.13-1.06.45-2.68.7-3.6.54-1.96.46-2.79-.52-5.26-.5-1.26-.68-2.09-.69-3.22-.01-1.48-.03-1.52-.65-1.65-.98-.2-1.89-2.24-2.05-4.59-.14-2.05-.49-2.72-1.8-3.43-.44-.23-.83-.62-.88-.86-.05-.24-.38-.84-.74-1.33-.87-1.2-1.01-2.09-.55-3.59.6-1.98.95-2.52,2.65-4.06,1.16-1.05,1.85-1.5,2.44-1.6.76-.12.85-.22,1.08-1.18.4-1.61.67-2,2.72-3.96,1.39-1.33,1.91-1.98,1.91-2.39,0-.75-.84-2.11-1.17-1.9-.16.1-.2.06-.1-.09.09-.14-.29-.84-.84-1.57-1.71-2.26-1.97-2.96-1.97-5.32s.53-3.73,1.58-4.02c.98-.27,2.84-.13,3.63.28.41.21.9.33,1.08.26.18-.07.28-.04.21.06-.06.1.16.33.5.51.34.18.92.65,1.3,1.05.38.4,1.35,1.05,2.16,1.44.81.39,1.84,1.04,2.27,1.45,1.26,1.18,2.57,1.8,3.47,1.66,1.86-.3,5.2.87,11.57,4.06,5.03,2.52,6.46,3.46,8.82,5.86.93.94,1.78,1.66,1.88,1.59.11-.07.17-.03.14.07-.1.35.77,1.44,1.04,1.29.14-.08.19-.07.11.02-.08.09,0,.52.17.94.27.64.28,1.06.06,2.36-.23,1.39-.21,1.66.12,2.17.45.68,1.21,1.02,2.3,1.02,1.63,0,2.61.97,2.61,2.59,0,1.11.34,1.9,1.32,3,.46.52,1.16,1.35,1.55,1.83.5.62,1.07,1.01,1.93,1.31.68.23,1.67.67,2.22.96.55.3,1.11.47,1.25.39.14-.08.2-.08.12.01-.08.09-.01.53.14.98.66,1.91-.45,3.43-3.33,4.61-1.51.62-2.09,1.01-3.17,2.14-.72.76-1.26,1.46-1.2,1.57.06.1.03.16-.07.14s-.95.32-1.89.77c-.94.45-2.06.97-2.5,1.15-.44.18-1.44.9-2.22,1.61-.78.7-1.69,1.34-2,1.42-.67.17-2.18.02-3.97-.38-1.76-.4-2.41-.17-3.86,1.39-.79.85-1.71,1.55-2.5,1.91-.69.31-1.95,1.19-2.8,1.94s-1.75,1.37-2,1.37c-.65,0-1.84.66-1.67.92.08.12.04.2-.08.16-.41-.12-1.68,1.23-2.13,2.25-.25.56-.4,1.07-.34,1.13.06.06-.12.35-.4.66-.28.3-.63.98-.79,1.5-.18.6-.74,1.43-1.51,2.23-.67.7-1.46,1.63-1.75,2.07-.6.91-1.77,1.26-1.77.54h0Z"/></svg>Districts</button>
     </nav>
 
@@ -864,6 +875,61 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
         <div id="captainsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:20px 24px"></div>
       </div>
 
+      <!-- ── MANAGE ADMINS ── -->
+      <div class="view" id="view-admins">
+        <div class="page-hd">
+          <div>
+            <div class="page-title">🔐 Manage Admins</div>
+            <div class="page-sub">Invite and manage admin and captain accounts — superadmin only</div>
+          </div>
+        </div>
+
+        <!-- Invite form -->
+        <div style="padding:16px 24px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div style="flex:1;min-width:200px">
+            <div class="fg-label" style="margin-bottom:5px">Email Address</div>
+            <input class="tb-search" type="email" id="inviteEmail" placeholder="invitee@example.com" style="width:100%" onkeydown="if(event.key==='Enter')sendInvite()">
+          </div>
+          <div style="min-width:180px">
+            <div class="fg-label" style="margin-bottom:5px">Role</div>
+            <select class="tb-select" id="inviteRole" style="width:100%;padding:8px 10px">
+              <option value="admin">Admin</option>
+              <option value="superadmin">Superadmin</option>
+              <option value="captain">District Captain</option>
+            </select>
+          </div>
+          <div id="inviteDistrictWrap" style="min-width:200px;display:none">
+            <div class="fg-label" style="margin-bottom:5px">District</div>
+            <select class="tb-select" id="inviteDistrict" style="width:100%;padding:8px 10px">
+              <option value="">— Select district…</option>
+            </select>
+          </div>
+          <button class="btn btn-teal btn-lg" onclick="sendInvite()" id="inviteBtn">✉️ Send Invite</button>
+        </div>
+        <div style="padding:6px 24px 0;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
+          The invitee will receive an email with a link to set their password. Captain invites are also linked to their district.
+        </div>
+
+        <!-- Admin list -->
+        <div style="padding:16px 24px 4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)">Current Accounts</div>
+        <div style="padding:0 24px 40px;overflow-x:auto">
+          <table class="member-table" id="adminsTable">
+            <thead>
+              <tr>
+                <th>Name / Email</th>
+                <th>Role</th>
+                <th>District</th>
+                <th>Last Sign In</th>
+                <th style="width:100px">Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminsGrid">
+              <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--slate)">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- ── CAPTAIN DIRECTORY ── -->
       <div class="view" id="view-captain-dir">
         <div class="page-hd">
@@ -1057,146 +1123,239 @@ function districtSelect(sel) {
    LOGIN
 ════════════════════════════════════════════════════ */
 
-// Current session role: 'admin' | 'captain'
-let currentRole = 'admin';
-let captainDistrict = null; // district id for captain session
+// Current session role: 'superadmin' | 'admin' | 'captain'
+let currentRole = null;
+let captainDistrict = null;
+let currentUserEmail = null;
+let currentUserName  = null;
 
-function switchLoginTab(tab) {
-  const isAdmin = tab === 'admin';
-  document.getElementById('loginAdmin').style.display   = isAdmin ? 'block' : 'none';
-  document.getElementById('loginCaptain').style.display = isAdmin ? 'none'  : 'block';
-  document.getElementById('tabAdmin').style.background   = isAdmin ? 'var(--teal)' : 'transparent';
-  document.getElementById('tabAdmin').style.color        = isAdmin ? 'var(--navy)'  : 'var(--slate)';
-  document.getElementById('tabCaptain').style.background = isAdmin ? 'transparent' : 'var(--gold)';
-  document.getElementById('tabCaptain').style.color      = isAdmin ? 'var(--slate)' : 'var(--navy)';
+/* ── Login form helpers ───────────────────────────────────── */
+function showLoginForm() {
+  document.getElementById('loginFormWrap').style.display = '';
+  document.getElementById('forgotWrap').style.display    = 'none';
+  document.getElementById('setPasswordWrap').style.display = 'none';
   document.getElementById('loginErr').style.display = 'none';
 }
-
-async function doLogin() {
-  const pw = document.getElementById('pwInput').value;
-  const errEl = document.getElementById('loginErr');
-  if (pw === ADMIN_PASSWORD) {
-    currentRole = 'admin';
-    captainDistrict = null;
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appShell').classList.add('visible');
-    applyRoleUI();
-    await initApp();
-  } else {
-    errEl.textContent = 'Incorrect password. Try again.';
-    errEl.style.display = 'block';
-    document.getElementById('pwInput').value = '';
-    document.getElementById('pwInput').focus();
-  }
+function showForgotPassword() {
+  document.getElementById('loginFormWrap').style.display = 'none';
+  document.getElementById('forgotWrap').style.display    = '';
+  document.getElementById('setPasswordWrap').style.display = 'none';
+  document.getElementById('loginErr').style.display = 'none';
+  document.getElementById('resetEmail').value = document.getElementById('authEmail').value || '';
 }
 
-async function doCaptainLogin() {
-  const email = (document.getElementById('captainEmail').value || '').trim().toLowerCase();
-  const pin   = (document.getElementById('captainPin').value   || '').trim();
-  const errEl = document.getElementById('loginErr');
+/* ── Main auth login ──────────────────────────────────────── */
+async function doAuthLogin() {
+  const email    = (document.getElementById('authEmail').value    || '').trim().toLowerCase();
+  const password = (document.getElementById('authPassword').value || '').trim();
+  const errEl    = document.getElementById('loginErr');
+  const btn      = document.getElementById('loginBtn');
   errEl.style.display = 'none';
 
-  if (!email) { errEl.textContent = 'Please enter your email address.'; errEl.style.display = 'block'; return; }
-  if (!pin)   { errEl.textContent = 'Please enter your PIN.';           errEl.style.display = 'block'; return; }
-  if (!/^\d{4,6}$/.test(pin)) { errEl.textContent = 'PIN must be 4–6 digits.'; errEl.style.display = 'block'; return; }
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.style.display = 'block'; return;
+  }
 
-  // Need Supabase to check — init client first
   if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
-    errEl.textContent = 'App not configured yet (check config.js).'; errEl.style.display = 'block'; return;
+    errEl.textContent = 'App not configured yet — check config.js.';
+    errEl.style.display = 'block'; return;
   }
   if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  btn.disabled = true; btn.textContent = 'Signing in…';
+
   try {
-    // Look up approved captain record by email — fetch captain_pin for verification
-    const { data, error } = await sb
-      .from('member_applications')
-      .select('email, full_name, district, captain_name, captain_pin')
-      .eq('status', 'approved')
-      .ilike('email', email)
-      .not('captain_name', 'is', null)
-      .not('captain_name', 'eq', '')
-      .limit(1);
+    const { data: authData, error: authErr } = await sb.auth.signInWithPassword({ email, password });
+    if (authErr) throw authErr;
 
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
-      errEl.textContent = 'No captain account found for that email. Contact your HIBCW admin.';
-      errEl.style.display = 'block';
-      return;
-    }
-
-    const captain = data[0];
-
-    // Verify PIN — must be set and must match
-    if (!captain.captain_pin) {
-      errEl.textContent = 'No PIN has been set for your account. Contact your HIBCW admin.';
-      errEl.style.display = 'block';
-      return;
-    }
-    if (String(captain.captain_pin).trim() !== pin) {
-      errEl.textContent = 'Incorrect PIN. Try again or contact your admin.';
-      errEl.style.display = 'block';
-      document.getElementById('captainPin').value = '';
-      document.getElementById('captainPin').focus();
-      return;
-    }
-
-    currentRole = 'captain';
-    captainDistrict = captain.district;
-
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appShell').classList.add('visible');
-    applyRoleUI();
-
-    // Update header
-    const distLabel = DISTRICTS.find(([v]) => v === captainDistrict)?.[1] || captainDistrict;
-    document.getElementById('hdUser').textContent = '👮 ' + (captain.captain_name || captain.full_name);
-    document.getElementById('captainBadge').style.display = 'block';
-    document.getElementById('captainBadge').title = 'Captain of ' + distLabel;
-
-    await initApp();
-    // Auto-navigate to their district view
-    showView('captains');
-
+    await handleAuthSession(authData.session);
   } catch(e) {
-    errEl.textContent = 'Login error: ' + e.message;
+    errEl.textContent = e.message || 'Sign-in failed. Check your email and password.';
     errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In →';
   }
 }
 
+/* ── Handle session after login or page load ─────────────── */
+async function handleAuthSession(session) {
+  if (!session) return;
+  if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const userId = session.user.id;
+  const email  = session.user.email;
+
+  // Look up role in admin_roles table
+  const { data: roleData, error: roleErr } = await sb
+    .from('admin_roles')
+    .select('role, full_name, district')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (roleErr || !roleData) {
+    // User exists in auth but has no role — sign them out
+    await sb.auth.signOut();
+    const errEl = document.getElementById('loginErr');
+    errEl.textContent = 'Your account has no assigned role. Contact your HIBCW superadmin.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  currentRole      = roleData.role;           // 'superadmin' | 'admin' | 'captain'
+  currentUserEmail = email;
+  currentUserName  = roleData.full_name || email;
+  captainDistrict  = roleData.district || null;
+
+  // Enter the app
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').classList.add('visible');
+  applyRoleUI();
+
+  // Update header user display
+  const roleLabel = currentRole === 'superadmin' ? '⭐ Superadmin'
+                  : currentRole === 'captain'    ? '👮 Captain'
+                  : '👤 Admin';
+  document.getElementById('hdUser').textContent = roleLabel + ': ' + currentUserName;
+
+  if (currentRole === 'captain') {
+    document.getElementById('captainBadge').style.display = 'block';
+    const distLabel = DISTRICTS.find(([v]) => v === captainDistrict)?.[1] || captainDistrict || '';
+    document.getElementById('captainBadge').title = 'Captain of ' + distLabel;
+  }
+
+  await initApp();
+  if (currentRole === 'captain') showView('captains');
+}
+
+/* ── Password reset ───────────────────────────────────────── */
+async function doPasswordReset() {
+  const email = (document.getElementById('resetEmail').value || '').trim().toLowerCase();
+  const errEl = document.getElementById('loginErr');
+  const btn   = document.getElementById('resetBtn');
+  errEl.style.display = 'none';
+
+  if (!email) { errEl.textContent = 'Please enter your email address.'; errEl.style.display = 'block'; return; }
+  if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.href
+    });
+    if (error) throw error;
+    errEl.style.cssText = 'display:block;color:var(--teal)';
+    errEl.textContent = '✅ Reset email sent! Check your inbox.';
+  } catch(e) {
+    errEl.textContent = e.message || 'Could not send reset email.';
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send Reset Email →';
+  }
+}
+
+async function doSetNewPassword() {
+  const password = (document.getElementById('newPasswordInput').value || '').trim();
+  const errEl    = document.getElementById('loginErr');
+  const btn      = document.getElementById('setPasswordBtn');
+  errEl.style.display = 'none';
+
+  if (!password || password.length < 8) {
+    errEl.textContent = 'Password must be at least 8 characters.';
+    errEl.style.display = 'block'; return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const { error } = await sb.auth.updateUser({ password });
+    if (error) throw error;
+    errEl.style.cssText = 'display:block;color:var(--teal)';
+    errEl.textContent = '✅ Password updated! Signing you in…';
+    setTimeout(async () => {
+      const { data } = await sb.auth.getSession();
+      if (data?.session) await handleAuthSession(data.session);
+    }, 1200);
+  } catch(e) {
+    errEl.textContent = e.message || 'Could not update password.';
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Set Password →';
+  }
+}
+
+/* ── Logout ───────────────────────────────────────────────── */
+async function logout() {
+  if (sb) await sb.auth.signOut();
+  currentRole      = null;
+  captainDistrict  = null;
+  currentUserEmail = null;
+  currentUserName  = null;
+  allIncidents     = [];
+  document.getElementById('appShell').classList.remove('visible');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('authEmail').value    = '';
+  document.getElementById('authPassword').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+  showLoginForm();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDstModal(); closeSetCaptainModal(); } });
+
+/* ── Check for existing session or password-reset redirect ── */
+(async function checkSession() {
+  if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) return;
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Handle password-reset / invite redirect (hash contains access_token)
+  const hash = window.location.hash;
+  if (hash && hash.includes('type=recovery')) {
+    // Supabase auto-handles the token — show set-password form
+    document.getElementById('loginFormWrap').style.display    = 'none';
+    document.getElementById('setPasswordWrap').style.display  = '';
+    return;
+  }
+  if (hash && hash.includes('type=invite')) {
+    document.getElementById('loginFormWrap').style.display    = 'none';
+    document.getElementById('setPasswordWrap').style.display  = '';
+    // Let Supabase handle the invite token
+    const { data } = await sb.auth.getSession();
+    if (data?.session) {
+      document.getElementById('setPasswordWrap').style.display = '';
+    }
+    return;
+  }
+
+  // Check for existing valid session
+  const { data } = await sb.auth.getSession();
+  if (data?.session) {
+    document.getElementById('loginScreen').style.display = 'none'; // hide briefly while loading
+    await handleAuthSession(data.session);
+  }
+})();
+
 function applyRoleUI() {
-  const isAdmin = currentRole === 'admin';
-  // Hide admin-only nav items
+  const isSuperadmin = currentRole === 'superadmin';
+  const isAdmin      = currentRole === 'admin' || isSuperadmin;
+  const isCaptain    = currentRole === 'captain';
+
+  // admin-only elements (hidden from captains)
   document.querySelectorAll('.admin-only').forEach(el => {
     el.style.display = isAdmin ? '' : 'none';
   });
-  // Hide admin-only action buttons throughout
+  // captain-hidden elements
   document.querySelectorAll('.captain-hidden').forEach(el => {
-    el.style.display = isAdmin ? '' : 'none';
+    el.style.display = isCaptain ? 'none' : '';
   });
-  // Show/hide captain badge in header
-  document.getElementById('captainBadge').style.display = isAdmin ? 'none' : 'block';
-  if (isAdmin) document.getElementById('hdUser').textContent = '👤 Admin';
-  // Show/hide captain welcome banner
+  // superadmin-only elements
+  document.querySelectorAll('.superadmin-only').forEach(el => {
+    el.style.display = isSuperadmin ? '' : 'none';
+  });
+  // Captain badge in header
+  document.getElementById('captainBadge').style.display = isCaptain ? 'block' : 'none';
+  // Captain welcome banner
   const banner = document.getElementById('captainWelcomeBanner');
-  if (banner) banner.style.display = isAdmin ? 'none' : 'block';
+  if (banner) banner.style.display = isCaptain ? 'block' : 'none';
 }
-
-function logout() {
-  currentRole = 'admin';
-  captainDistrict = null;
-  document.getElementById('appShell').classList.remove('visible');
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('pwInput').value = '';
-  document.getElementById('captainEmail').value = '';
-  document.getElementById('captainPin').value = '';
-  document.getElementById('loginErr').style.display = 'none';
-  allIncidents = [];
-  // Reset to admin tab
-  switchLoginTab('admin');
-}
-document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDstModal(); closeSetCaptainModal(); } });
 
 /* ════════════════════════════════════════════════════
    INIT
@@ -1309,6 +1468,8 @@ function showView(v) {
     renderCaptains();
   } else if (v === 'captain-dir') {
     renderCaptainDirectory();
+  } else if (v === 'admins') {
+    loadAdmins();
   } else {
     renderCurrentView();
   }
@@ -1892,7 +2053,7 @@ async function loadMembers() {
     // Fetch approved applications to enrich with full profile info
     const {data: apps} = await sb
       .from('member_applications')
-      .select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name,photo_url,captain_pin')
+      .select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name,photo_url')
       .eq('status','approved');
 
     // Build lookup map: email -> application data
@@ -2061,11 +2222,9 @@ function openEditMember(id) {
   const photoSection = document.getElementById('meCaptainPhotoSection');
   if (photoSection) photoSection.style.display = isCaptain ? '' : 'none';
 
-  // PIN group — show only for captains, admin-only field
+  // PIN group — removed (captains now use Supabase Auth)
   const pinGroup = document.getElementById('meCaptainPinGroup');
-  if (pinGroup) pinGroup.style.display = (isCaptain && currentRole === 'admin') ? '' : 'none';
-  const pinInput = document.getElementById('meCaptainPin');
-  if (pinInput) { pinInput.value = ''; pinInput.type = 'password'; } // always blank on open for security
+  if (pinGroup) pinGroup.style.display = 'none';
 
   if (isCaptain) {
     // Reset delete flag and file input
@@ -2135,12 +2294,6 @@ function meMarkPhotoDelete() {
   showToast('🗑', 'Photo will be removed when you save.');
 }
 
-function togglePinVisibility() {
-  const inp = document.getElementById('meCaptainPin');
-  if (!inp) return;
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
-
 
 function autoFillCaptainFromDistrict() {
   const district = document.getElementById('meDistrict')?.value;
@@ -2165,13 +2318,9 @@ async function saveMemberEdit() {
   const bizZip    = document.getElementById('meBizZip').value.trim();
   const district  = document.getElementById('meDistrict').value.trim();
   const captainName = document.getElementById('meCaptain').value.trim();
-  const newPin    = (document.getElementById('meCaptainPin')?.value || '').trim();
 
   if (!newEmail || !newEmail.includes('@')) {
     showToast('⚠️', 'A valid email address is required.', 'err'); return;
-  }
-  if (newPin && !/^\d{4,6}$/.test(newPin)) {
-    showToast('⚠️', 'PIN must be 4–6 digits (numbers only).', 'err'); return;
   }
 
   const btn = document.getElementById('meSaveBtn');
@@ -2233,8 +2382,6 @@ async function saveMemberEdit() {
     photo_url:        resolvedPhotoUrl || null,
     status:           'approved'
   };
-  // Only update PIN if a new one was entered — blank = keep existing
-  if (newPin) profile.captain_pin = newPin;
 
   // Check if an application record exists for this member
   const { data: existing } = await sb
@@ -2385,6 +2532,126 @@ function renderCaptains() {
       </div>
     </div>`;
   }).join('');
+}
+
+/* ════════════════════════════════════════════════════
+   MANAGE ADMINS
+════════════════════════════════════════════════════ */
+async function loadAdmins() {
+  const tbody = document.getElementById('adminsGrid');
+  if (!tbody || !sb) return;
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--slate)">Loading…</td></tr>';
+
+  // Populate invite district dropdown
+  const distSel = document.getElementById('inviteDistrict');
+  if (distSel && distSel.options.length <= 1) {
+    DISTRICTS.forEach(([v, l]) => {
+      const o = document.createElement('option'); o.value = v; o.textContent = l;
+      distSel.appendChild(o);
+    });
+  }
+  // Show/hide district field based on current role selection
+  const roleEl = document.getElementById('inviteRole');
+  if (roleEl) {
+    roleEl.onchange = () => {
+      const wrap = document.getElementById('inviteDistrictWrap');
+      if (wrap) wrap.style.display = roleEl.value === 'captain' ? '' : 'none';
+    };
+  }
+
+  try {
+    const { data, error } = await sb
+      .from('admin_roles')
+      .select('id, user_id, role, email, full_name, district, created_at, last_sign_in_at')
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    if (!data || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--slate2);font-style:italic">No admin accounts yet.</td></tr>';
+      return;
+    }
+
+    const roleColors = { superadmin: 'b-gold', admin: 'b-teal', captain: 'b-red' };
+    const roleLabels = { superadmin: '⭐ Superadmin', admin: '👤 Admin', captain: '👮 Captain' };
+
+    tbody.innerHTML = data.map(a => {
+      const isSelf    = a.email === currentUserEmail;
+      const distLabel = a.district ? (DISTRICTS.find(([v]) => v === a.district)?.[1] || a.district) : '—';
+      const lastSeen  = a.last_sign_in_at ? new Date(a.last_sign_in_at).toLocaleDateString() : 'Never';
+      return `<tr>
+        <td>
+          <div style="font-weight:500">${esc(a.full_name || '—')} ${isSelf ? '<span style="font-size:.65rem;color:var(--teal)">(you)</span>' : ''}</div>
+          <div style="font-family:IBM Plex Mono,monospace;font-size:.68rem;color:var(--slate)">${esc(a.email)}</div>
+        </td>
+        <td><span class="badge ${roleColors[a.role] || 'b-teal'}">${roleLabels[a.role] || a.role}</span></td>
+        <td style="font-size:.8rem;color:var(--slate)">${esc(distLabel)}</td>
+        <td style="font-family:IBM Plex Mono,monospace;font-size:.68rem;color:var(--slate2)">${lastSeen}</td>
+        <td>
+          ${!isSelf ? `<button class="btn btn-red" style="font-size:.65rem;padding:3px 9px" onclick="removeAdmin('${a.id}','${esc(a.email)}')">Remove</button>` : '<span style="font-size:.7rem;color:var(--slate2)">—</span>'}
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--red)">${esc(e.message)}</td></tr>`;
+  }
+}
+
+async function sendInvite() {
+  const email    = (document.getElementById('inviteEmail').value || '').trim().toLowerCase();
+  const role     = document.getElementById('inviteRole').value;
+  const district = document.getElementById('inviteDistrict')?.value || null;
+  const btn      = document.getElementById('inviteBtn');
+
+  if (!email || !email.includes('@')) { showToast('⚠️', 'Enter a valid email address.', 'err'); return; }
+  if (role === 'captain' && !district) { showToast('⚠️', 'Please select a district for this captain.', 'err'); return; }
+
+  btn.disabled = true; btn.textContent = '⏳ Sending…';
+
+  try {
+    // Step 1 — Create the Supabase Auth user (signUp with random temp password)
+    // If the user already exists this will fail gracefully — we just update the role record
+    const tempPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + 'A1!';
+    const { data: signUpData } = await sb.auth.signUp({ email, password: tempPassword });
+    const userId = signUpData?.user?.id || null;
+
+    // Step 2 — Upsert role record in admin_roles
+    const roleRecord = {
+      email,
+      role,
+      district: role === 'captain' ? district : null,
+      full_name: null,
+      ...(userId ? { user_id: userId } : {})
+    };
+    const { error: roleErr } = await sb.from('admin_roles').upsert(roleRecord, { onConflict: 'email' });
+    if (roleErr) throw roleErr;
+
+    // Step 3 — Send password reset email (acts as the invite / set-password link)
+    const { error: resetErr } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.href
+    });
+    if (resetErr) throw resetErr;
+
+    const roleLabel = role === 'superadmin' ? 'Superadmin' : role === 'captain' ? 'District Captain' : 'Admin';
+    showToast('✅', `Invite sent to ${email} as ${roleLabel}. They'll receive a set-password email.`);
+    document.getElementById('inviteEmail').value = '';
+    await loadAdmins();
+  } catch(e) {
+    showToast('⚠️', 'Invite failed: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = '✉️ Send Invite';
+  }
+}
+
+async function removeAdmin(id, email) {
+  if (!confirm(`Remove ${email} from admin access? They will no longer be able to sign in.`)) return;
+  try {
+    const { error } = await sb.from('admin_roles').delete().eq('id', id);
+    if (error) throw error;
+    showToast('🗑', `${email} removed.`);
+    await loadAdmins();
+  } catch(e) {
+    showToast('⚠️', 'Remove failed: ' + e.message, 'err');
+  }
 }
 
 /* ─── Captain Photo Upload ───────────────────────────────── */
@@ -3789,15 +4056,6 @@ function admToggleHeat() {
       <div class="mf-group">
         <div class="mf-label">District Captain Name</div>
         <input class="tb-search" id="meCaptain" type="text" placeholder="Captain's full name" style="width:100%">
-      </div>
-      <!-- Captain PIN — only shown when member is a captain -->
-      <div class="mf-group" id="meCaptainPinGroup" style="display:none">
-        <div class="mf-label">Captain Login PIN <span style="color:var(--slate2);font-weight:400;text-transform:none;letter-spacing:0">(4–6 digits)</span></div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input class="tb-search" id="meCaptainPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Set or update PIN…" style="width:100%;letter-spacing:.2em;font-size:1.1rem">
-          <button class="btn btn-ghost" type="button" style="flex-shrink:0;font-size:.7rem" onclick="togglePinVisibility()">👁</button>
-        </div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);margin-top:5px">Captains use this PIN + their email to sign in. Leave blank to keep the existing PIN.</div>
       </div>
       <input type="hidden" id="meId">
       <input type="hidden" id="meOrigEmail">
