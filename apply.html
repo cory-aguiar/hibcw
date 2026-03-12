@@ -403,6 +403,101 @@
         line-height: 1.7;
         max-width: 400px;
         margin: 0 auto 24px
+    }/* ── Thank You Modal ── */
+    .ty-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .7);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 20px;
+    }
+
+    .ty-overlay.open {
+        display: flex
+    }
+
+    .ty-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 40px 32px;
+        max-width: 440px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+        animation: tySlide .3s ease;
+    }
+
+    @keyframes tySlide {
+        from {
+            opacity: 0;
+            transform:translateY(20px)
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0)
+        }
+    }
+
+    .ty-emoji {
+        font-size: 3.2rem;
+        margin-bottom: 16px;
+        line-height: 1
+    }
+
+    .ty-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: var(--teal);
+        margin-bottom: 14px;
+        letter-spacing: .04em
+    }
+
+    .ty-body {
+        font-size: .88rem;
+        color: var(--slate);
+        line-height: 1.75;
+        margin-bottom: 8px
+    }
+
+    .ty-note {
+        background: rgba(0, 201, 167, .08);
+        border: 1px solid rgba(0, 201, 167, .2);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin: 18px 0;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .7rem;
+        color: var(--teal);
+        line-height: 1.6;
+    }
+
+    .ty-btn {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 11px 32px;
+        background: linear-gradient(135deg, var(--teal), #00a589);
+        color: #0b1524;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .9rem;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: filter .2s;
+    }
+
+    .ty-btn:hover {
+        filter: brightness(1.1)
     }/* ── Footer ── */
     .page-footer {
         text-align: center;
@@ -650,20 +745,41 @@
                 </button>
         </div>
 
-        <!-- Success state -->
-        <div class="success-box" id="successBox">
-            <div class="success-icon">✅</div>
-            <div class="success-title">Application Submitted!</div>
-            <div class="success-msg">
-                  Thank you for applying to join the Hawaii Island Business Crime Watch.
-                  KIAA staff will review your application and be in touch shortly.
-                  Once approved, your email will receive a verified member badge on all incident reports.
-                </div>
-            <a href="index.html" class="submit-btn" style="display:inline-block;width:auto;padding:12px 32px;text-decoration:none">
-                  ← Return to Map
-                </a>
-        </div>
+        <!-- Success state (hidden — modal takes over) -->
+        <div class="success-box" id="successBox" style="display:none"></div>
 
+    </div>
+
+    <!-- ── Thank You Modal ── -->
+    <div class="ty-overlay" id="tyOverlay">
+        <div class="ty-card">
+            <div class="ty-emoji">🤙🏼</div>
+            <div class="ty-title">Mahalo for Registering!</div>
+            <div class="ty-body">
+                  Thank you for joining the Hawaii Island Business Crime Watch network.
+                  Your application has been received and is now pending review by KIAA staff.
+                </div>
+            <div class="ty-note">
+
+                      ⏱ Approval can take up to 
+                <strong>48 hours</strong>
+                .
+                <br>
+
+                      ✉️ You will receive a confirmation email once your membership is approved.
+                    
+            </div>
+            <div class="ty-body" style="font-size:.8rem">
+
+                      Once approved, your incident reports will display a
+                <br>
+                <span style="background:rgba(0,201,167,.15);border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:1px 7px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.7rem">✅ Verified KIAA Member</span>
+
+                      badge.
+                    
+            </div>
+            <a href="index.html" class="ty-btn">← Return to Map</a>
+        </div>
     </div>
 
     <div class="page-footer">
@@ -748,9 +864,9 @@
             return;
         }
 
-        // Show success
+        // Show thank you modal
         document.getElementById('formCard').style.display = 'none';
-        document.getElementById('successBox').style.display = 'block';
+        document.getElementById('tyOverlay').classList.add('open');
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
