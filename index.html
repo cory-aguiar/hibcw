@@ -530,6 +530,8 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
 }
 .page-footer a{color:var(--slate);text-decoration:none}
 .page-footer a:hover{color:var(--teal)}
+.leaflet-dragging .leaflet-grab { cursor: grabbing !important; }
+.leaflet-marker-draggable { cursor: grab; }
 </style>
 </head>
 <body>
@@ -1005,39 +1007,87 @@ function setLayer(t) {
 
 // Pin placement marker
 let pinMarker = null;
-map.on('click', e => {
-  const {lat, lng} = e.latlng;
-  pendingPin = {lat, lng};
-  if (pinMarker) map.removeLayer(pinMarker);
-  pinMarker = L.circleMarker([lat, lng], {
-    radius:10, color:'#00c9a7', fillColor:'#00c9a7', fillOpacity:.35, weight:2
-  }).addTo(map);
-  document.getElementById('pinTxt').textContent = `Pin placed — drag to adjust`;
+
+// Shared function — updates pendingPin, coords bar, district badge, and reverse geocodes
+function updatePin(lat, lng, reverseGeocode) {
+  pendingPin = { lat, lng };
+
+  // Coords bar
   const bar = document.getElementById('coordsBar');
   bar.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
   bar.style.display = 'block';
 
-  // reverse geocode
-  fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
-    .then(r=>r.json())
-    .then(d=>{ if(d.display_name && !document.getElementById('fAddr').value.trim()) document.getElementById('fAddr').value = d.display_name.split(',').slice(0,3).join(',').trim(); })
-    .catch(()=>{});
-
-  // Auto-detect district
+  // District auto-detect
   const det = getDistrictForPoint(lat, lng);
   const badge = document.getElementById('districtBadge');
+  badge.style.display = 'inline-block';
   if (det) {
     badge.textContent = '📍 District: ' + det.label;
-    badge.style.display = 'inline-block';
+    badge.style.background   = 'rgba(0,201,167,.12)';
+    badge.style.borderColor  = 'rgba(0,201,167,.25)';
+    badge.style.color        = '#00c9a7';
     pendingPin.district = det.id;
   } else {
     badge.textContent = '⚠️ Location outside known districts';
-    badge.style.display = 'inline-block';
-    badge.style.background = 'rgba(245,166,35,.08)';
-    badge.style.borderColor = 'rgba(245,166,35,.25)';
-    badge.style.color = '#f5a623';
+    badge.style.background   = 'rgba(245,166,35,.08)';
+    badge.style.borderColor  = 'rgba(245,166,35,.25)';
+    badge.style.color        = '#f5a623';
     pendingPin.district = null;
   }
+
+  // Reverse geocode — only fill address if blank and requested
+  if (reverseGeocode) {
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.display_name && !document.getElementById('fAddr').value.trim())
+          document.getElementById('fAddr').value = d.display_name.split(',').slice(0,3).join(',').trim();
+      })
+      .catch(() => {});
+  }
+}
+
+// Custom draggable pin icon
+const pinIcon = L.divIcon({
+  className: '',
+  html: `<div style="
+    width:22px;height:22px;border-radius:50% 50% 50% 0;
+    background:#00c9a7;border:2.5px solid #fff;
+    transform:rotate(-45deg);
+    box-shadow:0 2px 8px rgba(0,0,0,.45);
+    cursor:grab;
+  "></div>`,
+  iconSize:   [22, 22],
+  iconAnchor: [11, 22],
+  popupAnchor:[0, -24]
+});
+
+map.on('click', e => {
+  const { lat, lng } = e.latlng;
+
+  // Create or move the draggable marker
+  if (pinMarker) {
+    pinMarker.setLatLng([lat, lng]);
+  } else {
+    pinMarker = L.marker([lat, lng], { icon: pinIcon, draggable: true }).addTo(map);
+
+    // Wire up drag events
+    pinMarker.on('dragstart', () => {
+      document.getElementById('pinTxt').textContent = 'Dragging pin…';
+    });
+    pinMarker.on('drag', e => {
+      const { lat, lng } = e.latlng;
+      document.getElementById('coordsBar').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    });
+    pinMarker.on('dragend', e => {
+      const { lat, lng } = e.target.getLatLng();
+      updatePin(lat, lng, true);
+      document.getElementById('pinTxt').textContent = 'Pin placed — drag to adjust';
+    });
+  }
+
+  document.getElementById('pinTxt').textContent = 'Pin placed — drag to adjust';
+  updatePin(lat, lng, true);
 });
 
 // Incident marker maker
