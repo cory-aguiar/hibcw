@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Use — HIBCW</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0b1524;--navy2:#111e30;--navy3:#18293f;
+  --teal:#00c9a7;--gold:#f5a623;--red:#e8415a;
+  --slate:#7a8fa6;--slate2:#4a6070;--white:#eef3f8;
+  --border:rgba(0,201,167,.15);--b2:rgba(255,255,255,.07);
+}
+/* ── Light mode ── */
+body.light{
+  --navy:#f0f4f8;--navy2:#ffffff;--navy3:#e8eef5;
+  --teal:#007a65;--gold:#b87c0a;--red:#c0273d;
+  --slate:#4a5f72;--slate2:#7a95a8;--white:#0f1e2e;
+  --border:rgba(0,122,101,.2);--b2:rgba(0,0,0,.1);
+}
+body.light header{background:linear-gradient(90deg,#dce8f5,#eaf1f8)!important;border-bottom-color:rgba(0,122,101,.2)!important}
+body.light .back-btn{border-color:rgba(0,0,0,.15);color:#4a5f72}
+body.light .back-btn:hover{border-color:#007a65;color:#007a65}
+body.light .doc-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .page-footer{border-top-color:rgba(0,0,0,.1)}
+
+html,body{min-height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
+header{
+  background:linear-gradient(90deg,#0b1524,#111e30);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.hd-left{display:flex;align-items:center;gap:10px}
+.logo-shield{
+  width:32px;height:32px;flex-shrink:0;
+  background:linear-gradient(160deg,#002266,#001133);
+  border:1.5px solid var(--gold);
+  clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani',sans-serif;font-size:.7rem;font-weight:700;color:var(--gold);
+}
+.logo-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.08em}
+.logo-sub{font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--teal);letter-spacing:.12em;text-transform:uppercase}
+.hd-right{display:flex;align-items:center;gap:10px}
+.back-btn{
+  background:none;border:1px solid var(--b2);border-radius:4px;
+  padding:5px 13px;color:var(--slate);font-size:.75rem;cursor:pointer;
+  text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:5px;
+}
+.back-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+.page{max-width:760px;margin:0 auto;padding:40px 24px 60px}
+.page-hero{margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--b2)}
+.page-badge{
+  display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.6rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--teal);
+  background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.2);
+  border-radius:4px;padding:3px 10px;margin-bottom:14px;
+}
+.page-title{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;letter-spacing:.04em;margin-bottom:8px}
+.page-meta{font-size:.78rem;color:var(--slate);font-family:'IBM Plex Mono',monospace}
+
+.doc-card{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:12px;padding:36px 40px;
+}
+.doc-section{margin-bottom:28px}
+.doc-section:last-child{margin-bottom:0}
+.doc-section h2{
+  font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--teal);
+  margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--b2);
+}
+.doc-section p{font-size:.88rem;line-height:1.75;color:var(--slate);margin-bottom:10px}
+.doc-section p:last-child{margin-bottom:0}
+.doc-section ul{padding-left:18px;margin-top:6px}
+.doc-section ul li{font-size:.88rem;line-height:1.75;color:var(--slate);margin-bottom:4px}
+.doc-section strong{color:var(--white)}
+.doc-section .alert{
+  background:rgba(232,65,90,.08);border:1px solid rgba(232,65,90,.25);
+  border-radius:6px;padding:12px 16px;margin:10px 0;
+  font-size:.85rem;font-weight:600;color:var(--red);
+}
+.doc-section a{color:var(--teal);text-decoration:none}
+.doc-section a:hover{text-decoration:underline}
+
+.page-footer{
+  text-align:center;padding:20px 24px;
+  font-size:.72rem;color:var(--slate2);border-top:1px solid var(--b2);
+  margin-top:40px;font-family:'IBM Plex Mono',monospace;
+}
+.page-footer a{color:var(--slate);text-decoration:none}
+.page-footer a:hover{color:var(--teal)}
+
+@media(max-width:600px){
+  .doc-card{padding:22px 18px}
+  .page{padding:24px 16px 40px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd-left">
+    <div class="logo-shield">HIBCW</div>
+    <div>
+      <div class="logo-name">Hawaii Island Business Crime Watch</div>
+      <div class="logo-sub">A Program of KIAA · kiaahilo.org</div>
+    </div>
+  </div>
+  <div class="hd-right">
+    <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
+    <a href="index.html" class="back-btn">← Back to Map</a>
+  </div>
+</header>
+
+<div class="page">
+  <div class="page-hero">
+    <div class="page-badge">Legal</div>
+    <div class="page-title">Terms of Use</div>
+    <div class="page-meta">Hawaii Island Business Crime Watch (HIBCW) &nbsp;·&nbsp; Effective Date: March 12, 2026</div>
+  </div>
+
+  <div class="doc-card">
+
+    <div class="doc-section">
+      <h2>1. Acceptance of Terms</h2>
+      <p>These Terms of Use ("Terms") govern your access to and use of the HIBCW incident reporting web application at hibcw.vercel.app, operated by KIAA (kiaahilo.org) as part of the Hawaii Island Business Crime Watch program. By accessing or using this site, you agree to be bound by these Terms. If you do not agree, do not use this site.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>2. Purpose of the Site</h2>
+      <p>HIBCW is a non-emergency community crime reporting tool designed to help Hawaii Island businesses and residents share information about local incidents for community awareness purposes. It is not an emergency service and is not monitored in real time.</p>
+      <div class="alert">⚠ FOR EMERGENCIES, CALL 911 IMMEDIATELY. Do not use this site to report crimes in progress or situations involving an immediate threat to life or safety.</div>
+      <p>Submitting a report through HIBCW does not constitute an official police report and does not notify the Hilo Police Department (HPD). To file an official police report, contact HPD at <a href="tel:8089353311">(808) 935-3311</a> or visit <a href="https://hawaiipolice.com" target="_blank">hawaiipolice.com</a>. For anonymous tips, contact Crime Stoppers at <a href="tel:8089618300">(808) 961-8300</a>.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>3. Eligibility</h2>
+      <p>You must be at least 18 years of age to submit an incident report. By submitting a report, you represent that you are 18 or older. This site may be viewed by users of all ages for community awareness purposes.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>4. Accuracy of Reports</h2>
+      <p>By submitting an incident report, you represent and warrant that:</p>
+      <ul>
+        <li>The information you provide is true, accurate, and based on your own direct observation or knowledge to the best of your ability.</li>
+        <li>You are not submitting a false, misleading, fabricated, or malicious report.</li>
+        <li>Any suspect descriptions you provide are based solely on your personal, direct observation and are not assumptions, stereotypes, or secondhand information.</li>
+        <li>You will not submit reports targeting specific individuals out of malice, personal disputes, or discriminatory intent.</li>
+      </ul>
+      <p>KIAA reserves the right to remove or archive any report it determines, in its sole discretion, to be false, misleading, defamatory, harassing, or submitted in bad faith.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>5. Prohibited Uses</h2>
+      <p>You agree not to use HIBCW to:</p>
+      <ul>
+        <li>Submit false, fabricated, or knowingly inaccurate incident reports</li>
+        <li>Harass, defame, or target any individual or group</li>
+        <li>Submit reports for purposes unrelated to legitimate community crime reporting</li>
+        <li>Upload content that is illegal, obscene, defamatory, or violates third-party rights</li>
+        <li>Attempt to gain unauthorized access to any part of the site or its underlying systems</li>
+        <li>Use automated tools, bots, or scrapers to access or extract data from the site</li>
+        <li>Submit content that includes sensitive personal data such as Social Security numbers, financial account details, or medical information</li>
+      </ul>
+    </div>
+
+    <div class="doc-section">
+      <h2>6. Content You Submit</h2>
+      <p>By submitting a report, you grant KIAA a non-exclusive, royalty-free license to display, share, archive, and use the content of your report (including photos and video) for purposes consistent with the HIBCW program, including sharing with law enforcement.</p>
+      <p>You retain ownership of any original content you submit, but you acknowledge that report content may be visible to the public and may be provided to law enforcement.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>7. No Guarantee of Action</h2>
+      <p>Submitting a report to HIBCW does not guarantee any response, follow-up, or law enforcement action. KIAA makes no representation that reports will be reviewed in any specific timeframe or that any particular outcome will result.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>8. Disclaimer of Warranties</h2>
+      <p>HIBCW and all content, data, and reports on this site are provided "as is" and "as available" without warranties of any kind, express or implied. KIAA makes no warranty that:</p>
+      <ul>
+        <li>The site will be available, uninterrupted, or error-free</li>
+        <li>Any incident reports are accurate, complete, or verified</li>
+        <li>The site is free from viruses or other harmful components</li>
+      </ul>
+      <p>Community-submitted reports are not independently verified by KIAA or law enforcement. Users should exercise their own judgment when relying on information published on this site.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>9. Limitation of Liability</h2>
+      <p>To the fullest extent permitted by law, KIAA and its officers, employees, agents, and program partners shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of HIBCW, including but not limited to reliance on unverified community reports, errors or omissions in report content, or inability to access the site.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>10. Indemnification</h2>
+      <p>You agree to indemnify and hold harmless KIAA, its officers, directors, and agents from and against any claims, damages, or expenses (including reasonable attorneys' fees) arising from your violation of these Terms, your submission of false or misleading reports, or your use of the site in violation of applicable law.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>11. Third-Party Links</h2>
+      <p>HIBCW may contain links to third-party websites such as <a href="https://hawaiipolice.com" target="_blank">hawaiipolice.com</a>, <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a>, or Crime Stoppers. These links are provided for convenience only. KIAA has no control over and assumes no responsibility for the content or practices of any third-party sites.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>12. Intellectual Property</h2>
+      <p>The HIBCW name, logo, site design, and original content are the property of KIAA. You may not reproduce, distribute, or create derivative works from site content without prior written permission.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>13. Governing Law</h2>
+      <p>These Terms shall be governed by and construed in accordance with the laws of the State of Hawaii, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be resolved in the courts of Hawaii County, Hawaii.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>14. Changes to These Terms</h2>
+      <p>KIAA reserves the right to modify these Terms at any time. The effective date at the top of this page reflects the most recent revision. Your continued use of the site after any changes constitutes acceptance of the updated Terms.</p>
+    </div>
+
+    <div class="doc-section">
+      <h2>15. Contact</h2>
+      <p>For questions about these Terms, please contact:<br>
+      <strong>KIAA / HIBCW Program Administrator</strong><br>
+      Website: <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a></p>
+    </div>
+
+  </div><!-- /doc-card -->
+</div><!-- /page -->
+
+<div class="page-footer">
+  Hawaii Island Business Crime Watch &nbsp;·&nbsp; hibcw.vercel.app &nbsp;·&nbsp; A Program of KIAA &nbsp;·&nbsp;
+  <a href="privacy.html">Privacy Statement</a> &nbsp;·&nbsp;
+  <a href="terms.html">Terms of Use</a> &nbsp;·&nbsp;
+  <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a>
+</div>
+
+<script>
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+}
+(function initTheme() {
+  const saved = localStorage.getItem('hibcw-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeToggle');
+      if (btn) btn.textContent = '☀️';
+    });
+  }
+})();
+</script>
+</body>
+</html>
