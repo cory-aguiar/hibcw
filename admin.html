@@ -867,6 +867,7 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
           </div>
           <div class="page-actions">
             <input type="text" class="tb-search" id="captainDirSearch" placeholder="🔍  Search name, district, phone…" oninput="renderCaptainDirectory()" style="min-width:220px">
+            <button class="btn btn-ghost btn-lg" onclick="printCaptainDirectory()" title="Print / Save as PDF">🖨 Print PDF</button>
           </div>
         </div>
         <div id="captainDirGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:20px 24px"></div>
@@ -2233,6 +2234,123 @@ function renderCaptains() {
       </div>
     </div>`;
   }).join('');
+}
+
+/* ─── Print Captain Directory ────────────────────────────── */
+function printCaptainDirectory() {
+  // Build the same data the directory view uses
+  const distCaptainMap = {};
+  DISTRICTS.forEach(([v]) => { distCaptainMap[v] = null; });
+  memberList.forEach(m => {
+    if (!m.district || !m.captain_name) return;
+    if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() && !distCaptainMap[m.district]) {
+      distCaptainMap[m.district] = m;
+    }
+  });
+  const distCaptainNameFallback = {};
+  memberList.forEach(m => {
+    if (m.district && m.captain_name && !distCaptainMap[m.district]) {
+      distCaptainNameFallback[m.district] = m.captain_name;
+    }
+  });
+
+  const rows = DISTRICTS.map(([v, fullLabel]) => {
+    const c   = distCaptainMap[v];
+    const fb  = distCaptainNameFallback[v];
+    const name    = c?.full_name || fb || '—';
+    const phone   = c?.phone   || '—';
+    const email   = c?.email   || '—';
+    const biz     = c?.business_name || '—';
+    const addr    = [c?.business_address, c?.business_city, c?.business_state, c?.business_zip].filter(Boolean).join(', ') || '—';
+    return `<tr>
+      <td class="dist">${esc(fullLabel)}</td>
+      <td>${esc(name)}</td>
+      <td>${esc(phone)}</td>
+      <td>${esc(email)}</td>
+      <td>${esc(biz)}</td>
+      <td>${esc(addr)}</td>
+    </tr>`;
+  }).join('');
+
+  const now = new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'});
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HIBCW District Captains Directory</title>
+<style>
+  @page { size: letter landscape; margin: 0.65in 0.6in; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt; color: #1a1a2e; background: #fff; }
+
+  /* Header */
+  .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2.5px solid #0b3d91; padding-bottom: 10px; margin-bottom: 18px; }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .shield { width: 38px; height: 38px; background: linear-gradient(160deg,#002266,#001133); border: 2px solid #c8960c; clip-path: polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%); display: flex; align-items: center; justify-content: center; font-size: 8pt; font-weight: 800; color: #c8960c; }
+  .org-name { font-size: 14pt; font-weight: 800; color: #0b3d91; letter-spacing: .04em; text-transform: uppercase; }
+  .org-sub  { font-size: 7.5pt; color: #555; letter-spacing: .08em; text-transform: uppercase; margin-top: 1px; }
+  .header-right { text-align: right; font-size: 8pt; color: #555; line-height: 1.6; }
+  .header-right strong { color: #0b3d91; font-size: 11pt; display: block; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #0b3d91; color: #fff; }
+  thead th { padding: 7px 10px; text-align: left; font-size: 8pt; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid #e0e4ea; }
+  tbody tr:nth-child(even) { background: #f4f7fb; }
+  tbody tr:last-child { border-bottom: 2px solid #0b3d91; }
+  td { padding: 7px 10px; vertical-align: top; line-height: 1.4; font-size: 9.5pt; }
+  td.dist { font-weight: 700; color: #0b3d91; white-space: nowrap; }
+  td.none { color: #aaa; font-style: italic; }
+
+  /* Footer */
+  .footer { margin-top: 14px; display: flex; justify-content: space-between; font-size: 7.5pt; color: #888; border-top: 1px solid #dde2ea; padding-top: 8px; }
+  .confidential { font-weight: 700; color: #c0392b; text-transform: uppercase; letter-spacing: .08em; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <div class="shield">HIBCW</div>
+      <div>
+        <div class="org-name">HIBCW</div>
+        <div class="org-sub">Hawaii Island Business Crime Watch</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <strong>District Captains Directory</strong>
+      Generated ${now}
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>District</th>
+        <th>Captain Name</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Business</th>
+        <th>Address</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+
+  <div class="footer">
+    <span class="confidential">🔒 Confidential — for internal use only</span>
+    <span>HIBCW District Captains Directory · ${now} · ${DISTRICTS.length} districts</span>
+  </div>
+
+  <script>window.onload = () => { window.print(); }<\/script>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank');
+  if (!win) { alert('Pop-up blocked — please allow pop-ups for this page and try again.'); return; }
+  win.document.write(html);
+  win.document.close();
 }
 
 /* ─── Captain Directory ─────────────────────────────────── */
