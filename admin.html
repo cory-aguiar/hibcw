@@ -572,6 +572,10 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
 <body>
 
 <!-- LOGIN -->
+<!-- Theme toggle — always visible -->
+<button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode"
+  style="position:fixed;top:14px;right:16px;z-index:99999;background:rgba(17,30,48,.7);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:1rem;color:#eef3f8;transition:all .2s;backdrop-filter:blur(4px)">🌙</button>
+
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
@@ -623,7 +627,6 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
         <span id="realtimeDot" style="width:7px;height:7px;border-radius:50%;background:var(--slate2);transition:background .5s;flex-shrink:0"></span>
         LIVE
       </div>
-      <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)'">🌙</button>
       <div class="hd-user" id="hdUser">👤 Admin</div>
       <div id="captainBadge" style="display:none;font-family:IBM Plex Mono,monospace;font-size:.62rem;padding:3px 10px;border-radius:4px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--gold)">CAPTAIN VIEW</div>
       <button class="logout-btn" onclick="logout()">Sign Out</button>
@@ -3247,18 +3250,21 @@ function admToggleHeat() {
 function toggleTheme() {
   const isLight = document.body.classList.toggle('light');
   localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
-  document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+  applyThemeButton(isLight);
+}
+function applyThemeButton(isLight) {
+  const btn = document.getElementById('themeToggle');
+  if (!btn) return;
+  btn.textContent = isLight ? '☀️' : '🌙';
+  btn.style.background = isLight ? 'rgba(240,244,248,.9)' : 'rgba(17,30,48,.7)';
+  btn.style.borderColor = isLight ? 'rgba(0,0,0,.15)' : 'rgba(255,255,255,.12)';
+  btn.style.color = isLight ? '#0f1e2e' : '#eef3f8';
 }
 (function initTheme() {
   const saved = localStorage.getItem('hibcw-theme');
-  if (saved === 'light') {
-    document.body.classList.add('light');
-    // Button may not exist yet at parse time — set after DOM ready
-    document.addEventListener('DOMContentLoaded', () => {
-      const btn = document.getElementById('themeToggle');
-      if (btn) btn.textContent = '☀️';
-    });
-  }
+  const isLight = saved === 'light';
+  if (isLight) document.body.classList.add('light');
+  document.addEventListener('DOMContentLoaded', () => applyThemeButton(isLight));
 })();
 
 </script>
