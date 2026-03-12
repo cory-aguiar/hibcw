@@ -2441,17 +2441,18 @@ function renderCaptains() {
   const grid = document.getElementById('captainsGrid');
   if (!grid) return;
 
-  // Build lookup: district -> {captain, members:[]}
+  // Build lookup: district -> {captain, captainMember, members:[]}
   const distMap = {};
-  DISTRICTS.forEach(([v]) => { distMap[v] = {captain: null, members: [], photo_url: null}; });
+  DISTRICTS.forEach(([v]) => { distMap[v] = {captain: null, captainMember: null, members: [], photo_url: null}; });
   memberList.forEach(m => {
     if (m.district && distMap[m.district]) {
       distMap[m.district].members.push(m);
       if (m.captain_name && !distMap[m.district].captain) {
         distMap[m.district].captain = m.captain_name;
-        // Also grab photo if this is the captain member
+        // Store full captain record if this member IS the captain
         if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()) {
-          distMap[m.district].photo_url = m.photo_url || null;
+          distMap[m.district].photo_url    = m.photo_url || null;
+          distMap[m.district].captainMember = m;
         }
       }
     }
@@ -2476,41 +2477,69 @@ function renderCaptains() {
   KIAA_DISTRICTS.forEach(d => { distColorMap[d.id] = d.color; });
 
   grid.innerHTML = DISTRICTS.map(([v, fullLabel]) => {
-    const info       = distMap[v] || {captain:null, members:[]};
-    const captain    = info.captain;
-    const memCount   = info.members.length;
-    const incCount   = incidentsByDistrict[v] || 0;
-    const hasCaptain  = !!captain;
-    const distColor   = distColorMap[v] || 'var(--teal)';
-    const num         = fullLabel.match(/\d+/)?.[0] || '';
-    const lastActive  = lastActiveByDistrict[v];
+    const info          = distMap[v] || {captain:null, captainMember:null, members:[]};
+    const captain       = info.captain;
+    const cm            = info.captainMember;  // full captain member record
+    const memCount      = info.members.length;
+    const incCount      = incidentsByDistrict[v] || 0;
+    const hasCaptain    = !!captain;
+    const distColor     = distColorMap[v] || 'var(--teal)';
+    const num           = fullLabel.match(/\d+/)?.[0] || '';
+    const lastActive    = lastActiveByDistrict[v];
     const lastActiveStr = lastActive ? ageTag(lastActive) : '—';
     const lastActiveColor = lastActive ? (() => {
       const days = (Date.now() - lastActive) / 86400000;
       return days < 7 ? 'var(--teal)' : days < 30 ? 'var(--gold)' : 'var(--slate)';
     })() : 'var(--slate2)';
 
-    const isMine = (currentRole === 'captain' && captainDistrict === v);
+    const isMine   = (currentRole === 'captain' && captainDistrict === v);
     const photoUrl = info.photo_url || null;
+    const canUpload = currentRole === 'admin' || currentRole === 'superadmin' || isMine;
+
+    // Captain contact details
+    const captainPhone = cm?.phone        || null;
+    const captainEmail = cm?.email        || null;
+    const captainBiz   = cm?.business_name || null;
+    const initials     = captain ? captain.split(' ').map(w=>w[0]).slice(0,2).join('') : '?';
+
+    // Avatar HTML
+    const avatarHtml = photoUrl
+      ? `<div style="position:relative;display:inline-block;${canUpload ? 'cursor:pointer;' : ''}" ${canUpload ? `onclick="triggerCaptainPhotoUpload('${v}')" title="Click to change photo"` : ''}>
+           <img src="${photoUrl}" alt="${initials}" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid ${distColor}66;display:block;box-shadow:0 4px 16px rgba(0,0,0,.35)">
+           ${canUpload ? `<div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:.65rem;color:#fff;font-weight:700" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">📷 Change</div>` : ''}
+         </div>`
+      : `<div style="width:96px;height:96px;border-radius:50%;background:${distColor}20;border:3px solid ${distColor}44;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-size:1.8rem;font-weight:700;color:${distColor};position:relative;${canUpload ? 'cursor:pointer;' : ''}" ${canUpload ? `onclick="triggerCaptainPhotoUpload('${v}')" title="Click to upload photo"` : ''}>
+           ${hasCaptain ? initials : '?'}
+           ${canUpload && hasCaptain ? `<div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:.65rem;color:#fff;font-weight:700" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">📷 Upload</div>` : ''}
+         </div>`;
+
     return `<div style="background:var(--navy2);border:1px solid ${isMine ? distColor : (hasCaptain ? 'rgba(0,201,167,.2)' : 'var(--b2)')};${isMine ? 'box-shadow:0 0 0 2px ' + distColor + '44' : ''};border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 0 0 2px ${distColor}66'" onmouseout="this.style.boxShadow='${isMine ? '0 0 0 2px ' + distColor + '44' : 'none'}'">
       ${isMine ? '<div style="font-family:IBM Plex Mono,monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:' + distColor + ';background:' + distColor + '15;border-radius:4px;padding:3px 8px;text-align:center;margin-bottom:-4px">★ Your District</div>' : ''}
 
-      <!-- Header row -->
+      <!-- Header row: district number + label -->
       <div style="display:flex;align-items:center;gap:12px">
         <div style="width:36px;height:36px;border-radius:8px;background:${distColor}22;border:1px solid ${distColor}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:800;font-size:1rem;color:${distColor};flex-shrink:0">${num}</div>
         <div style="min-width:0;flex:1">
           <div style="font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(fullLabel)}</div>
-          <div style="font-size:.72rem;color:var(--slate2);margin-top:1px">${hasCaptain ? '👮 ' + esc(captain) : '<span style="font-style:italic">No captain assigned</span>'}</div>
         </div>
       </div>
-      <!-- Captain photo — 96px card-style -->
-      ${photoUrl ? `
-      <div style="display:flex;justify-content:center;padding:4px 0 2px">
-        <div style="position:relative;display:inline-block" onclick="triggerCaptainPhotoUpload('${v}')" title="Click to change photo" style="cursor:pointer">
-          <img src="${photoUrl}" alt="" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid ${distColor}66;display:block;box-shadow:0 4px 16px rgba(0,0,0,.35)">
-          <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:.65rem;color:#fff;font-weight:700" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">📷 Change</div>
-        </div>
-      </div>` : ''}
+
+      <!-- Captain photo + info block -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:4px 0 2px">
+        ${avatarHtml}
+        ${hasCaptain ? `
+          <div style="text-align:center;width:100%">
+            <div style="font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;letter-spacing:.02em;margin-bottom:2px">👮 ${esc(captain)}</div>
+            ${captainBiz   ? `<div style="font-size:.72rem;color:var(--slate);margin-bottom:6px">🏢 ${esc(captainBiz)}</div>` : ''}
+            ${(captainPhone || captainEmail) ? `
+              <div style="display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:6px;border-top:1px solid ${distColor}22;padding-top:8px">
+                ${captainPhone ? `<a href="tel:${esc(captainPhone)}" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--white);transition:color .15s;font-family:IBM Plex Mono,monospace;font-size:.75rem" onmouseover="this.style.color='${distColor}'" onmouseout="this.style.color='var(--white)'"><span>📞</span>${esc(captainPhone)}</a>` : ''}
+                ${captainEmail ? `<a href="mailto:${esc(captainEmail)}" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--white);transition:color .15s;font-family:IBM Plex Mono,monospace;font-size:.72rem;word-break:break-all;text-align:center" onmouseover="this.style.color='${distColor}'" onmouseout="this.style.color='var(--white)'"><span style="flex-shrink:0">✉️</span>${esc(captainEmail)}</a>` : ''}
+              </div>
+            ` : '<div style="font-size:.7rem;color:var(--slate2);font-style:italic;margin-top:4px">No contact info on file</div>'}
+          </div>
+        ` : `<div style="font-size:.8rem;color:var(--slate2);font-style:italic">No captain assigned</div>`}
+      </div>
 
       <!-- Stats row -->
       <div style="display:flex;gap:8px">
@@ -2533,7 +2562,7 @@ function renderCaptains() {
         <button class="btn btn-ghost" style="flex:1;font-size:.75rem;padding:6px 10px;border-color:${distColor}44;color:${distColor}" onclick="openDistrictModal('${v}')">
           👥 Members
         </button>
-        ${currentRole === 'admin' ? `<button class="btn btn-ghost" style="flex:1;font-size:.75rem;padding:6px 10px;border-color:rgba(245,158,11,.3);color:var(--gold)" onclick="openSetCaptainModal('${v}')">
+        ${(currentRole === 'admin' || currentRole === 'superadmin') ? `<button class="btn btn-ghost" style="flex:1;font-size:.75rem;padding:6px 10px;border-color:rgba(245,158,11,.3);color:var(--gold)" onclick="openSetCaptainModal('${v}')">
           👮 Set Captain
         </button>` : ''}
       </div>
