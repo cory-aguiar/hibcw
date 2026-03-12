@@ -26,61 +26,6 @@
   --border:rgba(0,201,167,.15);
   --b2:    rgba(255,255,255,.07);
 }
-/* ── Light mode ───────────────────────────────────────────── */
-body.light{
-  --navy:  #f0f4f8;
-  --navy2: #ffffff;
-  --navy3: #e8eef5;
-  --teal:  #007a65;
-  --gold:  #b87c0a;
-  --red:   #c0273d;
-  --green: #1a9e50;
-  --slate: #4a5f72;
-  --slate2:#7a95a8;
-  --white: #0f1e2e;
-  --border:rgba(0,122,101,.2);
-  --b2:    rgba(0,0,0,.1);
-}
-body.light html,body.light body{background:var(--navy);color:var(--white)}
-body.light header{background:linear-gradient(90deg,#dce8f5,#eaf1f8)!important;border-bottom:1px solid rgba(0,122,101,.2)!important}
-body.light .sidebar{background:#e2ecf5;border-right:1px solid rgba(0,0,0,.08)}
-body.light .nav-btn{color:#2a4560}
-body.light .nav-btn:hover,.body.light .nav-btn.on{background:rgba(0,122,101,.12);color:#007a65}
-body.light .nav-btn.on{background:rgba(0,122,101,.15)!important;color:#007a65!important}
-body.light .main{background:#f0f4f8}
-body.light .page-hd{background:#f0f4f8;border-bottom:1px solid rgba(0,0,0,.08)}
-body.light .card,.body.light .inc-row{background:#fff;border-color:rgba(0,0,0,.1)}
-body.light .inc-row{border-bottom:1px solid rgba(0,0,0,.07)}
-body.light .inc-row:hover{background:#eaf3fb}
-body.light .tb-search,.body.light .tb-select,.body.light .tb-input,.body.light .app-filter-select{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
-body.light .tb-search,.body.light .member-search{background:#fff!important;border-color:rgba(0,0,0,.15)!important;color:#0f1e2e!important}
-body.light .member-search{background:#fff!important;color:#0f1e2e!important}
-body.light .btn-ghost{border-color:rgba(0,0,0,.2);color:#2a4560}
-body.light .btn-ghost:hover{border-color:#007a65;color:#007a65}
-body.light .modal-overlay,.body.light [style*="rgba(6,14,26"]{background:rgba(180,200,220,.85)!important}
-body.light .hd-shield,.body.light .login-shield,.body.light .page-shield{background:linear-gradient(160deg,#1a3a6e,#0d2145)!important}
-body.light .login-box{background:#fff;border-color:rgba(0,0,0,.12)}
-body.light .login-field input{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.15);color:#0f1e2e}
-body.light .login-field label{color:#4a5f72}
-body.light .hd-user{color:#2a4560}
-body.light .nav-section{color:#7a95a8}
-body.light .logout-btn{border-color:rgba(0,0,0,.15);color:#4a5f72}
-body.light .logout-btn:hover{border-color:#c0273d;color:#c0273d}
-body.light .bulk-bar{background:rgba(0,122,101,.08)}
-body.light .member-table thead tr{background:#dce8f5}
-body.light .member-table th{color:#4a5f72;border-color:rgba(0,0,0,.08)}
-body.light .member-table td{border-color:rgba(0,0,0,.06)}
-body.light .member-table tr:hover{background:#eaf3fb}
-body.light .stat-box{background:#fff;border-color:rgba(0,0,0,.1)}
-body.light .filter-panel{background:#e8eef5;border-color:rgba(0,0,0,.08)}
-body.light select option{background:#fff!important;color:#0f1e2e!important}
-body.light .app-card{background:#fff;border-color:rgba(0,0,0,.1)}
-body.light .app-card:hover{background:#f5f9fc}
-body.light .leaflet-container{background:#e8f0f8}
-body.light .leaflet-popup-content-wrapper{background:#fff;color:#0f1e2e;box-shadow:0 4px 20px rgba(0,0,0,.15)}
-body.light .leaflet-popup-tip{background:#fff}
-body.light .map-filter-bar{background:rgba(232,240,248,.95)!important;border-color:rgba(0,0,0,.1)!important}
-body.light .mfb-select{background:#fff!important;color:#0f1e2e!important;border-color:rgba(0,0,0,.15)!important}
 
 html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
 
@@ -572,10 +517,6 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
 <body>
 
 <!-- LOGIN -->
-<!-- Theme toggle — always visible -->
-<button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode"
-  style="position:fixed;top:14px;right:16px;z-index:99999;background:rgba(17,30,48,.7);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:1rem;color:#eef3f8;transition:all .2s;backdrop-filter:blur(4px)">🌙</button>
-
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
@@ -3244,28 +3185,7 @@ function admToggleHeat() {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js">
-/* ════════════════════════════════════════════════════
-   THEME TOGGLE
-════════════════════════════════════════════════════ */
-function toggleTheme() {
-  const isLight = document.body.classList.toggle('light');
-  localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
-  applyThemeButton(isLight);
-}
-function applyThemeButton(isLight) {
-  const btn = document.getElementById('themeToggle');
-  if (!btn) return;
-  btn.textContent = isLight ? '☀️' : '🌙';
-  btn.style.background = isLight ? 'rgba(240,244,248,.9)' : 'rgba(17,30,48,.7)';
-  btn.style.borderColor = isLight ? 'rgba(0,0,0,.15)' : 'rgba(255,255,255,.12)';
-  btn.style.color = isLight ? '#0f1e2e' : '#eef3f8';
-}
-(function initTheme() {
-  const saved = localStorage.getItem('hibcw-theme');
-  const isLight = saved === 'light';
-  if (isLight) document.body.classList.add('light');
-  document.addEventListener('DOMContentLoaded', () => applyThemeButton(isLight));
-})();
+
 
 </script>
 </body>
