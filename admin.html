@@ -2028,12 +2028,81 @@ function openEditMember(id) {
       '<option value="' + v + '"' + (String(m.district||'')===v?' selected':'') + '>' + l + '</option>'
     ).join('');
   document.getElementById('meCaptain').value  = m.captain_name || '';
+
+  // Photo section — show only if this member is a captain
+  const isCaptain = !!(m.captain_name && m.full_name &&
+    m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase());
+  const photoSection = document.getElementById('meCaptainPhotoSection');
+  if (photoSection) photoSection.style.display = isCaptain ? '' : 'none';
+
+  if (isCaptain) {
+    // Reset delete flag and file input
+    document.getElementById('mePhotoDeleteFlag').value = '0';
+    document.getElementById('mePhotoInput').value = '';
+    document.getElementById('mePhotoUrl').value = m.photo_url || '';
+    meUpdateAvatarPreview(m.photo_url || null, m.full_name || '');
+  }
+
+  // Wire hover overlay
+  const wrap = document.getElementById('meAvatarWrap');
+  const overlay = document.getElementById('meAvatarOverlay');
+  if (wrap && overlay) {
+    wrap.onmouseenter = () => { overlay.style.opacity = '1'; };
+    wrap.onmouseleave = () => { overlay.style.opacity = '0'; };
+  }
+
   document.getElementById('memberEditOverlay').style.display = 'flex';
 }
 
 function closeMemberEdit() {
   document.getElementById('memberEditOverlay').style.display = 'none';
 }
+
+function meUpdateAvatarPreview(photoUrl, fullName) {
+  const photoEl    = document.getElementById('meAvatarPhoto');
+  const initialsEl = document.getElementById('meAvatarInitials');
+  const deleteBtn  = document.getElementById('meDeletePhotoBtn');
+  if (!photoEl || !initialsEl) return;
+
+  const initials = fullName
+    ? fullName.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    : '—';
+
+  if (photoUrl) {
+    photoEl.src = photoUrl;
+    photoEl.style.display = 'block';
+    initialsEl.style.display = 'none';
+    if (deleteBtn) deleteBtn.style.display = '';
+  } else {
+    photoEl.src = '';
+    photoEl.style.display = 'none';
+    initialsEl.textContent = initials;
+    initialsEl.style.display = 'flex';
+    if (deleteBtn) deleteBtn.style.display = 'none';
+  }
+}
+
+function meHandlePhotoPreview(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('⚠️', 'Please select an image file.', 'err'); input.value=''; return; }
+  if (file.size > 4 * 1024 * 1024)    { showToast('⚠️', 'Image must be under 4 MB.', 'err'); input.value=''; return; }
+  // Show local preview
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('mePhotoDeleteFlag').value = '0';
+    meUpdateAvatarPreview(e.target.result, document.getElementById('meFullName').value);
+  };
+  reader.readAsDataURL(file);
+}
+
+function meMarkPhotoDelete() {
+  document.getElementById('mePhotoDeleteFlag').value = '1';
+  document.getElementById('mePhotoInput').value = '';
+  meUpdateAvatarPreview(null, document.getElementById('meFullName').value);
+  showToast('🗑', 'Photo will be removed when you save.');
+}
+
 
 function autoFillCaptainFromDistrict() {
   const district = document.getElementById('meDistrict')?.value;
@@ -2074,8 +2143,38 @@ async function saveMemberEdit() {
     btn.disabled = false; btn.textContent = '💾 Save Changes'; return;
   }
 
-  // 2. Upsert member_applications with profile fields (match on original email)
-  // Auto-fill captain if district is set but captain name is blank
+  // 2. Handle photo upload / deletion
+  let resolvedPhotoUrl = document.getElementById('mePhotoUrl')?.value || null;
+  const deleteFlag     = document.getElementById('mePhotoDeleteFlag')?.value === '1';
+  const photoFile      = document.getElementById('mePhotoInput')?.files?.[0];
+
+  if (deleteFlag && resolvedPhotoUrl) {
+    // Delete from storage
+    try {
+      const url  = new URL(resolvedPhotoUrl);
+      const path = url.pathname.split('/object/public/incident-media/')[1];
+      if (path) await sb.storage.from('incident-media').remove([path]);
+    } catch(e) { console.warn('Photo delete error:', e); }
+    resolvedPhotoUrl = null;
+  } else if (photoFile) {
+    // Upload new photo
+    try {
+      const districtId = district || 'unknown';
+      const ext  = photoFile.name.split('.').pop().toLowerCase() || 'jpg';
+      const path = `captain-photos/${districtId}.${ext}`;
+      // Remove old photo at any extension
+      const { data: existing } = await sb.storage.from('incident-media').list('captain-photos');
+      const old = (existing || []).find(f => f.name.startsWith(districtId + '.'));
+      if (old) await sb.storage.from('incident-media').remove([`captain-photos/${old.name}`]);
+      const { error: upErr } = await sb.storage.from('incident-media').upload(path, photoFile, { contentType: photoFile.type, upsert: true });
+      if (!upErr) {
+        const { data: urlData } = sb.storage.from('incident-media').getPublicUrl(path);
+        resolvedPhotoUrl = urlData?.publicUrl || resolvedPhotoUrl;
+      }
+    } catch(e) { console.warn('Photo upload error:', e); }
+  }
+
+  // 3. Upsert member_applications with profile fields (match on original email)
   const resolvedCaptain = captainName || (district ? getCaptainForDistrict(district) : null);
 
   const profile = {
@@ -2089,6 +2188,7 @@ async function saveMemberEdit() {
     business_zip:     bizZip    || null,
     district:         district  || null,
     captain_name:     resolvedCaptain || null,
+    photo_url:        resolvedPhotoUrl || null,
     status:           'approved'
   };
 
@@ -2106,7 +2206,7 @@ async function saveMemberEdit() {
     await sb.from('member_applications').insert(profile);
   }
 
-  // 3. Refresh list and close modal
+  // 4. Refresh list and close modal
   await loadMembers();
   closeMemberEdit();
   showToast('✅', `${newEmail} updated successfully.`);
@@ -3574,6 +3674,34 @@ function admToggleHeat() {
       <button class="modal-close" onclick="closeMemberEdit()">✕</button>
     </div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- Captain photo section — only visible when member is a captain -->
+      <div id="meCaptainPhotoSection" style="display:none">
+        <div class="mf-label" style="margin-bottom:8px">Captain Photo</div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <!-- Avatar preview -->
+          <div id="meAvatarWrap" style="position:relative;flex-shrink:0;cursor:pointer" onclick="document.getElementById('mePhotoInput').click()" title="Click to upload photo">
+            <!-- Photo (shown when photo_url exists) -->
+            <img id="meAvatarPhoto" src="" alt="" style="display:none;width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--teal)">
+            <!-- Initials fallback -->
+            <div id="meAvatarInitials" style="width:64px;height:64px;border-radius:50%;background:rgba(0,201,167,.15);border:2px dashed rgba(0,201,167,.4);display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-size:1.3rem;font-weight:700;color:var(--teal)">—</div>
+            <!-- Hover overlay -->
+            <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;pointer-events:none" id="meAvatarOverlay">
+              <span style="font-size:.65rem;color:#fff;font-weight:700;text-align:center;line-height:1.3">📷<br>Change</span>
+            </div>
+          </div>
+          <!-- Buttons -->
+          <div style="display:flex;flex-direction:column;gap:7px;flex:1">
+            <button class="btn btn-ghost" style="font-size:.72rem;text-align:left" onclick="document.getElementById('mePhotoInput').click()">📷 Upload Photo</button>
+            <button class="btn btn-red" id="meDeletePhotoBtn" style="font-size:.72rem;text-align:left;display:none" onclick="meMarkPhotoDelete()">🗑 Remove Photo</button>
+            <div style="font-size:.68rem;color:var(--slate2);line-height:1.5">JPG, PNG, or WebP · max 4 MB<br>Shown in Captains Directory</div>
+          </div>
+        </div>
+        <input type="hidden" id="mePhotoUrl">
+        <input type="hidden" id="mePhotoDeleteFlag" value="0">
+        <input type="file" id="mePhotoInput" accept="image/*" style="display:none" onchange="meHandlePhotoPreview(this)">
+      </div>
+
       <div class="mf-group">
         <div class="mf-label">Full Name</div>
         <input class="tb-search" id="meFullName" type="text" placeholder="Full name" style="width:100%">
