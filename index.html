@@ -1061,55 +1061,64 @@ async function geocodeAddress() {
   const addr = (document.getElementById('fAddr').value || '').trim();
   if (!addr || addr.length < 5) return;
 
-  const btn = document.getElementById('geocodeAddrBtn');
+  const btn    = document.getElementById('geocodeAddrBtn');
   const pinTxt = document.getElementById('pinTxt');
   btn.textContent = '⏳';
   btn.disabled = true;
   pinTxt.textContent = 'Looking up address…';
 
+  let latF = null, lngF = null;
+
   try {
-    // Bias results toward Hawaii Island
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr + ', Hawaii')}&format=json&limit=1&countrycodes=us&viewbox=-156.1,18.9,-154.7,20.4&bounded=0`;
-    const res  = await fetch(url);
-    const data = await res.json();
+    // ── Primary: US Census Bureau Geocoder (free, no key, great Hawaii coverage) ──
+    const censusUrl = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(addr)}&benchmark=2020&format=json`;
+    const censusRes  = await fetch(censusUrl);
+    const censusData = await censusRes.json();
+    const match = censusData?.result?.addressMatches?.[0];
 
-    if (!data || !data.length) {
-      pinTxt.textContent = '⚠️ Address not found — try adding a city or zip, or click the map';
-      btn.textContent = '🔍'; btn.disabled = false;
-      return;
+    if (match) {
+      latF = parseFloat(match.coordinates.y);
+      lngF = parseFloat(match.coordinates.x);
+      // Use the matched address to clean up the field
+      if (match.matchedAddress) document.getElementById('fAddr').value = match.matchedAddress;
     }
+  } catch(e) { /* Census failed — try fallback */ }
 
-    const { lat, lon, display_name } = data[0];
-    const latF = parseFloat(lat);
-    const lngF = parseFloat(lon);
-
-    // Place / move the pin
-    if (pinMarker) {
-      pinMarker.setLatLng([latF, lngF]);
-    } else {
-      pinMarker = L.marker([latF, lngF], { icon: pinIcon, draggable: true }).addTo(map);
-      wirePinDrag(pinMarker);
-    }
-
-    // Pan & zoom map to pin
-    map.setView([latF, lngF], 16);
-
-    // Update state, badge, coords — no reverse geocode needed (we already have the address)
-    updatePin(latF, lngF, false);
-    pinTxt.textContent = 'Pin placed — drag to adjust';
-
-    // Clean up the display name into a readable short address
-    const shortAddr = display_name.split(',').slice(0,3).join(',').trim();
-    if (!document.getElementById('fAddr').value.trim() || document.getElementById('fAddr').value.trim() === addr) {
-      document.getElementById('fAddr').value = shortAddr;
-    }
-
-  } catch(e) {
-    pinTxt.textContent = '⚠️ Geocoding failed — click the map to place pin manually';
-  } finally {
-    btn.textContent = '🔍';
-    btn.disabled = false;
+  // ── Fallback: Nominatim (OpenStreetMap) ──
+  if (latF === null) {
+    try {
+      // Strip state/zip before appending Hawaii to avoid conflicts
+      const cleanAddr = addr.replace(/,?\s*(HI|Hawaii)\s*\d{0,5}/gi, '').trim();
+      const nomUrl  = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cleanAddr + ', Hawaii Island, Hawaii, USA')}&format=json&limit=1&countrycodes=us`;
+      const nomRes  = await fetch(nomUrl, { headers: { 'User-Agent': 'HIBCW/2.0' } });
+      const nomData = await nomRes.json();
+      if (nomData?.length) {
+        latF = parseFloat(nomData[0].lat);
+        lngF = parseFloat(nomData[0].lon);
+      }
+    } catch(e) { /* both failed */ }
   }
+
+  if (latF === null) {
+    pinTxt.textContent = '⚠️ Address not found — try a nearby intersection, or click the map to place pin manually';
+    btn.textContent = '🔍'; btn.disabled = false;
+    return;
+  }
+
+  // ── Place / move the pin ──
+  if (pinMarker) {
+    pinMarker.setLatLng([latF, lngF]);
+  } else {
+    pinMarker = L.marker([latF, lngF], { icon: pinIcon, draggable: true }).addTo(map);
+    wirePinDrag(pinMarker);
+  }
+
+  map.setView([latF, lngF], 17);
+  updatePin(latF, lngF, false);
+  pinTxt.textContent = 'Pin placed — drag to adjust if needed';
+
+  btn.textContent = '🔍';
+  btn.disabled = false;
 }
 
 
