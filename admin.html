@@ -2541,20 +2541,58 @@ function renderCaptains() {
         ` : `<div style="font-size:.8rem;color:var(--slate2);font-style:italic">No captain assigned</div>`}
       </div>
 
-      <!-- Stats row -->
-      <div style="display:flex;gap:8px">
-        <div style="flex:1;background:var(--navy3);border-radius:6px;padding:8px 10px;text-align:center">
-          <div style="font-family:IBM Plex Mono,monospace;font-size:1.2rem;font-weight:700;color:${distColor}">${memCount}</div>
-          <div style="font-size:.6rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.08em;margin-top:1px">Member${memCount!==1?'s':''}</div>
+      <!-- District stats -->
+      <div style="border-top:1px solid ${distColor}22;padding-top:12px">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:${distColor};margin-bottom:8px">📊 District Stats</div>
+
+        <!-- Members + summary tiles -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
+          <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
+            <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:${distColor}">${memCount}</div>
+            <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Member${memCount!==1?'s':''}</div>
+          </div>
+          <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
+            <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--gold)">${(() => { const ms = new Date(new Date().getFullYear(), new Date().getMonth(), 1); return allIncidents.filter(i => i.district===v && new Date(i.occurred_at)>=ms).length; })()}</div>
+            <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Month</div>
+          </div>
+          <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
+            <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--white)">${(() => { const ws = new Date(); ws.setHours(0,0,0,0); ws.setDate(ws.getDate()-((ws.getDay()+6)%7)); return allIncidents.filter(i => i.district===v && new Date(i.occurred_at)>=ws).length; })()}</div>
+            <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Week</div>
+          </div>
+          <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
+            <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--white)">${(() => { const ts = new Date(); ts.setHours(0,0,0,0); return allIncidents.filter(i => i.district===v && new Date(i.occurred_at)>=ts).length; })()}</div>
+            <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Today</div>
+          </div>
         </div>
-        <div style="flex:1;background:var(--navy3);border-radius:6px;padding:8px 10px;text-align:center">
-          <div style="font-family:IBM Plex Mono,monospace;font-size:1.2rem;font-weight:700;color:var(--gold)">${incCount}</div>
-          <div style="font-size:.6rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.08em;margin-top:1px">Incident${incCount!==1?'s':''}</div>
+
+        <!-- Last reported -->
+        <div style="font-family:IBM Plex Mono,monospace;font-size:.65rem;color:var(--slate2);margin-bottom:10px">
+          Last report: <span style="color:${lastActive ? 'var(--white)' : 'var(--slate2)'}">${lastActive ? lastActive.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'None'}</span>
         </div>
-        <div style="flex:1;background:var(--navy3);border-radius:6px;padding:8px 10px;text-align:center" title="${lastActive ? 'Last incident: ' + lastActive.toLocaleDateString() : 'No incidents yet'}">
-          <div style="font-family:IBM Plex Mono,monospace;font-size:.8rem;font-weight:700;color:${lastActiveColor};line-height:1.8">${lastActiveStr}</div>
-          <div style="font-size:.6rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.08em;margin-top:1px">Last Active</div>
-        </div>
+
+        <!-- Type breakdown bars (top 4 active) -->
+        <div style="margin-bottom:8px">${(() => {
+          const typeColors = { red:'#e8415a', gold:'#f5a623', teal:'#00c9a7' };
+          const tc = {}; const tcm = {};
+          allIncidents.filter(i => i.district===v && i.status==='active').forEach(i => { tc[i.type]=(tc[i.type]||0)+1; tcm[i.type]=i.type_color; });
+          const sorted = Object.entries(tc).sort((a,b)=>b[1]-a[1]).slice(0,4);
+          const mx = sorted[0]?.[1]||1;
+          return sorted.length
+            ? sorted.map(([type,count])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+                <div style="font-size:.68rem;color:var(--white);width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(type)}</div>
+                <div style="flex:1;height:6px;background:var(--b2);border-radius:3px;overflow:hidden">
+                  <div style="height:100%;border-radius:3px;background:${typeColors[tcm[type]]||'#00c9a7'};width:${(count/mx*100).toFixed(1)}%"></div>
+                </div>
+                <div style="font-family:IBM Plex Mono,monospace;font-size:.62rem;color:var(--slate);width:20px;text-align:right;flex-shrink:0">${count}</div>
+              </div>`).join('')
+            : `<div style="font-size:.7rem;color:var(--slate2);font-style:italic">No active incidents</div>`;
+        })()}</div>
+
+        <!-- View Full Stats button -->
+        <button class="btn btn-ghost" style="width:100%;font-size:.7rem;border-color:${distColor}33;color:${distColor}"
+          onclick="showView('stats');setTimeout(()=>{const s=document.getElementById('statsDistrictFilter');if(s){s.value='${v}';renderStats();}},120)">
+          📊 View Full Stats for this District
+        </button>
       </div>
 
       <!-- Action buttons -->
