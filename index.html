@@ -636,10 +636,19 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
           <div class="sec-label">03 · Location</div>
           <div class="fld">
             <label>Street Address *</label>
-            <input type="text" id="fAddr" placeholder="e.g. 820 Piilani St, Hilo">
+            <div style="display:flex;gap:6px;align-items:center">
+              <input type="text" id="fAddr" placeholder="e.g. 820 Piilani St, Hilo" style="flex:1"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();geocodeAddress();}"
+                onblur="if(this.value.trim().length>6 && !pendingPin) geocodeAddress();">
+              <button type="button" id="geocodeAddrBtn" onclick="geocodeAddress()" title="Find address on map"
+                style="flex-shrink:0;background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:.85rem;color:var(--teal);transition:all .2s;white-space:nowrap"
+                onmouseover="this.style.background='rgba(0,201,167,.2)'" onmouseout="this.style.background='rgba(0,201,167,.1)'">
+                🔍
+              </button>
+            </div>
           </div>
           <div class="pin-hint">
-            📍 <span id="pinTxt">Click on the map to drop a pin at the exact location</span>
+            📍 <span id="pinTxt">Enter an address and tap 🔍, or click the map to drop a pin</span>
           </div>
           <div class="coords" id="coordsBar"></div>
           <div id="districtBadge" style="display:none;margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;padding:4px 10px;border-radius:4px;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);color:#00c9a7"></div>
@@ -1047,7 +1056,63 @@ function updatePin(lat, lng, reverseGeocode) {
   }
 }
 
-// Custom draggable pin icon
+// Geocode a typed address and drop/move the pin
+async function geocodeAddress() {
+  const addr = (document.getElementById('fAddr').value || '').trim();
+  if (!addr || addr.length < 5) return;
+
+  const btn = document.getElementById('geocodeAddrBtn');
+  const pinTxt = document.getElementById('pinTxt');
+  btn.textContent = '⏳';
+  btn.disabled = true;
+  pinTxt.textContent = 'Looking up address…';
+
+  try {
+    // Bias results toward Hawaii Island
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr + ', Hawaii')}&format=json&limit=1&countrycodes=us&viewbox=-156.1,18.9,-154.7,20.4&bounded=0`;
+    const res  = await fetch(url);
+    const data = await res.json();
+
+    if (!data || !data.length) {
+      pinTxt.textContent = '⚠️ Address not found — try adding a city or zip, or click the map';
+      btn.textContent = '🔍'; btn.disabled = false;
+      return;
+    }
+
+    const { lat, lon, display_name } = data[0];
+    const latF = parseFloat(lat);
+    const lngF = parseFloat(lon);
+
+    // Place / move the pin
+    if (pinMarker) {
+      pinMarker.setLatLng([latF, lngF]);
+    } else {
+      pinMarker = L.marker([latF, lngF], { icon: pinIcon, draggable: true }).addTo(map);
+      wirePinDrag(pinMarker);
+    }
+
+    // Pan & zoom map to pin
+    map.setView([latF, lngF], 16);
+
+    // Update state, badge, coords — no reverse geocode needed (we already have the address)
+    updatePin(latF, lngF, false);
+    pinTxt.textContent = 'Pin placed — drag to adjust';
+
+    // Clean up the display name into a readable short address
+    const shortAddr = display_name.split(',').slice(0,3).join(',').trim();
+    if (!document.getElementById('fAddr').value.trim() || document.getElementById('fAddr').value.trim() === addr) {
+      document.getElementById('fAddr').value = shortAddr;
+    }
+
+  } catch(e) {
+    pinTxt.textContent = '⚠️ Geocoding failed — click the map to place pin manually';
+  } finally {
+    btn.textContent = '🔍';
+    btn.disabled = false;
+  }
+}
+
+
 const pinIcon = L.divIcon({
   className: '',
   html: `<div style="
@@ -1062,28 +1127,30 @@ const pinIcon = L.divIcon({
   popupAnchor:[0, -24]
 });
 
+// Attach drag events to a newly created pinMarker
+function wirePinDrag(marker) {
+  marker.on('dragstart', () => {
+    document.getElementById('pinTxt').textContent = 'Dragging pin…';
+  });
+  marker.on('drag', e => {
+    const { lat, lng } = e.latlng;
+    document.getElementById('coordsBar').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  });
+  marker.on('dragend', e => {
+    const { lat, lng } = e.target.getLatLng();
+    updatePin(lat, lng, true);
+    document.getElementById('pinTxt').textContent = 'Pin placed — drag to adjust';
+  });
+}
+
 map.on('click', e => {
   const { lat, lng } = e.latlng;
 
-  // Create or move the draggable marker
   if (pinMarker) {
     pinMarker.setLatLng([lat, lng]);
   } else {
     pinMarker = L.marker([lat, lng], { icon: pinIcon, draggable: true }).addTo(map);
-
-    // Wire up drag events
-    pinMarker.on('dragstart', () => {
-      document.getElementById('pinTxt').textContent = 'Dragging pin…';
-    });
-    pinMarker.on('drag', e => {
-      const { lat, lng } = e.latlng;
-      document.getElementById('coordsBar').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-    });
-    pinMarker.on('dragend', e => {
-      const { lat, lng } = e.target.getLatLng();
-      updatePin(lat, lng, true);
-      document.getElementById('pinTxt').textContent = 'Pin placed — drag to adjust';
-    });
+    wirePinDrag(pinMarker);
   }
 
   document.getElementById('pinTxt').textContent = 'Pin placed — drag to adjust';
