@@ -797,6 +797,26 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
           </div>
         </div>
 
+        <!-- District Captains collapsible -->
+        <div class="section" style="padding:0;overflow:hidden;border:1px solid rgba(0,201,167,.2);border-radius:8px;margin-bottom:4px">
+          <button id="captainToggle" onclick="toggleCaptainSection()"
+            style="width:100%;display:flex;align-items:center;justify-content:space-between;
+                   background:rgba(0,201,167,.07);border:none;padding:12px 16px;
+                   cursor:pointer;color:var(--white);font-family:'IBM Plex Mono',monospace;
+                   font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;text-align:left">
+            <span>👮 District Captains</span>
+            <span id="captainChevron" style="color:var(--teal);transition:transform .25s">▼</span>
+          </button>
+          <div id="captainSection" style="display:none;padding:12px 14px 14px">
+            <div id="captainSectionHint" style="font-size:.72rem;color:var(--slate);margin-bottom:10px;line-height:1.5">
+              Drop a pin on the map to highlight your local District Captain.
+            </div>
+            <div id="captainGrid" style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:.75rem;color:var(--slate2);font-style:italic">Loading captains…</div>
+            </div>
+          </div>
+        </div>
+
         <button class="submit-btn" id="submitBtn" onclick="submitReport()">⊕ Submit Incident Report</button>
 
         <!-- No law enforcement disclaimer -->
@@ -1054,6 +1074,9 @@ function updatePin(lat, lng, reverseGeocode) {
       })
       .catch(() => {});
   }
+
+  // Highlight local captain
+  renderCaptainGrid(pendingPin.district || null);
 }
 
 // Geocode a typed address and drop/move the pin
@@ -1427,8 +1450,107 @@ function resetForm() {
 }
 
 /* ════════════════════════════════════════════════════
-   LOAD INCIDENTS
+   DISTRICT CAPTAINS PANEL
 ════════════════════════════════════════════════════ */
+let captainData = []; // [{district, full_name, email, photo_url}]
+
+async function loadCaptains() {
+  if (!sb) return;
+  try {
+    const { data, error } = await sb
+      .from('member_applications')
+      .select('full_name, email, photo_url, district, captain_name')
+      .eq('status', 'approved')
+      .not('captain_name', 'is', null);
+    if (error || !data) return;
+
+    // A captain is a member whose full_name matches captain_name
+    captainData = data.filter(m =>
+      m.captain_name && m.full_name &&
+      m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()
+    );
+    renderCaptainGrid(null);
+  } catch(e) { /* silent */ }
+}
+
+function toggleCaptainSection() {
+  const sec = document.getElementById('captainSection');
+  const chev = document.getElementById('captainChevron');
+  const open = sec.style.display === 'none';
+  sec.style.display = open ? 'block' : 'none';
+  chev.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function renderCaptainGrid(highlightDistrict) {
+  const grid = document.getElementById('captainGrid');
+  const hint = document.getElementById('captainSectionHint');
+  if (!grid) return;
+
+  if (!captainData.length) {
+    grid.innerHTML = `<div style="font-size:.75rem;color:var(--slate2);font-style:italic">No captain info available yet.</div>`;
+    return;
+  }
+
+  // Sort: highlighted district first, then alphabetically
+  const sorted = [...captainData].sort((a, b) => {
+    if (a.district === highlightDistrict) return -1;
+    if (b.district === highlightDistrict) return 1;
+    return (a.district || '').localeCompare(b.district || '');
+  });
+
+  const districtLabel = (id) => {
+    const d = DISTRICT_GEO.find(d => d.id === id);
+    return d ? d.label : id;
+  };
+  const districtColor = (id) => {
+    const d = DISTRICT_GEO.find(d => d.id === id);
+    return d ? d.color : '#00c9a7';
+  };
+
+  if (highlightDistrict) {
+    hint.innerHTML = `Drop a pin to see your local captain. <span style="color:var(--teal)">Your district is highlighted.</span>`;
+  } else {
+    hint.textContent = 'Drop a pin on the map to highlight your local District Captain.';
+  }
+
+  grid.innerHTML = sorted.map(c => {
+    const isLocal = c.district === highlightDistrict;
+    const color   = districtColor(c.district);
+    const label   = districtLabel(c.district);
+    const initials = (c.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+
+    const avatar = c.photo_url
+      ? `<img src="${c.photo_url}" alt="${initials}"
+             style="width:44px;height:44px;border-radius:50%;object-fit:cover;
+                    border:2px solid ${isLocal ? color : 'rgba(255,255,255,.15)'};flex-shrink:0">`
+      : `<div style="width:44px;height:44px;border-radius:50%;flex-shrink:0;
+                     background:${color}22;border:2px solid ${isLocal ? color : color + '44'};
+                     display:flex;align-items:center;justify-content:center;
+                     font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;color:${color}">
+           ${initials}
+         </div>`;
+
+    return `<div style="
+      display:flex;align-items:center;gap:12px;
+      padding:10px 12px;border-radius:7px;
+      background:${isLocal ? color + '12' : 'rgba(255,255,255,.03)'};
+      border:1px solid ${isLocal ? color + '40' : 'rgba(255,255,255,.07)'};
+      transition:all .25s;
+      ${isLocal ? 'box-shadow:0 0 0 1px ' + color + '30;' : ''}
+    ">
+      ${avatar}
+      <div style="min-width:0;flex:1">
+        ${isLocal ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:${color};margin-bottom:2px">📍 Your District Captain</div>` : ''}
+        <div style="font-weight:600;font-size:.82rem;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.full_name}</div>
+        <div style="font-size:.68rem;color:${color};margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</div>
+        ${c.email ? `<a href="mailto:${c.email}" style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block"
+            onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--slate)'">✉️ ${c.email}</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+
 async function loadIncidents() {
   if (!sb) return;
   const {data,error} = await sb.from('incidents').select('*,incident_media(*)').eq('status','active').order('occurred_at',{ascending:false});
@@ -1499,6 +1621,27 @@ function updateCount() {
 /* ════════════════════════════════════════════════════
    MODAL
 ════════════════════════════════════════════════════ */
+function publicCaptainCardHtml(districtId) {
+  const captain = captainData.find(c => c.district === districtId);
+  if (!captain) return '';
+  const d        = DISTRICT_GEO.find(d => d.id === districtId);
+  const color    = d?.color || '#00c9a7';
+  const initials = (captain.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  const avatar   = captain.photo_url
+    ? `<img src="${captain.photo_url}" alt="${initials}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid ${color}66;flex-shrink:0">`
+    : `<div style="width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${color}22;border:2px solid ${color}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;color:${color}">${initials}</div>`;
+  return `<div class="mf-row" style="background:${color}0d;border:1px solid ${color}30;border-radius:6px;padding:10px 12px;">
+    <div class="mf-label" style="color:${color};margin-bottom:8px">👮 District Captain</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      ${avatar}
+      <div style="min-width:0">
+        <div style="font-weight:600;font-size:.85rem;color:var(--white)">${captain.full_name}</div>
+        ${captain.email ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;margin-top:3px"><a href="mailto:${captain.email}" style="color:var(--slate);text-decoration:none" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--slate)'">✉️ ${captain.email}</a></div>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
 function openModal(id) {
   const inc = incidents.find(i=>i.id===id);
   if (!inc) return;
@@ -1509,6 +1652,7 @@ function openModal(id) {
   document.getElementById('mBody').innerHTML = `
     <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)} &nbsp;${ageTag(inc.occurred_at)}</div></div>
     <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${inc.address}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">GPS ${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span> &nbsp;<a href="https://www.google.com/maps?q=&layer=c&cbll=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none">🔭 Street View</a>`:''}</div></div>
+    ${inc.district ? publicCaptainCardHtml(inc.district) : ''}
     <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${inc.description}</div></div>
     ${inc.is_recurring?`<div class="mf-row"><span class="recurring-flag">🔁 Reported as Recurring Incident</span></div>`:''}
     ${inc.is_verified_member?`<div class="mf-row"><span class="verified-badge" style="font-size:.72rem;padding:3px 10px">✅ Submitted by a Verified KIAA Member</span></div>`:''}
@@ -1842,6 +1986,7 @@ function clearMapFilter() {
   document.getElementById('fTime').value=new Date(now-off).toISOString().slice(0,16);
   if (!initSB()) return;
   await loadIncidents();
+  await loadCaptains();
 
   // Realtime — new incidents appear instantly
   sb.channel('incidents').on('postgres_changes',{event:'INSERT',schema:'public',table:'incidents'}, async p => {
