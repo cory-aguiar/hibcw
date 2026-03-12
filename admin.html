@@ -817,11 +817,27 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
       <!-- ── STATS ── -->
       <div class="view" id="view-stats">
         <div class="page-hd">
-          <div><div class="page-title">Statistics</div><div class="page-sub">Incident summary and type breakdown</div></div>
+          <div><div class="page-title">Statistics</div><div class="page-sub" id="statsSubtitle">Incident summary and type breakdown</div></div>
+          <div class="page-actions">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2);white-space:nowrap">Filter by District</span>
+              <select class="tb-select" id="statsDistrictFilter" onchange="renderStats()" style="min-width:180px">
+                <option value="">All Districts</option>
+              </select>
+              <button class="btn btn-ghost" onclick="document.getElementById('statsDistrictFilter').value='';renderStats()">✕ Clear</button>
+            </div>
+          </div>
         </div>
         <div class="stats-grid" id="statsGrid"></div>
-        <div style="padding:0 24px 8px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)">Incidents by Type (Active)</div></div>
+        <div style="padding:0 24px 8px;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)" id="typeBreakdownLabel">Incidents by Type (Active)</div>
+        </div>
         <div class="type-breakdown" id="typeBreakdown"></div>
+        <!-- District breakdown (shown when no district filter) -->
+        <div id="districtBreakdownWrap" style="padding:0 24px 24px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2);margin-bottom:10px">Active Incidents by District</div>
+          <div id="districtBreakdown"></div>
+        </div>
       </div>
       <!-- ── DISTRICT CAPTAINS VIEW ── -->
       <div class="view" id="view-captains">
@@ -1683,37 +1699,90 @@ function closeLightbox(){document.getElementById('lightbox').classList.remove('o
    STATS
 ════════════════════════════════════════════════════ */
 function renderStats() {
-  const active   = allIncidents.filter(i=>i.status==='active');
-  const archived = allIncidents.filter(i=>i.status==='archived');
-  const withPin  = allIncidents.filter(i=>i.lat);
-  const withMedia= allIncidents.filter(i=>i.incident_media?.length);
-  const last30   = allIncidents.filter(i=>new Date(i.occurred_at)>=new Date(Date.now()-30*864e5));
+  // Populate district filter dropdown (once)
+  const distSel = document.getElementById('statsDistrictFilter');
+  if (distSel && distSel.options.length === 1) {
+    DISTRICTS.forEach(([v, l]) => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = l;
+      distSel.appendChild(o);
+    });
+  }
+
+  const distFilter = distSel?.value || '';
+  const scope = distFilter ? allIncidents.filter(i => i.district === distFilter) : allIncidents;
+
+  const active   = scope.filter(i=>i.status==='active');
+  const archived = scope.filter(i=>i.status==='archived');
+  const withPin  = scope.filter(i=>i.lat);
+  const withMedia= scope.filter(i=>i.incident_media?.length);
+  const last30   = scope.filter(i=>new Date(i.occurred_at)>=new Date(Date.now()-30*864e5));
+
+  // Update subtitle
+  const subtitle = document.getElementById('statsSubtitle');
+  if (subtitle) subtitle.textContent = distFilter
+    ? 'Filtered by: ' + (DISTRICTS.find(([v])=>v===distFilter)?.[1] || distFilter)
+    : 'Incident summary and type breakdown';
 
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card accent"><div class="stat-num">${active.length}</div><div class="stat-lbl">Active</div></div>
     <div class="stat-card"><div class="stat-num">${archived.length}</div><div class="stat-lbl">Archived</div></div>
-    <div class="stat-card"><div class="stat-num">${allIncidents.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card"><div class="stat-num">${scope.length}</div><div class="stat-lbl">Total</div></div>
     <div class="stat-card"><div class="stat-num">${last30.length}</div><div class="stat-lbl">Last 30 Days</div></div>
     <div class="stat-card"><div class="stat-num">${withPin.length}</div><div class="stat-lbl">With GPS Pin</div></div>
     <div class="stat-card"><div class="stat-num">${withMedia.length}</div><div class="stat-lbl">With Media</div></div>`;
 
   // Type breakdown bars
-  const counts = {};
-  active.forEach(i => counts[i.type]=(counts[i.type]||0)+1);
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const max = sorted[0]?.[1] || 1;
   const colors = {red:'#e8415a',gold:'#f5a623',teal:'#00c9a7'};
   const typeColor = {};
   allIncidents.forEach(i=>typeColor[i.type]=i.type_color);
 
-  document.getElementById('typeBreakdown').innerHTML = sorted.map(([type,count])=>`
+  const typeCounts = {};
+  active.forEach(i => typeCounts[i.type]=(typeCounts[i.type]||0)+1);
+  const typeSorted = Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]);
+  const typeMax = typeSorted[0]?.[1] || 1;
+
+  const typeLabel = document.getElementById('typeBreakdownLabel');
+  if (typeLabel) typeLabel.textContent = distFilter
+    ? 'Incidents by Type (Active · ' + (DISTRICTS.find(([v])=>v===distFilter)?.[1] || distFilter) + ')'
+    : 'Incidents by Type (Active)';
+
+  document.getElementById('typeBreakdown').innerHTML = typeSorted.map(([type,count])=>`
     <div class="type-row">
       <div class="type-row-label">${type}</div>
       <div class="type-bar-wrap">
-        <div class="type-bar" style="width:${(count/max*100).toFixed(1)}%;background:${colors[typeColor[type]]||'#00c9a7'}"></div>
+        <div class="type-bar" style="width:${(count/typeMax*100).toFixed(1)}%;background:${colors[typeColor[type]]||'#00c9a7'}"></div>
       </div>
       <div class="type-count">${count}</div>
     </div>`).join('') || '<div style="padding:10px;color:var(--slate2);font-size:.8rem">No active incidents.</div>';
+
+  // District breakdown — only show when no district filter active
+  const distWrap = document.getElementById('districtBreakdownWrap');
+  const distBreak = document.getElementById('districtBreakdown');
+  if (distFilter) {
+    if (distWrap) distWrap.style.display = 'none';
+  } else {
+    if (distWrap) distWrap.style.display = '';
+    if (distBreak) {
+      const distCounts = {};
+      DISTRICTS.forEach(([v]) => distCounts[v] = 0);
+      allIncidents.filter(i=>i.status==='active').forEach(i => {
+        if (i.district && distCounts[i.district] !== undefined) distCounts[i.district]++;
+        else if (i.district) distCounts[i.district] = (distCounts[i.district]||0)+1;
+      });
+      const distSorted = DISTRICTS.map(([v,l]) => [v, l, distCounts[v]||0])
+        .sort((a,b)=>b[2]-a[2]);
+      const distMax = distSorted[0]?.[2] || 1;
+      distBreak.innerHTML = distSorted.map(([v, label, count])=>`
+        <div class="type-row" style="cursor:pointer" onclick="document.getElementById('statsDistrictFilter').value='${v}';renderStats()" title="Click to filter by this district">
+          <div class="type-row-label" style="width:200px">${label}</div>
+          <div class="type-bar-wrap">
+            <div class="type-bar" style="width:${count?((count/distMax*100).toFixed(1)):'0'}%;background:var(--teal)"></div>
+          </div>
+          <div class="type-count">${count}</div>
+        </div>`).join('') || '<div style="padding:10px;color:var(--slate2);font-size:.8rem">No data.</div>';
+    }
+  }
 }
 
 /* ════════════════════════════════════════════════════
