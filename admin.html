@@ -920,7 +920,7 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
                 <th>Role</th>
                 <th>District</th>
                 <th>Last Sign In</th>
-                <th style="width:100px">Action</th>
+                <th style="width:160px">Actions</th>
               </tr>
             </thead>
             <tbody id="adminsGrid">
@@ -1299,7 +1299,7 @@ async function logout() {
   showLoginForm();
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDstModal(); closeSetCaptainModal(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDstModal(); closeSetCaptainModal(); closeEditAdmin(); } });
 
 /* ── Check for existing session or password-reset redirect ── */
 (async function checkSession() {
@@ -2622,7 +2622,8 @@ async function loadAdmins() {
         <td><span class="badge ${roleColors[a.role] || 'b-teal'}">${roleLabels[a.role] || a.role}</span></td>
         <td style="font-size:.8rem;color:var(--slate)">${esc(distLabel)}</td>
         <td style="font-family:IBM Plex Mono,monospace;font-size:.68rem;color:var(--slate2)">${lastSeen}</td>
-        <td>
+        <td style="white-space:nowrap;display:flex;gap:6px;align-items:center">
+          <button class="btn btn-ghost" style="font-size:.65rem;padding:3px 9px;border-color:var(--teal);color:var(--teal)" onclick="openEditAdmin('${a.id}','${esc(a.email)}','${esc(a.full_name||'')}','${a.role}','${a.district||''}')">✏️ Edit</button>
           ${!isSelf ? `<button class="btn btn-red" style="font-size:.65rem;padding:3px 9px" onclick="removeAdmin('${a.id}','${esc(a.email)}')">Remove</button>` : '<span style="font-size:.7rem;color:var(--slate2)">—</span>'}
         </td>
       </tr>`;
@@ -2687,6 +2688,68 @@ async function removeAdmin(id, email) {
     await loadAdmins();
   } catch(e) {
     showToast('⚠️', 'Remove failed: ' + e.message, 'err');
+  }
+}
+
+function openEditAdmin(id, email, fullName, role, district) {
+  document.getElementById('editAdminId').value    = id;
+  document.getElementById('editAdminEmail').value = email;
+  document.getElementById('editAdminName').value  = fullName;
+  document.getElementById('editAdminTitle').textContent = 'Edit: ' + (fullName || email);
+
+  // Populate district dropdown if not already done
+  const distSel = document.getElementById('editAdminDistrict');
+  if (distSel.options.length <= 1) {
+    DISTRICTS.forEach(([v, l]) => {
+      const o = document.createElement('option'); o.value = v; o.textContent = l;
+      distSel.appendChild(o);
+    });
+  }
+
+  document.getElementById('editAdminRole').value = role;
+  distSel.value = district || '';
+  toggleEditAdminDistrict();
+
+  document.getElementById('editAdminOverlay').style.display = 'flex';
+}
+
+function closeEditAdmin() {
+  document.getElementById('editAdminOverlay').style.display = 'none';
+}
+
+function toggleEditAdminDistrict() {
+  const role = document.getElementById('editAdminRole').value;
+  document.getElementById('editAdminDistrictGroup').style.display = role === 'captain' ? '' : 'none';
+}
+
+async function saveEditAdmin() {
+  const id       = document.getElementById('editAdminId').value;
+  const email    = (document.getElementById('editAdminEmail').value || '').trim().toLowerCase();
+  const fullName = (document.getElementById('editAdminName').value  || '').trim();
+  const role     = document.getElementById('editAdminRole').value;
+  const district = document.getElementById('editAdminDistrict').value || null;
+  const btn      = document.getElementById('editAdminSaveBtn');
+
+  if (!email || !email.includes('@')) { showToast('⚠️', 'A valid email is required.', 'err'); return; }
+  if (role === 'captain' && !district) { showToast('⚠️', 'Please select a district for this captain.', 'err'); return; }
+
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+  try {
+    const { error } = await sb.from('admin_roles').update({
+      email,
+      full_name: fullName || null,
+      role,
+      district: role === 'captain' ? district : null
+    }).eq('id', id);
+
+    if (error) throw error;
+    showToast('✅', `${fullName || email} updated.`);
+    closeEditAdmin();
+    await loadAdmins();
+  } catch(e) {
+    showToast('⚠️', 'Save failed: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = '💾 Save Changes';
   }
 }
 
@@ -4105,7 +4168,53 @@ function admToggleHeat() {
   </div>
 </div>
 
-<!-- Leaflet loaded last so it never blocks login -->
+<!-- EDIT ADMIN MODAL -->
+<div class="overlay" id="editAdminOverlay" style="display:none" onclick="if(event.target===this)closeEditAdmin()">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-type-badge" style="background:rgba(0,201,167,.12);color:var(--teal);border-color:rgba(0,201,167,.25)">✏️ Edit Account</div>
+        <div class="modal-title" id="editAdminTitle" style="margin-top:6px">Edit Admin</div>
+      </div>
+      <button class="modal-close" onclick="closeEditAdmin()">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+      <input type="hidden" id="editAdminId">
+
+      <div class="mf-group">
+        <div class="mf-label">Full Name</div>
+        <input class="tb-search" type="text" id="editAdminName" placeholder="Full name" style="width:100%">
+      </div>
+
+      <div class="mf-group">
+        <div class="mf-label">Email Address</div>
+        <input class="tb-search" type="email" id="editAdminEmail" placeholder="email@example.com" style="width:100%">
+      </div>
+
+      <div class="mf-group">
+        <div class="mf-label">Role</div>
+        <select class="tb-select" id="editAdminRole" style="width:100%;padding:8px 10px" onchange="toggleEditAdminDistrict()">
+          <option value="admin">👤 Admin</option>
+          <option value="superadmin">⭐ Superadmin</option>
+          <option value="captain">👮 District Captain</option>
+        </select>
+      </div>
+
+      <div class="mf-group" id="editAdminDistrictGroup" style="display:none">
+        <div class="mf-label">District</div>
+        <select class="tb-select" id="editAdminDistrict" style="width:100%;padding:8px 10px">
+          <option value="">— Select district…</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeEditAdmin()">Cancel</button>
+      <button class="btn btn-teal" onclick="saveEditAdmin()" id="editAdminSaveBtn">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js">
