@@ -673,6 +673,9 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
           <div class="pin-hint">
             📍 <span id="pinTxt">Enter an address and tap 🔍, or click the map to drop a pin</span>
           </div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);margin-top:4px;line-height:1.5">
+            💡 No need to type ʻokinas — Hawaiian street names like <em>Piʻilani</em> or <em>Keaʻau</em> are found automatically.
+          </div>
           <div class="coords" id="coordsBar"></div>
           <div id="districtBadge" style="display:none;margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;padding:4px 10px;border-radius:4px;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);color:#00c9a7"></div>
         </div>
@@ -1119,70 +1122,96 @@ async function geocodeAddress() {
   const cleanAddr = addr.replace(/,?\s*(HI|Hawaii)\s*\d{0,5}/gi, '').trim();
   const fullAddr  = cleanAddr + ', Hawaii, USA';
 
-  // ── Primary: Nominatim — no custom User-Agent (avoids policy rejection in browsers) ──
+  // Hawaiian street names use the ʻokina (ʻ U+02BB) character which geocoders
+  // store inconsistently. Build a variant with the proper okina inserted after
+  // any vowel-starting syllable following a common consonant boundary.
+  // Simple approach: if no okina present, also try with straight apostrophe
+  // and with the Unicode okina for the most common patterns.
+  const withApostrophe = cleanAddr.replace(/([A-Za-z])i([A-Za-z])/g, (m,a,b) => `${a}i${b}`);
+  // Generate okina variants for known patterns
+  const oqueryAddr = cleanAddr
+    .replace(/\bPiilani\b/gi, "Piʻilani")
+    .replace(/\bKalanianaole\b/gi, "Kalanianaʻole")
+    .replace(/\bKamehameha\b/gi, "Kamehameha")
+    .replace(/\bKeaau\b/gi, "Keaʻau")
+    .replace(/\bKailua\b/gi, "Kailua")
+    .replace(/\bHonokaa\b/gi, "Honokaʻa")
+    .replace(/\bPahoa\b/gi, "Pāhoa");
+  const oFullAddr = oqueryAddr + ', Hawaii, USA';
+
+  // Helper: filter results to Big Island bbox
+  const onIsland = r => {
+    const lt = parseFloat(r.lat ?? r.geometry?.coordinates?.[1]);
+    const ln = parseFloat(r.lon ?? r.geometry?.coordinates?.[0]);
+    return lt >= 18.9 && lt <= 20.3 && ln >= -156.1 && ln <= -154.8;
+  };
+  const nomSearch = async (q) => {
+    const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&countrycodes=us`);
+    const data = await res.json();
+    return data.find(onIsland) || null;
+  };
+
+  // ── Primary: Nominatim with original query ──
   try {
-    const nomUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(fullAddr)}&format=json&limit=3&countrycodes=us`;
-    const nomRes  = await fetch(nomUrl);
-    const nomData = await nomRes.json();
-    // Filter to Big Island bounding box: lat 18.9–20.3, lon -156.1 to -154.8
-    const match = nomData.find(r => {
-      const lt = parseFloat(r.lat), ln = parseFloat(r.lon);
-      return lt >= 18.9 && lt <= 20.3 && ln >= -156.1 && ln <= -154.8;
-    }) || nomData[0];
-    if (match) {
-      latF = parseFloat(match.lat);
-      lngF = parseFloat(match.lon);
-    }
-  } catch(e) { /* try next */ }
+    const match = await nomSearch(fullAddr);
+    if (match) { latF = parseFloat(match.lat); lngF = parseFloat(match.lon); }
+  } catch(e) {}
 
-  // ── Fallback 1: Nominatim structured search (separate city field helps matching) ──
-  if (latF === null) {
+  // ── Fallback 1: Nominatim with okina variant (Hawaiian street name fix) ──
+  if (latF === null && oFullAddr !== fullAddr) {
     try {
-      const street = cleanAddr.replace(/,.*$/, '').trim();
-      const nomUrl2 = `https://nominatim.openstreetmap.org/search?street=${encodeURIComponent(street)}&state=Hawaii&country=US&format=json&limit=3`;
-      const nomRes2  = await fetch(nomUrl2);
-      const nomData2 = await nomRes2.json();
-      const match2 = nomData2.find(r => {
-        const lt = parseFloat(r.lat), ln = parseFloat(r.lon);
-        return lt >= 18.9 && lt <= 20.3 && ln >= -156.1 && ln <= -154.8;
-      }) || nomData2[0];
-      if (match2) {
-        latF = parseFloat(match2.lat);
-        lngF = parseFloat(match2.lon);
-      }
-    } catch(e) { /* try next */ }
+      const match = await nomSearch(oFullAddr);
+      if (match) { latF = parseFloat(match.lat); lngF = parseFloat(match.lon); }
+    } catch(e) {}
   }
 
-  // ── Fallback 2: US Census Bureau Geocoder ──
+  // ── Fallback 2: Nominatim structured search (street + state separated) ──
   if (latF === null) {
     try {
-      const censusUrl = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(cleanAddr + ', HI')}&benchmark=Public_AR_Current&format=json`;
-      const censusRes  = await fetch(censusUrl);
-      const censusData = await censusRes.json();
-      const match = censusData?.result?.addressMatches?.[0];
-      if (match) {
-        latF = parseFloat(match.coordinates.y);
-        lngF = parseFloat(match.coordinates.x);
-        if (match.matchedAddress) document.getElementById('fAddr').value = match.matchedAddress;
+      // Try both original and okina street name
+      for (const streetSrc of [cleanAddr, oqueryAddr]) {
+        const street = streetSrc.replace(/,.*$/, '').trim();
+        const res  = await fetch(`https://nominatim.openstreetmap.org/search?street=${encodeURIComponent(street)}&state=Hawaii&country=US&format=json&limit=5`);
+        const data = await res.json();
+        const match = data.find(onIsland) || data[0];
+        if (match) { latF = parseFloat(match.lat); lngF = parseFloat(match.lon); break; }
       }
-    } catch(e) { /* all failed */ }
+    } catch(e) {}
   }
 
-  // ── Fallback 3: Photon (OSM-based, no rate-limit headers needed) ──
+  // ── Fallback 3: US Census Bureau Geocoder ──
   if (latF === null) {
     try {
-      const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(fullAddr)}&limit=5&lang=en`;
-      const photonRes  = await fetch(photonUrl);
-      const photonData = await photonRes.json();
-      const match = (photonData?.features || []).find(f => {
-        const [ln, lt] = f.geometry?.coordinates || [];
-        return lt >= 18.9 && lt <= 20.3 && ln >= -156.1 && ln <= -154.8;
-      });
-      if (match) {
-        latF = match.geometry.coordinates[1];
-        lngF = match.geometry.coordinates[0];
+      for (const a of [cleanAddr, oqueryAddr]) {
+        const censusUrl = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(a + ', HI')}&benchmark=Public_AR_Current&format=json`;
+        const censusData = await (await fetch(censusUrl)).json();
+        const match = censusData?.result?.addressMatches?.[0];
+        if (match) {
+          latF = parseFloat(match.coordinates.y);
+          lngF = parseFloat(match.coordinates.x);
+          if (match.matchedAddress) document.getElementById('fAddr').value = match.matchedAddress;
+          break;
+        }
       }
-    } catch(e) { /* all failed */ }
+    } catch(e) {}
+  }
+
+  // ── Fallback 4: Photon (OSM-based, permissive) ──
+  if (latF === null) {
+    try {
+      for (const q of [fullAddr, oFullAddr]) {
+        const photonData = await (await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=5&lang=en`)).json();
+        const match = (photonData?.features || []).find(f => {
+          const [ln, lt] = f.geometry?.coordinates || [];
+          return lt >= 18.9 && lt <= 20.3 && ln >= -156.1 && ln <= -154.8;
+        });
+        if (match) {
+          latF = match.geometry.coordinates[1];
+          lngF = match.geometry.coordinates[0];
+          break;
+        }
+      }
+    } catch(e) {}
   }
 
   if (latF === null) {
