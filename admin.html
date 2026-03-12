@@ -1704,6 +1704,7 @@ function renderRow(inc, showCb, showStatus) {
   const bc = inc.type_color==='red'?'b-red':inc.type_color==='gold'?'b-gold':'b-teal';
   const mc = inc.incident_media?.length || 0;
   const archived = inc.status === 'archived';
+  const canAct = currentRole !== 'captain';
   return `
     <tr id="row-${inc.id}" style="${archived?'opacity:.65':''}">
       ${showCb ? `<td><input type="checkbox" class="row-cb" data-id="${inc.id}" onchange="toggleRow('${inc.id}',this.checked)" ${selectedIds.has(inc.id)?'checked':''}></td>` : ''}
@@ -1717,10 +1718,11 @@ function renderRow(inc, showCb, showStatus) {
       <td>
         <div class="row-actions">
           <button class="btn btn-ghost" onclick="openDetail('${inc.id}')">View</button>
-          ${!archived
-            ? `<button class="btn btn-gold captain-hidden" onclick="archiveOne('${inc.id}')">Archive</button>`
-            : `<button class="btn btn-green captain-hidden" onclick="restoreOne('${inc.id}')">Restore</button>`}
-          <button class="btn btn-red captain-hidden" onclick="deleteOne('${inc.id}')">Delete</button>
+          ${canAct ? (!archived
+            ? `<button class="btn btn-gold" onclick="archiveOne('${inc.id}')">Archive</button>`
+            : `<button class="btn btn-green" onclick="restoreOne('${inc.id}')">Restore</button>`)
+          : ''}
+          ${canAct ? `<button class="btn btn-red" onclick="deleteOne('${inc.id}')">Delete</button>` : ''}
         </div>
       </td>
     </tr>`;
@@ -1878,10 +1880,10 @@ function openDetail(id) {
     </div>`;
   document.getElementById('mActions').innerHTML = `
     <div class="print-header">Hawaii Island Business Crime Watch — Incident Report — Printed ${new Date().toLocaleDateString()}</div>
-    ${inc.status==='active'
-      ? `<button class="btn btn-gold captain-hidden" onclick="archiveOne('${id}');closeModal()">📦 Archive</button>`
-      : `<button class="btn btn-green captain-hidden" onclick="restoreOne('${id}');closeModal()">↩ Restore</button>`}
-    <button class="btn btn-red captain-hidden" onclick="deleteOne('${id}');closeModal()">🗑 Delete</button>
+    ${currentRole !== 'captain' ? (inc.status==='active'
+      ? `<button class="btn btn-gold" onclick="archiveOne('${id}');closeModal()">📦 Archive</button>`
+      : `<button class="btn btn-green" onclick="restoreOne('${id}');closeModal()">↩ Restore</button>`) : ''}
+    ${currentRole !== 'captain' ? `<button class="btn btn-red" onclick="deleteOne('${id}');closeModal()">🗑 Delete</button>` : ''}
     <button class="btn btn-teal" onclick="printIncident()">🖨 Print / PDF</button>
     <button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
   document.getElementById('overlay').classList.add('open');
