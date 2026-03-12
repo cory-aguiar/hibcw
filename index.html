@@ -1751,7 +1751,7 @@ function toggleDistrictOverlay(mapObj, btn) {
     districtLayers = DISTRICT_GEO.map(d => {
       const poly = L.polygon(d.coords, {
         color: d.color, weight: 2, opacity: 0.8,
-        fillColor: d.color, fillOpacity: 0.10, interactive: true
+        fillColor: d.color, fillOpacity: 0.10, interactive: false
       });
       poly.bindTooltip('<strong>' + d.label + '</strong>',
         { permanent: true, direction: 'center', className: 'district-label' });
