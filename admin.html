@@ -544,9 +544,14 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
     <div id="loginCaptain" style="display:none">
       <div class="login-field">
         <label>Your Email Address</label>
-        <input type="email" id="captainEmail" placeholder="Enter your captain email" onkeydown="if(event.key==='Enter')doCaptainLogin()">
+        <input type="email" id="captainEmail" placeholder="Enter your captain email" onkeydown="if(event.key==='Enter')document.getElementById('captainPin').focus()">
+      </div>
+      <div class="login-field">
+        <label>Your PIN</label>
+        <input type="password" id="captainPin" placeholder="Enter your 4–6 digit PIN" maxlength="6" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')doCaptainLogin()">
       </div>
       <button class="login-btn" onclick="doCaptainLogin()">Sign In as Captain →</button>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);text-align:center;margin-top:10px;line-height:1.6">Your PIN is set by your HIBCW admin.<br>Contact them if you need help signing in.</div>
     </div>
 
     <div class="login-err" id="loginErr"></div>
@@ -1087,9 +1092,13 @@ async function doLogin() {
 
 async function doCaptainLogin() {
   const email = (document.getElementById('captainEmail').value || '').trim().toLowerCase();
+  const pin   = (document.getElementById('captainPin').value   || '').trim();
   const errEl = document.getElementById('loginErr');
   errEl.style.display = 'none';
+
   if (!email) { errEl.textContent = 'Please enter your email address.'; errEl.style.display = 'block'; return; }
+  if (!pin)   { errEl.textContent = 'Please enter your PIN.';           errEl.style.display = 'block'; return; }
+  if (!/^\d{4,6}$/.test(pin)) { errEl.textContent = 'PIN must be 4–6 digits.'; errEl.style.display = 'block'; return; }
 
   // Need Supabase to check — init client first
   if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
@@ -1098,10 +1107,10 @@ async function doCaptainLogin() {
   if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   try {
-    // Look up approved application with this email that has a captain_name set
+    // Look up approved captain record by email — fetch captain_pin for verification
     const { data, error } = await sb
       .from('member_applications')
-      .select('email, full_name, district, captain_name')
+      .select('email, full_name, district, captain_name, captain_pin')
       .eq('status', 'approved')
       .ilike('email', email)
       .not('captain_name', 'is', null)
@@ -1117,6 +1126,21 @@ async function doCaptainLogin() {
     }
 
     const captain = data[0];
+
+    // Verify PIN — must be set and must match
+    if (!captain.captain_pin) {
+      errEl.textContent = 'No PIN has been set for your account. Contact your HIBCW admin.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (String(captain.captain_pin).trim() !== pin) {
+      errEl.textContent = 'Incorrect PIN. Try again or contact your admin.';
+      errEl.style.display = 'block';
+      document.getElementById('captainPin').value = '';
+      document.getElementById('captainPin').focus();
+      return;
+    }
+
     currentRole = 'captain';
     captainDistrict = captain.district;
 
@@ -1165,6 +1189,7 @@ function logout() {
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('pwInput').value = '';
   document.getElementById('captainEmail').value = '';
+  document.getElementById('captainPin').value = '';
   document.getElementById('loginErr').style.display = 'none';
   allIncidents = [];
   // Reset to admin tab
@@ -1867,7 +1892,7 @@ async function loadMembers() {
     // Fetch approved applications to enrich with full profile info
     const {data: apps} = await sb
       .from('member_applications')
-      .select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name,photo_url')
+      .select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name,photo_url,captain_pin')
       .eq('status','approved');
 
     // Build lookup map: email -> application data
@@ -2036,6 +2061,12 @@ function openEditMember(id) {
   const photoSection = document.getElementById('meCaptainPhotoSection');
   if (photoSection) photoSection.style.display = isCaptain ? '' : 'none';
 
+  // PIN group — show only for captains, admin-only field
+  const pinGroup = document.getElementById('meCaptainPinGroup');
+  if (pinGroup) pinGroup.style.display = (isCaptain && currentRole === 'admin') ? '' : 'none';
+  const pinInput = document.getElementById('meCaptainPin');
+  if (pinInput) { pinInput.value = ''; pinInput.type = 'password'; } // always blank on open for security
+
   if (isCaptain) {
     // Reset delete flag and file input
     document.getElementById('mePhotoDeleteFlag').value = '0';
@@ -2104,6 +2135,12 @@ function meMarkPhotoDelete() {
   showToast('🗑', 'Photo will be removed when you save.');
 }
 
+function togglePinVisibility() {
+  const inp = document.getElementById('meCaptainPin');
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
 
 function autoFillCaptainFromDistrict() {
   const district = document.getElementById('meDistrict')?.value;
@@ -2128,9 +2165,13 @@ async function saveMemberEdit() {
   const bizZip    = document.getElementById('meBizZip').value.trim();
   const district  = document.getElementById('meDistrict').value.trim();
   const captainName = document.getElementById('meCaptain').value.trim();
+  const newPin    = (document.getElementById('meCaptainPin')?.value || '').trim();
 
   if (!newEmail || !newEmail.includes('@')) {
     showToast('⚠️', 'A valid email address is required.', 'err'); return;
+  }
+  if (newPin && !/^\d{4,6}$/.test(newPin)) {
+    showToast('⚠️', 'PIN must be 4–6 digits (numbers only).', 'err'); return;
   }
 
   const btn = document.getElementById('meSaveBtn');
@@ -2192,6 +2233,8 @@ async function saveMemberEdit() {
     photo_url:        resolvedPhotoUrl || null,
     status:           'approved'
   };
+  // Only update PIN if a new one was entered — blank = keep existing
+  if (newPin) profile.captain_pin = newPin;
 
   // Check if an application record exists for this member
   const { data: existing } = await sb
@@ -3746,6 +3789,15 @@ function admToggleHeat() {
       <div class="mf-group">
         <div class="mf-label">District Captain Name</div>
         <input class="tb-search" id="meCaptain" type="text" placeholder="Captain's full name" style="width:100%">
+      </div>
+      <!-- Captain PIN — only shown when member is a captain -->
+      <div class="mf-group" id="meCaptainPinGroup" style="display:none">
+        <div class="mf-label">Captain Login PIN <span style="color:var(--slate2);font-weight:400;text-transform:none;letter-spacing:0">(4–6 digits)</span></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="tb-search" id="meCaptainPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Set or update PIN…" style="width:100%;letter-spacing:.2em;font-size:1.1rem">
+          <button class="btn btn-ghost" type="button" style="flex-shrink:0;font-size:.7rem" onclick="togglePinVisibility()">👁</button>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);margin-top:5px">Captains use this PIN + their email to sign in. Leave blank to keep the existing PIN.</div>
       </div>
       <input type="hidden" id="meId">
       <input type="hidden" id="meOrigEmail">
