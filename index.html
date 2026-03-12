@@ -580,7 +580,7 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
     <div class="header-right">
       <div class="live-dot"><span class="dot"></span>LIVE</div>
       <div class="count-badge" id="countBadge">0 incidents</div>
-      <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border2)'">🌙</button>
+      <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 12px;cursor:pointer;font-size:.65rem;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--slate)'">🌙 Dark</button>
       <a href="https://form.jotform.com/260695751808064" target="_blank" rel="noopener" class="donate-link">💛 Donate</a>
       <a href="apply.html" class="member-link">✅ Join</a>
     </div>
@@ -2106,7 +2106,7 @@ function clearMapFilter() {
 function toggleTheme() {
   const isLight = document.body.classList.toggle('light');
   localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
-  document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+  document.getElementById('themeToggle').textContent = isLight ? '☀️ Light' : '🌙 Dark';
 }
 (function initTheme() {
   const saved = localStorage.getItem('hibcw-theme');
@@ -2114,7 +2114,7 @@ function toggleTheme() {
     document.body.classList.add('light');
     document.addEventListener('DOMContentLoaded', () => {
       const btn = document.getElementById('themeToggle');
-      if (btn) btn.textContent = '☀️';
+      if (btn) btn.textContent = '☀️ Light';
     });
   }
 })();
