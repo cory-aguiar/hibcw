@@ -1115,38 +1115,85 @@ async function geocodeAddress() {
 
   let latF = null, lngF = null;
 
+  // Strip any existing Hawaii/HI/zip suffix so we can append cleanly
+  const cleanAddr = addr.replace(/,?\s*(HI|Hawaii)\s*\d{0,5}/gi, '').trim();
+  const fullAddr  = cleanAddr + ', Hawaii, USA';
+
+  // ── Primary: Nominatim — no custom User-Agent (avoids policy rejection in browsers) ──
   try {
-    // ── Primary: US Census Bureau Geocoder (free, no key, great Hawaii coverage) ──
-    const censusUrl = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(addr)}&benchmark=2020&format=json`;
-    const censusRes  = await fetch(censusUrl);
-    const censusData = await censusRes.json();
-    const match = censusData?.result?.addressMatches?.[0];
-
+    const nomUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(fullAddr)}&format=json&limit=3&countrycodes=us`;
+    const nomRes  = await fetch(nomUrl);
+    const nomData = await nomRes.json();
+    // Filter to Big Island bounding box: lat 18.9–20.3, lon -156.1 to -154.8
+    const match = nomData.find(r => {
+      const lt = parseFloat(r.lat), ln = parseFloat(r.lon);
+      return lt >= 18.9 && lt <= 20.3 && ln >= -156.1 && ln <= -154.8;
+    }) || nomData[0];
     if (match) {
-      latF = parseFloat(match.coordinates.y);
-      lngF = parseFloat(match.coordinates.x);
-      // Use the matched address to clean up the field
-      if (match.matchedAddress) document.getElementById('fAddr').value = match.matchedAddress;
+      latF = parseFloat(match.lat);
+      lngF = parseFloat(match.lon);
     }
-  } catch(e) { /* Census failed — try fallback */ }
+  } catch(e) { /* try next */ }
 
-  // ── Fallback: Nominatim (OpenStreetMap) ──
+  // ── Fallback 1: Nominatim structured search (separate city field helps matching) ──
   if (latF === null) {
     try {
-      // Strip state/zip before appending Hawaii to avoid conflicts
-      const cleanAddr = addr.replace(/,?\s*(HI|Hawaii)\s*\d{0,5}/gi, '').trim();
-      const nomUrl  = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cleanAddr + ', Hawaii Island, Hawaii, USA')}&format=json&limit=1&countrycodes=us`;
-      const nomRes  = await fetch(nomUrl, { headers: { 'User-Agent': 'HIBCW/2.0' } });
-      const nomData = await nomRes.json();
-      if (nomData?.length) {
-        latF = parseFloat(nomData[0].lat);
-        lngF = parseFloat(nomData[0].lon);
+      const street = cleanAddr.replace(/,.*$/, '').trim();
+      const nomUrl2 = `https://nominatim.openstreetmap.org/search?street=${encodeURIComponent(street)}&state=Hawaii&country=US&format=json&limit=3`;
+      const nomRes2  = await fetch(nomUrl2);
+      const nomData2 = await nomRes2.json();
+      const match2 = nomData2.find(r => {
+        const lt = parseFloat(r.lat), ln = parseFloat(r.lon);
+        return lt >= 18.9 && lt <= 20.3 && ln >= -156.1 && ln <= -154.8;
+      }) || nomData2[0];
+      if (match2) {
+        latF = parseFloat(match2.lat);
+        lngF = parseFloat(match2.lon);
       }
-    } catch(e) { /* both failed */ }
+    } catch(e) { /* try next */ }
+  }
+
+  // ── Fallback 2: US Census Bureau Geocoder ──
+  if (latF === null) {
+    try {
+      const censusUrl = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(cleanAddr + ', HI')}&benchmark=Public_AR_Current&format=json`;
+      const censusRes  = await fetch(censusUrl);
+      const censusData = await censusRes.json();
+      const match = censusData?.result?.addressMatches?.[0];
+      if (match) {
+        latF = parseFloat(match.coordinates.y);
+        lngF = parseFloat(match.coordinates.x);
+        if (match.matchedAddress) document.getElementById('fAddr').value = match.matchedAddress;
+      }
+    } catch(e) { /* all failed */ }
+  }
+
+  // ── Fallback 3: Photon (OSM-based, no rate-limit headers needed) ──
+  if (latF === null) {
+    try {
+      const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(fullAddr)}&limit=5&lang=en`;
+      const photonRes  = await fetch(photonUrl);
+      const photonData = await photonRes.json();
+      const match = (photonData?.features || []).find(f => {
+        const [ln, lt] = f.geometry?.coordinates || [];
+        return lt >= 18.9 && lt <= 20.3 && ln >= -156.1 && ln <= -154.8;
+      });
+      if (match) {
+        latF = match.geometry.coordinates[1];
+        lngF = match.geometry.coordinates[0];
+      }
+    } catch(e) { /* all failed */ }
   }
 
   if (latF === null) {
-    pinTxt.textContent = '⚠️ Address not found — try a nearby intersection, or click the map to place pin manually';
+    pinTxt.textContent = '⚠️ Address not found — try adding a city (e.g. "Hilo" or "Kona"), or click the map to place pin manually';
+    btn.textContent = '🔍'; btn.disabled = false;
+    return;
+  }
+
+  // Sanity-check result is on the Big Island
+  if (latF < 18.9 || latF > 20.3 || lngF < -156.1 || lngF > -154.8) {
+    pinTxt.textContent = '⚠️ Result seems off-island — try adding "Hilo" or "Kona, HI" to your address';
     btn.textContent = '🔍'; btn.disabled = false;
     return;
   }
