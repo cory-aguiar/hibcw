@@ -1893,6 +1893,37 @@ function googleTranslateElementInit() {
     layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
     autoDisplay: false
   }, 'google_translate_element');
+
+  // After widget loads, watch for changes to detect when English is re-selected
+  setTimeout(() => {
+    const sel = document.querySelector('.goog-te-combo');
+    if (!sel) return;
+
+    // Add English as the first option
+    const engOpt = document.createElement('option');
+    engOpt.value = '';
+    engOpt.textContent = '🌐 Language';
+    sel.insertBefore(engOpt, sel.firstChild);
+    sel.value = '';
+
+    sel.addEventListener('change', () => {
+      if (sel.value === '') revertToEnglish();
+    });
+  }, 1000);
+}
+
+function revertToEnglish() {
+  // Remove the Google translate cookie and reload
+  const cookie = document.cookie.split(';');
+  for (let c of cookie) {
+    const eqPos = c.indexOf('=');
+    const name  = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+    if (name === 'googtrans') {
+      document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname;
+    }
+  }
+  window.location.reload();
 }
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
