@@ -15,6 +15,29 @@
   --slate:#7a8fa6;--slate2:#4a6070;--white:#eef3f8;
   --border:rgba(0,201,167,.15);--b2:rgba(255,255,255,.07);
 }
+/* ── Light mode ───────────────────────────────────────────── */
+body.light{
+  --navy:#f0f4f8;--navy2:#ffffff;--navy3:#e8eef5;
+  --teal:#007a65;--gold:#b87c0a;--red:#c0273d;
+  --slate:#4a5f72;--slate2:#7a95a8;--white:#0f1e2e;
+  --border:rgba(0,122,101,.2);--b2:rgba(0,0,0,.1);
+}
+body.light{background:#f0f4f8;color:#0f1e2e}
+body.light header{background:linear-gradient(90deg,#dce8f5,#eaf1f8)!important;border-bottom-color:rgba(0,122,101,.2)!important}
+body.light .back-btn{border-color:rgba(0,0,0,.15);color:#4a5f72}
+body.light .back-btn:hover{border-color:#007a65;color:#007a65}
+body.light .benefit{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .benefit-title{color:#0f1e2e}
+body.light .form-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .form-title{border-bottom-color:rgba(0,0,0,.1);color:#0f1e2e}
+body.light .fld input,.body.light .fld textarea{background:rgba(0,0,0,.04)!important;border-color:rgba(0,0,0,.15)!important;color:#0f1e2e!important}
+body.light .fld input:focus,.body.light .fld textarea:focus{border-color:#007a65!important}
+body.light .fld input::placeholder,.body.light .fld textarea::placeholder{color:#7a95a8!important}
+body.light .disc{background:rgba(0,122,101,.06);border-color:rgba(0,122,101,.2)}
+body.light .page-footer{border-top-color:rgba(0,0,0,.1)}
+body.light select{background:#fff!important;color:#0f1e2e!important;border-color:rgba(0,0,0,.15)!important}
+body.light select option{background:#fff!important;color:#0f1e2e!important}
+
 html,body{min-height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
 
 /* ── Header ── */
@@ -149,7 +172,10 @@ select option{background:#1a2b45;color:#c8d8e8}
       <div class="logo-sub">Hawaii Island Business Crime Watch</div>
     </div>
   </div>
-  <a href="index.html" class="back-btn">← Back to Map</a>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
+    <a href="index.html" class="back-btn">← Back to Map</a>
+  </div>
 </header>
 
 <div class="page">
@@ -189,7 +215,7 @@ select option{background:#1a2b45;color:#c8d8e8}
 
     <div class="disc">
       Applications are reviewed by KIAA staff. You will be notified once your
-      membership is approved. There is no cost to join the HIBCW network.
+      membership is approved. There is no cost to join the Crime Watch network.
     </div>
 
     <div class="fld-row">
@@ -350,6 +376,24 @@ async function submitApplication() {
   document.getElementById('successBox').style.display = 'block';
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
+</script>
+
+<script>
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+}
+(function initTheme() {
+  const saved = localStorage.getItem('hibcw-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeToggle');
+      if (btn) btn.textContent = '☀️';
+    });
+  }
+})();
 </script>
 </body>
 </html>
