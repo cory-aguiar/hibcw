@@ -1822,6 +1822,33 @@ async function bulkDelete() {
 /* ════════════════════════════════════════════════════
    DETAIL MODAL
 ════════════════════════════════════════════════════ */
+function captainCardHtml(districtId) {
+  const captain = memberList.find(m =>
+    m.district === districtId &&
+    m.captain_name && m.full_name &&
+    m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()
+  );
+  if (!captain) return '';
+
+  const distColor = DISTRICT_GEO.find(d => d.id === districtId)?.color || '#00c9a7';
+  const initials  = (captain.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  const avatar    = captain.photo_url
+    ? `<img src="${captain.photo_url}" alt="${initials}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid ${distColor}66;flex-shrink:0">`
+    : `<div style="width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${distColor}22;border:2px solid ${distColor}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;color:${distColor}">${initials}</div>`;
+
+  return `<div class="mf-row" style="background:${distColor}0d;border:1px solid ${distColor}30;border-radius:6px;padding:10px 12px;">
+    <div class="mf-label" style="color:${distColor};margin-bottom:8px">👮 District Captain</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      ${avatar}
+      <div style="min-width:0">
+        <div style="font-weight:600;font-size:.85rem;color:var(--white)">${esc(captain.full_name)}</div>
+        ${captain.phone ? `<div style="font-size:.75rem;color:var(--slate);margin-top:2px"><a href="tel:${captain.phone}" style="color:var(--slate);text-decoration:none" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--slate)'">📞 ${esc(captain.phone)}</a></div>` : ''}
+        ${captain.email ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--slate);margin-top:2px"><a href="mailto:${captain.email}" style="color:var(--slate);text-decoration:none" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--slate)'">✉️ ${esc(captain.email)}</a></div>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
 function openDetail(id) {
   const inc = allIncidents.find(i=>i.id===id);
   if (!inc) return;
@@ -1832,6 +1859,7 @@ function openDetail(id) {
   document.getElementById('mBody').innerHTML = `
     <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)} &nbsp;${ageTag(inc.occurred_at)}</div></div>
     ${inc.district ? `<div class="mf-row"><div class="mf-label">District</div><div class="mf-val"><span class="teal-badge">${DISTRICT_GEO.find(d=>d.id===inc.district)?.label||inc.district}</span></div></div>` : ''}
+    ${inc.district ? captainCardHtml(inc.district) : ''}
     <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${esc(inc.address)}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span> &nbsp;<a href="https://www.google.com/maps?q=&layer=c&cbll=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none">🔭 Street View ↗</a>`:''}</div></div>
     <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${esc(inc.description)}</div></div>
     <div class="mf-row"><div class="mf-label">Reported By</div><div class="mf-val">${esc(inc.reporter_name||'Anonymous')}</div></div>
