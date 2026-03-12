@@ -859,7 +859,7 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
           <option value="kau">District 6 - Kaʻū</option>
           <option value="south-kona">District 7 - South Kona</option>
           <option value="north-kona">District 8 - North Kona</option>
-          <option value="north-kohala">District 9 - North Kohala</option>
+          <option value="north-kohala">District 9 - Kohala</option>
         </select>
         <button class="mfb-clear" id="mapClearBtn" onclick="clearMapFilter()">✕ Clear</button>
         <div class="mfb-count" id="mapFilterCount"></div>
@@ -1495,7 +1495,7 @@ function updateStats() {
 // Council 6 = Kaʻū (Na'alehu, Ocean View, South Point)
 // Council 7 = South Kona (Captain Cook, Kealakekua, Miloli'i)
 // Council 8 = North Kona (Kailua-Kona, Holualoa)
-// Council 9 = North Kohala + Waimea (Waikoloa, Waimea, Hāwī, Kapa'au)
+// Council 9 = Kohala + Waimea (Waikoloa, Waimea, Hāwī, Kapa'au)
 const COUNCIL_TO_DISTRICT = {
   'Council 1': { id:'hamakua',      label:'District 1 - Hāmākua',      color:'#84cc16' },
   'Council 2': { id:'north-hilo',   label:'District 2 - North Hilo',   color:'#3b82f6' },
@@ -1505,7 +1505,7 @@ const COUNCIL_TO_DISTRICT = {
   'Council 6': { id:'kau',          label:'District 6 - Kaʻū',          color:'#ef4444' },
   'Council 7': { id:'south-kona',   label:'District 7 - South Kona',   color:'#f59e0b' },
   'Council 8': { id:'north-kona',   label:'District 8 - North Kona',   color:'#f97316' },
-  'Council 9': { id:'north-kohala', label:'District 9 - North Kohala', color:'#10b981' },
+  'Council 9': { id:'north-kohala', label:'District 9 - Kohala', color:'#10b981' },
 };
 
 // Flat array of districts (for dropdowns, filters, etc.) — ordered 1-9
@@ -1529,7 +1529,7 @@ const DISTRICT_GEO_FALLBACK = [
     coords:[[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.45,-155.88],[19.33,-155.80],[19.28,-155.72],[19.18,-155.87],[19.03,-155.92],[18.95,-155.84],[18.91,-155.68],[19.02,-155.25],[19.28,-155.04],[19.45,-155.35],[19.78,-155.47],[19.90,-155.65]] },
   { id:'north-kona',   label:'District 8 - North Kona',   color:'#f97316',
     coords:[[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.60,-156.07],[19.73,-156.10],[19.85,-156.05],[19.90,-155.96],[19.90,-155.65]] },
-  { id:'north-kohala', label:'District 9 - North Kohala', color:'#10b981',
+  { id:'north-kohala', label:'District 9 - Kohala', color:'#10b981',
     coords:[[20.27,-155.87],[20.27,-156.10],[20.10,-156.07],[20.01,-156.00],[19.94,-155.98],[19.85,-156.05],[19.73,-156.10],[19.60,-156.07],[19.55,-155.93],[19.63,-155.99],[19.72,-155.98],[19.87,-155.87],[19.90,-155.65],[20.27,-155.87]] },
 ];
 
