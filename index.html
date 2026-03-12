@@ -91,6 +91,13 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
 .app{display:flex;flex-direction:column;height:100vh}
 
 /* ── Header ───────────────────────────────────────────────── */
+.disclaimer-bar{
+  background:rgba(245,166,35,.08);border-bottom:1px solid rgba(245,166,35,.2);
+  padding:5px 20px;display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;font-style:italic;
+  color:rgba(245,166,35,.75);letter-spacing:.04em;text-align:center;
+  flex-shrink:0;
+}
 header{
   height:54px;flex-shrink:0;
   background:linear-gradient(90deg,#0b1524,#111e30);
@@ -529,6 +536,11 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
 <div class="app">
 
   <!-- HEADER -->
+  <!-- DISCLAIMER BAR -->
+  <div class="disclaimer-bar">
+    ⚠️ &nbsp;Reports are for community awareness only and are not verified by KIAA or law enforcement.
+  </div>
+
   <header>
     <div class="logo">
       <div class="logo-shield">HIBCW</div>
@@ -563,9 +575,9 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
     <div style="flex:1"></div>
     <div class="stat-pill" style="color:var(--red);font-weight:600">Emergencies: <a href="tel:911" style="color:var(--red);text-decoration:none;font-weight:700">911</a></div>
     <span class="stat-sep">·</span>
-    <div class="stat-pill">HPD non-emergency: <a href="tel:8089353311" style="color:var(--slate);text-decoration:none">​(808) 935-3311</a></div>
+    <div class="stat-pill">HPD non-emergency: <a href="tel:8089353311" style="color:var(--slate);text-decoration:none">(808) 935-3311</a></div>
     <span class="stat-sep">·</span>
-    <div class="stat-pill" style="color:var(--slate2);font-style:italic">Reports are for community awareness only and are not verified by KIAA or law enforcement</div>
+    <div class="stat-pill">Crime Stoppers: <a href="tel:8089618300" style="color:var(--slate);text-decoration:none">(808) 961-8300</a></div>
   </div>
 
   <div class="body">
