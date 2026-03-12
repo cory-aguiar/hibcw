@@ -1370,7 +1370,7 @@ async function submitReport() {
       setTimeout(()=>prog.classList.remove('show'),1400);
     }
 
-    showToast('✅','Incident reported successfully!');
+    showThankYou();
     addMarker(inc);
     incidents.unshift(inc);
     updateCount();
@@ -1384,6 +1384,18 @@ async function submitReport() {
   } finally {
     btn.disabled=false; btn.textContent='⊕ Submit Incident Report';
   }
+}
+
+function showThankYou() {
+  const el = document.getElementById('thankYouOverlay');
+  el.style.display = 'flex';
+  requestAnimationFrame(() => el.classList.add('open'));
+}
+
+function closeThankYou() {
+  const el = document.getElementById('thankYouOverlay');
+  el.classList.remove('open');
+  setTimeout(() => el.style.display = 'none', 200);
 }
 
 function flashSubmit(msg) {
@@ -1864,5 +1876,52 @@ function toggleTheme() {
 })();
 
 </script>
+<!-- THANK YOU MODAL -->
+<div class="overlay" id="thankYouOverlay" onclick="if(event.target===this)closeThankYou()" style="display:none;z-index:9999">
+  <div class="modal" style="max-width:420px;text-align:center;padding:0;overflow:hidden">
+
+    <!-- Teal header band -->
+    <div style="background:linear-gradient(135deg,rgba(0,201,167,.2),rgba(0,201,167,.08));border-bottom:1px solid rgba(0,201,167,.25);padding:32px 24px 24px">
+      <div style="font-size:3.5rem;line-height:1;margin-bottom:12px">🤙🏼</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--white)">Mahalo for Your Report!</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-top:6px">Hawaii Island Business Crime Watch</div>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:24px 28px">
+      <p style="font-size:.88rem;line-height:1.75;color:var(--white);margin:0 0 16px">
+        Your incident report has been submitted and is now visible to HIBCW members and District Captains across Hawaii Island.
+      </p>
+      <p style="font-size:.85rem;line-height:1.75;color:var(--slate);margin:0 0 20px">
+        Every report helps our community stay informed and aware. By sharing what you've witnessed, you're helping local businesses and neighbors protect themselves — and making Hawaii Island a safer place for everyone.
+      </p>
+
+      <!-- Divider -->
+      <div style="border-top:1px solid var(--border2);margin-bottom:18px"></div>
+
+      <!-- Contact -->
+      <div style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.18);border-radius:8px;padding:12px 16px;margin-bottom:20px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:6px">Questions or Concerns?</div>
+        <a href="mailto:hibcw@kiaahilo.org" style="font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--white);text-decoration:none;transition:color .15s"
+          onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--white)'">
+          ✉️ hibcw@kiaahilo.org
+        </a>
+      </div>
+
+      <button onclick="closeThankYou()" style="
+        width:100%;padding:12px;
+        background:linear-gradient(135deg,#00c9a7,#00a589);
+        border:none;border-radius:7px;
+        font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;
+        letter-spacing:.06em;text-transform:uppercase;
+        color:var(--navy);cursor:pointer;
+        transition:opacity .2s
+      " onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        Done
+      </button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
