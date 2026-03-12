@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HIBCW Public Beta — Become a Member</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0b1524;--navy2:#111e30;--navy3:#18293f;
+  --teal:#00c9a7;--gold:#f5a623;--red:#e8415a;
+  --slate:#7a8fa6;--slate2:#4a6070;--white:#eef3f8;
+  --border:rgba(0,201,167,.15);--b2:rgba(255,255,255,.07);
+}
+/* ── Light mode ───────────────────────────────────────────── */
+body.light{
+  --navy:#f0f4f8;--navy2:#ffffff;--navy3:#e8eef5;
+  --teal:#007a65;--gold:#b87c0a;--red:#c0273d;
+  --slate:#4a5f72;--slate2:#7a95a8;--white:#0f1e2e;
+  --border:rgba(0,122,101,.2);--b2:rgba(0,0,0,.1);
+}
+body.light{background:#f0f4f8;color:#0f1e2e}
+body.light header{background:linear-gradient(90deg,#dce8f5,#eaf1f8)!important;border-bottom-color:rgba(0,122,101,.2)!important}
+body.light .back-btn{border-color:rgba(0,0,0,.15);color:#4a5f72}
+body.light .back-btn:hover{border-color:#007a65;color:#007a65}
+body.light .benefit{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .benefit-title{color:#0f1e2e}
+body.light .form-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .form-title{border-bottom-color:rgba(0,0,0,.1);color:#0f1e2e}
+body.light .fld input,.body.light .fld textarea{background:rgba(0,0,0,.04)!important;border-color:rgba(0,0,0,.15)!important;color:#0f1e2e!important}
+body.light .fld input:focus,.body.light .fld textarea:focus{border-color:#007a65!important}
+body.light .fld input::placeholder,.body.light .fld textarea::placeholder{color:#7a95a8!important}
+body.light .disc{background:rgba(0,122,101,.06);border-color:rgba(0,122,101,.2)}
+body.light .page-footer{border-top-color:rgba(0,0,0,.1)}
+body.light select{background:#fff!important;color:#0f1e2e!important;border-color:rgba(0,0,0,.15)!important}
+body.light select option{background:#fff!important;color:#0f1e2e!important}
+
+html,body{min-height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
+
+/* ── Header ── */
+header{
+  background:linear-gradient(90deg,#0b1524,#111e30);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.hd-left{display:flex;align-items:center;gap:10px}
+.logo-shield{
+  width:32px;height:32px;flex-shrink:0;
+  background:linear-gradient(160deg,#002266,#001133);
+  border:1.5px solid var(--gold);
+  clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani',sans-serif;font-size:.7rem;font-weight:700;color:var(--gold);
+}
+.logo-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.08em}
+.logo-sub{font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--teal);letter-spacing:.12em;text-transform:uppercase}
+.back-btn{
+  background:none;border:1px solid var(--b2);border-radius:4px;
+  padding:5px 13px;color:var(--slate);font-size:.75rem;cursor:pointer;
+  text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:5px;
+}
+.back-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+/* ── Page layout ── */
+.page{max-width:640px;margin:0 auto;padding:40px 24px 60px}
+.page-hero{text-align:center;margin-bottom:40px}
+.page-shield{
+  width:64px;height:64px;margin:0 auto 16px;
+  background:linear-gradient(160deg,#002266,#001133);
+  border:2px solid var(--gold);
+  clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:var(--gold);
+}
+.page-title{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;letter-spacing:.05em;margin-bottom:10px}
+.page-sub{font-size:.88rem;color:var(--slate);line-height:1.7;max-width:480px;margin:0 auto}
+
+/* ── Benefits strip ── */
+.benefits{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  margin-bottom:36px;
+}
+.benefit{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:8px;
+  padding:16px 14px;text-align:center;
+}
+.benefit-icon{font-size:1.4rem;margin-bottom:8px}
+.benefit-title{font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.06em;color:var(--white);margin-bottom:4px}
+.benefit-desc{font-size:.72rem;color:var(--slate);line-height:1.5}
+
+/* ── Form card ── */
+.form-card{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:12px;
+  padding:32px;
+}
+.form-title{
+  font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;
+  letter-spacing:.06em;margin-bottom:24px;padding-bottom:14px;
+  border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:8px;
+}
+.fld{margin-bottom:18px}
+.fld label{
+  display:block;font-family:'IBM Plex Mono',monospace;font-size:.58rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:6px;
+}
+.fld input,.fld textarea{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b2);
+  border-radius:5px;padding:10px 13px;color:var(--white);font-size:.88rem;
+  outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;
+}
+.fld input:focus,.fld textarea:focus{border-color:var(--teal)}
+.fld input.err,.fld textarea.err{border-color:var(--red)}
+.fld input::placeholder,.fld textarea::placeholder{color:var(--slate2)}
+.fld textarea{resize:vertical;min-height:80px}
+select option{background:#1a2b45;color:#c8d8e8}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.req{color:var(--red);margin-left:2px}
+
+/* ── Submit ── */
+.submit-btn{
+  width:100%;padding:13px;border:none;border-radius:6px;cursor:pointer;
+  background:linear-gradient(135deg,var(--teal),#00a589);
+  color:#0b1524;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;transition:filter .2s;margin-top:8px;
+}
+.submit-btn:hover{filter:brightness(1.1)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;filter:none}
+
+/* ── Disclaimer ── */
+.disc{
+  background:rgba(0,201,167,.05);border:1px solid rgba(0,201,167,.15);
+  border-radius:6px;padding:12px 14px;margin-bottom:20px;
+  font-size:.75rem;color:var(--slate);line-height:1.6;
+}
+
+/* ── Success state ── */
+.success-box{
+  text-align:center;padding:40px 24px;display:none;
+}
+.success-icon{font-size:3rem;margin-bottom:16px}
+.success-title{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:var(--teal);margin-bottom:10px}
+.success-msg{font-size:.88rem;color:var(--slate);line-height:1.7;max-width:400px;margin:0 auto 24px}
+
+/* ── Footer ── */
+.page-footer{
+  text-align:center;padding:20px 24px;
+  font-size:.72rem;color:var(--slate2);border-top:1px solid var(--b2);
+  margin-top:40px;
+}
+.page-footer a{color:var(--slate);text-decoration:none}
+.page-footer a:hover{color:var(--teal)}
+
+@media(max-width:600px){
+  .benefits{grid-template-columns:1fr}
+  .fld-row{grid-template-columns:1fr}
+  .form-card{padding:20px}
+  .page{padding:24px 16px 40px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-left">
+    <div class="logo-shield">HIBCW</div>
+    <div>
+      <div class="logo-name">HIBCW</div>
+      <div class="logo-sub">Hawaii Island Business Crime Watch</div>
+    </div>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(245,166,35,.15);color:#f5a623;border:1px solid rgba(245,166,35,.35);border-radius:4px;padding:2px 7px;white-space:nowrap;margin-left:4px">PUBLIC BETA</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
+    <a href="index.html" class="back-btn">← Back to Map</a>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="page-hero">
+    <div class="page-shield">KIAA</div>
+    <div class="page-title">Become a Verified Member</div>
+    <div class="page-sub">
+      Join the Hawaii Island Business Crime Watch network. Verified members
+      receive a ✅ badge on incident reports, helping build trust and
+      credibility in our community safety network.
+    </div>
+  </div>
+
+  <!-- Benefits -->
+  <div class="benefits">
+    <div class="benefit">
+      <div class="benefit-icon">✅</div>
+      <div class="benefit-title">Verified Badge</div>
+      <div class="benefit-desc">Your incident reports display a verified KIAA member badge</div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon">🤝</div>
+      <div class="benefit-title">Community Network</div>
+      <div class="benefit-desc">Connect with fellow Hilo business owners committed to safety</div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon">🔔</div>
+      <div class="benefit-title">Stay Informed</div>
+      <div class="benefit-desc">Be part of Hawaii Island's most active business crime watch</div>
+    </div>
+  </div>
+
+  <!-- Form card -->
+  <div class="form-card" id="formCard">
+    <div class="form-title">📋 Membership Application</div>
+
+    <div class="disc">
+      Applications are reviewed by KIAA staff. You will be notified once your
+      membership is approved. There is no cost to join the Crime Watch network.
+    </div>
+
+    <div class="fld-row">
+      <div class="fld">
+        <label>Full Name <span class="req">*</span></label>
+        <input type="text" id="aName" placeholder="Your full name">
+      </div>
+      <div class="fld">
+        <label>Email Address <span class="req">*</span></label>
+        <input type="email" id="aEmail" placeholder="your@email.com">
+      </div>
+    </div>
+
+    <div class="fld">
+      <label>Phone Number <span class="req">*</span></label>
+      <input type="tel" id="aPhone" placeholder="(808) 000-0000">
+    </div>
+
+    <div class="fld">
+      <label>Business Name <span class="req">*</span></label>
+      <input type="text" id="aBizName" placeholder="Your business name">
+    </div>
+
+    <div class="fld">
+      <label>Business Street Address <span class="req">*</span></label>
+      <input type="text" id="aBizAddr" placeholder="123 Kamehameha Ave">
+    </div>
+    <div class="fld-row" style="grid-template-columns:2fr 1fr 1fr">
+      <div class="fld">
+        <label>City <span class="req">*</span></label>
+        <input type="text" id="aBizCity" placeholder="Hilo">
+      </div>
+      <div class="fld">
+        <label>State <span class="req">*</span></label>
+        <input type="text" id="aBizState" placeholder="HI" maxlength="2">
+      </div>
+      <div class="fld">
+        <label>Zip Code <span class="req">*</span></label>
+        <input type="text" id="aBizZip" placeholder="96720" maxlength="10">
+      </div>
+    </div>
+
+    <div class="fld">
+      <label>Business District <span class="req">*</span></label>
+      <select id="aDistrict" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:10px 13px;color:var(--white);font-size:.88rem;outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;-webkit-appearance:none">
+              <option value="">— Select your district…</option>
+              <option value="hamakua">District 1 - Hāmākua</option>
+              <option value="north-hilo">District 2 - North Hilo</option>
+              <option value="south-hilo">District 3 - South Hilo</option>
+              <option value="lower-puna">District 4 - Lower Puna</option>
+              <option value="upper-puna">District 5 - Upper Puna</option>
+              <option value="kau">District 6 - Kaʻū</option>
+              <option value="south-kona">District 7 - South Kona</option>
+              <option value="north-kona">District 8 - North Kona</option>
+              <option value="north-kohala">District 9 - Kohala</option>
+      </select>
+    </div>
+
+    <div class="fld">
+      <label>Additional Notes (optional)</label>
+      <textarea id="aNotes" placeholder="Anything else you'd like KIAA to know…"></textarea>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitApplication()">
+      Submit Application →
+    </button>
+  </div>
+
+  <!-- Success state -->
+  <div class="success-box" id="successBox">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Application Submitted!</div>
+    <div class="success-msg">
+      Thank you for applying to join the Hawaii Island Business Crime Watch.
+      KIAA staff will review your application and be in touch shortly.
+      Once approved, your email will receive a verified member badge on all incident reports.
+    </div>
+    <a href="index.html" class="submit-btn" style="display:inline-block;width:auto;padding:12px 32px;text-decoration:none">
+      ← Return to Map
+    </a>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  Hawaii Island Business Crime Watch &nbsp;·&nbsp;
+  A Program of <a href="https://kiaahilo.org" target="_blank">KIAA</a> &nbsp;·&nbsp;
+  820 Piilani St Suite 201, Hilo HI &nbsp;·&nbsp;
+  <a href="tel:8089615422">(808) 961-5422</a>
+</div>
+
+<script>
+let sb = null;
+
+(function init() {
+  if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) return;
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+})();
+
+async function submitApplication() {
+  const name    = document.getElementById('aName').value.trim();
+  const email   = document.getElementById('aEmail').value.trim().toLowerCase();
+  const phone   = document.getElementById('aPhone').value.trim();
+  const bizName = document.getElementById('aBizName').value.trim();
+  const bizAddr  = document.getElementById('aBizAddr').value.trim();
+  const bizCity  = document.getElementById('aBizCity').value.trim();
+  const bizState = document.getElementById('aBizState').value.trim().toUpperCase();
+  const bizZip   = document.getElementById('aBizZip').value.trim();
+  const district = document.getElementById('aDistrict').value.trim();
+  const notes    = document.getElementById('aNotes').value.trim();
+
+  // Validate
+  let ok = true;
+  [['aName',name],['aEmail',email],['aPhone',phone],['aBizName',bizName],['aBizAddr',bizAddr],['aBizCity',bizCity],['aBizState',bizState],['aBizZip',bizZip],['aDistrict',district]]
+    .forEach(([id,val]) => {
+      const el = document.getElementById(id);
+      if (!val) { el.classList.add('err'); ok = false; }
+      else el.classList.remove('err');
+    });
+  if (!ok) return;
+
+  if (!email.includes('@')) {
+    document.getElementById('aEmail').classList.add('err'); return;
+  }
+
+  if (!sb) {
+    alert('Configuration error — please contact KIAA directly at (808) 961-5422.');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Submitting…';
+
+  const {error} = await sb.from('member_applications').insert({
+    full_name:    name,
+    email:        email,
+    phone:        phone,
+    business_name: bizName,
+    business_address: bizAddr  || null,
+    business_city:    bizCity  || null,
+    business_state:   bizState || null,
+    business_zip:     bizZip   || null,
+    district:         district || null,
+    notes:            notes    || null,
+    status:       'pending'
+  });
+
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = 'Submit Application →';
+    alert('Submission failed: ' + error.message + '\nPlease contact KIAA directly at (808) 961-5422.');
+    return;
+  }
+
+  // Show success
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('successBox').style.display = 'block';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+<script>
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+}
+(function initTheme() {
+  const saved = localStorage.getItem('hibcw-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeToggle');
+      if (btn) btn.textContent = '☀️';
+    });
+  }
+})();
+</script>
+</body>
+</html>
