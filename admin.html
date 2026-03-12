@@ -904,6 +904,7 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
           <button class="btn btn-teal btn-lg captain-hidden" onclick="addMember()">＋ Add Member</button>
           <button class="btn btn-ghost btn-lg captain-hidden" onclick="importMemberCSV()">⬆ Import CSV</button>
           <input type="file" id="memberCSVInput" accept=".csv" style="display:none" onchange="handleMemberCSV(this)">
+          <input type="file" id="captainPhotoInput" accept="image/*" style="display:none" onchange="handleCaptainPhotoUpload(this)">
         </div>
         <div class="member-toolbar">
           <input class="member-search" type="text" id="memberSearch" placeholder="🔍  Search name, email, business…" oninput="renderMembers()">
@@ -1865,7 +1866,7 @@ async function loadMembers() {
     // Fetch approved applications to enrich with full profile info
     const {data: apps} = await sb
       .from('member_applications')
-      .select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name')
+      .select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name,photo_url')
       .eq('status','approved');
 
     // Build lookup map: email -> application data
@@ -2151,12 +2152,16 @@ function renderCaptains() {
 
   // Build lookup: district -> {captain, members:[]}
   const distMap = {};
-  DISTRICTS.forEach(([v]) => { distMap[v] = {captain: null, members: []}; });
+  DISTRICTS.forEach(([v]) => { distMap[v] = {captain: null, members: [], photo_url: null}; });
   memberList.forEach(m => {
     if (m.district && distMap[m.district]) {
       distMap[m.district].members.push(m);
       if (m.captain_name && !distMap[m.district].captain) {
         distMap[m.district].captain = m.captain_name;
+        // Also grab photo if this is the captain member
+        if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()) {
+          distMap[m.district].photo_url = m.photo_url || null;
+        }
       }
     }
   });
@@ -2195,16 +2200,18 @@ function renderCaptains() {
     })() : 'var(--slate2)';
 
     const isMine = (currentRole === 'captain' && captainDistrict === v);
+    const photoUrl = info.photo_url || null;
     return `<div style="background:var(--navy2);border:1px solid ${isMine ? distColor : (hasCaptain ? 'rgba(0,201,167,.2)' : 'var(--b2)')};${isMine ? 'box-shadow:0 0 0 2px ' + distColor + '44' : ''};border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 0 0 2px ${distColor}66'" onmouseout="this.style.boxShadow='${isMine ? '0 0 0 2px ' + distColor + '44' : 'none'}'">
       ${isMine ? '<div style="font-family:IBM Plex Mono,monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:' + distColor + ';background:' + distColor + '15;border-radius:4px;padding:3px 8px;text-align:center;margin-bottom:-4px">★ Your District</div>' : ''}
 
       <!-- Header row -->
       <div style="display:flex;align-items:center;gap:12px">
         <div style="width:36px;height:36px;border-radius:8px;background:${distColor}22;border:1px solid ${distColor}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:800;font-size:1rem;color:${distColor};flex-shrink:0">${num}</div>
-        <div style="min-width:0">
+        <div style="min-width:0;flex:1">
           <div style="font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(fullLabel)}</div>
           <div style="font-size:.72rem;color:var(--slate2);margin-top:1px">${hasCaptain ? '👮 ' + esc(captain) : '<span style="font-style:italic">No captain assigned</span>'}</div>
         </div>
+        ${photoUrl ? `<img src="${photoUrl}" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid ${distColor}55;flex-shrink:0">` : ''}
       </div>
 
       <!-- Stats row -->
@@ -2234,6 +2241,77 @@ function renderCaptains() {
       </div>
     </div>`;
   }).join('');
+}
+
+/* ─── Captain Photo Upload ───────────────────────────────── */
+let _captainPhotoUploadDistrict = null;
+
+function triggerCaptainPhotoUpload(districtId) {
+  _captainPhotoUploadDistrict = districtId;
+  const inp = document.getElementById('captainPhotoInput');
+  if (inp) inp.click();
+}
+
+async function handleCaptainPhotoUpload(input) {
+  const file = input.files?.[0];
+  input.value = '';
+  if (!file || !_captainPhotoUploadDistrict) return;
+
+  // Validate type & size (max 4 MB)
+  if (!file.type.startsWith('image/')) { showToast('⚠️', 'Please select an image file.', 'err'); return; }
+  if (file.size > 4 * 1024 * 1024)    { showToast('⚠️', 'Image must be under 4 MB.', 'err');  return; }
+
+  const districtId = _captainPhotoUploadDistrict;
+  showToast('⏳', 'Uploading photo…');
+
+  try {
+    // Upload to Supabase storage — overwrite any existing photo for this district
+    const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
+    const path = `captain-photos/${districtId}.${ext}`;
+
+    // Remove old file (any extension) — ignore errors
+    const { data: existing } = await sb.storage.from('incident-media').list('captain-photos');
+    const old = (existing || []).find(f => f.name.startsWith(districtId + '.'));
+    if (old) await sb.storage.from('incident-media').remove([`captain-photos/${old.name}`]);
+
+    const { error: upErr } = await sb.storage.from('incident-media').upload(path, file, { contentType: file.type, upsert: true });
+    if (upErr) throw upErr;
+
+    const { data: urlData } = sb.storage.from('incident-media').getPublicUrl(path);
+    const photoUrl = urlData?.publicUrl;
+    if (!photoUrl) throw new Error('Could not get public URL');
+
+    // Save URL to the captain's member_applications record
+    // Find the captain's app_id in memberList
+    const captainMember = memberList.find(m =>
+      m.district === districtId &&
+      m.captain_name &&
+      m.full_name &&
+      m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()
+    );
+
+    if (captainMember?.app_id) {
+      const { error: dbErr } = await sb.from('member_applications')
+        .update({ photo_url: photoUrl })
+        .eq('id', captainMember.app_id);
+      if (dbErr) throw dbErr;
+    }
+
+    // Update local memberList immediately so re-render shows photo without reload
+    memberList.forEach(m => {
+      if (m.district === districtId && m.captain_name && m.full_name &&
+          m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()) {
+        m.photo_url = photoUrl;
+      }
+    });
+
+    showToast('✅', 'Photo updated!');
+    renderCaptainDirectory();
+    renderCaptains();
+  } catch (e) {
+    console.error('Captain photo upload failed:', e);
+    showToast('⚠️', 'Upload failed: ' + (e.message || 'Unknown error'), 'err');
+  }
 }
 
 /* ─── Print Captain Directory ────────────────────────────── */
@@ -2418,6 +2496,26 @@ function renderCaptainDirectory() {
     const phone      = captain?.phone;
     const biz        = captain?.business_name;
     const bizAddr    = [captain?.business_address, captain?.business_city, captain?.business_state].filter(Boolean).join(', ');
+    const photoUrl   = captain?.photo_url || null;
+    const initials   = name ? esc(name.split(' ').map(w=>w[0]).slice(0,2).join('')) : '?';
+    const canUpload  = currentRole === 'admin' || (currentRole === 'captain' && captainDistrict === v);
+
+    const avatarHtml = photoUrl
+      ? `<div style="position:relative;flex-shrink:0" ${canUpload ? `onclick="triggerCaptainPhotoUpload('${v}')" title="Click to change photo" style="cursor:pointer"` : ''}>
+           <img src="${photoUrl}" alt="${initials}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid ${distColor}55;display:block;">
+           ${canUpload ? `<div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:.6rem;color:#fff;font-weight:700" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">📷</div>` : ''}
+         </div>`
+      : `<div style="
+           width:48px;height:48px;border-radius:50%;flex-shrink:0;
+           background:${distColor}20;border:2px solid ${distColor}44;
+           display:flex;align-items:center;justify-content:center;
+           font-family:Rajdhani,sans-serif;font-size:1.1rem;font-weight:700;color:${distColor};
+           ${canUpload ? 'cursor:pointer;' : ''}
+           position:relative;
+         " ${canUpload ? `onclick="triggerCaptainPhotoUpload('${v}')" title="Click to upload photo"` : ''}>
+           ${initials}
+           ${canUpload ? `<div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:.6rem;color:#fff;font-weight:700" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">📷</div>` : ''}
+         </div>`;
 
     return `<div style="
         background:var(--navy2);
@@ -2447,12 +2545,7 @@ function renderCaptainDirectory() {
       <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
         ${name ? `
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="
-              width:38px;height:38px;border-radius:50%;flex-shrink:0;
-              background:${distColor}20;border:1.5px solid ${distColor}44;
-              display:flex;align-items:center;justify-content:center;
-              font-family:Rajdhani,sans-serif;font-size:1.1rem;font-weight:700;color:${distColor}
-            ">${esc(name.split(' ').map(w=>w[0]).slice(0,2).join(''))}</div>
+            ${avatarHtml}
             <div>
               <div style="font-weight:600;font-size:.9rem">${esc(name)}</div>
               ${biz ? `<div style="font-size:.72rem;color:var(--slate);margin-top:1px">🏢 ${esc(biz)}</div>` : ''}
