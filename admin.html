@@ -2071,15 +2071,17 @@ function renderCaptains() {
     }
   });
 
-  // Count incidents per district
+  // Count incidents per district + track last active date
   const incidentsByDistrict = {};
-  DISTRICTS.forEach(([v]) => { incidentsByDistrict[v] = 0; });
+  const lastActiveByDistrict = {};
+  DISTRICTS.forEach(([v]) => { incidentsByDistrict[v] = 0; lastActiveByDistrict[v] = null; });
   allIncidents.forEach(inc => {
-    if (inc.reporter_email) {
-      const mem = memberList.find(m =>
-        (m.email||'').toLowerCase() === inc.reporter_email.toLowerCase()
-      );
-      if (mem && mem.district) incidentsByDistrict[mem.district] = (incidentsByDistrict[mem.district]||0) + 1;
+    if (inc.district && incidentsByDistrict[inc.district] !== undefined) {
+      incidentsByDistrict[inc.district]++;
+      const t = new Date(inc.occurred_at || inc.created_at);
+      if (!lastActiveByDistrict[inc.district] || t > lastActiveByDistrict[inc.district]) {
+        lastActiveByDistrict[inc.district] = t;
+      }
     }
   });
 
@@ -2092,9 +2094,15 @@ function renderCaptains() {
     const captain    = info.captain;
     const memCount   = info.members.length;
     const incCount   = incidentsByDistrict[v] || 0;
-    const hasCaptain = !!captain;
-    const distColor  = distColorMap[v] || 'var(--teal)';
-    const num        = fullLabel.match(/\d+/)?.[0] || '';
+    const hasCaptain  = !!captain;
+    const distColor   = distColorMap[v] || 'var(--teal)';
+    const num         = fullLabel.match(/\d+/)?.[0] || '';
+    const lastActive  = lastActiveByDistrict[v];
+    const lastActiveStr = lastActive ? ageTag(lastActive) : '—';
+    const lastActiveColor = lastActive ? (() => {
+      const days = (Date.now() - lastActive) / 86400000;
+      return days < 7 ? 'var(--teal)' : days < 30 ? 'var(--gold)' : 'var(--slate)';
+    })() : 'var(--slate2)';
 
     const isMine = (currentRole === 'captain' && captainDistrict === v);
     return `<div style="background:var(--navy2);border:1px solid ${isMine ? distColor : (hasCaptain ? 'rgba(0,201,167,.2)' : 'var(--b2)')};${isMine ? 'box-shadow:0 0 0 2px ' + distColor + '44' : ''};border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 0 0 2px ${distColor}66'" onmouseout="this.style.boxShadow='${isMine ? '0 0 0 2px ' + distColor + '44' : 'none'}'">
@@ -2118,6 +2126,10 @@ function renderCaptains() {
         <div style="flex:1;background:var(--navy3);border-radius:6px;padding:8px 10px;text-align:center">
           <div style="font-family:IBM Plex Mono,monospace;font-size:1.2rem;font-weight:700;color:var(--gold)">${incCount}</div>
           <div style="font-size:.6rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.08em;margin-top:1px">Incident${incCount!==1?'s':''}</div>
+        </div>
+        <div style="flex:1;background:var(--navy3);border-radius:6px;padding:8px 10px;text-align:center" title="${lastActive ? 'Last incident: ' + lastActive.toLocaleDateString() : 'No incidents yet'}">
+          <div style="font-family:IBM Plex Mono,monospace;font-size:.8rem;font-weight:700;color:${lastActiveColor};line-height:1.8">${lastActiveStr}</div>
+          <div style="font-size:.6rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.08em;margin-top:1px">Last Active</div>
         </div>
       </div>
 
@@ -2208,7 +2220,10 @@ function openDistrictModal(districtId) {
       <!-- Footer -->
       <div style="padding:12px 22px;border-top:1px solid var(--b2);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:var(--navy3)">
         <div style="font-size:.75rem;color:var(--slate2)">Click a member's <strong style="color:var(--slate)">Edit</strong> button to update their details or reassign districts.</div>
-        <button class="btn btn-ghost" style="font-size:.75rem" onclick="closeDstModal();showView('members')">✏️ Manage All Members</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" style="font-size:.75rem" onclick="printDistrictRoster()" title="Print or save as PDF">🖨 Print Roster</button>
+          <button class="btn btn-ghost captain-hidden" style="font-size:.75rem" onclick="closeDstModal();showView('members')">✏️ Manage All Members</button>
+        </div>
       </div>
     </div>`;
 
@@ -2221,6 +2236,135 @@ function openDistrictModal(districtId) {
 function closeDstModal() {
   const modal = document.getElementById('districtMembersModal');
   if (modal) modal.style.display = 'none';
+}
+
+function printDistrictRoster() {
+  const modal = document.getElementById('districtMembersModal');
+  if (!modal) return;
+
+  // Grab current visible members from the filtered tbody
+  const tbody = document.getElementById('dstModalBody');
+  const distLabel = modal.querySelector('[style*="Rajdhani"]')?.textContent?.trim() || 'District';
+  const distNum   = distLabel.match(/\d+/)?.[0] || '';
+
+  // Build member rows from stored data (use modal._members so we have all fields)
+  const members = modal._members || [];
+  const captain = members.find(m => m.captain_name)?.captain_name || '—';
+  const today   = new Date().toLocaleDateString('en-US', {year:'numeric', month:'long', day:'numeric'});
+
+  const rows = members.map((m, i) => `
+    <tr>
+      <td class="num">${i + 1}</td>
+      <td>${m.full_name || '—'}${m.captain_name ? ' <span class="cap-badge">★ Captain</span>' : ''}</td>
+      <td>${m.business_name || '—'}</td>
+      <td>${m.business_address ? [m.business_address, m.business_city, m.business_state, m.business_zip].filter(Boolean).join(', ') : '—'}</td>
+      <td>${m.phone || '—'}</td>
+      <td>${m.email || '—'}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HIBCW ${distLabel} — Member Roster</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans', sans-serif; color: #0f1e2e; background: #fff; padding: 36px 44px; font-size: 11px; }
+
+    /* Header */
+    .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #0f1e2e; }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .shield { width: 44px; height: 44px; background: #0f1e2e; clip-path: polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%); display: flex; align-items: center; justify-content: center; }
+    .shield span { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 9px; color: #c9a84c; letter-spacing: .05em; }
+    .org { font-family: 'Rajdhani', sans-serif; }
+    .org-name { font-size: 16px; font-weight: 700; letter-spacing: .06em; color: #0f1e2e; text-transform: uppercase; }
+    .org-sub  { font-size: 9px; color: #556; letter-spacing: .08em; text-transform: uppercase; margin-top: 2px; }
+    .header-right { text-align: right; }
+    .doc-title { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #0f1e2e; }
+    .doc-date  { font-size: 9px; color: #778; margin-top: 3px; font-family: 'IBM Plex Mono', monospace; }
+
+    /* District banner */
+    .district-banner { background: #f0f4f8; border-left: 4px solid #0f1e2e; padding: 12px 18px; margin-bottom: 20px; border-radius: 0 6px 6px 0; display: flex; justify-content: space-between; align-items: center; }
+    .district-name { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: .04em; }
+    .district-meta { font-size: 10px; color: #445; }
+    .district-meta span { font-weight: 600; color: #0f1e2e; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    thead tr { background: #0f1e2e; color: #fff; }
+    thead th { padding: 8px 10px; text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
+    tbody tr { border-bottom: 1px solid #e2e8f0; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:last-child { border-bottom: 2px solid #0f1e2e; }
+    td { padding: 7px 10px; vertical-align: top; line-height: 1.4; }
+    td.num { width: 28px; text-align: center; font-family: 'IBM Plex Mono', monospace; color: #889; font-size: 10px; }
+    .cap-badge { display: inline-block; background: #0f1e2e; color: #c9a84c; font-size: 7.5px; padding: 1px 5px; border-radius: 3px; letter-spacing: .06em; font-family: 'IBM Plex Mono', monospace; vertical-align: middle; margin-left: 4px; }
+
+    /* Footer */
+    .footer { margin-top: 28px; padding-top: 10px; border-top: 1px solid #ccc; display: flex; justify-content: space-between; font-size: 9px; color: #889; font-family: 'IBM Plex Mono', monospace; }
+
+    /* Empty state */
+    .empty { text-align: center; padding: 40px; color: #889; font-style: italic; }
+
+    @media print {
+      body { padding: 20px 28px; }
+      @page { margin: 0.5in; size: letter landscape; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <div class="shield"><span>HIBCW</span></div>
+      <div class="org">
+        <div class="org-name">Hawaii Island Business Crime Watch</div>
+        <div class="org-sub">A Program of KIAA · kiaahilo.org · (808) 961-5422</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="doc-title">Member Roster</div>
+      <div class="doc-date">Generated ${today}</div>
+    </div>
+  </div>
+
+  <div class="district-banner">
+    <div class="district-name">${distLabel}</div>
+    <div class="district-meta">
+      District Captain: <span>${captain}</span> &nbsp;·&nbsp;
+      Total Members: <span>${members.length}</span>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Business</th>
+        <th>Address</th>
+        <th>Phone</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows || '<tr><td colspan="6" class="empty">No members registered in this district yet.</td></tr>'}
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <span>HIBCW · Hawaii Island Business Crime Watch · CONFIDENTIAL — For authorized use only</span>
+    <span>Crime Stoppers (808) 961-8300 · HPD Non-Emergency (808) 935-3311</span>
+  </div>
+
+  <script>window.onload = () => window.print();<\/script>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank', 'width=1000,height=700');
+  win.document.write(html);
+  win.document.close();
 }
 
 /* ─── Set Captain Modal ──────────────────────────────────── */
