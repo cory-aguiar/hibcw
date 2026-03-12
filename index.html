@@ -30,6 +30,61 @@
   --border:  rgba(0,201,167,.15);
   --border2: rgba(255,255,255,.07);
 }
+/* ── Light mode ───────────────────────────────────────────── */
+body.light{
+  --navy:    #f0f4f8;
+  --navy2:   #ffffff;
+  --navy3:   #e8eef5;
+  --teal:    #007a65;
+  --teal2:   #005c4c;
+  --gold:    #b87c0a;
+  --red:     #c0273d;
+  --slate:   #4a5f72;
+  --slate2:  #7a95a8;
+  --white:   #0f1e2e;
+  --border:  rgba(0,122,101,.2);
+  --border2: rgba(0,0,0,.1);
+}
+body.light{background:#f0f4f8;color:#0f1e2e}
+body.light header{background:linear-gradient(90deg,#dce8f5,#eaf1f8)!important;border-bottom:1px solid rgba(0,122,101,.2)!important}
+body.light .donate-link{border-color:rgba(0,122,101,.3);color:#007a65}
+body.light .tab-bar{background:#e2ecf5;border-bottom:1px solid rgba(0,0,0,.08)}
+body.light .tab-btn{color:#4a5f72}
+body.light .tab-btn.on{background:#fff;color:#007a65;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+body.light .side-panel{background:#f0f4f8;border-right:1px solid rgba(0,0,0,.08)}
+body.light .stats-bar{background:#e2ecf5;border-bottom:1px solid rgba(0,0,0,.08)}
+body.light .stat-val{color:#007a65}
+body.light .stat-lbl{color:#7a95a8}
+body.light .fld input,.body.light .fld textarea,.body.light .fld select{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .fld label{color:#4a5f72}
+body.light .fld input::placeholder,.body.light .fld textarea::placeholder{color:#7a95a8}
+body.light .form-section{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .form-section-title{color:#0f1e2e;border-bottom-color:rgba(0,0,0,.08)}
+body.light .filt{background:#fff!important;border-color:rgba(0,0,0,.15)!important;color:#0f1e2e!important}
+body.light .inc-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .inc-card:hover{background:#eaf3fb;border-color:rgba(0,122,101,.3)}
+body.light .inc-title{color:#0f1e2e}
+body.light .inc-meta{color:#4a5f72}
+body.light .empty{color:#4a5f72}
+body.light .map-filter-bar{background:rgba(232,240,248,.95)!important;border-color:rgba(0,0,0,.1)!important}
+body.light .mfb-select{background:#fff!important;color:#0f1e2e!important;border-color:rgba(0,0,0,.15)!important}
+body.light .mfb-search{background:#fff!important;color:#0f1e2e!important;border-color:rgba(0,0,0,.15)!important}
+body.light .map-btn{background:rgba(240,244,248,.9)!important;border-color:rgba(0,0,0,.15)!important;color:#2a4560!important}
+body.light .modal-wrap{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .modal-hd{background:#e8eef5;border-bottom-color:rgba(0,0,0,.1)}
+body.light .modal-title{color:#0f1e2e}
+body.light .modal-close{color:#4a5f72}
+body.light .mf-label{color:#4a5f72}
+body.light .mf-val{color:#0f1e2e}
+body.light .mf-row{border-bottom-color:rgba(0,0,0,.06)}
+body.light .tag{background:rgba(0,122,101,.12);color:#007a65}
+body.light .leaflet-container{background:#e8f0f8}
+body.light .leaflet-popup-content-wrapper{background:#fff;color:#0f1e2e;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+body.light .leaflet-popup-tip{background:#fff}
+body.light select option{background:#fff!important;color:#0f1e2e!important}
+body.light .live-dot{color:#007a65}
+body.light .dot{background:#007a65!important}
+
 html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
 
 /* ── Layout ───────────────────────────────────────────────── */
@@ -483,6 +538,7 @@ select option{background:#1a2b45;color:#c8d8e8}
     <div class="header-right">
       <div class="live-dot"><span class="dot"></span>LIVE</div>
       <div class="count-badge" id="countBadge">0 incidents</div>
+      <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border2)'">🌙</button>
       <a href="https://form.jotform.com/260695751808064" target="_blank" rel="noopener" class="donate-link">💛 Donate</a>
       <a href="apply.html" class="member-link">✅ Join</a>
     </div>
@@ -1642,6 +1698,26 @@ function clearMapFilter() {
     }
   }).subscribe();
 })();
+
+/* ════════════════════════════════════════════════════
+   THEME TOGGLE
+════════════════════════════════════════════════════ */
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+}
+(function initTheme() {
+  const saved = localStorage.getItem('hibcw-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeToggle');
+      if (btn) btn.textContent = '☀️';
+    });
+  }
+})();
+
 </script>
 </body>
 </html>
