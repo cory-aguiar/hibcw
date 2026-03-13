@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -20,10 +20,12 @@
 <script>
 // Auto-redirect mobile devices to the native-app mobile experience
 (function() {
-  var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  var forceMobile = new URLSearchParams(window.location.search).get('mobile') === '1';
-  var forceDesktop = new URLSearchParams(window.location.search).get('desktop') === '1';
-  if (!forceDesktop && (isMobile || forceMobile)) {
+  var params = new URLSearchParams(window.location.search);
+  var fromIndex    = params.get('from') === 'index';   // already came from index.html, don't loop
+  var isMobile     = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+  var forceMobile  = params.get('mobile')  === '1';
+  var forceDesktop = params.get('desktop') === '1';
+  if (!fromIndex && !forceDesktop && (isMobile || forceMobile)) {
     window.location.replace('index.html');
   }
 })();
