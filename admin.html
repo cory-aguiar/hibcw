@@ -3154,55 +3154,6 @@ function renderCaptainDirectory() {
     const initials   = name ? esc(name.split(' ').map(w=>w[0]).slice(0,2).join('')) : '?';
     const canUpload  = currentRole === 'admin' || currentRole === 'superadmin' || (currentRole === 'captain' && captainDistrict === v);
 
-    // ── District stats ───────────────────────────────────────
-    const distInc = allIncidents.filter(i => i.district === v);
-    const now     = new Date();
-
-    // Calendar month (1st of current month to now)
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    // Calendar week (Monday–Sunday)
-    const dayOfWeek  = (now.getDay() + 6) % 7; // Mon=0 … Sun=6
-    const weekStart  = new Date(now); weekStart.setHours(0,0,0,0); weekStart.setDate(now.getDate() - dayOfWeek);
-    // Today
-    const todayStart = new Date(now); todayStart.setHours(0,0,0,0);
-
-    const totalInc  = distInc.length;
-    const monthInc  = distInc.filter(i => new Date(i.occurred_at) >= monthStart).length;
-    const weekInc   = distInc.filter(i => new Date(i.occurred_at) >= weekStart).length;
-    const todayInc  = distInc.filter(i => new Date(i.occurred_at) >= todayStart).length;
-
-    // Last reported incident
-    const lastIncDate = distInc.reduce((latest, i) => {
-      const t = new Date(i.occurred_at);
-      return (!latest || t > latest) ? t : latest;
-    }, null);
-    const lastIncStr = lastIncDate
-      ? lastIncDate.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
-      : 'None';
-
-    // Type breakdown for this district (active only, top 4)
-    const typeColors = { red:'#e8415a', gold:'#f5a623', teal:'#00c9a7' };
-    const typeCounts = {};
-    const typeColorMap = {};
-    distInc.filter(i => i.status === 'active').forEach(i => {
-      typeCounts[i.type] = (typeCounts[i.type] || 0) + 1;
-      typeColorMap[i.type] = i.type_color;
-    });
-    const typeSorted = Object.entries(typeCounts).sort((a,b) => b[1]-a[1]).slice(0, 4);
-    const typeMax    = typeSorted[0]?.[1] || 1;
-
-    const typeRowsHtml = typeSorted.length
-      ? typeSorted.map(([type, count]) => `
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-            <div style="font-size:.7rem;color:var(--white);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(type)}</div>
-            <div style="flex:1;height:6px;background:var(--b2);border-radius:3px;overflow:hidden">
-              <div style="height:100%;border-radius:3px;background:${typeColors[typeColorMap[type]]||'#00c9a7'};width:${(count/typeMax*100).toFixed(1)}%;transition:width .4s ease"></div>
-            </div>
-            <div style="font-family:IBM Plex Mono,monospace;font-size:.62rem;color:var(--slate);width:20px;text-align:right;flex-shrink:0">${count}</div>
-          </div>`)
-        .join('')
-      : `<div style="font-size:.7rem;color:var(--slate2);font-style:italic;padding:4px 0">No active incidents</div>`;
-
     const avatarHtml = photoUrl
       ? `<div style="position:relative;flex-shrink:0;${canUpload ? 'cursor:pointer;' : ''}" ${canUpload ? `onclick="triggerCaptainPhotoUpload('${v}')" title="Click to change photo"` : ''}>
            <img src="${photoUrl}" alt="${initials}" style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid ${distColor}66;display:block;box-shadow:0 4px 20px rgba(0,0,0,.35);">
@@ -3286,45 +3237,6 @@ function renderCaptainDirectory() {
         ${!hasContact && !fallback ? '' : (!phone && !email && hasContact) ? `
           <div style="font-size:.72rem;color:var(--slate2);font-style:italic;border-top:1px solid var(--b2);padding-top:8px">No contact info on file</div>
         ` : ''}
-
-        <!-- ── District Stats ── -->
-        <div style="border-top:1px solid ${distColor}22;padding-top:12px;margin-top:2px">
-          <div style="font-family:IBM Plex Mono,monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:${distColor};margin-bottom:8px">📊 District Stats</div>
-
-          <!-- Summary row -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
-            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-              <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:${distColor}">${totalInc}</div>
-              <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Total</div>
-            </div>
-            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-              <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--white)">${monthInc}</div>
-              <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Month</div>
-            </div>
-            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-              <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--white)">${weekInc}</div>
-              <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Week</div>
-            </div>
-            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-              <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--white)">${todayInc}</div>
-              <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Today</div>
-            </div>
-          </div>
-
-          <!-- Last reported -->
-          <div style="font-family:IBM Plex Mono,monospace;font-size:.65rem;color:var(--slate2);margin-bottom:10px">
-            Last report: <span style="color:${lastIncDate ? 'var(--white)' : 'var(--slate2)'}">${lastIncStr}</span>
-          </div>
-
-          <!-- Type breakdown bars -->
-          <div style="margin-bottom:4px">${typeRowsHtml}</div>
-
-          <!-- View Full Stats link -->
-          <button class="btn btn-ghost" style="width:100%;font-size:.7rem;margin-top:6px;border-color:${distColor}33;color:${distColor}"
-            onclick="showView('stats');setTimeout(()=>{const s=document.getElementById('statsDistrictFilter');if(s){s.value='${v}';renderStats();}},120)">
-            📊 View Full Stats for this District
-          </button>
-        </div>
 
         ${(currentRole === 'admin' || currentRole === 'superadmin') ? `
           <div style="border-top:1px solid var(--b2);padding-top:10px">
