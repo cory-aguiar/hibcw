@@ -70,6 +70,38 @@ create policy "admin update"  on public.incidents for update using (true);
 create policy "admin delete"  on public.incidents for delete using (true);
 create policy "admin delete media" on public.incident_media for delete using (true);
 
+-- ── MEMBER APPLICATIONS TABLE ────────────────────────────────
+create table public.member_applications (
+  id               uuid primary key default uuid_generate_v4(),
+  created_at       timestamptz not null default now(),
+  email            text not null,
+  full_name        text,
+  phone            text,
+  business_name    text,
+  business_address text,
+  business_city    text,
+  business_state   text,
+  business_zip     text,
+  district         text,
+  captain_name     text,
+  photo_url        text,
+  notes            text,
+  status           text not null default 'pending'  -- 'pending' | 'approved' | 'rejected'
+);
+
+create index member_applications_email_idx    on public.member_applications (email);
+create index member_applications_status_idx   on public.member_applications (status);
+create index member_applications_district_idx on public.member_applications (district);
+
+alter table public.member_applications enable row level security;
+
+-- Public: submit applications
+create policy "insert application"  on public.member_applications for insert with check (true);
+-- Authenticated (admin/captain): read, update, delete
+create policy "admin read members"   on public.member_applications for select using (auth.role() = 'authenticated');
+create policy "admin update members" on public.member_applications for update using (auth.role() = 'authenticated');
+create policy "admin delete members" on public.member_applications for delete using (auth.role() = 'authenticated');
+
 -- ── STORAGE BUCKET ────────────────────────────────────────────
 insert into storage.buckets (id, name, public)
 values ('incident-media', 'incident-media', true)
