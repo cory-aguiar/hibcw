@@ -1,238 +1,457 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Privacy Statement — HIBCW</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --navy:#0b1524;--navy2:#111e30;--navy3:#18293f;
-  --teal:#00c9a7;--gold:#f5a623;--red:#e8415a;
-  --slate:#7a8fa6;--slate2:#4a6070;--white:#eef3f8;
-  --border:rgba(0,201,167,.15);--b2:rgba(255,255,255,.07);
-}
-body.light{
-  --navy:#f0f4f8;--navy2:#ffffff;--navy3:#e8eef5;
-  --teal:#007a65;--gold:#b87c0a;--red:#c0273d;
-  --slate:#4a5f72;--slate2:#7a95a8;--white:#0f1e2e;
-  --border:rgba(0,122,101,.2);--b2:rgba(0,0,0,.1);
-}
-body.light header{background:linear-gradient(90deg,#dce8f5,#eaf1f8)!important;border-bottom-color:rgba(0,122,101,.2)!important}
-body.light .back-btn{border-color:rgba(0,0,0,.15);color:#4a5f72}
-body.light .back-btn:hover{border-color:#007a65;color:#007a65}
-body.light .doc-card{background:#fff;border-color:rgba(0,0,0,.1)}
-body.light .page-footer{border-top-color:rgba(0,0,0,.1)}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Statement — HIBCW</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box
+    }
 
-html,body{min-height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
-header{
-  background:linear-gradient(90deg,#0b1524,#111e30);
-  border-bottom:1px solid var(--border);
-  padding:0 24px;height:54px;
-  display:flex;align-items:center;justify-content:space-between;
-}
-.hd-left{display:flex;align-items:center;gap:10px}
-.logo-shield{
-  width:32px;height:32px;flex-shrink:0;
-  background:linear-gradient(160deg,#002266,#001133);
-  border:1.5px solid var(--gold);
-  clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Rajdhani',sans-serif;font-size:.7rem;font-weight:700;color:var(--gold);
-}
-.logo-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.08em}
-.logo-sub{font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--teal);letter-spacing:.12em;text-transform:uppercase}
-.hd-right{display:flex;align-items:center;gap:10px}
-.back-btn{
-  background:none;border:1px solid var(--b2);border-radius:4px;
-  padding:5px 13px;color:var(--slate);font-size:.75rem;cursor:pointer;
-  text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:5px;
-}
-.back-btn:hover{border-color:var(--teal);color:var(--teal)}
+    :root {
+        --navy: #0b1524;
+        --navy2: #111e30;
+        --navy3: #18293f;
+        --teal: #00c9a7;
+        --gold: #f5a623;
+        --red: #e8415a;
+        --slate: #7a8fa6;
+        --slate2: #4a6070;
+        --white: #eef3f8;
+        --border: rgba(0, 201, 167, .15);
+        --b2: rgba(255, 255, 255, .07);
+    }
 
-.page{max-width:760px;margin:0 auto;padding:40px 24px 60px}
-.page-hero{margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--b2)}
-.page-badge{
-  display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.6rem;
-  letter-spacing:.12em;text-transform:uppercase;color:var(--teal);
-  background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.2);
-  border-radius:4px;padding:3px 10px;margin-bottom:14px;
-}
-.page-title{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;letter-spacing:.04em;margin-bottom:8px}
-.page-meta{font-size:.78rem;color:var(--slate);font-family:'IBM Plex Mono',monospace}
+    body.light {
+        --navy: #f0f4f8;
+        --navy2: #ffffff;
+        --navy3: #e8eef5;
+        --teal: #007a65;
+        --gold: #b87c0a;
+        --red: #c0273d;
+        --slate: #4a5f72;
+        --slate2: #7a95a8;
+        --white: #0f1e2e;
+        --border: rgba(0, 122, 101, .2);
+        --b2: rgba(0, 0, 0, .1);
+    }
 
-.doc-card{
-  background:var(--navy2);border:1px solid var(--b2);border-radius:12px;padding:36px 40px;
-}
-.doc-section{margin-bottom:28px}
-.doc-section:last-child{margin-bottom:0}
-.doc-section h2{
-  font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;color:var(--teal);
-  margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--b2);
-}
-.doc-section h3{
-  font-family:'IBM Plex Sans',sans-serif;font-size:.88rem;font-weight:600;
-  color:var(--white);margin:14px 0 6px;
-}
-.doc-section p{font-size:.88rem;line-height:1.75;color:var(--slate);margin-bottom:10px}
-.doc-section p:last-child{margin-bottom:0}
-.doc-section ul{padding-left:18px;margin-top:6px}
-.doc-section ul li{font-size:.88rem;line-height:1.75;color:var(--slate);margin-bottom:4px}
-.doc-section strong{color:var(--white)}
-.doc-section a{color:var(--teal);text-decoration:none}
-.doc-section a:hover{text-decoration:underline}
+    body.light header {
+        background: linear-gradient(90deg, #dce8f5, #eaf1f8) !important;
+        border-bottom-color: rgba(0, 122, 101, .2) !important
+    }
 
-.page-footer{
-  text-align:center;padding:20px 24px;
-  font-size:.72rem;color:var(--slate2);border-top:1px solid var(--b2);
-  margin-top:40px;font-family:'IBM Plex Mono',monospace;
-}
-.page-footer a{color:var(--slate);text-decoration:none}
-.page-footer a:hover{color:var(--teal)}
+    body.light .back-btn {
+        border-color: rgba(0, 0, 0, .15);
+        color: #4a5f72
+    }
 
-@media(max-width:600px){
-  .doc-card{padding:22px 18px}
-  .page{padding:24px 16px 40px}
-}
-</style>
+    body.light .back-btn:hover {
+        border-color: #007a65;
+        color: #007a65
+    }
+
+    body.light .doc-card {
+        background: #fff;
+        border-color: rgba(0, 0, 0, .1)
+    }
+
+    body.light .page-footer {
+        border-top-color: rgba(0, 0, 0, .1)
+    }
+
+    html, body {
+        min-height: 100%;
+        font-family: 'IBM Plex Sans', sans-serif;
+        background: var(--navy);
+        color: var(--white)
+    }
+
+    header {
+        background: linear-gradient(90deg, #0b1524, #111e30);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .hd-left {
+        display: flex;
+        align-items: center;
+        gap: 10px
+    }
+
+    .logo-shield {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        background: linear-gradient(160deg, #002266, #001133);
+        border: 1.5px solid var(--gold);
+        clip-path: polygon(50% 0%, 100% 15%, 100% 60%, 50% 100%, 0% 60%, 0% 15%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .7rem;
+        font-weight: 700;
+        color: var(--gold);
+    }
+
+    .logo-name {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: .08em
+    }
+
+    .logo-sub {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .55rem;
+        color: var(--teal);
+        letter-spacing: .12em;
+        text-transform: uppercase
+    }
+
+    .hd-right {
+        display: flex;
+        align-items: center;
+        gap: 10px
+    }
+
+    .back-btn {
+        background: none;
+        border: 1px solid var(--b2);
+        border-radius: 4px;
+        padding: 5px 13px;
+        color: var(--slate);
+        font-size: .75rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all .2s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .back-btn:hover {
+        border-color: var(--teal);
+        color: var(--teal)
+    }
+
+    .page {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 40px 24px 60px
+    }
+
+    .page-hero {
+        margin-bottom: 36px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--b2)
+    }
+
+    .page-badge {
+        display: inline-block;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .6rem;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--teal);
+        background: rgba(0, 201, 167, .1);
+        border: 1px solid rgba(0, 201, 167, .2);
+        border-radius: 4px;
+        padding: 3px 10px;
+        margin-bottom: 14px;
+    }
+
+    .page-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: .04em;
+        margin-bottom: 8px
+    }
+
+    .page-meta {
+        font-size: .78rem;
+        color: var(--slate);
+        font-family: 'IBM Plex Mono', monospace
+    }
+
+    .doc-card {
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 12px;
+        padding: 36px 40px;
+    }
+
+    .doc-section {
+        margin-bottom: 28px
+    }
+
+    .doc-section:last-child {
+        margin-bottom: 0
+    }
+
+    .doc-section h2 {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--b2);
+    }
+
+    .doc-section h3 {
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-size: .88rem;
+        font-weight: 600;
+        color: var(--white);
+        margin: 14px 0 6px;
+    }
+
+    .doc-section p {
+        font-size: .88rem;
+        line-height: 1.75;
+        color: var(--slate);
+        margin-bottom: 10px
+    }
+
+    .doc-section p:last-child {
+        margin-bottom: 0
+    }
+
+    .doc-section ul {
+        padding-left: 18px;
+        margin-top: 6px
+    }
+
+    .doc-section ul li {
+        font-size: .88rem;
+        line-height: 1.75;
+        color: var(--slate);
+        margin-bottom: 4px
+    }
+
+    .doc-section strong {
+        color: var(--white)
+    }
+
+    .doc-section a {
+        color: var(--teal);
+        text-decoration: none
+    }
+
+    .doc-section a:hover {
+        text-decoration: underline
+    }
+
+    .page-footer {
+        text-align: center;
+        padding: 20px 24px;
+        font-size: .72rem;
+        color: var(--slate2);
+        border-top: 1px solid var(--b2);
+        margin-top: 40px;
+        font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .page-footer a {
+        color: var(--slate);
+        text-decoration: none
+    }
+
+    .page-footer a:hover {
+        color: var(--teal)
+    }
+
+    @media (max-width: 600px) {
+        .doc-card {
+            padding: 22px 18px
+        }
+
+        .page {
+            padding: 24px 16px 40px
+        }
+    }
+    </style>
 </head>
 <body>
-<header>
-  <div class="hd-left">
-    <div class="logo-shield">HIBCW</div>
-    <div>
-      <div class="logo-name">Hawaii Island Business Crime Watch</div>
-      <div class="logo-sub">A Program of KIAA · kiaahilo.org</div>
+    <header>
+        <div class="hd-left">
+            <div class="logo-shield">HIBCW</div>
+            <div>
+                <div class="logo-name">Hawaii Island Business Crime Watch</div>
+                <div class="logo-sub">A Program of KIAA · kiaahilo.org</div>
+            </div>
+        </div>
+        <div class="hd-right">
+            <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
+            <a href="index.html" class="back-btn">← Back to Map</a>
+        </div>
+    </header>
+
+    <div class="page">
+        <div class="page-hero">
+            <div class="page-badge">Legal</div>
+            <div class="page-title">Privacy Statement</div>
+            <div class="page-meta">Hawaii Island Business Crime Watch (HIBCW) &nbsp;·&nbsp; Effective Date: March 12, 2026</div>
+        </div>
+
+        <div class="doc-card">
+
+            <div class="doc-section">
+                <h2>1. Introduction</h2>
+                <p>
+                    Hawaii Island Business Crime Watch (HIBCW) is a community crime reporting program administered through KIAA (
+                    <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a>
+                    ). This Privacy Statement explains how HIBCW collects, uses, stores, and shares information submitted through the HIBCW incident reporting web application at hibcw.vercel.app.
+                </p>
+                <p>By using this site, you agree to the practices described in this Privacy Statement.</p>
+            </div>
+
+            <div class="doc-section">
+                <h2>2. Information We Collect</h2>
+                <h3>2a. Information You Voluntarily Submit</h3>
+                <p>When you submit an incident report, we may collect:</p>
+                <ul>
+                    <li>Incident type, date, time, and location (street address and/or map pin)</li>
+                    <li>A written description of the incident</li>
+                    <li>Your name (optional) and email address (optional)</li>
+                    <li>Police report number, if applicable</li>
+                    <li>Suspect descriptions, if provided (physical description, clothing, etc.)</li>
+                    <li>Vehicle descriptions, if provided (make, model, color, year, license plate)</li>
+                    <li>Photos or video files you choose to upload</li>
+                </ul>
+                <p>Providing your name and email is entirely optional. If you provide an email address, it may be used to follow up on your report if you are a KIAA member.</p>
+                <h3>2b. Automatically Collected Information</h3>
+                <p>Like most web applications, HIBCW may automatically collect limited technical data when you visit the site, including your IP address, browser type, device type, and pages visited. This information is used solely for security and site performance purposes and is not linked to your incident report.</p>
+            </div>
+
+            <div class="doc-section">
+                <h2>3. How We Use Your Information</h2>
+                <p>Information submitted through HIBCW may be used to:</p>
+                <ul>
+                    <li>Display community incident reports on the public map and incident feed</li>
+                    <li>Allow KIAA staff to review, verify, and moderate submitted reports</li>
+                    <li>Share reports with local law enforcement (including the Hilo Police Department) upon request or when required by law</li>
+                    <li>Identify patterns of criminal activity to support community safety efforts</li>
+                    <li>Contact you (if you provided your email) to verify or follow up on your report</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <h2>4. Public Display of Reports</h2>
+                <p>
+                    Incident reports you submit — including incident type, location, date/time, and description — may be displayed publicly on the HIBCW website. 
+                    <strong>Your name will not be displayed publicly</strong>
+                     even if you provide it. 
+                    <strong>Your email address will never be displayed publicly.</strong>
+                </p>
+                <p>Do not include sensitive personal information (such as Social Security numbers, financial account numbers, or medical information) in the description or any other field of your report.</p>
+            </div>
+
+            <div class="doc-section">
+                <h2>5. Sharing of Information</h2>
+                <p>HIBCW does not sell your personal information. We may share information in the following circumstances:</p>
+                <ul>
+                    <li>
+                        <strong>With law enforcement:</strong>
+                         Submitted reports and uploaded media may be shared with the Hilo Police Department or other law enforcement agencies upon request, or as required by applicable law.
+                    </li>
+                    <li>
+                        <strong>With KIAA staff and administrators:</strong>
+                         Staff may access submitted reports for review, moderation, and program administration.
+                    </li>
+                    <li>
+                        <strong>As required by law:</strong>
+                         We may disclose information if required to do so by a court order, subpoena, or other legal process.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <h2>6. Data Retention</h2>
+                <p>Incident reports are retained to maintain a historical record of community crime activity. KIAA reserves the right to remove or archive reports found to be false, misleading, or submitted in bad faith. If you submitted a report and wish to request its removal, please contact us at the address below.</p>
+            </div>
+
+            <div class="doc-section">
+                <h2>7. Cookies and Tracking</h2>
+                <p>HIBCW may use cookies or similar technologies to support basic site functionality. We do not use third-party advertising trackers or sell your browsing data.</p>
+            </div>
+
+            <div class="doc-section">
+                <h2>8. Children's Privacy</h2>
+                <p>HIBCW is not directed at children under the age of 13 and we do not knowingly collect personal information from children. If you believe a child has submitted information through this site, please contact us so we can remove it.</p>
+            </div>
+
+            <div class="doc-section">
+                <h2>9. Security</h2>
+                <p>We take reasonable technical and administrative measures to protect information submitted through HIBCW. However, no internet transmission is completely secure, and we cannot guarantee the absolute security of information you submit.</p>
+            </div>
+
+            <div class="doc-section">
+                <h2>10. Your Rights</h2>
+                <p>If you voluntarily provided your name or email address and wish to request access to, correction of, or deletion of that information from our records, please contact us at:</p>
+                <p>
+                    <strong>KIAA / HIBCW Program Administrator</strong>
+                    <br>
+
+                          Website: 
+                    <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a>
+                </p>
+                <p>Note: Incident report content submitted to HIBCW that has been shared with law enforcement may not be eligible for deletion.</p>
+            </div>
+
+            <div class="doc-section">
+                <h2>11. Changes to This Privacy Statement</h2>
+                <p>We may update this Privacy Statement from time to time. The effective date at the top of this page will reflect the most recent revision. Continued use of the site after any changes constitutes acceptance of the updated statement.</p>
+            </div>
+
+        </div>
+        <!-- /doc-card -->
     </div>
-  </div>
-  <div class="hd-right">
-    <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
-    <a href="index.html" class="back-btn">← Back to Map</a>
-  </div>
-</header>
+    <!-- /page -->
 
-<div class="page">
-  <div class="page-hero">
-    <div class="page-badge">Legal</div>
-    <div class="page-title">Privacy Statement</div>
-    <div class="page-meta">Hawaii Island Business Crime Watch (HIBCW) &nbsp;·&nbsp; Effective Date: March 12, 2026</div>
-  </div>
+    <div class="page-footer">
 
-  <div class="doc-card">
-
-    <div class="doc-section">
-      <h2>1. Introduction</h2>
-      <p>Hawaii Island Business Crime Watch (HIBCW) is a community crime reporting program administered through KIAA (<a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a>). This Privacy Statement explains how HIBCW collects, uses, stores, and shares information submitted through the HIBCW incident reporting web application at hibcw.vercel.app.</p>
-      <p>By using this site, you agree to the practices described in this Privacy Statement.</p>
+          Hawaii Island Business Crime Watch &nbsp;·&nbsp; hibcw.vercel.app &nbsp;·&nbsp; A Program of KIAA &nbsp;·&nbsp;
+          
+        <a href="privacy.html">Privacy Statement</a>
+         &nbsp;·&nbsp;
+          
+        <a href="terms.html">Terms of Use</a>
+         &nbsp;·&nbsp;
+          
+        <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a>
     </div>
 
-    <div class="doc-section">
-      <h2>2. Information We Collect</h2>
-      <h3>2a. Information You Voluntarily Submit</h3>
-      <p>When you submit an incident report, we may collect:</p>
-      <ul>
-        <li>Incident type, date, time, and location (street address and/or map pin)</li>
-        <li>A written description of the incident</li>
-        <li>Your name (optional) and email address (optional)</li>
-        <li>Police report number, if applicable</li>
-        <li>Suspect descriptions, if provided (physical description, clothing, etc.)</li>
-        <li>Vehicle descriptions, if provided (make, model, color, year, license plate)</li>
-        <li>Photos or video files you choose to upload</li>
-      </ul>
-      <p>Providing your name and email is entirely optional. If you provide an email address, it may be used to follow up on your report if you are a KIAA member.</p>
-      <h3>2b. Automatically Collected Information</h3>
-      <p>Like most web applications, HIBCW may automatically collect limited technical data when you visit the site, including your IP address, browser type, device type, and pages visited. This information is used solely for security and site performance purposes and is not linked to your incident report.</p>
-    </div>
-
-    <div class="doc-section">
-      <h2>3. How We Use Your Information</h2>
-      <p>Information submitted through HIBCW may be used to:</p>
-      <ul>
-        <li>Display community incident reports on the public map and incident feed</li>
-        <li>Allow KIAA staff to review, verify, and moderate submitted reports</li>
-        <li>Share reports with local law enforcement (including the Hilo Police Department) upon request or when required by law</li>
-        <li>Identify patterns of criminal activity to support community safety efforts</li>
-        <li>Contact you (if you provided your email) to verify or follow up on your report</li>
-      </ul>
-    </div>
-
-    <div class="doc-section">
-      <h2>4. Public Display of Reports</h2>
-      <p>Incident reports you submit — including incident type, location, date/time, and description — may be displayed publicly on the HIBCW website. <strong>Your name will not be displayed publicly</strong> even if you provide it. <strong>Your email address will never be displayed publicly.</strong></p>
-      <p>Do not include sensitive personal information (such as Social Security numbers, financial account numbers, or medical information) in the description or any other field of your report.</p>
-    </div>
-
-    <div class="doc-section">
-      <h2>5. Sharing of Information</h2>
-      <p>HIBCW does not sell your personal information. We may share information in the following circumstances:</p>
-      <ul>
-        <li><strong>With law enforcement:</strong> Submitted reports and uploaded media may be shared with the Hilo Police Department or other law enforcement agencies upon request, or as required by applicable law.</li>
-        <li><strong>With KIAA staff and administrators:</strong> Staff may access submitted reports for review, moderation, and program administration.</li>
-        <li><strong>As required by law:</strong> We may disclose information if required to do so by a court order, subpoena, or other legal process.</li>
-      </ul>
-    </div>
-
-    <div class="doc-section">
-      <h2>6. Data Retention</h2>
-      <p>Incident reports are retained to maintain a historical record of community crime activity. KIAA reserves the right to remove or archive reports found to be false, misleading, or submitted in bad faith. If you submitted a report and wish to request its removal, please contact us at the address below.</p>
-    </div>
-
-    <div class="doc-section">
-      <h2>7. Cookies and Tracking</h2>
-      <p>HIBCW may use cookies or similar technologies to support basic site functionality. We do not use third-party advertising trackers or sell your browsing data.</p>
-    </div>
-
-    <div class="doc-section">
-      <h2>8. Children's Privacy</h2>
-      <p>HIBCW is not directed at children under the age of 13 and we do not knowingly collect personal information from children. If you believe a child has submitted information through this site, please contact us so we can remove it.</p>
-    </div>
-
-    <div class="doc-section">
-      <h2>9. Security</h2>
-      <p>We take reasonable technical and administrative measures to protect information submitted through HIBCW. However, no internet transmission is completely secure, and we cannot guarantee the absolute security of information you submit.</p>
-    </div>
-
-    <div class="doc-section">
-      <h2>10. Your Rights</h2>
-      <p>If you voluntarily provided your name or email address and wish to request access to, correction of, or deletion of that information from our records, please contact us at:</p>
-      <p><strong>KIAA / HIBCW Program Administrator</strong><br>
-      Website: <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a></p>
-      <p>Note: Incident report content submitted to HIBCW that has been shared with law enforcement may not be eligible for deletion.</p>
-    </div>
-
-    <div class="doc-section">
-      <h2>11. Changes to This Privacy Statement</h2>
-      <p>We may update this Privacy Statement from time to time. The effective date at the top of this page will reflect the most recent revision. Continued use of the site after any changes constitutes acceptance of the updated statement.</p>
-    </div>
-
-  </div><!-- /doc-card -->
-</div><!-- /page -->
-
-<div class="page-footer">
-  Hawaii Island Business Crime Watch &nbsp;·&nbsp; hibcw.vercel.app &nbsp;·&nbsp; A Program of KIAA &nbsp;·&nbsp;
-  <a href="privacy.html">Privacy Statement</a> &nbsp;·&nbsp;
-  <a href="terms.html">Terms of Use</a> &nbsp;·&nbsp;
-  <a href="https://kiaahilo.org" target="_blank">kiaahilo.org</a>
-</div>
-
-<script>
-function toggleTheme() {
-  const isLight = document.body.classList.toggle('light');
-  localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
-  document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
-}
-(function initTheme() {
-  const saved = localStorage.getItem('hibcw-theme');
-  if (saved === 'light') {
-    document.body.classList.add('light');
-    document.addEventListener('DOMContentLoaded', () => {
-      const btn = document.getElementById('themeToggle');
-      if (btn) btn.textContent = '☀️';
-    });
-  }
-})();
-</script>
+    <script>
+    function toggleTheme() {
+        const isLight = document.body.classList.toggle('light');
+        localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
+        document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+    }
+    (function initTheme() {
+        const saved = localStorage.getItem('hibcw-theme');
+        if (saved === 'light') {
+            document.body.classList.add('light');
+            document.addEventListener('DOMContentLoaded', () => {
+                const btn = document.getElementById('themeToggle');
+                if (btn)
+                    btn.textContent = '☀️';
+            });
+        }
+    })();
+    </script>
 </body>
 </html>
