@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIBCW Public Beta — Become a Member</title>
+    <title>HIBCW — Become a Member</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
@@ -403,101 +403,6 @@
         line-height: 1.7;
         max-width: 400px;
         margin: 0 auto 24px
-    }/* ── Thank You Modal ── */
-    .ty-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, .7);
-        backdrop-filter: blur(4px);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-        padding: 20px;
-    }
-
-    .ty-overlay.open {
-        display: flex
-    }
-
-    .ty-card {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 40px 32px;
-        max-width: 440px;
-        width: 100%;
-        text-align: center;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
-        animation: tySlide .3s ease;
-    }
-
-    @keyframes tySlide {
-        from {
-            opacity: 0;
-            transform:translateY(20px)
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0)
-        }
-    }
-
-    .ty-emoji {
-        font-size: 3.2rem;
-        margin-bottom: 16px;
-        line-height: 1
-    }
-
-    .ty-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1.7rem;
-        font-weight: 700;
-        color: var(--teal);
-        margin-bottom: 14px;
-        letter-spacing: .04em
-    }
-
-    .ty-body {
-        font-size: .88rem;
-        color: var(--slate);
-        line-height: 1.75;
-        margin-bottom: 8px
-    }
-
-    .ty-note {
-        background: rgba(0, 201, 167, .08);
-        border: 1px solid rgba(0, 201, 167, .2);
-        border-radius: 8px;
-        padding: 12px 16px;
-        margin: 18px 0;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .7rem;
-        color: var(--teal);
-        line-height: 1.6;
-    }
-
-    .ty-btn {
-        display: inline-block;
-        margin-top: 8px;
-        padding: 11px 32px;
-        background: linear-gradient(135deg, var(--teal), #00a589);
-        color: #0b1524;
-        font-family: 'Rajdhani', sans-serif;
-        font-size: .9rem;
-        font-weight: 700;
-        letter-spacing: .1em;
-        text-transform: uppercase;
-        border: none;
-        border-radius: 7px;
-        cursor: pointer;
-        text-decoration: none;
-        transition: filter .2s;
-    }
-
-    .ty-btn:hover {
-        filter: brightness(1.1)
     }/* ── Footer ── */
     .page-footer {
         text-align: center;
@@ -540,44 +445,14 @@
 
     <header>
         <div class="hd-left">
-            <svg width="44" height="52" viewBox="0 0 110 130" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))">
-                <defs>
-                    <linearGradient id="apsg" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#1e3550"/>
-                        <stop offset="100%" style="stop-color:#0a1520"/>
-                    </linearGradient>
-                    <linearGradient id="apgg" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style="stop-color:#f0b429"/>
-                        <stop offset="100%" style="stop-color:#c8960c"/>
-                    </linearGradient>
-                    <linearGradient id="apif" x1="10%" y1="0%" x2="90%" y2="100%">
-                        <stop offset="0%" style="stop-color:#00c9a7"/>
-                        <stop offset="100%" style="stop-color:#006b56"/>
-                    </linearGradient>
-                    <clipPath id="apsc">
-                        <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z"/>
-                    </clipPath>
-                </defs>
-                <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z" fill="url(#apsg)"/>
-                <rect x="5" y="5" width="100" height="3.5" fill="url(#apgg)" opacity="0.95"/>
-                <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z" fill="none" stroke="#00c9a7" stroke-width="2.5" opacity="0.8"/>
-                <g clip-path="url(#apsc)">
-                    <g transform="translate(13 10) scale(1.1667)">
-                        <path fill="url(#apif)" opacity="0.75" d="M24.21,70c0-.48-2.23-2.58-2.74-2.58-.2,0-.9-.4-1.56-.9-.86-.64-1.66-1-2.78-1.26-.87-.2-1.68-.3-1.8-.22-.12.07-.2.05-.16-.05.1-.35-.77-1.44-1.04-1.29-.14.08-.19.07-.1-.03.09-.1-.14-.6-.51-1.12-.94-1.31-1.13-2.14-.89-3.83.11-.78.31-2.29.45-3.36.13-1.06.45-2.68.7-3.6.54-1.96.46-2.79-.52-5.26-.5-1.26-.68-2.09-.69-3.22-.01-1.48-.03-1.52-.65-1.65-.98-.2-1.89-2.24-2.05-4.59-.14-2.05-.49-2.72-1.8-3.43-.44-.23-.83-.62-.88-.86-.05-.24-.38-.84-.74-1.33-.87-1.2-1.01-2.09-.55-3.59.6-1.98.95-2.52,2.65-4.06,1.16-1.05,1.85-1.5,2.44-1.6.76-.12.85-.22,1.08-1.18.4-1.61.67-2,2.72-3.96,1.39-1.33,1.91-1.98,1.91-2.39,0-.75-.84-2.11-1.17-1.9-.16.1-.2.06-.1-.09.09-.14-.29-.84-.84-1.57-1.71-2.26-1.97-2.96-1.97-5.32s.53-3.73,1.58-4.02c.98-.27,2.84-.13,3.63.28.41.21.9.33,1.08.26.18-.07.28-.04.21.06-.06.1.16.33.5.51.34.18.92.65,1.3,1.05.38.4,1.35,1.05,2.16,1.44.81.39,1.84,1.04,2.27,1.45,1.26,1.18,2.57,1.8,3.47,1.66,1.86-.3,5.2.87,11.57,4.06,5.03,2.52,6.46,3.46,8.82,5.86.93.94,1.78,1.66,1.88,1.59.11-.07.17-.03.14.07-.1.35.77,1.44,1.04,1.29.14-.08.19-.07.11.02-.08.09,0,.52.17.94.27.64.28,1.06.06,2.36-.23,1.39-.21,1.66.12,2.17.45.68,1.21,1.02,2.3,1.02,1.63,0,2.61.97,2.61,2.59,0,1.11.34,1.9,1.32,3,.46.52,1.16,1.35,1.55,1.83.5.62,1.07,1.01,1.93,1.31.68.23,1.67.67,2.22.96.55.3,1.11.47,1.25.39.14-.08.2-.08.12.01-.08.09-.01.53.14.98.66,1.91-.45,3.43-3.33,4.61-1.51.62-2.09,1.01-3.17,2.14-.72.76-1.26,1.46-1.2,1.57.06.1.03.16-.07.14s-.95.32-1.89.77c-.94.45-2.06.97-2.5,1.15-.44.18-1.44.9-2.22,1.61-.78.7-1.69,1.34-2,1.42-.67.17-2.18.02-3.97-.38-1.76-.4-2.41-.17-3.86,1.39-.79.85-1.71,1.55-2.5,1.91-.69.31-1.95,1.19-2.8,1.94s-1.75,1.37-2,1.37c-.65,0-1.84.66-1.67.92.08.12.04.2-.08.16-.41-.12-1.68,1.23-2.13,2.25-.25.56-.4,1.07-.34,1.13.06.06-.12.35-.4.66-.28.3-.63.98-.79,1.5-.18.6-.74,1.43-1.51,2.23-.67.7-1.46,1.63-1.75,2.07-.6.91-1.77,1.26-1.77.54h0Z"/>
-                    </g>
-                    <text x="55" y="68" font-family="'Barlow Condensed','Arial Black',Impact,sans-serif" font-size="26" font-weight="800" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="1">HIBCW</text>
-                    <line x1="25" y1="78" x2="85" y2="78" stroke="#f0b429" stroke-width="1.8" opacity="0.75"/>
-                </g>
-                <ellipse cx="55" cy="122" rx="3" ry="1.8" fill="#f0b429" opacity="0.9"/>
-            </svg>
+            <div class="logo-shield">HIBCW</div>
             <div>
                 <div class="logo-name">HIBCW</div>
                 <div class="logo-sub">Hawaii Island Business Crime Watch</div>
             </div>
-            <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(245,166,35,.15);color:#f5a623;border:1px solid rgba(245,166,35,.35);border-radius:4px;padding:2px 7px;white-space:nowrap;margin-left:4px">PUBLIC BETA</span>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
-            <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 12px;cursor:pointer;font-size:.65rem;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">🌙 Dark</button>
+            <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
             <a href="index.html" class="back-btn">← Back to Map</a>
         </div>
     </header>
@@ -585,37 +460,7 @@
     <div class="page">
 
         <div class="page-hero">
-            <svg width="100" height="118" viewBox="0 0 110 130" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 16px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))">
-                <defs>
-                    <linearGradient id="phsg" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#1e3550"/>
-                        <stop offset="100%" style="stop-color:#0a1520"/>
-                    </linearGradient>
-                    <linearGradient id="phgg" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style="stop-color:#f0b429"/>
-                        <stop offset="100%" style="stop-color:#c8960c"/>
-                    </linearGradient>
-                    <linearGradient id="phif" x1="10%" y1="0%" x2="90%" y2="100%">
-                        <stop offset="0%" style="stop-color:#00c9a7"/>
-                        <stop offset="100%" style="stop-color:#006b56"/>
-                    </linearGradient>
-                    <clipPath id="phsc">
-                        <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z"/>
-                    </clipPath>
-                </defs>
-                <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z" fill="url(#phsg)"/>
-                <rect x="5" y="5" width="100" height="3.5" fill="url(#phgg)" opacity="0.95"/>
-                <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z" fill="none" stroke="#00c9a7" stroke-width="2.5" opacity="0.8"/>
-                <path d="M 12 12 L 98 12 L 98 74 Q 98 108 55 120 Q 12 108 12 74 Z" fill="none" stroke="#00c9a7" stroke-width="0.6" opacity="0.18"/>
-                <g clip-path="url(#phsc)">
-                    <g transform="translate(13 10) scale(1.1667)">
-                        <path fill="url(#phif)" opacity="0.75" d="M24.21,70c0-.48-2.23-2.58-2.74-2.58-.2,0-.9-.4-1.56-.9-.86-.64-1.66-1-2.78-1.26-.87-.2-1.68-.3-1.8-.22-.12.07-.2.05-.16-.05.1-.35-.77-1.44-1.04-1.29-.14.08-.19.07-.1-.03.09-.1-.14-.6-.51-1.12-.94-1.31-1.13-2.14-.89-3.83.11-.78.31-2.29.45-3.36.13-1.06.45-2.68.7-3.6.54-1.96.46-2.79-.52-5.26-.5-1.26-.68-2.09-.69-3.22-.01-1.48-.03-1.52-.65-1.65-.98-.2-1.89-2.24-2.05-4.59-.14-2.05-.49-2.72-1.8-3.43-.44-.23-.83-.62-.88-.86-.05-.24-.38-.84-.74-1.33-.87-1.2-1.01-2.09-.55-3.59.6-1.98.95-2.52,2.65-4.06,1.16-1.05,1.85-1.5,2.44-1.6.76-.12.85-.22,1.08-1.18.4-1.61.67-2,2.72-3.96,1.39-1.33,1.91-1.98,1.91-2.39,0-.75-.84-2.11-1.17-1.9-.16.1-.2.06-.1-.09.09-.14-.29-.84-.84-1.57-1.71-2.26-1.97-2.96-1.97-5.32s.53-3.73,1.58-4.02c.98-.27,2.84-.13,3.63.28.41.21.9.33,1.08.26.18-.07.28-.04.21.06-.06.1.16.33.5.51.34.18.92.65,1.3,1.05.38.4,1.35,1.05,2.16,1.44.81.39,1.84,1.04,2.27,1.45,1.26,1.18,2.57,1.8,3.47,1.66,1.86-.3,5.2.87,11.57,4.06,5.03,2.52,6.46,3.46,8.82,5.86.93.94,1.78,1.66,1.88,1.59.11-.07.17-.03.14.07-.1.35.77,1.44,1.04,1.29.14-.08.19-.07.11.02-.08.09,0,.52.17.94.27.64.28,1.06.06,2.36-.23,1.39-.21,1.66.12,2.17.45.68,1.21,1.02,2.3,1.02,1.63,0,2.61.97,2.61,2.59,0,1.11.34,1.9,1.32,3,.46.52,1.16,1.35,1.55,1.83.5.62,1.07,1.01,1.93,1.31.68.23,1.67.67,2.22.96.55.3,1.11.47,1.25.39.14-.08.2-.08.12.01-.08.09-.01.53.14.98.66,1.91-.45,3.43-3.33,4.61-1.51.62-2.09,1.01-3.17,2.14-.72.76-1.26,1.46-1.2,1.57.06.1.03.16-.07.14s-.95.32-1.89.77c-.94.45-2.06.97-2.5,1.15-.44.18-1.44.9-2.22,1.61-.78.7-1.69,1.34-2,1.42-.67.17-2.18.02-3.97-.38-1.76-.4-2.41-.17-3.86,1.39-.79.85-1.71,1.55-2.5,1.91-.69.31-1.95,1.19-2.8,1.94s-1.75,1.37-2,1.37c-.65,0-1.84.66-1.67.92.08.12.04.2-.08.16-.41-.12-1.68,1.23-2.13,2.25-.25.56-.4,1.07-.34,1.13.06.06-.12.35-.4.66-.28.3-.63.98-.79,1.5-.18.6-.74,1.43-1.51,2.23-.67.7-1.46,1.63-1.75,2.07-.6.91-1.77,1.26-1.77.54h0Z"/>
-                    </g>
-                    <text x="55" y="68" font-family="'Barlow Condensed','Arial Black',Impact,sans-serif" font-size="26" font-weight="800" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="1" style="filter:drop-shadow(0 1px 3px rgba(0,0,0,.8))">HIBCW</text>
-                    <line x1="25" y1="78" x2="85" y2="78" stroke="#f0b429" stroke-width="1.8" opacity="0.75"/>
-                </g>
-                <ellipse cx="55" cy="122" rx="3" ry="1.8" fill="#f0b429" opacity="0.9"/>
-            </svg>
+            <div class="page-shield">KIAA</div>
             <div class="page-title">Become a Verified Member</div>
             <div class="page-sub">
                   Join the Hawaii Island Business Crime Watch network. Verified members
@@ -731,7 +576,7 @@
                     <option value="kau">District 6 - Kaʻū</option>
                     <option value="south-kona">District 7 - South Kona</option>
                     <option value="north-kona">District 8 - North Kona</option>
-                    <option value="north-kohala">District 9 - Kohala</option>
+                    <option value="north-kohala">District 9 - North Kohala</option>
                 </select>
             </div>
 
@@ -745,41 +590,20 @@
                 </button>
         </div>
 
-        <!-- Success state (hidden — modal takes over) -->
-        <div class="success-box" id="successBox" style="display:none"></div>
-
-    </div>
-
-    <!-- ── Thank You Modal ── -->
-    <div class="ty-overlay" id="tyOverlay">
-        <div class="ty-card">
-            <div class="ty-emoji">🤙🏼</div>
-            <div class="ty-title">Mahalo for Registering!</div>
-            <div class="ty-body">
-                  Thank you for joining the Hawaii Island Business Crime Watch network.
-                  Your application has been received and is now pending review by KIAA staff.
+        <!-- Success state -->
+        <div class="success-box" id="successBox">
+            <div class="success-icon">✅</div>
+            <div class="success-title">Application Submitted!</div>
+            <div class="success-msg">
+                  Thank you for applying to join the Hawaii Island Business Crime Watch.
+                  KIAA staff will review your application and be in touch shortly.
+                  Once approved, your email will receive a verified member badge on all incident reports.
                 </div>
-            <div class="ty-note">
-
-                      ⏱ Approval can take up to 
-                <strong>48 hours</strong>
-                .
-                <br>
-
-                      ✉️ You will receive a confirmation email once your membership is approved.
-                    
-            </div>
-            <div class="ty-body" style="font-size:.8rem">
-
-                      Once approved, your incident reports will display a
-                <br>
-                <span style="background:rgba(0,201,167,.15);border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:1px 7px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.7rem">✅ Verified KIAA Member</span>
-
-                      badge.
-                    
-            </div>
-            <a href="index.html" class="ty-btn">← Return to Map</a>
+            <a href="index.html" class="submit-btn" style="display:inline-block;width:auto;padding:12px 32px;text-decoration:none">
+                  ← Return to Map
+                </a>
         </div>
+
     </div>
 
     <div class="page-footer">
@@ -864,9 +688,9 @@
             return;
         }
 
-        // Show thank you modal
+        // Show success
         document.getElementById('formCard').style.display = 'none';
-        document.getElementById('tyOverlay').classList.add('open');
+        document.getElementById('successBox').style.display = 'block';
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
@@ -878,7 +702,7 @@
     function toggleTheme() {
         const isLight = document.body.classList.toggle('light');
         localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
-        document.getElementById('themeToggle').textContent = isLight ? '☀️ Light' : '🌙 Dark';
+        document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
     }
     (function initTheme() {
         const saved = localStorage.getItem('hibcw-theme');
@@ -887,7 +711,7 @@
             document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.getElementById('themeToggle');
                 if (btn)
-                    btn.textContent = '☀️ Light';
+                    btn.textContent = '☀️';
             });
         }
     })();
