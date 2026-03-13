@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1208,7 +1208,7 @@ function initSB() {
 /* ════════════════════════════════════════════════════
    MAP SETUP
 ════════════════════════════════════════════════════ */
-const map = L.map('map', { center:[19.7024,-155.0824], zoom:13 });
+const map = window.map = L.map('map', { center:[19.7024,-155.0824], zoom:13 });
 
 const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   attribution:'© OpenStreetMap', maxZoom:19 });
@@ -2355,7 +2355,7 @@ function toggleTheme() {
     setTimeout(() => { if (window.map) window.map.invalidateSize(); }, 200);
   });
 })();
-
+</script>
 
 <!-- THANK YOU MODAL -->
 <div class="overlay" id="thankYouOverlay" onclick="if(event.target===this)closeThankYou()" style="display:none;z-index:9999">
