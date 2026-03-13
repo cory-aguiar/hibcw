@@ -15,7 +15,7 @@
 <script src="config.js"></script>
 <script>
 (function() {
-  var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+  var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   var forceMobile  = new URLSearchParams(window.location.search).get("mobile")  === "1";
   var forceDesktop = new URLSearchParams(window.location.search).get("desktop") === "1";
   if (!forceDesktop && (isMobile || forceMobile)) {
