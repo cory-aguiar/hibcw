@@ -2,12 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0b1524">
-<title>HIBCW Public Beta — Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HIBCW Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
@@ -99,10 +95,6 @@ header{
 
 /* ── Body ─────────────────────────────────────────────────── */
 .body{display:flex;flex:1;overflow:hidden}
-
-/* Nav label visibility — long on desktop, short on mobile */
-.nav-short{display:none}
-.nav-long{display:inline}
 
 /* ── Sidebar ──────────────────────────────────────────────── */
 .sidebar{
@@ -471,183 +463,6 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
 }
 @media(max-width:1100px){.filter-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:700px){.filter-grid{grid-template-columns:1fr}}
-
-/* ═══════════════════════════════════════════════════════════
-   ADMIN MOBILE-FIRST RESPONSIVE — ≤768px
-   ═══════════════════════════════════════════════════════════ */
-@media(max-width:768px){
-
-  /* App shell — full dvh */
-  #appShell{height:100dvh;height:100vh}
-
-  /* Header — compact */
-  header{height:48px;padding:0 12px}
-  .hd-sub{display:none}
-  .hd-title{font-size:.8rem}
-  .hd-user{
-    max-width:120px;overflow:hidden;
-    text-overflow:ellipsis;white-space:nowrap;
-    font-size:.58rem;
-  }
-  .hd-right{gap:8px}
-  .logout-btn{padding:3px 9px;font-size:.65rem}
-  #themeToggle{padding:3px 8px !important;font-size:.58rem !important}
-
-  /* Body — stack with bottom nav */
-  .body{
-    flex-direction:column;
-    padding-bottom:56px; /* room for bottom nav */
-  }
-
-  /* Sidebar → bottom nav bar */
-  .sidebar{
-    position:fixed;
-    bottom:0;left:0;right:0;
-    width:100%;
-    height:56px;
-    border-right:none;
-    border-top:1px solid var(--b2);
-    padding:0;
-    overflow:hidden;
-    display:flex;
-    flex-direction:row;
-    align-items:stretch;
-    z-index:150;
-    background:var(--navy2);
-    padding-bottom:env(safe-area-inset-bottom);
-  }
-
-  /* Hide nav section labels on mobile */
-  .nav-section{display:none}
-
-  /* Nav buttons → bottom bar tabs */
-  .nav-btn{
-    flex:1;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:4px 2px;
-    gap:2px;
-    font-size:.52rem;
-    letter-spacing:.02em;
-    border-left:none;
-    border-top:2px solid transparent;
-    min-height:0;
-  }
-  .nav-btn.on{
-    border-left-color:transparent;
-    border-top-color:var(--teal);
-    background:rgba(0,201,167,.06);
-  }
-  /* Nav button text — show short labels on mobile bottom bar */
-  .nav-short{display:inline}
-  .nav-long{display:none}
-
-  /* Nav button emoji — make bigger on mobile */
-  .nav-btn > span:first-child{font-size:1.1rem;line-height:1}
-  .nav-count{
-    margin-left:0;margin-top:1px;
-    font-size:.5rem;padding:0px 4px;
-  }
-
-  /* Main — full width, scrollable */
-  main{
-    flex:1;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    width:100%;
-  }
-
-  /* Page headers */
-  .page-hd{padding:14px 14px 0;gap:10px}
-  .page-title{font-size:1.15rem}
-  .page-sub{font-size:.72rem}
-  .page-actions{gap:6px}
-  .page-actions .btn,.page-actions button{
-    font-size:.68rem;padding:6px 10px;
-  }
-
-  /* Toolbar */
-  .toolbar{padding:10px 14px;gap:6px}
-  .tb-search{font-size:16px !important;min-width:0;padding:9px 11px}
-
-  /* Incident table → card list on mobile */
-  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{min-width:560px}
-  .td-addr{max-width:120px}
-  .td-desc{max-width:160px}
-
-  /* Filter grids */
-  .filter-grid{grid-template-columns:1fr !important;gap:8px}
-  .filter-grid select,.filter-grid input{
-    font-size:16px !important;
-  }
-
-  /* Applications grid */
-  .app-grid{
-    grid-template-columns:1fr !important;
-    padding:12px 14px;gap:10px;
-  }
-  .app-filter-bar{padding:10px 14px 0;gap:6px}
-
-  /* Captain directory grid */
-  #captainDirGrid{
-    grid-template-columns:1fr !important;
-    padding:12px 14px;gap:10px;
-  }
-
-  /* Stats cards */
-  .stats-grid,
-  div[style*="grid-template-columns:repeat(3"]{
-    grid-template-columns:1fr 1fr !important;
-  }
-
-  /* Modal — slide up from bottom */
-  .overlay{align-items:flex-end !important}
-  .modal{
-    max-width:100% !important;
-    max-height:92dvh !important;
-    border-radius:16px 16px 0 0 !important;
-    margin:0 !important;
-  }
-  .modal input,.modal select,.modal textarea{
-    font-size:16px !important;
-  }
-
-  /* Toast */
-  .toast{
-    left:12px;right:12px;bottom:68px; /* above bottom nav */
-    min-width:0;max-width:none;
-  }
-
-  /* Form sections inside modals */
-  .form-section{padding:14px !important}
-
-  /* Member/admin tables in modals */
-  .mf-row{padding:8px 0}
-
-  /* Lightbox */
-  .lightbox img,.lightbox video{
-    max-width:100vw;max-height:80dvh;
-  }
-
-  /* Login screen — already centered but needs touch-friendly inputs */
-  .login-box input{
-    font-size:16px !important;
-    padding:11px !important;
-  }
-}
-
-/* ── Small phones (≤390px) ── */
-@media(max-width:390px){
-  .hd-title{font-size:.72rem}
-  .hd-user{display:none}
-  .nav-btn{font-size:.48rem}
-  .nav-btn > span:first-child{font-size:1rem}
-  .page-hd{padding:10px 10px 0}
-  .toolbar{padding:8px 10px}
-  .page-title{font-size:1rem}
-}
 .fg-label{
   font-family:'IBM Plex Mono',monospace;font-size:.58rem;
   letter-spacing:.1em;text-transform:uppercase;color:var(--slate);
@@ -705,67 +520,33 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
-      <svg width="90" height="106" viewBox="0 0 110 130" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 12px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))">
-        <defs>
-          <linearGradient id="lsg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1e3550"/><stop offset="100%" style="stop-color:#0a1520"/></linearGradient>
-          <linearGradient id="lgg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#f0b429"/><stop offset="100%" style="stop-color:#c8960c"/></linearGradient>
-          <linearGradient id="lif" x1="10%" y1="0%" x2="90%" y2="100%"><stop offset="0%" style="stop-color:#00c9a7"/><stop offset="100%" style="stop-color:#006b56"/></linearGradient>
-          <clipPath id="lsc"><path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z"/></clipPath>
-        </defs>
-        <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z" fill="url(#lsg)"/>
-        <rect x="5" y="5" width="100" height="3.5" fill="url(#lgg)" opacity="0.95"/>
-        <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z" fill="none" stroke="#00c9a7" stroke-width="2.5" opacity="0.8"/>
-        <path d="M 12 12 L 98 12 L 98 74 Q 98 108 55 120 Q 12 108 12 74 Z" fill="none" stroke="#00c9a7" stroke-width="0.6" opacity="0.18"/>
-        <g clip-path="url(#lsc)">
-          <g transform="translate(13 10) scale(1.1667)">
-            <path fill="url(#lif)" opacity="0.75" d="M24.21,70c0-.48-2.23-2.58-2.74-2.58-.2,0-.9-.4-1.56-.9-.86-.64-1.66-1-2.78-1.26-.87-.2-1.68-.3-1.8-.22-.12.07-.2.05-.16-.05.1-.35-.77-1.44-1.04-1.29-.14.08-.19.07-.1-.03.09-.1-.14-.6-.51-1.12-.94-1.31-1.13-2.14-.89-3.83.11-.78.31-2.29.45-3.36.13-1.06.45-2.68.7-3.6.54-1.96.46-2.79-.52-5.26-.5-1.26-.68-2.09-.69-3.22-.01-1.48-.03-1.52-.65-1.65-.98-.2-1.89-2.24-2.05-4.59-.14-2.05-.49-2.72-1.8-3.43-.44-.23-.83-.62-.88-.86-.05-.24-.38-.84-.74-1.33-.87-1.2-1.01-2.09-.55-3.59.6-1.98.95-2.52,2.65-4.06,1.16-1.05,1.85-1.5,2.44-1.6.76-.12.85-.22,1.08-1.18.4-1.61.67-2,2.72-3.96,1.39-1.33,1.91-1.98,1.91-2.39,0-.75-.84-2.11-1.17-1.9-.16.1-.2.06-.1-.09.09-.14-.29-.84-.84-1.57-1.71-2.26-1.97-2.96-1.97-5.32s.53-3.73,1.58-4.02c.98-.27,2.84-.13,3.63.28.41.21.9.33,1.08.26.18-.07.28-.04.21.06-.06.1.16.33.5.51.34.18.92.65,1.3,1.05.38.4,1.35,1.05,2.16,1.44.81.39,1.84,1.04,2.27,1.45,1.26,1.18,2.57,1.8,3.47,1.66,1.86-.3,5.2.87,11.57,4.06,5.03,2.52,6.46,3.46,8.82,5.86.93.94,1.78,1.66,1.88,1.59.11-.07.17-.03.14.07-.1.35.77,1.44,1.04,1.29.14-.08.19-.07.11.02-.08.09,0,.52.17.94.27.64.28,1.06.06,2.36-.23,1.39-.21,1.66.12,2.17.45.68,1.21,1.02,2.3,1.02,1.63,0,2.61.97,2.61,2.59,0,1.11.34,1.9,1.32,3,.46.52,1.16,1.35,1.55,1.83.5.62,1.07,1.01,1.93,1.31.68.23,1.67.67,2.22.96.55.3,1.11.47,1.25.39.14-.08.2-.08.12.01-.08.09-.01.53.14.98.66,1.91-.45,3.43-3.33,4.61-1.51.62-2.09,1.01-3.17,2.14-.72.76-1.26,1.46-1.2,1.57.06.1.03.16-.07.14s-.95.32-1.89.77c-.94.45-2.06.97-2.5,1.15-.44.18-1.44.9-2.22,1.61-.78.7-1.69,1.34-2,1.42-.67.17-2.18.02-3.97-.38-1.76-.4-2.41-.17-3.86,1.39-.79.85-1.71,1.55-2.5,1.91-.69.31-1.95,1.19-2.8,1.94s-1.75,1.37-2,1.37c-.65,0-1.84.66-1.67.92.08.12.04.2-.08.16-.41-.12-1.68,1.23-2.13,2.25-.25.56-.4,1.07-.34,1.13.06.06-.12.35-.4.66-.28.3-.63.98-.79,1.5-.18.6-.74,1.43-1.51,2.23-.67.7-1.46,1.63-1.75,2.07-.6.91-1.77,1.26-1.77.54h0Z"/>
-          </g>
-          <text x="55" y="68" font-family="'Barlow Condensed','Arial Black',Impact,sans-serif" font-size="26" font-weight="800" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="1" style="filter:drop-shadow(0 1px 3px rgba(0,0,0,.8))">HIBCW</text>
-          <line x1="25" y1="78" x2="85" y2="78" stroke="#f0b429" stroke-width="1.8" opacity="0.75"/>
-        </g>
-        <ellipse cx="55" cy="122" rx="3" ry="1.8" fill="#f0b429" opacity="0.9"/>
-      </svg>
+      <div class="login-shield">HIBCW</div>
       <div class="login-title">HIBCW Admin</div>
       <div class="login-sub">Hawaii Island Business Crime Watch</div>
     </div>
 
-    <!-- Unified login form -->
-    <div id="loginFormWrap">
-      <div class="login-field">
-        <label>Email Address</label>
-        <input type="email" id="authEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPassword').focus()">
-      </div>
-      <div class="login-field">
-        <label>Password</label>
-        <input type="password" id="authPassword" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doAuthLogin()">
-      </div>
-      <button class="login-btn" onclick="doAuthLogin()" id="loginBtn">Sign In →</button>
-      <div style="text-align:center;margin-top:12px">
-        <button onclick="showForgotPassword()" style="background:none;border:none;color:var(--slate);font-size:.75rem;cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans',sans-serif">Forgot password?</button>
-      </div>
+    <!-- Tab switcher -->
+    <div style="display:flex;border:1px solid var(--b2);border-radius:7px;overflow:hidden;margin-bottom:18px">
+      <button id="tabAdmin" onclick="switchLoginTab('admin')" style="flex:1;padding:8px;background:var(--teal);color:var(--navy);border:none;cursor:pointer;font-family:Rajdhani,sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.04em;transition:all .2s">Admin</button>
+      <button id="tabCaptain" onclick="switchLoginTab('captain')" style="flex:1;padding:8px;background:transparent;color:var(--slate);border:none;cursor:pointer;font-family:Rajdhani,sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.04em;transition:all .2s">District Captain</button>
     </div>
 
-    <!-- Forgot password form -->
-    <div id="forgotWrap" style="display:none">
-      <div style="font-size:.8rem;color:var(--slate);margin-bottom:14px;line-height:1.6">Enter your email and we'll send you a link to reset your password.</div>
+    <!-- Admin login -->
+    <div id="loginAdmin">
       <div class="login-field">
-        <label>Email Address</label>
-        <input type="email" id="resetEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doPasswordReset()">
+        <label>Admin Password</label>
+        <input type="password" id="pwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
-      <button class="login-btn" onclick="doPasswordReset()" id="resetBtn">Send Reset Email →</button>
-      <div style="text-align:center;margin-top:12px">
-        <button onclick="showLoginForm()" style="background:none;border:none;color:var(--slate);font-size:.75rem;cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans',sans-serif">← Back to sign in</button>
-      </div>
+      <button class="login-btn" onclick="doLogin()">Sign In →</button>
     </div>
 
-    <!-- Set new password form (shown after reset link click) -->
-    <div id="setPasswordWrap" style="display:none">
-      <div style="font-size:.8rem;color:var(--teal);margin-bottom:14px;line-height:1.6">✅ You're verified. Please set your new password.</div>
+    <!-- Captain login -->
+    <div id="loginCaptain" style="display:none">
       <div class="login-field">
-        <label>New Password</label>
-        <input type="password" id="newPasswordInput" placeholder="Choose a strong password" onkeydown="if(event.key==='Enter')doSetNewPassword()">
+        <label>Your Email Address</label>
+        <input type="email" id="captainEmail" placeholder="Enter your captain email" onkeydown="if(event.key==='Enter')doCaptainLogin()">
       </div>
-      <button class="login-btn" onclick="doSetNewPassword()" id="setPasswordBtn">Set Password →</button>
+      <button class="login-btn" onclick="doCaptainLogin()">Sign In as Captain →</button>
     </div>
 
     <div class="login-err" id="loginErr"></div>
@@ -776,30 +557,11 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
 <div id="appShell">
   <header>
     <div class="hd-left">
-      <svg width="44" height="52" viewBox="0 0 110 130" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))">
-        <defs>
-          <linearGradient id="ahsg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1e3550"/><stop offset="100%" style="stop-color:#0a1520"/></linearGradient>
-          <linearGradient id="ahgg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#f0b429"/><stop offset="100%" style="stop-color:#c8960c"/></linearGradient>
-          <linearGradient id="ahif" x1="10%" y1="0%" x2="90%" y2="100%"><stop offset="0%" style="stop-color:#00c9a7"/><stop offset="100%" style="stop-color:#006b56"/></linearGradient>
-          <clipPath id="ahsc"><path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z"/></clipPath>
-        </defs>
-        <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z" fill="url(#ahsg)"/>
-        <rect x="5" y="5" width="100" height="3.5" fill="url(#ahgg)" opacity="0.95"/>
-        <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z" fill="none" stroke="#00c9a7" stroke-width="2.5" opacity="0.8"/>
-        <g clip-path="url(#ahsc)">
-          <g transform="translate(13 10) scale(1.1667)">
-            <path fill="url(#ahif)" opacity="0.75" d="M24.21,70c0-.48-2.23-2.58-2.74-2.58-.2,0-.9-.4-1.56-.9-.86-.64-1.66-1-2.78-1.26-.87-.2-1.68-.3-1.8-.22-.12.07-.2.05-.16-.05.1-.35-.77-1.44-1.04-1.29-.14.08-.19.07-.1-.03.09-.1-.14-.6-.51-1.12-.94-1.31-1.13-2.14-.89-3.83.11-.78.31-2.29.45-3.36.13-1.06.45-2.68.7-3.6.54-1.96.46-2.79-.52-5.26-.5-1.26-.68-2.09-.69-3.22-.01-1.48-.03-1.52-.65-1.65-.98-.2-1.89-2.24-2.05-4.59-.14-2.05-.49-2.72-1.8-3.43-.44-.23-.83-.62-.88-.86-.05-.24-.38-.84-.74-1.33-.87-1.2-1.01-2.09-.55-3.59.6-1.98.95-2.52,2.65-4.06,1.16-1.05,1.85-1.5,2.44-1.6.76-.12.85-.22,1.08-1.18.4-1.61.67-2,2.72-3.96,1.39-1.33,1.91-1.98,1.91-2.39,0-.75-.84-2.11-1.17-1.9-.16.1-.2.06-.1-.09.09-.14-.29-.84-.84-1.57-1.71-2.26-1.97-2.96-1.97-5.32s.53-3.73,1.58-4.02c.98-.27,2.84-.13,3.63.28.41.21.9.33,1.08.26.18-.07.28-.04.21.06-.06.1.16.33.5.51.34.18.92.65,1.3,1.05.38.4,1.35,1.05,2.16,1.44.81.39,1.84,1.04,2.27,1.45,1.26,1.18,2.57,1.8,3.47,1.66,1.86-.3,5.2.87,11.57,4.06,5.03,2.52,6.46,3.46,8.82,5.86.93.94,1.78,1.66,1.88,1.59.11-.07.17-.03.14.07-.1.35.77,1.44,1.04,1.29.14-.08.19-.07.11.02-.08.09,0,.52.17.94.27.64.28,1.06.06,2.36-.23,1.39-.21,1.66.12,2.17.45.68,1.21,1.02,2.3,1.02,1.63,0,2.61.97,2.61,2.59,0,1.11.34,1.9,1.32,3,.46.52,1.16,1.35,1.55,1.83.5.62,1.07,1.01,1.93,1.31.68.23,1.67.67,2.22.96.55.3,1.11.47,1.25.39.14-.08.2-.08.12.01-.08.09-.01.53.14.98.66,1.91-.45,3.43-3.33,4.61-1.51.62-2.09,1.01-3.17,2.14-.72.76-1.26,1.46-1.2,1.57.06.1.03.16-.07.14s-.95.32-1.89.77c-.94.45-2.06.97-2.5,1.15-.44.18-1.44.9-2.22,1.61-.78.7-1.69,1.34-2,1.42-.67.17-2.18.02-3.97-.38-1.76-.4-2.41-.17-3.86,1.39-.79.85-1.71,1.55-2.5,1.91-.69.31-1.95,1.19-2.8,1.94s-1.75,1.37-2,1.37c-.65,0-1.84.66-1.67.92.08.12.04.2-.08.16-.41-.12-1.68,1.23-2.13,2.25-.25.56-.4,1.07-.34,1.13.06.06-.12.35-.4.66-.28.3-.63.98-.79,1.5-.18.6-.74,1.43-1.51,2.23-.67.7-1.46,1.63-1.75,2.07-.6.91-1.77,1.26-1.77.54h0Z"/>
-          </g>
-          <text x="55" y="68" font-family="'Barlow Condensed','Arial Black',Impact,sans-serif" font-size="26" font-weight="800" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="1">HIBCW</text>
-          <line x1="25" y1="78" x2="85" y2="78" stroke="#f0b429" stroke-width="1.8" opacity="0.75"/>
-        </g>
-        <ellipse cx="55" cy="122" rx="3" ry="1.8" fill="#f0b429" opacity="0.9"/>
-      </svg>
+      <div class="hd-shield">HIBCW</div>
       <div>
         <div class="hd-title">HIBCW Admin</div>
         <div class="hd-sub">Hawaii Island Business Crime Watch</div>
       </div>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(245,166,35,.15);color:#f5a623;border:1px solid rgba(245,166,35,.35);border-radius:4px;padding:2px 7px;white-space:nowrap;margin-left:2px">PUBLIC BETA</span>
     </div>
     <div class="hd-right">
       <div style="display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal)">
@@ -816,17 +578,15 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
     <!-- Sidebar -->
     <nav class="sidebar">
       <div class="nav-section">Incidents</div>
-      <button class="nav-btn on" id="nav-active"   onclick="showView('active')">🟢 <span class="nav-long">Active</span><span class="nav-short">Active</span> <span class="nav-count" id="nc-active">—</span></button>
-      <button class="nav-btn"    id="nav-archived" onclick="showView('archived')">📦 <span class="nav-long">Archived</span><span class="nav-short">Archive</span> <span class="nav-count" id="nc-archived">—</span></button>
-      <button class="nav-btn"    id="nav-all"      onclick="showView('all')">☰ <span class="nav-long">All</span><span class="nav-short">All</span> <span class="nav-count" id="nc-all">—</span></button>
+      <button class="nav-btn on" id="nav-active"   onclick="showView('active')">🟢 Active <span class="nav-count" id="nc-active">—</span></button>
+      <button class="nav-btn"    id="nav-archived" onclick="showView('archived')">📦 Archived <span class="nav-count" id="nc-archived">—</span></button>
+      <button class="nav-btn"    id="nav-all"      onclick="showView('all')">☰ All <span class="nav-count" id="nc-all">—</span></button>
       <div class="nav-section">Reports</div>
-      <button class="nav-btn"    id="nav-stats"    onclick="showView('stats')">📊 <span class="nav-long">Statistics</span><span class="nav-short">Stats</span></button>
-      <button class="nav-btn"    id="nav-map"      onclick="showView('map')">🗺 <span class="nav-long">Map View</span><span class="nav-short">Map</span></button>
+      <button class="nav-btn"    id="nav-stats"    onclick="showView('stats')">📊 Statistics</button>
+      <button class="nav-btn"    id="nav-map"      onclick="showView('map')">🗺 Map View</button>
       <div class="nav-section">Settings</div>
-      <button class="nav-btn admin-only"    id="nav-members"  onclick="showView('members')">✅ <span class="nav-long">Members</span><span class="nav-short">Members</span> <span class="nav-count" id="nc-members">—</span></button>
-      <button class="nav-btn"               id="nav-apps"      onclick="showView('apps')">📋 <span class="nav-long">Applications</span><span class="nav-short">Apps</span> <span class="nav-count" id="nc-apps">—</span></button>
-      <button class="nav-btn"               id="nav-captain-dir" onclick="showView('captain-dir')">📇 <span class="nav-long">Captains Directory</span><span class="nav-short">Captains</span></button>
-      <button class="nav-btn superadmin-only" id="nav-admins"  onclick="showView('admins')">🔐 <span class="nav-long">Manage Admins</span><span class="nav-short">Admins</span></button>
+      <button class="nav-btn admin-only"    id="nav-members"  onclick="showView('members')">✅ Members <span class="nav-count" id="nc-members">—</span></button>
+      <button class="nav-btn"               id="nav-apps"      onclick="showView('apps')">📋 Applications <span class="nav-count" id="nc-apps">—</span></button>
       <button class="nav-btn"               id="nav-captains"  onclick="showView('captains')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="13" height="15" style="display:inline-block;vertical-align:middle;margin-right:5px;flex-shrink:0;margin-bottom:1px" aria-hidden="true"><path fill="currentColor" d="M24.21,70c0-.48-2.23-2.58-2.74-2.58-.2,0-.9-.4-1.56-.9-.86-.64-1.66-1-2.78-1.26-.87-.2-1.68-.3-1.8-.22-.12.07-.2.05-.16-.05.1-.35-.77-1.44-1.04-1.29-.14.08-.19.07-.1-.03.09-.1-.14-.6-.51-1.12-.94-1.31-1.13-2.14-.89-3.83.11-.78.31-2.29.45-3.36.13-1.06.45-2.68.7-3.6.54-1.96.46-2.79-.52-5.26-.5-1.26-.68-2.09-.69-3.22-.01-1.48-.03-1.52-.65-1.65-.98-.2-1.89-2.24-2.05-4.59-.14-2.05-.49-2.72-1.8-3.43-.44-.23-.83-.62-.88-.86-.05-.24-.38-.84-.74-1.33-.87-1.2-1.01-2.09-.55-3.59.6-1.98.95-2.52,2.65-4.06,1.16-1.05,1.85-1.5,2.44-1.6.76-.12.85-.22,1.08-1.18.4-1.61.67-2,2.72-3.96,1.39-1.33,1.91-1.98,1.91-2.39,0-.75-.84-2.11-1.17-1.9-.16.1-.2.06-.1-.09.09-.14-.29-.84-.84-1.57-1.71-2.26-1.97-2.96-1.97-5.32s.53-3.73,1.58-4.02c.98-.27,2.84-.13,3.63.28.41.21.9.33,1.08.26.18-.07.28-.04.21.06-.06.1.16.33.5.51.34.18.92.65,1.3,1.05.38.4,1.35,1.05,2.16,1.44.81.39,1.84,1.04,2.27,1.45,1.26,1.18,2.57,1.8,3.47,1.66,1.86-.3,5.2.87,11.57,4.06,5.03,2.52,6.46,3.46,8.82,5.86.93.94,1.78,1.66,1.88,1.59.11-.07.17-.03.14.07-.1.35.77,1.44,1.04,1.29.14-.08.19-.07.11.02-.08.09,0,.52.17.94.27.64.28,1.06.06,2.36-.23,1.39-.21,1.66.12,2.17.45.68,1.21,1.02,2.3,1.02,1.63,0,2.61.97,2.61,2.59,0,1.11.34,1.9,1.32,3,.46.52,1.16,1.35,1.55,1.83.5.62,1.07,1.01,1.93,1.31.68.23,1.67.67,2.22.96.55.3,1.11.47,1.25.39.14-.08.2-.08.12.01-.08.09-.01.53.14.98.66,1.91-.45,3.43-3.33,4.61-1.51.62-2.09,1.01-3.17,2.14-.72.76-1.26,1.46-1.2,1.57.06.1.03.16-.07.14s-.95.32-1.89.77c-.94.45-2.06.97-2.5,1.15-.44.18-1.44.9-2.22,1.61-.78.7-1.69,1.34-2,1.42-.67.17-2.18.02-3.97-.38-1.76-.4-2.41-.17-3.86,1.39-.79.85-1.71,1.55-2.5,1.91-.69.31-1.95,1.19-2.8,1.94s-1.75,1.37-2,1.37c-.65,0-1.84.66-1.67.92.08.12.04.2-.08.16-.41-.12-1.68,1.23-2.13,2.25-.25.56-.4,1.07-.34,1.13.06.06-.12.35-.4.66-.28.3-.63.98-.79,1.5-.18.6-.74,1.43-1.51,2.23-.67.7-1.46,1.63-1.75,2.07-.6.91-1.77,1.26-1.77.54h0Z"/></svg>Districts</button>
     </nav>
 
@@ -903,8 +663,8 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
         <div class="result-count" id="rcount-active"></div>
         <div class="bulk-bar" id="bulk-active">
           <span class="bulk-label" id="bulk-label-active">0 selected</span>
-          <button class="btn btn-gold captain-hidden" onclick="bulkArchive()">📦 Archive Selected</button>
-          <button class="btn btn-red captain-hidden"  onclick="bulkDelete()">🗑 Delete Selected</button>
+          <button class="btn btn-gold" onclick="bulkArchive()">📦 Archive Selected</button>
+          <button class="btn btn-red"  onclick="bulkDelete()">🗑 Delete Selected</button>
           <button class="btn btn-ghost" onclick="clearSelection()">Cancel</button>
         </div>
         <div class="table-wrap"><div id="table-active"></div></div>
@@ -1057,27 +817,11 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
       <!-- ── STATS ── -->
       <div class="view" id="view-stats">
         <div class="page-hd">
-          <div><div class="page-title">Statistics</div><div class="page-sub" id="statsSubtitle">Incident summary and type breakdown</div></div>
-          <div class="page-actions">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2);white-space:nowrap">Filter by District</span>
-              <select class="tb-select" id="statsDistrictFilter" onchange="renderStats()" style="min-width:180px">
-                <option value="">All Districts</option>
-              </select>
-              <button class="btn btn-ghost" onclick="document.getElementById('statsDistrictFilter').value='';renderStats()">✕ Clear</button>
-            </div>
-          </div>
+          <div><div class="page-title">Statistics</div><div class="page-sub">Incident summary and type breakdown</div></div>
         </div>
         <div class="stats-grid" id="statsGrid"></div>
-        <div style="padding:0 24px 8px;display:flex;align-items:center;justify-content:space-between">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)" id="typeBreakdownLabel">Incidents by Type (Active)</div>
-        </div>
+        <div style="padding:0 24px 8px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)">Incidents by Type (Active)</div></div>
         <div class="type-breakdown" id="typeBreakdown"></div>
-        <!-- District breakdown (shown when no district filter) -->
-        <div id="districtBreakdownWrap" style="padding:0 24px 24px">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2);margin-bottom:10px">Active Incidents by District</div>
-          <div id="districtBreakdown"></div>
-        </div>
       </div>
       <!-- ── DISTRICT CAPTAINS VIEW ── -->
       <div class="view" id="view-captains">
@@ -1095,76 +839,6 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
           👮 You are signed in as a <strong>District Captain</strong>. You can view all incidents and your district's members, and add notes to incidents.
         </div>
         <div id="captainsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:20px 24px"></div>
-      </div>
-
-      <!-- ── MANAGE ADMINS ── -->
-      <div class="view" id="view-admins">
-        <div class="page-hd">
-          <div>
-            <div class="page-title">🔐 Manage Admins</div>
-            <div class="page-sub">Invite and manage admin and captain accounts — superadmin only</div>
-          </div>
-        </div>
-
-        <!-- Invite form -->
-        <div style="padding:16px 24px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
-          <div style="flex:1;min-width:200px">
-            <div class="fg-label" style="margin-bottom:5px">Email Address</div>
-            <input class="tb-search" type="email" id="inviteEmail" placeholder="invitee@example.com" style="width:100%" onkeydown="if(event.key==='Enter')sendInvite()">
-          </div>
-          <div style="min-width:180px">
-            <div class="fg-label" style="margin-bottom:5px">Role</div>
-            <select class="tb-select" id="inviteRole" style="width:100%;padding:8px 10px">
-              <option value="admin">Admin</option>
-              <option value="superadmin">Superadmin</option>
-              <option value="captain">District Captain</option>
-            </select>
-          </div>
-          <div id="inviteDistrictWrap" style="min-width:200px;display:none">
-            <div class="fg-label" style="margin-bottom:5px">District</div>
-            <select class="tb-select" id="inviteDistrict" style="width:100%;padding:8px 10px">
-              <option value="">— Select district…</option>
-            </select>
-          </div>
-          <button class="btn btn-teal btn-lg" onclick="sendInvite()" id="inviteBtn">✉️ Send Invite</button>
-        </div>
-        <div style="padding:6px 24px 0;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
-          The invitee will receive an email with a link to set their password. Captain invites are also linked to their district.
-        </div>
-
-        <!-- Admin list -->
-        <div style="padding:16px 24px 4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2)">Current Accounts</div>
-        <div style="padding:0 24px 40px;overflow-x:auto">
-          <table class="member-table" id="adminsTable">
-            <thead>
-              <tr>
-                <th>Name / Email</th>
-                <th>Role</th>
-                <th>District</th>
-                <th>Last Sign In</th>
-                <th style="width:160px">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="adminsGrid">
-              <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--slate)">Loading…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ── CAPTAIN DIRECTORY ── -->
-      <div class="view" id="view-captain-dir">
-        <div class="page-hd">
-          <div>
-            <div class="page-title">👮 Captains Directory</div>
-            <div class="page-sub">Contact information for all district captains — visible to all captains and admins</div>
-          </div>
-          <div class="page-actions">
-            <input type="text" class="tb-search" id="captainDirSearch" placeholder="🔍  Search name, district, phone…" oninput="renderCaptainDirectory()" style="min-width:220px">
-            <button class="btn btn-ghost btn-lg" onclick="printCaptainDirectory()" title="Print / Save as PDF">🖨 Print PDF</button>
-          </div>
-        </div>
-        <div id="captainDirGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:20px 24px"></div>
       </div>
 
       <!-- ── APPLICATIONS VIEW ── -->
@@ -1198,7 +872,6 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
           <button class="btn btn-teal btn-lg captain-hidden" onclick="addMember()">＋ Add Member</button>
           <button class="btn btn-ghost btn-lg captain-hidden" onclick="importMemberCSV()">⬆ Import CSV</button>
           <input type="file" id="memberCSVInput" accept=".csv" style="display:none" onchange="handleMemberCSV(this)">
-          <input type="file" id="captainPhotoInput" accept="image/*" style="display:none" onchange="handleCaptainPhotoUpload(this)">
         </div>
         <div class="member-toolbar">
           <input class="member-search" type="text" id="memberSearch" placeholder="🔍  Search name, email, business…" oninput="renderMembers()">
@@ -1212,7 +885,7 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
             <option value="kau">District 6 - Kaʻū</option>
             <option value="south-kona">District 7 - South Kona</option>
             <option value="north-kona">District 8 - North Kona</option>
-            <option value="north-kohala">District 9 - Kohala</option>
+            <option value="north-kohala">District 9 - North Kohala</option>
           </select>
           <div class="member-count" id="memberCountLabel">— members</div>
         </div>
@@ -1319,7 +992,7 @@ const DISTRICTS = [
   ["kau",          "District 6 - Kaʻū"],
   ["south-kona",   "District 7 - South Kona"],
   ["north-kona",   "District 8 - North Kona"],
-  ["north-kohala", "District 9 - Kohala"]
+  ["north-kohala", "District 9 - North Kohala"]
 ];
 function districtLabel(v) {
   if (!v) return '—';
@@ -1345,239 +1018,126 @@ function districtSelect(sel) {
    LOGIN
 ════════════════════════════════════════════════════ */
 
-// Current session role: 'superadmin' | 'admin' | 'captain'
-let currentRole = null;
-let captainDistrict = null;
-let currentUserEmail = null;
-let currentUserName  = null;
+// Current session role: 'admin' | 'captain'
+let currentRole = 'admin';
+let captainDistrict = null; // district id for captain session
 
-/* ── Login form helpers ───────────────────────────────────── */
-function showLoginForm() {
-  document.getElementById('loginFormWrap').style.display = '';
-  document.getElementById('forgotWrap').style.display    = 'none';
-  document.getElementById('setPasswordWrap').style.display = 'none';
+function switchLoginTab(tab) {
+  const isAdmin = tab === 'admin';
+  document.getElementById('loginAdmin').style.display   = isAdmin ? 'block' : 'none';
+  document.getElementById('loginCaptain').style.display = isAdmin ? 'none'  : 'block';
+  document.getElementById('tabAdmin').style.background   = isAdmin ? 'var(--teal)' : 'transparent';
+  document.getElementById('tabAdmin').style.color        = isAdmin ? 'var(--navy)'  : 'var(--slate)';
+  document.getElementById('tabCaptain').style.background = isAdmin ? 'transparent' : 'var(--gold)';
+  document.getElementById('tabCaptain').style.color      = isAdmin ? 'var(--slate)' : 'var(--navy)';
   document.getElementById('loginErr').style.display = 'none';
 }
-function showForgotPassword() {
-  document.getElementById('loginFormWrap').style.display = 'none';
-  document.getElementById('forgotWrap').style.display    = '';
-  document.getElementById('setPasswordWrap').style.display = 'none';
-  document.getElementById('loginErr').style.display = 'none';
-  document.getElementById('resetEmail').value = document.getElementById('authEmail').value || '';
-}
 
-/* ── Main auth login ──────────────────────────────────────── */
-async function doAuthLogin() {
-  const email    = (document.getElementById('authEmail').value    || '').trim().toLowerCase();
-  const password = (document.getElementById('authPassword').value || '').trim();
-  const errEl    = document.getElementById('loginErr');
-  const btn      = document.getElementById('loginBtn');
-  errEl.style.display = 'none';
-
-  if (!email || !password) {
-    errEl.textContent = 'Please enter your email and password.';
-    errEl.style.display = 'block'; return;
-  }
-
-  if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
-    errEl.textContent = 'App not configured yet — check config.js.';
-    errEl.style.display = 'block'; return;
-  }
-  if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  btn.disabled = true; btn.textContent = 'Signing in…';
-
-  try {
-    const { data: authData, error: authErr } = await sb.auth.signInWithPassword({ email, password });
-    if (authErr) throw authErr;
-
-    await handleAuthSession(authData.session);
-  } catch(e) {
-    errEl.textContent = e.message || 'Sign-in failed. Check your email and password.';
-    errEl.style.display = 'block';
-  } finally {
-    btn.disabled = false; btn.textContent = 'Sign In →';
-  }
-}
-
-/* ── Handle session after login or page load ─────────────── */
-async function handleAuthSession(session) {
-  if (!session) return;
-  if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  const userId = session.user.id;
-  const email  = session.user.email;
-
-  // Look up role in admin_roles table
-  const { data: roleData, error: roleErr } = await sb
-    .from('admin_roles')
-    .select('role, full_name, district')
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  if (roleErr || !roleData) {
-    // User exists in auth but has no role — sign them out
-    await sb.auth.signOut();
-    const errEl = document.getElementById('loginErr');
-    errEl.textContent = 'Your account has no assigned role. Contact your HIBCW superadmin.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  currentRole      = roleData.role;           // 'superadmin' | 'admin' | 'captain'
-  currentUserEmail = email;
-  currentUserName  = roleData.full_name || email;
-  captainDistrict  = roleData.district || null;
-
-  // Enter the app
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('appShell').classList.add('visible');
-  applyRoleUI();
-
-  // Update header user display
-  const roleLabel = currentRole === 'superadmin' ? '⭐ Superadmin'
-                  : currentRole === 'captain'    ? '👮 Captain'
-                  : '👤 Admin';
-  document.getElementById('hdUser').textContent = roleLabel + ': ' + currentUserName;
-
-  if (currentRole === 'captain') {
-    document.getElementById('captainBadge').style.display = 'block';
-    const distLabel = DISTRICTS.find(([v]) => v === captainDistrict)?.[1] || captainDistrict || '';
-    document.getElementById('captainBadge').title = 'Captain of ' + distLabel;
-  }
-
-  await initApp();
-  if (currentRole === 'captain') showView('captains');
-}
-
-/* ── Password reset ───────────────────────────────────────── */
-async function doPasswordReset() {
-  const email = (document.getElementById('resetEmail').value || '').trim().toLowerCase();
+async function doLogin() {
+  const pw = document.getElementById('pwInput').value;
   const errEl = document.getElementById('loginErr');
-  const btn   = document.getElementById('resetBtn');
-  errEl.style.display = 'none';
+  if (pw === ADMIN_PASSWORD) {
+    currentRole = 'admin';
+    captainDistrict = null;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').classList.add('visible');
+    applyRoleUI();
+    await initApp();
+  } else {
+    errEl.textContent = 'Incorrect password. Try again.';
+    errEl.style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
 
+async function doCaptainLogin() {
+  const email = (document.getElementById('captainEmail').value || '').trim().toLowerCase();
+  const errEl = document.getElementById('loginErr');
+  errEl.style.display = 'none';
   if (!email) { errEl.textContent = 'Please enter your email address.'; errEl.style.display = 'block'; return; }
+
+  // Need Supabase to check — init client first
+  if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
+    errEl.textContent = 'App not configured yet (check config.js).'; errEl.style.display = 'block'; return;
+  }
   if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  btn.disabled = true; btn.textContent = 'Sending…';
   try {
-    const { error } = await sb.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.href
-    });
+    // Look up approved application with this email that has a captain_name set
+    const { data, error } = await sb
+      .from('member_applications')
+      .select('email, full_name, district, captain_name')
+      .eq('status', 'approved')
+      .ilike('email', email)
+      .not('captain_name', 'is', null)
+      .not('captain_name', 'eq', '')
+      .limit(1);
+
     if (error) throw error;
-    errEl.style.cssText = 'display:block;color:var(--teal)';
-    errEl.textContent = '✅ Reset email sent! Check your inbox.';
-  } catch(e) {
-    errEl.textContent = e.message || 'Could not send reset email.';
-    errEl.style.display = 'block';
-  } finally {
-    btn.disabled = false; btn.textContent = 'Send Reset Email →';
-  }
-}
 
-async function doSetNewPassword() {
-  const password = (document.getElementById('newPasswordInput').value || '').trim();
-  const errEl    = document.getElementById('loginErr');
-  const btn      = document.getElementById('setPasswordBtn');
-  errEl.style.display = 'none';
-
-  if (!password || password.length < 8) {
-    errEl.textContent = 'Password must be at least 8 characters.';
-    errEl.style.display = 'block'; return;
-  }
-
-  btn.disabled = true; btn.textContent = 'Saving…';
-  try {
-    const { error } = await sb.auth.updateUser({ password });
-    if (error) throw error;
-    errEl.style.cssText = 'display:block;color:var(--teal)';
-    errEl.textContent = '✅ Password updated! Signing you in…';
-    setTimeout(async () => {
-      const { data } = await sb.auth.getSession();
-      if (data?.session) await handleAuthSession(data.session);
-    }, 1200);
-  } catch(e) {
-    errEl.textContent = e.message || 'Could not update password.';
-    errEl.style.display = 'block';
-  } finally {
-    btn.disabled = false; btn.textContent = 'Set Password →';
-  }
-}
-
-/* ── Logout ───────────────────────────────────────────────── */
-async function logout() {
-  if (sb) await sb.auth.signOut();
-  currentRole      = null;
-  captainDistrict  = null;
-  currentUserEmail = null;
-  currentUserName  = null;
-  allIncidents     = [];
-  document.getElementById('appShell').classList.remove('visible');
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('authEmail').value    = '';
-  document.getElementById('authPassword').value = '';
-  document.getElementById('loginErr').style.display = 'none';
-  showLoginForm();
-}
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDstModal(); closeSetCaptainModal(); closeEditAdmin(); } });
-
-/* ── Check for existing session or password-reset redirect ── */
-(async function checkSession() {
-  if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) return;
-  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  // Handle password-reset / invite redirect (hash contains access_token)
-  const hash = window.location.hash;
-  if (hash && hash.includes('type=recovery')) {
-    // Supabase auto-handles the token — show set-password form
-    document.getElementById('loginFormWrap').style.display    = 'none';
-    document.getElementById('setPasswordWrap').style.display  = '';
-    return;
-  }
-  if (hash && hash.includes('type=invite')) {
-    document.getElementById('loginFormWrap').style.display    = 'none';
-    document.getElementById('setPasswordWrap').style.display  = '';
-    // Let Supabase handle the invite token
-    const { data } = await sb.auth.getSession();
-    if (data?.session) {
-      document.getElementById('setPasswordWrap').style.display = '';
+    if (!data || data.length === 0) {
+      errEl.textContent = 'No captain account found for that email. Contact your HIBCW admin.';
+      errEl.style.display = 'block';
+      return;
     }
-    return;
-  }
 
-  // Check for existing valid session
-  const { data } = await sb.auth.getSession();
-  if (data?.session) {
-    document.getElementById('loginScreen').style.display = 'none'; // hide briefly while loading
-    await handleAuthSession(data.session);
+    const captain = data[0];
+    currentRole = 'captain';
+    captainDistrict = captain.district;
+
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').classList.add('visible');
+    applyRoleUI();
+
+    // Update header
+    const distLabel = DISTRICTS.find(([v]) => v === captainDistrict)?.[1] || captainDistrict;
+    document.getElementById('hdUser').textContent = '👮 ' + (captain.captain_name || captain.full_name);
+    document.getElementById('captainBadge').style.display = 'block';
+    document.getElementById('captainBadge').title = 'Captain of ' + distLabel;
+
+    await initApp();
+    // Auto-navigate to their district view
+    showView('captains');
+
+  } catch(e) {
+    errEl.textContent = 'Login error: ' + e.message;
+    errEl.style.display = 'block';
   }
-})();
+}
 
 function applyRoleUI() {
-  const isSuperadmin = currentRole === 'superadmin';
-  const isAdmin      = currentRole === 'admin' || isSuperadmin;
-  const isCaptain    = currentRole === 'captain';
-
-  // admin-only elements (hidden from captains)
+  const isAdmin = currentRole === 'admin';
+  // Hide admin-only nav items
   document.querySelectorAll('.admin-only').forEach(el => {
     el.style.display = isAdmin ? '' : 'none';
   });
-  // captain-hidden elements
+  // Hide admin-only action buttons throughout
   document.querySelectorAll('.captain-hidden').forEach(el => {
-    el.style.display = isCaptain ? 'none' : '';
+    el.style.display = isAdmin ? '' : 'none';
   });
-  // superadmin-only elements
-  document.querySelectorAll('.superadmin-only').forEach(el => {
-    el.style.display = isSuperadmin ? '' : 'none';
-  });
-  // Captain badge in header
-  document.getElementById('captainBadge').style.display = isCaptain ? 'block' : 'none';
-  // Captain welcome banner
+  // Show/hide captain badge in header
+  document.getElementById('captainBadge').style.display = isAdmin ? 'none' : 'block';
+  if (isAdmin) document.getElementById('hdUser').textContent = '👤 Admin';
+  // Show/hide captain welcome banner
   const banner = document.getElementById('captainWelcomeBanner');
-  if (banner) banner.style.display = isCaptain ? 'block' : 'none';
+  if (banner) banner.style.display = isAdmin ? 'none' : 'block';
 }
+
+function logout() {
+  currentRole = 'admin';
+  captainDistrict = null;
+  document.getElementById('appShell').classList.remove('visible');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('pwInput').value = '';
+  document.getElementById('captainEmail').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+  allIncidents = [];
+  // Reset to admin tab
+  switchLoginTab('admin');
+}
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDstModal(); closeSetCaptainModal(); } });
 
 /* ════════════════════════════════════════════════════
    INIT
@@ -1688,10 +1248,6 @@ function showView(v) {
     loadApplications();
   } else if (v === 'captains') {
     renderCaptains();
-  } else if (v === 'captain-dir') {
-    renderCaptainDirectory();
-  } else if (v === 'admins') {
-    loadAdmins();
   } else {
     renderCurrentView();
   }
@@ -1907,7 +1463,7 @@ function renderTable(rows, containerId, view) {
     wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No incidents found.</div></div>`;
     return;
   }
-  const showCb     = view === 'active' && currentRole !== 'captain';
+  const showCb     = view === 'active';
   const showStatus = view === 'all';
   wrap.innerHTML = `
     <table>
@@ -1926,7 +1482,6 @@ function renderRow(inc, showCb, showStatus) {
   const bc = inc.type_color==='red'?'b-red':inc.type_color==='gold'?'b-gold':'b-teal';
   const mc = inc.incident_media?.length || 0;
   const archived = inc.status === 'archived';
-  const canAct = currentRole !== 'captain';
   return `
     <tr id="row-${inc.id}" style="${archived?'opacity:.65':''}">
       ${showCb ? `<td><input type="checkbox" class="row-cb" data-id="${inc.id}" onchange="toggleRow('${inc.id}',this.checked)" ${selectedIds.has(inc.id)?'checked':''}></td>` : ''}
@@ -1940,11 +1495,10 @@ function renderRow(inc, showCb, showStatus) {
       <td>
         <div class="row-actions">
           <button class="btn btn-ghost" onclick="openDetail('${inc.id}')">View</button>
-          ${canAct ? (!archived
-            ? `<button class="btn btn-gold" onclick="archiveOne('${inc.id}')">Archive</button>`
-            : `<button class="btn btn-green" onclick="restoreOne('${inc.id}')">Restore</button>`)
-          : ''}
-          ${canAct ? `<button class="btn btn-red" onclick="deleteOne('${inc.id}')">Delete</button>` : ''}
+          ${!archived
+            ? `<button class="btn btn-gold captain-hidden" onclick="archiveOne('${inc.id}')">Archive</button>`
+            : `<button class="btn btn-green" onclick="restoreOne('${inc.id}')">Restore</button>`}
+          <button class="btn btn-red" onclick="deleteOne('${inc.id}')">Delete</button>
         </div>
       </td>
     </tr>`;
@@ -2044,33 +1598,6 @@ async function bulkDelete() {
 /* ════════════════════════════════════════════════════
    DETAIL MODAL
 ════════════════════════════════════════════════════ */
-function captainCardHtml(districtId) {
-  const captain = memberList.find(m =>
-    m.district === districtId &&
-    m.captain_name && m.full_name &&
-    m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()
-  );
-  if (!captain) return '';
-
-  const distColor = DISTRICT_GEO.find(d => d.id === districtId)?.color || '#00c9a7';
-  const initials  = (captain.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-  const avatar    = captain.photo_url
-    ? `<img src="${captain.photo_url}" alt="${initials}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid ${distColor}66;flex-shrink:0">`
-    : `<div style="width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${distColor}22;border:2px solid ${distColor}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;color:${distColor}">${initials}</div>`;
-
-  return `<div class="mf-row" style="background:${distColor}0d;border:1px solid ${distColor}30;border-radius:6px;padding:10px 12px;">
-    <div class="mf-label" style="color:${distColor};margin-bottom:8px">👮 District Captain</div>
-    <div style="display:flex;align-items:center;gap:12px">
-      ${avatar}
-      <div style="min-width:0">
-        <div style="font-weight:600;font-size:.85rem;color:var(--white)">${esc(captain.full_name)}</div>
-        ${captain.phone ? `<div style="font-size:.75rem;color:var(--slate);margin-top:2px"><a href="tel:${captain.phone}" style="color:var(--slate);text-decoration:none" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--slate)'">📞 ${esc(captain.phone)}</a></div>` : ''}
-        ${captain.email ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--slate);margin-top:2px"><a href="mailto:${captain.email}" style="color:var(--slate);text-decoration:none" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--slate)'">✉️ ${esc(captain.email)}</a></div>` : ''}
-      </div>
-    </div>
-  </div>`;
-}
-
 function openDetail(id) {
   const inc = allIncidents.find(i=>i.id===id);
   if (!inc) return;
@@ -2081,7 +1608,6 @@ function openDetail(id) {
   document.getElementById('mBody').innerHTML = `
     <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)} &nbsp;${ageTag(inc.occurred_at)}</div></div>
     ${inc.district ? `<div class="mf-row"><div class="mf-label">District</div><div class="mf-val"><span class="teal-badge">${DISTRICT_GEO.find(d=>d.id===inc.district)?.label||inc.district}</span></div></div>` : ''}
-    ${inc.district ? captainCardHtml(inc.district) : ''}
     <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${esc(inc.address)}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal)">${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span> &nbsp;<a href="https://www.google.com/maps?q=&layer=c&cbll=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none">🔭 Street View ↗</a>`:''}</div></div>
     <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${esc(inc.description)}</div></div>
     <div class="mf-row"><div class="mf-label">Reported By</div><div class="mf-val">${esc(inc.reporter_name||'Anonymous')}</div></div>
@@ -2130,10 +1656,10 @@ function openDetail(id) {
     </div>`;
   document.getElementById('mActions').innerHTML = `
     <div class="print-header">Hawaii Island Business Crime Watch — Incident Report — Printed ${new Date().toLocaleDateString()}</div>
-    ${currentRole !== 'captain' ? (inc.status==='active'
-      ? `<button class="btn btn-gold" onclick="archiveOne('${id}');closeModal()">📦 Archive</button>`
-      : `<button class="btn btn-green" onclick="restoreOne('${id}');closeModal()">↩ Restore</button>`) : ''}
-    ${currentRole !== 'captain' ? `<button class="btn btn-red" onclick="deleteOne('${id}');closeModal()">🗑 Delete</button>` : ''}
+    ${inc.status==='active'
+      ? `<button class="btn btn-gold captain-hidden" onclick="archiveOne('${id}');closeModal()">📦 Archive</button>`
+      : `<button class="btn btn-green" onclick="restoreOne('${id}');closeModal()">↩ Restore</button>`}
+    <button class="btn btn-red" onclick="deleteOne('${id}');closeModal()">🗑 Delete</button>
     <button class="btn btn-teal" onclick="printIncident()">🖨 Print / PDF</button>
     <button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
   document.getElementById('overlay').classList.add('open');
@@ -2157,90 +1683,37 @@ function closeLightbox(){document.getElementById('lightbox').classList.remove('o
    STATS
 ════════════════════════════════════════════════════ */
 function renderStats() {
-  // Populate district filter dropdown (once)
-  const distSel = document.getElementById('statsDistrictFilter');
-  if (distSel && distSel.options.length === 1) {
-    DISTRICTS.forEach(([v, l]) => {
-      const o = document.createElement('option');
-      o.value = v; o.textContent = l;
-      distSel.appendChild(o);
-    });
-  }
-
-  const distFilter = distSel?.value || '';
-  const scope = distFilter ? allIncidents.filter(i => i.district === distFilter) : allIncidents;
-
-  const active   = scope.filter(i=>i.status==='active');
-  const archived = scope.filter(i=>i.status==='archived');
-  const withPin  = scope.filter(i=>i.lat);
-  const withMedia= scope.filter(i=>i.incident_media?.length);
-  const last30   = scope.filter(i=>new Date(i.occurred_at)>=new Date(Date.now()-30*864e5));
-
-  // Update subtitle
-  const subtitle = document.getElementById('statsSubtitle');
-  if (subtitle) subtitle.textContent = distFilter
-    ? 'Filtered by: ' + (DISTRICTS.find(([v])=>v===distFilter)?.[1] || distFilter)
-    : 'Incident summary and type breakdown';
+  const active   = allIncidents.filter(i=>i.status==='active');
+  const archived = allIncidents.filter(i=>i.status==='archived');
+  const withPin  = allIncidents.filter(i=>i.lat);
+  const withMedia= allIncidents.filter(i=>i.incident_media?.length);
+  const last30   = allIncidents.filter(i=>new Date(i.occurred_at)>=new Date(Date.now()-30*864e5));
 
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card accent"><div class="stat-num">${active.length}</div><div class="stat-lbl">Active</div></div>
     <div class="stat-card"><div class="stat-num">${archived.length}</div><div class="stat-lbl">Archived</div></div>
-    <div class="stat-card"><div class="stat-num">${scope.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card"><div class="stat-num">${allIncidents.length}</div><div class="stat-lbl">Total</div></div>
     <div class="stat-card"><div class="stat-num">${last30.length}</div><div class="stat-lbl">Last 30 Days</div></div>
     <div class="stat-card"><div class="stat-num">${withPin.length}</div><div class="stat-lbl">With GPS Pin</div></div>
     <div class="stat-card"><div class="stat-num">${withMedia.length}</div><div class="stat-lbl">With Media</div></div>`;
 
   // Type breakdown bars
+  const counts = {};
+  active.forEach(i => counts[i.type]=(counts[i.type]||0)+1);
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1] || 1;
   const colors = {red:'#e8415a',gold:'#f5a623',teal:'#00c9a7'};
   const typeColor = {};
   allIncidents.forEach(i=>typeColor[i.type]=i.type_color);
 
-  const typeCounts = {};
-  active.forEach(i => typeCounts[i.type]=(typeCounts[i.type]||0)+1);
-  const typeSorted = Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]);
-  const typeMax = typeSorted[0]?.[1] || 1;
-
-  const typeLabel = document.getElementById('typeBreakdownLabel');
-  if (typeLabel) typeLabel.textContent = distFilter
-    ? 'Incidents by Type (Active · ' + (DISTRICTS.find(([v])=>v===distFilter)?.[1] || distFilter) + ')'
-    : 'Incidents by Type (Active)';
-
-  document.getElementById('typeBreakdown').innerHTML = typeSorted.map(([type,count])=>`
+  document.getElementById('typeBreakdown').innerHTML = sorted.map(([type,count])=>`
     <div class="type-row">
       <div class="type-row-label">${type}</div>
       <div class="type-bar-wrap">
-        <div class="type-bar" style="width:${(count/typeMax*100).toFixed(1)}%;background:${colors[typeColor[type]]||'#00c9a7'}"></div>
+        <div class="type-bar" style="width:${(count/max*100).toFixed(1)}%;background:${colors[typeColor[type]]||'#00c9a7'}"></div>
       </div>
       <div class="type-count">${count}</div>
     </div>`).join('') || '<div style="padding:10px;color:var(--slate2);font-size:.8rem">No active incidents.</div>';
-
-  // District breakdown — only show when no district filter active
-  const distWrap = document.getElementById('districtBreakdownWrap');
-  const distBreak = document.getElementById('districtBreakdown');
-  if (distFilter) {
-    if (distWrap) distWrap.style.display = 'none';
-  } else {
-    if (distWrap) distWrap.style.display = '';
-    if (distBreak) {
-      const distCounts = {};
-      DISTRICTS.forEach(([v]) => distCounts[v] = 0);
-      allIncidents.filter(i=>i.status==='active').forEach(i => {
-        if (i.district && distCounts[i.district] !== undefined) distCounts[i.district]++;
-        else if (i.district) distCounts[i.district] = (distCounts[i.district]||0)+1;
-      });
-      const distSorted = DISTRICTS.map(([v,l]) => [v, l, distCounts[v]||0])
-        .sort((a,b)=>b[2]-a[2]);
-      const distMax = distSorted[0]?.[2] || 1;
-      distBreak.innerHTML = distSorted.map(([v, label, count])=>`
-        <div class="type-row" style="cursor:pointer" onclick="document.getElementById('statsDistrictFilter').value='${v}';renderStats()" title="Click to filter by this district">
-          <div class="type-row-label" style="width:200px">${label}</div>
-          <div class="type-bar-wrap">
-            <div class="type-bar" style="width:${count?((count/distMax*100).toFixed(1)):'0'}%;background:var(--teal)"></div>
-          </div>
-          <div class="type-count">${count}</div>
-        </div>`).join('') || '<div style="padding:10px;color:var(--slate2);font-size:.8rem">No data.</div>';
-    }
-  }
 }
 
 /* ════════════════════════════════════════════════════
@@ -2305,7 +1778,7 @@ async function loadMembers() {
     // Fetch approved applications to enrich with full profile info
     const {data: apps} = await sb
       .from('member_applications')
-      .select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name,photo_url')
+      .select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name')
       .eq('status','approved');
 
     // Build lookup map: email -> application data
@@ -2320,8 +1793,6 @@ async function loadMembers() {
     });
 
     renderMembers();
-    renderCaptains();
-    if (currentView === 'captain-dir') renderCaptainDirectory();
     const nc = document.getElementById('nc-members');
     if (nc) nc.textContent = memberList.length;
   } catch(e) {
@@ -2467,85 +1938,12 @@ function openEditMember(id) {
       '<option value="' + v + '"' + (String(m.district||'')===v?' selected':'') + '>' + l + '</option>'
     ).join('');
   document.getElementById('meCaptain').value  = m.captain_name || '';
-
-  // Photo section — show only if this member is a captain
-  const isCaptain = !!(m.captain_name && m.full_name &&
-    m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase());
-  const photoSection = document.getElementById('meCaptainPhotoSection');
-  if (photoSection) photoSection.style.display = isCaptain ? '' : 'none';
-
-  // PIN group — removed (captains now use Supabase Auth)
-  const pinGroup = document.getElementById('meCaptainPinGroup');
-  if (pinGroup) pinGroup.style.display = 'none';
-
-  if (isCaptain) {
-    // Reset delete flag and file input
-    document.getElementById('mePhotoDeleteFlag').value = '0';
-    document.getElementById('mePhotoInput').value = '';
-    document.getElementById('mePhotoUrl').value = m.photo_url || '';
-    meUpdateAvatarPreview(m.photo_url || null, m.full_name || '');
-  }
-
-  // Wire hover overlay
-  const wrap = document.getElementById('meAvatarWrap');
-  const overlay = document.getElementById('meAvatarOverlay');
-  if (wrap && overlay) {
-    wrap.onmouseenter = () => { overlay.style.opacity = '1'; };
-    wrap.onmouseleave = () => { overlay.style.opacity = '0'; };
-  }
-
   document.getElementById('memberEditOverlay').style.display = 'flex';
 }
 
 function closeMemberEdit() {
   document.getElementById('memberEditOverlay').style.display = 'none';
 }
-
-function meUpdateAvatarPreview(photoUrl, fullName) {
-  const photoEl    = document.getElementById('meAvatarPhoto');
-  const initialsEl = document.getElementById('meAvatarInitials');
-  const deleteBtn  = document.getElementById('meDeletePhotoBtn');
-  if (!photoEl || !initialsEl) return;
-
-  const initials = fullName
-    ? fullName.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
-    : '—';
-
-  if (photoUrl) {
-    photoEl.src = photoUrl;
-    photoEl.style.display = 'block';
-    initialsEl.style.display = 'none';
-    if (deleteBtn) deleteBtn.style.display = '';
-  } else {
-    photoEl.src = '';
-    photoEl.style.display = 'none';
-    initialsEl.textContent = initials;
-    initialsEl.style.display = 'flex';
-    if (deleteBtn) deleteBtn.style.display = 'none';
-  }
-}
-
-function meHandlePhotoPreview(input) {
-  const file = input.files?.[0];
-  if (!file) return;
-  if (!file.type.startsWith('image/')) { showToast('⚠️', 'Please select an image file.', 'err'); input.value=''; return; }
-  if (file.size > 4 * 1024 * 1024)    { showToast('⚠️', 'Image must be under 4 MB.', 'err'); input.value=''; return; }
-  // Show local preview
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('mePhotoDeleteFlag').value = '0';
-    meUpdateAvatarPreview(e.target.result, document.getElementById('meFullName').value);
-  };
-  reader.readAsDataURL(file);
-}
-
-function meMarkPhotoDelete() {
-  document.getElementById('mePhotoDeleteFlag').value = '1';
-  document.getElementById('mePhotoInput').value = '';
-  meUpdateAvatarPreview(null, document.getElementById('meFullName').value);
-  showToast('🗑', 'Photo will be removed when you save.');
-}
-
 
 function autoFillCaptainFromDistrict() {
   const district = document.getElementById('meDistrict')?.value;
@@ -2586,38 +1984,8 @@ async function saveMemberEdit() {
     btn.disabled = false; btn.textContent = '💾 Save Changes'; return;
   }
 
-  // 2. Handle photo upload / deletion
-  let resolvedPhotoUrl = document.getElementById('mePhotoUrl')?.value || null;
-  const deleteFlag     = document.getElementById('mePhotoDeleteFlag')?.value === '1';
-  const photoFile      = document.getElementById('mePhotoInput')?.files?.[0];
-
-  if (deleteFlag && resolvedPhotoUrl) {
-    // Delete from storage
-    try {
-      const url  = new URL(resolvedPhotoUrl);
-      const path = url.pathname.split('/object/public/incident-media/')[1];
-      if (path) await sb.storage.from('incident-media').remove([path]);
-    } catch(e) { console.warn('Photo delete error:', e); }
-    resolvedPhotoUrl = null;
-  } else if (photoFile) {
-    // Upload new photo
-    try {
-      const districtId = district || 'unknown';
-      const ext  = photoFile.name.split('.').pop().toLowerCase() || 'jpg';
-      const path = `captain-photos/${districtId}.${ext}`;
-      // Remove old photo at any extension
-      const { data: existing } = await sb.storage.from('incident-media').list('captain-photos');
-      const old = (existing || []).find(f => f.name.startsWith(districtId + '.'));
-      if (old) await sb.storage.from('incident-media').remove([`captain-photos/${old.name}`]);
-      const { error: upErr } = await sb.storage.from('incident-media').upload(path, photoFile, { contentType: photoFile.type, upsert: true });
-      if (!upErr) {
-        const { data: urlData } = sb.storage.from('incident-media').getPublicUrl(path);
-        resolvedPhotoUrl = urlData?.publicUrl || resolvedPhotoUrl;
-      }
-    } catch(e) { console.warn('Photo upload error:', e); }
-  }
-
-  // 3. Upsert member_applications with profile fields (match on original email)
+  // 2. Upsert member_applications with profile fields (match on original email)
+  // Auto-fill captain if district is set but captain name is blank
   const resolvedCaptain = captainName || (district ? getCaptainForDistrict(district) : null);
 
   const profile = {
@@ -2631,7 +1999,6 @@ async function saveMemberEdit() {
     business_zip:     bizZip    || null,
     district:         district  || null,
     captain_name:     resolvedCaptain || null,
-    photo_url:        resolvedPhotoUrl || null,
     status:           'approved'
   };
 
@@ -2649,7 +2016,7 @@ async function saveMemberEdit() {
     await sb.from('member_applications').insert(profile);
   }
 
-  // 4. Refresh list and close modal
+  // 3. Refresh list and close modal
   await loadMembers();
   closeMemberEdit();
   showToast('✅', `${newEmail} updated successfully.`);
@@ -2693,22 +2060,13 @@ function renderCaptains() {
   const grid = document.getElementById('captainsGrid');
   if (!grid) return;
 
-  // Build lookup: district -> {captain, captainMember, members:[]}
+  // Build lookup: district -> {captain, members:[]}
   const distMap = {};
-  DISTRICTS.forEach(([v]) => { distMap[v] = {captain: null, captainMember: null, members: [], photo_url: null}; });
+  DISTRICTS.forEach(([v]) => { distMap[v] = {captain: null, members: []}; });
   memberList.forEach(m => {
     if (m.district && distMap[m.district]) {
       distMap[m.district].members.push(m);
-      // Check if this member IS the captain (name matches captain_name)
-      const isTheCaptain = m.captain_name && m.full_name &&
-        m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase();
-      if (isTheCaptain) {
-        // Always prefer the actual captain record over any fallback
-        distMap[m.district].captain       = m.captain_name;
-        distMap[m.district].captainMember = m;
-        distMap[m.district].photo_url     = m.photo_url || null;
-      } else if (m.captain_name && !distMap[m.district].captain) {
-        // Fallback: a member knows who the captain is but isn't them
+      if (m.captain_name && !distMap[m.district].captain) {
         distMap[m.district].captain = m.captain_name;
       }
     }
@@ -2733,122 +2091,47 @@ function renderCaptains() {
   KIAA_DISTRICTS.forEach(d => { distColorMap[d.id] = d.color; });
 
   grid.innerHTML = DISTRICTS.map(([v, fullLabel]) => {
-    const info          = distMap[v] || {captain:null, captainMember:null, members:[]};
-    const captain       = info.captain;
-    const cm            = info.captainMember;  // full captain member record
-    const memCount      = info.members.length;
-    const incCount      = incidentsByDistrict[v] || 0;
-    const hasCaptain    = !!captain;
-    const distColor     = distColorMap[v] || 'var(--teal)';
-    const num           = fullLabel.match(/\d+/)?.[0] || '';
-    const lastActive    = lastActiveByDistrict[v];
+    const info       = distMap[v] || {captain:null, members:[]};
+    const captain    = info.captain;
+    const memCount   = info.members.length;
+    const incCount   = incidentsByDistrict[v] || 0;
+    const hasCaptain  = !!captain;
+    const distColor   = distColorMap[v] || 'var(--teal)';
+    const num         = fullLabel.match(/\d+/)?.[0] || '';
+    const lastActive  = lastActiveByDistrict[v];
     const lastActiveStr = lastActive ? ageTag(lastActive) : '—';
     const lastActiveColor = lastActive ? (() => {
       const days = (Date.now() - lastActive) / 86400000;
       return days < 7 ? 'var(--teal)' : days < 30 ? 'var(--gold)' : 'var(--slate)';
     })() : 'var(--slate2)';
 
-    const isMine   = (currentRole === 'captain' && captainDistrict === v);
-    const photoUrl = info.photo_url || null;
-    const canUpload = currentRole === 'admin' || currentRole === 'superadmin' || isMine;
-
-    // Captain contact details
-    const captainPhone = cm?.phone        || null;
-    const captainEmail = cm?.email        || null;
-    const captainBiz   = cm?.business_name || null;
-    const initials     = captain ? captain.split(' ').map(w=>w[0]).slice(0,2).join('') : '?';
-
-    // Avatar HTML
-    const avatarHtml = photoUrl
-      ? `<div style="position:relative;display:inline-block;${canUpload ? 'cursor:pointer;' : ''}" ${canUpload ? `onclick="triggerCaptainPhotoUpload('${v}')" title="Click to change photo"` : ''}>
-           <img src="${photoUrl}" alt="${initials}" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid ${distColor}66;display:block;box-shadow:0 4px 16px rgba(0,0,0,.35)">
-           ${canUpload ? `<div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:.65rem;color:#fff;font-weight:700" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">📷 Change</div>` : ''}
-         </div>`
-      : `<div style="width:96px;height:96px;border-radius:50%;background:${distColor}20;border:3px solid ${distColor}44;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-size:1.8rem;font-weight:700;color:${distColor};position:relative;${canUpload ? 'cursor:pointer;' : ''}" ${canUpload ? `onclick="triggerCaptainPhotoUpload('${v}')" title="Click to upload photo"` : ''}>
-           ${hasCaptain ? initials : '?'}
-           ${canUpload && hasCaptain ? `<div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:.65rem;color:#fff;font-weight:700" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">📷 Upload</div>` : ''}
-         </div>`;
-
+    const isMine = (currentRole === 'captain' && captainDistrict === v);
     return `<div style="background:var(--navy2);border:1px solid ${isMine ? distColor : (hasCaptain ? 'rgba(0,201,167,.2)' : 'var(--b2)')};${isMine ? 'box-shadow:0 0 0 2px ' + distColor + '44' : ''};border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 0 0 2px ${distColor}66'" onmouseout="this.style.boxShadow='${isMine ? '0 0 0 2px ' + distColor + '44' : 'none'}'">
       ${isMine ? '<div style="font-family:IBM Plex Mono,monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:' + distColor + ';background:' + distColor + '15;border-radius:4px;padding:3px 8px;text-align:center;margin-bottom:-4px">★ Your District</div>' : ''}
 
-      <!-- Header row: district number + label -->
+      <!-- Header row -->
       <div style="display:flex;align-items:center;gap:12px">
         <div style="width:36px;height:36px;border-radius:8px;background:${distColor}22;border:1px solid ${distColor}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:800;font-size:1rem;color:${distColor};flex-shrink:0">${num}</div>
-        <div style="min-width:0;flex:1">
+        <div style="min-width:0">
           <div style="font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(fullLabel)}</div>
+          <div style="font-size:.72rem;color:var(--slate2);margin-top:1px">${hasCaptain ? '👮 ' + esc(captain) : '<span style="font-style:italic">No captain assigned</span>'}</div>
         </div>
       </div>
 
-      <!-- Captain photo + info block -->
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:4px 0 2px">
-        ${avatarHtml}
-        ${hasCaptain ? `
-          <div style="text-align:center;width:100%">
-            <div style="font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;letter-spacing:.02em;margin-bottom:2px">👮 ${esc(captain)}</div>
-            ${captainBiz   ? `<div style="font-size:.72rem;color:var(--slate);margin-bottom:6px">🏢 ${esc(captainBiz)}</div>` : ''}
-            ${(captainPhone || captainEmail) ? `
-              <div style="display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:6px;border-top:1px solid ${distColor}22;padding-top:8px">
-                ${captainPhone ? `<a href="tel:${esc(captainPhone)}" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--white);transition:color .15s;font-family:IBM Plex Mono,monospace;font-size:.75rem" onmouseover="this.style.color='${distColor}'" onmouseout="this.style.color='var(--white)'"><span>📞</span>${esc(captainPhone)}</a>` : ''}
-                ${captainEmail ? `<a href="mailto:${esc(captainEmail)}" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--white);transition:color .15s;font-family:IBM Plex Mono,monospace;font-size:.72rem;word-break:break-all;text-align:center" onmouseover="this.style.color='${distColor}'" onmouseout="this.style.color='var(--white)'"><span style="flex-shrink:0">✉️</span>${esc(captainEmail)}</a>` : ''}
-              </div>
-            ` : '<div style="font-size:.7rem;color:var(--slate2);font-style:italic;margin-top:4px">No contact info on file</div>'}
-          </div>
-        ` : `<div style="font-size:.8rem;color:var(--slate2);font-style:italic">No captain assigned</div>`}
-      </div>
-
-      <!-- District stats -->
-      <div style="border-top:1px solid ${distColor}22;padding-top:12px">
-        <div style="font-family:IBM Plex Mono,monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:${distColor};margin-bottom:8px">📊 District Stats</div>
-
-        <!-- Members + summary tiles -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
-          <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-            <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:${distColor}">${memCount}</div>
-            <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Member${memCount!==1?'s':''}</div>
-          </div>
-          <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-            <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--gold)">${(() => { const ms = new Date(new Date().getFullYear(), new Date().getMonth(), 1); return allIncidents.filter(i => i.district===v && new Date(i.occurred_at)>=ms).length; })()}</div>
-            <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Month</div>
-          </div>
-          <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-            <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--white)">${(() => { const ws = new Date(); ws.setHours(0,0,0,0); ws.setDate(ws.getDate()-((ws.getDay()+6)%7)); return allIncidents.filter(i => i.district===v && new Date(i.occurred_at)>=ws).length; })()}</div>
-            <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Week</div>
-          </div>
-          <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-            <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--white)">${(() => { const ts = new Date(); ts.setHours(0,0,0,0); return allIncidents.filter(i => i.district===v && new Date(i.occurred_at)>=ts).length; })()}</div>
-            <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Today</div>
-          </div>
+      <!-- Stats row -->
+      <div style="display:flex;gap:8px">
+        <div style="flex:1;background:var(--navy3);border-radius:6px;padding:8px 10px;text-align:center">
+          <div style="font-family:IBM Plex Mono,monospace;font-size:1.2rem;font-weight:700;color:${distColor}">${memCount}</div>
+          <div style="font-size:.6rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.08em;margin-top:1px">Member${memCount!==1?'s':''}</div>
         </div>
-
-        <!-- Last reported -->
-        <div style="font-family:IBM Plex Mono,monospace;font-size:.65rem;color:var(--slate2);margin-bottom:10px">
-          Last report: <span style="color:${lastActive ? 'var(--white)' : 'var(--slate2)'}">${lastActive ? lastActive.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'None'}</span>
+        <div style="flex:1;background:var(--navy3);border-radius:6px;padding:8px 10px;text-align:center">
+          <div style="font-family:IBM Plex Mono,monospace;font-size:1.2rem;font-weight:700;color:var(--gold)">${incCount}</div>
+          <div style="font-size:.6rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.08em;margin-top:1px">Incident${incCount!==1?'s':''}</div>
         </div>
-
-        <!-- Type breakdown bars (top 4 active) -->
-        <div style="margin-bottom:8px">${(() => {
-          const typeColors = { red:'#e8415a', gold:'#f5a623', teal:'#00c9a7' };
-          const tc = {}; const tcm = {};
-          allIncidents.filter(i => i.district===v && i.status==='active').forEach(i => { tc[i.type]=(tc[i.type]||0)+1; tcm[i.type]=i.type_color; });
-          const sorted = Object.entries(tc).sort((a,b)=>b[1]-a[1]).slice(0,4);
-          const mx = sorted[0]?.[1]||1;
-          return sorted.length
-            ? sorted.map(([type,count])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-                <div style="font-size:.68rem;color:var(--white);width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(type)}</div>
-                <div style="flex:1;height:6px;background:var(--b2);border-radius:3px;overflow:hidden">
-                  <div style="height:100%;border-radius:3px;background:${typeColors[tcm[type]]||'#00c9a7'};width:${(count/mx*100).toFixed(1)}%"></div>
-                </div>
-                <div style="font-family:IBM Plex Mono,monospace;font-size:.62rem;color:var(--slate);width:20px;text-align:right;flex-shrink:0">${count}</div>
-              </div>`).join('')
-            : `<div style="font-size:.7rem;color:var(--slate2);font-style:italic">No active incidents</div>`;
-        })()}</div>
-
-        <!-- View Full Stats button -->
-        <button class="btn btn-ghost" style="width:100%;font-size:.7rem;border-color:${distColor}33;color:${distColor}"
-          onclick="showView('stats');setTimeout(()=>{const s=document.getElementById('statsDistrictFilter');if(s){s.value='${v}';renderStats();}},120)">
-          📊 View Full Stats for this District
-        </button>
+        <div style="flex:1;background:var(--navy3);border-radius:6px;padding:8px 10px;text-align:center" title="${lastActive ? 'Last incident: ' + lastActive.toLocaleDateString() : 'No incidents yet'}">
+          <div style="font-family:IBM Plex Mono,monospace;font-size:.8rem;font-weight:700;color:${lastActiveColor};line-height:1.8">${lastActiveStr}</div>
+          <div style="font-size:.6rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.08em;margin-top:1px">Last Active</div>
+        </div>
       </div>
 
       <!-- Action buttons -->
@@ -2856,7 +2139,7 @@ function renderCaptains() {
         <button class="btn btn-ghost" style="flex:1;font-size:.75rem;padding:6px 10px;border-color:${distColor}44;color:${distColor}" onclick="openDistrictModal('${v}')">
           👥 Members
         </button>
-        ${(currentRole === 'admin' || currentRole === 'superadmin') ? `<button class="btn btn-ghost" style="flex:1;font-size:.75rem;padding:6px 10px;border-color:rgba(245,158,11,.3);color:var(--gold)" onclick="openSetCaptainModal('${v}')">
+        ${currentRole === 'admin' ? `<button class="btn btn-ghost" style="flex:1;font-size:.75rem;padding:6px 10px;border-color:rgba(245,158,11,.3);color:var(--gold)" onclick="openSetCaptainModal('${v}')">
           👮 Set Captain
         </button>` : ''}
       </div>
@@ -2864,631 +2147,7 @@ function renderCaptains() {
   }).join('');
 }
 
-/* ════════════════════════════════════════════════════
-   MANAGE ADMINS
-════════════════════════════════════════════════════ */
-async function loadAdmins() {
-  const tbody = document.getElementById('adminsGrid');
-  if (!tbody || !sb) return;
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--slate)">Loading…</td></tr>';
-
-  // Populate invite district dropdown
-  const distSel = document.getElementById('inviteDistrict');
-  if (distSel && distSel.options.length <= 1) {
-    DISTRICTS.forEach(([v, l]) => {
-      const o = document.createElement('option'); o.value = v; o.textContent = l;
-      distSel.appendChild(o);
-    });
-  }
-  // Show/hide district field based on current role selection
-  const roleEl = document.getElementById('inviteRole');
-  if (roleEl) {
-    roleEl.onchange = () => {
-      const wrap = document.getElementById('inviteDistrictWrap');
-      if (wrap) wrap.style.display = roleEl.value === 'captain' ? '' : 'none';
-    };
-  }
-
-  try {
-    const { data, error } = await sb
-      .from('admin_roles')
-      .select('id, user_id, role, email, full_name, district, created_at, last_sign_in_at')
-      .order('created_at', { ascending: true });
-
-    if (error) throw error;
-    if (!data || !data.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--slate2);font-style:italic">No admin accounts yet.</td></tr>';
-      return;
-    }
-
-    const roleColors = { superadmin: 'b-gold', admin: 'b-teal', captain: 'b-red' };
-    const roleLabels = { superadmin: '⭐ Superadmin', admin: '👤 Admin', captain: '👮 Captain' };
-
-    tbody.innerHTML = data.map(a => {
-      const isSelf    = a.email === currentUserEmail;
-      const distLabel = a.district ? (DISTRICTS.find(([v]) => v === a.district)?.[1] || a.district) : '—';
-      const lastSeen  = a.last_sign_in_at ? new Date(a.last_sign_in_at).toLocaleDateString() : 'Never';
-      return `<tr>
-        <td>
-          <div style="font-weight:500">${esc(a.full_name || '—')} ${isSelf ? '<span style="font-size:.65rem;color:var(--teal)">(you)</span>' : ''}</div>
-          <div style="font-family:IBM Plex Mono,monospace;font-size:.68rem;color:var(--slate)">${esc(a.email)}</div>
-        </td>
-        <td><span class="badge ${roleColors[a.role] || 'b-teal'}">${roleLabels[a.role] || a.role}</span></td>
-        <td style="font-size:.8rem;color:var(--slate)">${esc(distLabel)}</td>
-        <td style="font-family:IBM Plex Mono,monospace;font-size:.68rem;color:var(--slate2)">${lastSeen}</td>
-        <td style="white-space:nowrap;display:flex;gap:6px;align-items:center">
-          <button class="btn btn-ghost" style="font-size:.65rem;padding:3px 9px;border-color:var(--teal);color:var(--teal)" onclick="openEditAdmin('${a.id}','${esc(a.email)}','${esc(a.full_name||'')}','${a.role}','${a.district||''}')">✏️ Edit</button>
-          ${!isSelf ? `<button class="btn btn-red" style="font-size:.65rem;padding:3px 9px" onclick="removeAdmin('${a.id}','${esc(a.email)}')">Remove</button>` : '<span style="font-size:.7rem;color:var(--slate2)">—</span>'}
-        </td>
-      </tr>`;
-    }).join('');
-  } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--red)">${esc(e.message)}</td></tr>`;
-  }
-}
-
-async function sendInvite() {
-  const email    = (document.getElementById('inviteEmail').value || '').trim().toLowerCase();
-  const role     = document.getElementById('inviteRole').value;
-  const district = document.getElementById('inviteDistrict')?.value || null;
-  const btn      = document.getElementById('inviteBtn');
-
-  if (!email || !email.includes('@')) { showToast('⚠️', 'Enter a valid email address.', 'err'); return; }
-  if (role === 'captain' && !district) { showToast('⚠️', 'Please select a district for this captain.', 'err'); return; }
-
-  btn.disabled = true; btn.textContent = '⏳ Sending…';
-
-  try {
-    // Step 1 — Create the Supabase Auth user (signUp with random temp password)
-    // If the user already exists this will fail gracefully — we just update the role record
-    const tempPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + 'A1!';
-    const { data: signUpData } = await sb.auth.signUp({ email, password: tempPassword });
-    const userId = signUpData?.user?.id || null;
-
-    // Step 2 — Upsert role record in admin_roles
-    const roleRecord = {
-      email,
-      role,
-      district: role === 'captain' ? district : null,
-      full_name: null,
-      ...(userId ? { user_id: userId } : {})
-    };
-    const { error: roleErr } = await sb.from('admin_roles').upsert(roleRecord, { onConflict: 'email' });
-    if (roleErr) throw roleErr;
-
-    // Step 3 — Send password reset email (acts as the invite / set-password link)
-    const { error: resetErr } = await sb.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.href
-    });
-    if (resetErr) throw resetErr;
-
-    const roleLabel = role === 'superadmin' ? 'Superadmin' : role === 'captain' ? 'District Captain' : 'Admin';
-    showToast('✅', `Invite sent to ${email} as ${roleLabel}. They'll receive a set-password email.`);
-    document.getElementById('inviteEmail').value = '';
-    await loadAdmins();
-  } catch(e) {
-    showToast('⚠️', 'Invite failed: ' + e.message, 'err');
-  } finally {
-    btn.disabled = false; btn.textContent = '✉️ Send Invite';
-  }
-}
-
-async function removeAdmin(id, email) {
-  if (!confirm(`Remove ${email} from admin access? They will no longer be able to sign in.`)) return;
-  try {
-    const { error } = await sb.from('admin_roles').delete().eq('id', id);
-    if (error) throw error;
-    showToast('🗑', `${email} removed.`);
-    await loadAdmins();
-  } catch(e) {
-    showToast('⚠️', 'Remove failed: ' + e.message, 'err');
-  }
-}
-
-function openEditAdmin(id, email, fullName, role, district) {
-  document.getElementById('editAdminId').value    = id;
-  document.getElementById('editAdminEmail').value = email;
-  document.getElementById('editAdminName').value  = fullName;
-  document.getElementById('editAdminTitle').textContent = 'Edit: ' + (fullName || email);
-
-  // Populate district dropdown if not already done
-  const distSel = document.getElementById('editAdminDistrict');
-  if (distSel.options.length <= 1) {
-    DISTRICTS.forEach(([v, l]) => {
-      const o = document.createElement('option'); o.value = v; o.textContent = l;
-      distSel.appendChild(o);
-    });
-  }
-
-  document.getElementById('editAdminRole').value = role;
-  distSel.value = district || '';
-  toggleEditAdminDistrict();
-
-  document.getElementById('editAdminOverlay').style.display = 'flex';
-}
-
-function closeEditAdmin() {
-  document.getElementById('editAdminOverlay').style.display = 'none';
-}
-
-function toggleEditAdminDistrict() {
-  const role = document.getElementById('editAdminRole').value;
-  document.getElementById('editAdminDistrictGroup').style.display = role === 'captain' ? '' : 'none';
-}
-
-async function saveEditAdmin() {
-  const id       = document.getElementById('editAdminId').value;
-  const email    = (document.getElementById('editAdminEmail').value || '').trim().toLowerCase();
-  const fullName = (document.getElementById('editAdminName').value  || '').trim();
-  const role     = document.getElementById('editAdminRole').value;
-  const district = document.getElementById('editAdminDistrict').value || null;
-  const btn      = document.getElementById('editAdminSaveBtn');
-
-  if (!email || !email.includes('@')) { showToast('⚠️', 'A valid email is required.', 'err'); return; }
-  if (role === 'captain' && !district) { showToast('⚠️', 'Please select a district for this captain.', 'err'); return; }
-
-  btn.disabled = true; btn.textContent = '⏳ Saving…';
-  try {
-    const { error } = await sb.from('admin_roles').update({
-      email,
-      full_name: fullName || null,
-      role,
-      district: role === 'captain' ? district : null
-    }).eq('id', id);
-
-    if (error) throw error;
-    showToast('✅', `${fullName || email} updated.`);
-    closeEditAdmin();
-    await loadAdmins();
-  } catch(e) {
-    showToast('⚠️', 'Save failed: ' + e.message, 'err');
-  } finally {
-    btn.disabled = false; btn.textContent = '💾 Save Changes';
-  }
-}
-
-/* ─── Captain Photo Upload ───────────────────────────────── */
-let _captainPhotoUploadDistrict = null;
-
-function triggerCaptainPhotoUpload(districtId) {
-  _captainPhotoUploadDistrict = districtId;
-  const inp = document.getElementById('captainPhotoInput');
-  if (inp) inp.click();
-}
-
-async function handleCaptainPhotoUpload(input) {
-  const file = input.files?.[0];
-  input.value = '';
-  if (!file || !_captainPhotoUploadDistrict) return;
-
-  // Validate type & size (max 4 MB)
-  if (!file.type.startsWith('image/')) { showToast('⚠️', 'Please select an image file.', 'err'); return; }
-  if (file.size > 4 * 1024 * 1024)    { showToast('⚠️', 'Image must be under 4 MB.', 'err');  return; }
-
-  const districtId = _captainPhotoUploadDistrict;
-  showToast('⏳', 'Uploading photo…');
-
-  try {
-    // Upload to Supabase storage — overwrite any existing photo for this district
-    const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
-    const path = `captain-photos/${districtId}.${ext}`;
-
-    // Remove old file (any extension) — ignore errors
-    const { data: existing } = await sb.storage.from('incident-media').list('captain-photos');
-    const old = (existing || []).find(f => f.name.startsWith(districtId + '.'));
-    if (old) await sb.storage.from('incident-media').remove([`captain-photos/${old.name}`]);
-
-    const { error: upErr } = await sb.storage.from('incident-media').upload(path, file, { contentType: file.type, upsert: true });
-    if (upErr) throw upErr;
-
-    const { data: urlData } = sb.storage.from('incident-media').getPublicUrl(path);
-    const photoUrl = urlData?.publicUrl;
-    if (!photoUrl) throw new Error('Could not get public URL');
-
-    // Save URL to the captain's member_applications record
-    // Find the captain's app_id in memberList
-    const captainMember = memberList.find(m =>
-      m.district === districtId &&
-      m.captain_name &&
-      m.full_name &&
-      m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()
-    );
-
-    if (captainMember?.app_id) {
-      const { error: dbErr } = await sb.from('member_applications')
-        .update({ photo_url: photoUrl })
-        .eq('id', captainMember.app_id);
-      if (dbErr) throw dbErr;
-    }
-
-    // Update local memberList immediately so re-render shows photo without reload
-    memberList.forEach(m => {
-      if (m.district === districtId && m.captain_name && m.full_name &&
-          m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()) {
-        m.photo_url = photoUrl;
-      }
-    });
-
-    showToast('✅', 'Photo updated!');
-    renderCaptainDirectory();
-    renderCaptains();
-  } catch (e) {
-    console.error('Captain photo upload failed:', e);
-    showToast('⚠️', 'Upload failed: ' + (e.message || 'Unknown error'), 'err');
-  }
-}
-
-/* ─── Print Captain Directory ────────────────────────────── */
-function printCaptainDirectory() {
-  // Build the same data the directory view uses
-  const distCaptainMap = {};
-  DISTRICTS.forEach(([v]) => { distCaptainMap[v] = null; });
-  memberList.forEach(m => {
-    if (!m.district || !m.captain_name) return;
-    if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() && !distCaptainMap[m.district]) {
-      distCaptainMap[m.district] = m;
-    }
-  });
-  const distCaptainNameFallback = {};
-  memberList.forEach(m => {
-    if (m.district && m.captain_name && !distCaptainMap[m.district]) {
-      distCaptainNameFallback[m.district] = m.captain_name;
-    }
-  });
-
-  const rows = DISTRICTS.map(([v, fullLabel]) => {
-    const c   = distCaptainMap[v];
-    const fb  = distCaptainNameFallback[v];
-    const name    = c?.full_name || fb || '—';
-    const phone   = c?.phone   || '—';
-    const email   = c?.email   || '—';
-    const biz     = c?.business_name || '—';
-    const addr    = [c?.business_address, c?.business_city, c?.business_state, c?.business_zip].filter(Boolean).join(', ') || '—';
-    return `<tr>
-      <td class="dist">${esc(fullLabel)}</td>
-      <td>${esc(name)}</td>
-      <td>${esc(phone)}</td>
-      <td>${esc(email)}</td>
-      <td>${esc(biz)}</td>
-      <td>${esc(addr)}</td>
-    </tr>`;
-  }).join('');
-
-  const now = new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'});
-
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>HIBCW District Captains Directory</title>
-<style>
-  @page { size: letter landscape; margin: 0.65in 0.6in; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt; color: #1a1a2e; background: #fff; }
-
-  /* Header */
-  .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2.5px solid #0b3d91; padding-bottom: 10px; margin-bottom: 18px; }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .shield { width: 38px; height: 38px; background: linear-gradient(160deg,#002266,#001133); border: 2px solid #c8960c; clip-path: polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%); display: flex; align-items: center; justify-content: center; font-size: 8pt; font-weight: 800; color: #c8960c; }
-  .org-name { font-size: 14pt; font-weight: 800; color: #0b3d91; letter-spacing: .04em; text-transform: uppercase; }
-  .org-sub  { font-size: 7.5pt; color: #555; letter-spacing: .08em; text-transform: uppercase; margin-top: 1px; }
-  .header-right { text-align: right; font-size: 8pt; color: #555; line-height: 1.6; }
-  .header-right strong { color: #0b3d91; font-size: 11pt; display: block; }
-
-  /* Table */
-  table { width: 100%; border-collapse: collapse; }
-  thead tr { background: #0b3d91; color: #fff; }
-  thead th { padding: 7px 10px; text-align: left; font-size: 8pt; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; white-space: nowrap; }
-  tbody tr { border-bottom: 1px solid #e0e4ea; }
-  tbody tr:nth-child(even) { background: #f4f7fb; }
-  tbody tr:last-child { border-bottom: 2px solid #0b3d91; }
-  td { padding: 7px 10px; vertical-align: top; line-height: 1.4; font-size: 9.5pt; }
-  td.dist { font-weight: 700; color: #0b3d91; white-space: nowrap; }
-  td.none { color: #aaa; font-style: italic; }
-
-  /* Footer */
-  .footer { margin-top: 14px; display: flex; justify-content: space-between; font-size: 7.5pt; color: #888; border-top: 1px solid #dde2ea; padding-top: 8px; }
-  .confidential { font-weight: 700; color: #c0392b; text-transform: uppercase; letter-spacing: .08em; }
-</style>
-</head>
-<body>
-  <div class="header">
-    <div class="header-left">
-      <div class="shield">HIBCW</div>
-      <div>
-        <div class="org-name">HIBCW</div>
-        <div class="org-sub">Hawaii Island Business Crime Watch</div>
-      </div>
-    </div>
-    <div class="header-right">
-      <strong>District Captains Directory</strong>
-      Generated ${now}
-    </div>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>District</th>
-        <th>Captain Name</th>
-        <th>Phone</th>
-        <th>Email</th>
-        <th>Business</th>
-        <th>Address</th>
-      </tr>
-    </thead>
-    <tbody>${rows}</tbody>
-  </table>
-
-  <div class="footer">
-    <span class="confidential">🔒 Confidential — for internal use only</span>
-    <span>HIBCW District Captains Directory · ${now} · ${DISTRICTS.length} districts</span>
-  </div>
-
-  <script>window.onload = () => { window.print(); }<\/script>
-</body>
-</html>`;
-
-  const win = window.open('', '_blank');
-  if (!win) { alert('Pop-up blocked — please allow pop-ups for this page and try again.'); return; }
-  win.document.write(html);
-  win.document.close();
-}
-
-/* ─── Captain Directory ─────────────────────────────────── */
-function renderCaptainDirectory() {
-  const grid = document.getElementById('captainDirGrid');
-  if (!grid) return;
-
-  const q = (document.getElementById('captainDirSearch')?.value || '').toLowerCase().trim();
-
-  // Build a map of district -> captain member record
-  // A captain is identified as the member in a district whose full_name matches the captain_name set on district members
-  const distCaptainMap = {};
-  DISTRICTS.forEach(([v]) => { distCaptainMap[v] = null; });
-
-  memberList.forEach(m => {
-    if (!m.district || !m.captain_name) return;
-    // The captain is the member whose full_name matches the district's captain_name
-    if (
-      m.full_name &&
-      m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() &&
-      !distCaptainMap[m.district]
-    ) {
-      distCaptainMap[m.district] = m;
-    }
-  });
-
-  // Fallback: if no name match, use captain_name string only (no contact details)
-  const distCaptainNameFallback = {};
-  memberList.forEach(m => {
-    if (m.district && m.captain_name && !distCaptainMap[m.district]) {
-      distCaptainNameFallback[m.district] = m.captain_name;
-    }
-  });
-
-  const distColorMap = {};
-  KIAA_DISTRICTS.forEach(d => { distColorMap[d.id] = d.color; });
-
-  const entries = DISTRICTS.map(([v, fullLabel]) => {
-    const captain   = distCaptainMap[v];
-    const fallback  = distCaptainNameFallback[v];
-    const distColor = distColorMap[v] || 'var(--teal)';
-    const num       = fullLabel.match(/\d+/)?.[0] || '';
-    const isMine    = (currentRole === 'captain' && captainDistrict === v);
-    return { v, fullLabel, captain, fallback, distColor, num, isMine };
-  });
-
-  // Apply search filter
-  const filtered = q ? entries.filter(({ fullLabel, captain, fallback }) => {
-    const name  = (captain?.full_name || fallback || '').toLowerCase();
-    const email = (captain?.email || '').toLowerCase();
-    const phone = (captain?.phone || '').toLowerCase();
-    const biz   = (captain?.business_name || '').toLowerCase();
-    return fullLabel.toLowerCase().includes(q) || name.includes(q) || email.includes(q) || phone.includes(q) || biz.includes(q);
-  }) : entries;
-
-  if (!filtered.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--slate2);font-size:.85rem">No captains found matching your search.</div>';
-    return;
-  }
-
-  grid.innerHTML = filtered.map(({ v, fullLabel, captain, fallback, distColor, num, isMine }) => {
-    const hasContact = !!captain;
-    const name       = captain?.full_name || fallback || null;
-    const email      = captain?.email;
-    const phone      = captain?.phone;
-    const biz        = captain?.business_name;
-    const bizAddr    = [captain?.business_address, captain?.business_city, captain?.business_state].filter(Boolean).join(', ');
-    const photoUrl   = captain?.photo_url || null;
-    const initials   = name ? esc(name.split(' ').map(w=>w[0]).slice(0,2).join('')) : '?';
-    const canUpload  = currentRole === 'admin' || currentRole === 'superadmin' || (currentRole === 'captain' && captainDistrict === v);
-
-    // ── District stats ───────────────────────────────────────
-    const distInc = allIncidents.filter(i => i.district === v);
-    const now     = new Date();
-
-    // Calendar month (1st of current month to now)
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    // Calendar week (Monday–Sunday)
-    const dayOfWeek  = (now.getDay() + 6) % 7; // Mon=0 … Sun=6
-    const weekStart  = new Date(now); weekStart.setHours(0,0,0,0); weekStart.setDate(now.getDate() - dayOfWeek);
-    // Today
-    const todayStart = new Date(now); todayStart.setHours(0,0,0,0);
-
-    const totalInc  = distInc.length;
-    const monthInc  = distInc.filter(i => new Date(i.occurred_at) >= monthStart).length;
-    const weekInc   = distInc.filter(i => new Date(i.occurred_at) >= weekStart).length;
-    const todayInc  = distInc.filter(i => new Date(i.occurred_at) >= todayStart).length;
-
-    // Last reported incident
-    const lastIncDate = distInc.reduce((latest, i) => {
-      const t = new Date(i.occurred_at);
-      return (!latest || t > latest) ? t : latest;
-    }, null);
-    const lastIncStr = lastIncDate
-      ? lastIncDate.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
-      : 'None';
-
-    // Type breakdown for this district (active only, top 4)
-    const typeColors = { red:'#e8415a', gold:'#f5a623', teal:'#00c9a7' };
-    const typeCounts = {};
-    const typeColorMap = {};
-    distInc.filter(i => i.status === 'active').forEach(i => {
-      typeCounts[i.type] = (typeCounts[i.type] || 0) + 1;
-      typeColorMap[i.type] = i.type_color;
-    });
-    const typeSorted = Object.entries(typeCounts).sort((a,b) => b[1]-a[1]).slice(0, 4);
-    const typeMax    = typeSorted[0]?.[1] || 1;
-
-    const typeRowsHtml = typeSorted.length
-      ? typeSorted.map(([type, count]) => `
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-            <div style="font-size:.7rem;color:var(--white);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(type)}</div>
-            <div style="flex:1;height:6px;background:var(--b2);border-radius:3px;overflow:hidden">
-              <div style="height:100%;border-radius:3px;background:${typeColors[typeColorMap[type]]||'#00c9a7'};width:${(count/typeMax*100).toFixed(1)}%;transition:width .4s ease"></div>
-            </div>
-            <div style="font-family:IBM Plex Mono,monospace;font-size:.62rem;color:var(--slate);width:20px;text-align:right;flex-shrink:0">${count}</div>
-          </div>`)
-        .join('')
-      : `<div style="font-size:.7rem;color:var(--slate2);font-style:italic;padding:4px 0">No active incidents</div>`;
-
-    const avatarHtml = photoUrl
-      ? `<div style="position:relative;flex-shrink:0;${canUpload ? 'cursor:pointer;' : ''}" ${canUpload ? `onclick="triggerCaptainPhotoUpload('${v}')" title="Click to change photo"` : ''}>
-           <img src="${photoUrl}" alt="${initials}" style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid ${distColor}66;display:block;box-shadow:0 4px 20px rgba(0,0,0,.35);">
-           ${canUpload ? `<div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:.65rem;color:#fff;font-weight:700" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">📷 Change</div>` : ''}
-         </div>`
-      : `<div style="
-           width:120px;height:120px;border-radius:50%;flex-shrink:0;
-           background:${distColor}20;border:3px solid ${distColor}44;
-           display:flex;align-items:center;justify-content:center;
-           font-family:Rajdhani,sans-serif;font-size:2.2rem;font-weight:700;color:${distColor};
-           ${canUpload ? 'cursor:pointer;' : ''}
-           position:relative;
-         " ${canUpload ? `onclick="triggerCaptainPhotoUpload('${v}')" title="Click to upload photo"` : ''}>
-           ${initials}
-           ${canUpload ? `<div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:.65rem;color:#fff;font-weight:700" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">📷 Upload</div>` : ''}
-         </div>`;
-
-    return `<div style="
-        background:var(--navy2);
-        border:1px solid ${isMine ? distColor : (hasContact ? 'rgba(0,201,167,.18)' : 'var(--b2)')};
-        ${isMine ? 'box-shadow:0 0 0 2px ' + distColor + '33;' : ''}
-        border-radius:10px;padding:0;overflow:hidden;
-        transition:box-shadow .15s;
-      "
-      onmouseover="this.style.boxShadow='0 0 0 2px ${distColor}55'"
-      onmouseout="this.style.boxShadow='${isMine ? '0 0 0 2px ' + distColor + '33' : 'none'}'">
-
-      <!-- Coloured district header band -->
-      <div style="background:${distColor}18;border-bottom:1px solid ${distColor}33;padding:12px 16px;display:flex;align-items:center;gap:10px">
-        <div style="
-          width:32px;height:32px;border-radius:7px;flex-shrink:0;
-          background:${distColor}22;border:1px solid ${distColor}55;
-          display:flex;align-items:center;justify-content:center;
-          font-family:Rajdhani,sans-serif;font-weight:800;font-size:.95rem;color:${distColor}
-        ">${num}</div>
-        <div style="min-width:0;flex:1">
-          <div style="font-family:Rajdhani,sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.03em;color:${distColor};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(fullLabel)}</div>
-          ${isMine ? '<div style="font-family:IBM Plex Mono,monospace;font-size:.55rem;letter-spacing:.1em;color:' + distColor + ';opacity:.8">★ YOUR DISTRICT</div>' : ''}
-        </div>
-      </div>
-
-      <!-- Captain info body -->
-      <div style="padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px">
-        ${name ? `
-          <!-- Avatar centered above name -->
-          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-bottom:4px">
-            ${avatarHtml}
-            <div style="text-align:center">
-              <div style="font-weight:700;font-size:.95rem;line-height:1.3">${esc(name)}</div>
-              ${biz ? `<div style="font-size:.72rem;color:var(--slate);margin-top:3px">🏢 ${esc(biz)}</div>` : ''}
-            </div>
-          </div>
-        ` : `
-          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 0">
-            ${avatarHtml}
-            <div style="color:var(--slate2);font-style:italic;font-size:.82rem">No captain assigned yet</div>
-          </div>
-        `}
-
-        ${(phone || email) ? `<div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--b2);padding-top:10px">` : ''}
-        ${phone ? `
-          <a href="tel:${esc(phone)}" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--white);transition:color .15s" onmouseover="this.style.color='${distColor}'" onmouseout="this.style.color='var(--white)'">
-            <span style="font-size:.8rem;width:16px;text-align:center">📞</span>
-            <span style="font-family:IBM Plex Mono,monospace;font-size:.78rem">${esc(phone)}</span>
-          </a>
-        ` : ''}
-        ${email ? `
-          <a href="mailto:${esc(email)}" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--white);transition:color .15s;min-width:0" onmouseover="this.style.color='${distColor}'" onmouseout="this.style.color='var(--white)'">
-            <span style="font-size:.8rem;width:16px;text-align:center;flex-shrink:0">✉️</span>
-            <span style="font-family:IBM Plex Mono,monospace;font-size:.75rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(email)}</span>
-          </a>
-        ` : ''}
-        ${bizAddr ? `
-          <div style="display:flex;align-items:flex-start;gap:8px;color:var(--slate)">
-            <span style="font-size:.8rem;width:16px;text-align:center;flex-shrink:0;margin-top:1px">📍</span>
-            <span style="font-size:.75rem;line-height:1.4">${esc(bizAddr)}</span>
-          </div>
-        ` : ''}
-        ${(phone || email) ? `</div>` : ''}
-
-        ${!hasContact && !fallback ? '' : (!phone && !email && hasContact) ? `
-          <div style="font-size:.72rem;color:var(--slate2);font-style:italic;border-top:1px solid var(--b2);padding-top:8px">No contact info on file</div>
-        ` : ''}
-
-        <!-- ── District Stats ── -->
-        <div style="border-top:1px solid ${distColor}22;padding-top:12px;margin-top:2px">
-          <div style="font-family:IBM Plex Mono,monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:${distColor};margin-bottom:8px">📊 District Stats</div>
-
-          <!-- Summary row -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
-            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-              <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:${distColor}">${totalInc}</div>
-              <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Total</div>
-            </div>
-            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-              <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--white)">${monthInc}</div>
-              <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Month</div>
-            </div>
-            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-              <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--white)">${weekInc}</div>
-              <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Week</div>
-            </div>
-            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
-              <div style="font-family:IBM Plex Mono,monospace;font-size:1rem;font-weight:700;color:var(--white)">${todayInc}</div>
-              <div style="font-size:.55rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Today</div>
-            </div>
-          </div>
-
-          <!-- Last reported -->
-          <div style="font-family:IBM Plex Mono,monospace;font-size:.65rem;color:var(--slate2);margin-bottom:10px">
-            Last report: <span style="color:${lastIncDate ? 'var(--white)' : 'var(--slate2)'}">${lastIncStr}</span>
-          </div>
-
-          <!-- Type breakdown bars -->
-          <div style="margin-bottom:4px">${typeRowsHtml}</div>
-
-          <!-- View Full Stats link -->
-          <button class="btn btn-ghost" style="width:100%;font-size:.7rem;margin-top:6px;border-color:${distColor}33;color:${distColor}"
-            onclick="showView('stats');setTimeout(()=>{const s=document.getElementById('statsDistrictFilter');if(s){s.value='${v}';renderStats();}},120)">
-            📊 View Full Stats for this District
-          </button>
-        </div>
-
-        ${(currentRole === 'admin' || currentRole === 'superadmin') ? `
-          <div style="border-top:1px solid var(--b2);padding-top:10px">
-            <button class="btn btn-ghost" style="width:100%;font-size:.7rem;border-color:${distColor}33;color:${distColor}" onclick="showView('captains');setTimeout(()=>openSetCaptainModal('${v}'),100)">
-              ✏️ Edit Captain
-            </button>
-          </div>
-        ` : ''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-
+/* ─── District Members Modal ─────────────────────────────── */
 function openDistrictModal(districtId) {
   const distEntry  = DISTRICTS.find(([v]) => v === districtId);
   const distLabel  = distEntry ? distEntry[1] : districtId;
@@ -4169,7 +2828,7 @@ const COUNCIL_TO_DISTRICT = {
   'Council 6': { id:'kau',          label:'District 6 - Kaʻū',          color:'#ef4444' },
   'Council 7': { id:'south-kona',   label:'District 7 - South Kona',   color:'#f59e0b' },
   'Council 8': { id:'north-kona',   label:'District 8 - North Kona',   color:'#f97316' },
-  'Council 9': { id:'north-kohala', label:'District 9 - Kohala', color:'#10b981' },
+  'Council 9': { id:'north-kohala', label:'District 9 - North Kohala', color:'#10b981' },
 };
 
 // Flat ordered array for dropdowns/filters
@@ -4193,7 +2852,7 @@ const DISTRICT_GEO_FALLBACK = [
     coords:[[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.45,-155.88],[19.33,-155.80],[19.28,-155.72],[19.18,-155.87],[19.03,-155.92],[18.95,-155.84],[18.91,-155.68],[19.02,-155.25],[19.28,-155.04],[19.45,-155.35],[19.78,-155.47],[19.90,-155.65]] },
   { id:'north-kona',   label:'District 8 - North Kona',   color:'#f97316',
     coords:[[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.60,-156.07],[19.73,-156.10],[19.85,-156.05],[19.90,-155.96],[19.90,-155.65]] },
-  { id:'north-kohala', label:'District 9 - Kohala', color:'#10b981',
+  { id:'north-kohala', label:'District 9 - North Kohala', color:'#10b981',
     coords:[[20.27,-155.87],[20.27,-156.10],[20.10,-156.07],[20.01,-156.00],[19.94,-155.98],[19.85,-156.05],[19.73,-156.10],[19.60,-156.07],[19.55,-155.93],[19.63,-155.99],[19.72,-155.98],[19.87,-155.87],[19.90,-155.65],[20.27,-155.87]] },
 ];
 
@@ -4468,34 +3127,6 @@ function admToggleHeat() {
       <button class="modal-close" onclick="closeMemberEdit()">✕</button>
     </div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
-
-      <!-- Captain photo section — only visible when member is a captain -->
-      <div id="meCaptainPhotoSection" style="display:none">
-        <div class="mf-label" style="margin-bottom:8px">Captain Photo</div>
-        <div style="display:flex;align-items:center;gap:14px">
-          <!-- Avatar preview -->
-          <div id="meAvatarWrap" style="position:relative;flex-shrink:0;cursor:pointer" onclick="document.getElementById('mePhotoInput').click()" title="Click to upload photo">
-            <!-- Photo (shown when photo_url exists) -->
-            <img id="meAvatarPhoto" src="" alt="" style="display:none;width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--teal)">
-            <!-- Initials fallback -->
-            <div id="meAvatarInitials" style="width:64px;height:64px;border-radius:50%;background:rgba(0,201,167,.15);border:2px dashed rgba(0,201,167,.4);display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-size:1.3rem;font-weight:700;color:var(--teal)">—</div>
-            <!-- Hover overlay -->
-            <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;pointer-events:none" id="meAvatarOverlay">
-              <span style="font-size:.65rem;color:#fff;font-weight:700;text-align:center;line-height:1.3">📷<br>Change</span>
-            </div>
-          </div>
-          <!-- Buttons -->
-          <div style="display:flex;flex-direction:column;gap:7px;flex:1">
-            <button class="btn btn-ghost" style="font-size:.72rem;text-align:left" onclick="document.getElementById('mePhotoInput').click()">📷 Upload Photo</button>
-            <button class="btn btn-red" id="meDeletePhotoBtn" style="font-size:.72rem;text-align:left;display:none" onclick="meMarkPhotoDelete()">🗑 Remove Photo</button>
-            <div style="font-size:.68rem;color:var(--slate2);line-height:1.5">JPG, PNG, or WebP · max 4 MB<br>Shown in Captains Directory</div>
-          </div>
-        </div>
-        <input type="hidden" id="mePhotoUrl">
-        <input type="hidden" id="mePhotoDeleteFlag" value="0">
-        <input type="file" id="mePhotoInput" accept="image/*" style="display:none" onchange="meHandlePhotoPreview(this)">
-      </div>
-
       <div class="mf-group">
         <div class="mf-label">Full Name</div>
         <input class="tb-search" id="meFullName" type="text" placeholder="Full name" style="width:100%">
@@ -4550,53 +3181,7 @@ function admToggleHeat() {
   </div>
 </div>
 
-<!-- EDIT ADMIN MODAL -->
-<div class="overlay" id="editAdminOverlay" style="display:none" onclick="if(event.target===this)closeEditAdmin()">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-hd">
-      <div>
-        <div class="modal-type-badge" style="background:rgba(0,201,167,.12);color:var(--teal);border-color:rgba(0,201,167,.25)">✏️ Edit Account</div>
-        <div class="modal-title" id="editAdminTitle" style="margin-top:6px">Edit Admin</div>
-      </div>
-      <button class="modal-close" onclick="closeEditAdmin()">✕</button>
-    </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
-      <input type="hidden" id="editAdminId">
-
-      <div class="mf-group">
-        <div class="mf-label">Full Name</div>
-        <input class="tb-search" type="text" id="editAdminName" placeholder="Full name" style="width:100%">
-      </div>
-
-      <div class="mf-group">
-        <div class="mf-label">Email Address</div>
-        <input class="tb-search" type="email" id="editAdminEmail" placeholder="email@example.com" style="width:100%">
-      </div>
-
-      <div class="mf-group">
-        <div class="mf-label">Role</div>
-        <select class="tb-select" id="editAdminRole" style="width:100%;padding:8px 10px" onchange="toggleEditAdminDistrict()">
-          <option value="admin">👤 Admin</option>
-          <option value="superadmin">⭐ Superadmin</option>
-          <option value="captain">👮 District Captain</option>
-        </select>
-      </div>
-
-      <div class="mf-group" id="editAdminDistrictGroup" style="display:none">
-        <div class="mf-label">District</div>
-        <select class="tb-select" id="editAdminDistrict" style="width:100%;padding:8px 10px">
-          <option value="">— Select district…</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeEditAdmin()">Cancel</button>
-      <button class="btn btn-teal" onclick="saveEditAdmin()" id="editAdminSaveBtn">💾 Save Changes</button>
-    </div>
-  </div>
-</div>
-
-
+<!-- Leaflet loaded last so it never blocks login -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js">
