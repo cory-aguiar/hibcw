@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────
 // HIBCW Configuration
-// Replace both values below with your Supabase project credentials.
+// Replace both values  below with your Supabase project credentials.
 // Supabase Dashboard → Your Project → Settings → API
 // ─────────────────────────────────────────────────────────────
 const SUPABASE_URL      = "https://pyiwxjdzztqdnaljkwsc.supabase.co";       // e.g. https://abcdefgh.supabase.co
