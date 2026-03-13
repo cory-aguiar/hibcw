@@ -1,0 +1,2916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0b1524">
+    <title>HIBCW Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent
+    }
+
+    :root {
+        --navy: #0b1524;
+        --navy2: #111e30;
+        --navy3: #18293f;
+        --teal: #00c9a7;
+        --teal2: #00a589;
+        --gold: #f5a623;
+        --red: #e8415a;
+        --green: #2ecc71;
+        --slate: #7a8fa6;
+        --slate2: #4a6070;
+        --white: #eef3f8;
+        --border: rgba(0, 201, 167, .15);
+        --b2: rgba(255, 255, 255, .07);
+        --bn-h: 56px;
+        --safe-b: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        font-family: 'IBM Plex Sans', sans-serif;
+        background: var(--navy);
+        color: var(--white);
+        overscroll-behavior: none
+    }/* LOGIN */
+    #loginScreen {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(ellipse at 40% 40%, #112240, #0b1524);
+        padding: 20px
+    }
+
+    .lbox {
+        background: var(--navy2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 32px 28px;
+        width: 100%;
+        max-width: 360px
+    }
+
+    .llogo {
+        text-align: center;
+        margin-bottom: 22px
+    }
+
+    .lshield {
+        width: 46px;
+        height: 46px;
+        margin: 0 auto 9px;
+        background: linear-gradient(160deg, #002266, #001133);
+        border: 2px solid var(--gold);
+        clip-path: polygon(50% 0%, 100% 15%, 100% 60%, 50% 100%, 0% 60%, 0% 15%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .85rem;
+        font-weight: 700;
+        color: var(--gold)
+    }
+
+    .ltitle {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: .06em
+    }
+
+    .lsub {
+        font-size: .7rem;
+        color: var(--slate);
+        margin-top: 2px
+    }
+
+    .lfield {
+        margin-bottom: 13px
+    }
+
+    .lfield label {
+        display: block;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .54rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--slate);
+        margin-bottom: 5px
+    }
+
+    .lfield input {
+        width: 100%;
+        background: rgba(255, 255, 255, .05);
+        border: 1px solid var(--b2);
+        border-radius: 7px;
+        padding: 11px 13px;
+        color: var(--white);
+        font-size: 16px;
+        outline: none;
+        transition: border-color .2s
+    }
+
+    .lfield input:focus {
+        border-color: var(--teal)
+    }
+
+    .lbtn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--teal), var(--teal2));
+        color: #0b1524;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .95rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        margin-top: 4px;
+        min-height: 46px
+    }
+
+    .lbtn:disabled {
+        opacity: .6
+    }
+
+    .lerr {
+        color: var(--red);
+        font-size: .74rem;
+        text-align: center;
+        margin-top: 9px;
+        display: none
+    }
+
+    .llink {
+        text-align: center;
+        margin-top: 13px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .58rem;
+        color: var(--slate)
+    }
+
+    .llink a {
+        color: var(--teal);
+        text-decoration: none;
+        cursor: pointer
+    }/* APP SHELL */
+    #app {
+        display: none;
+        flex-direction: column;
+        height: 100dvh
+    }
+
+    #app.visible {
+        display: flex
+    }
+
+    .status-bar {
+        height: env(safe-area-inset-top, 0px);
+        background: var(--navy2);
+        flex-shrink: 0
+    }/* HEADER */
+    .app-hd {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 13px;
+        background: linear-gradient(90deg, #0b1524, #111e30);
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0
+    }
+
+    .hd-l {
+        display: flex;
+        align-items: center;
+        gap: 8px
+    }
+
+    .hd-shield {
+        width: 27px;
+        height: 27px;
+        flex-shrink: 0;
+        background: linear-gradient(160deg, #002266, #001133);
+        border: 1.5px solid var(--gold);
+        clip-path: polygon(50% 0%, 100% 15%, 100% 60%, 50% 100%, 0% 60%, 0% 15%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .55rem;
+        font-weight: 700;
+        color: var(--gold)
+    }
+
+    .hd-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .98rem;
+        font-weight: 700;
+        letter-spacing: .06em
+    }
+
+    .hd-sub {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .48rem;
+        color: var(--teal);
+        letter-spacing: .08em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 160px
+    }
+
+    .hd-r {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-shrink: 0
+    }
+
+    .rpill {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .48rem;
+        letter-spacing: .05em;
+        border-radius: 3px;
+        padding: 2px 6px
+    }
+
+    .rpill.superadmin {
+        background: rgba(245, 166, 35, .12);
+        color: var(--gold);
+        border: 1px solid rgba(245, 166, 35, .3)
+    }
+
+    .rpill.admin {
+        background: rgba(0, 201, 167, .1);
+        color: var(--teal);
+        border: 1px solid rgba(0, 201, 167, .25)
+    }
+
+    .rpill.captain {
+        background: rgba(232, 65, 90, .1);
+        color: var(--red);
+        border: 1px solid rgba(232, 65, 90, .25)
+    }
+
+    .hd-out {
+        background: none;
+        border: 1px solid var(--b2);
+        border-radius: 5px;
+        padding: 4px 8px;
+        color: var(--slate);
+        font-size: .6rem;
+        cursor: pointer
+    }
+
+    .rt-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--gold);
+        flex-shrink: 0;
+        transition: background .3s
+    }
+
+    .rt-dot.live {
+        background: var(--teal);
+        box-shadow: 0 0 5px rgba(0, 201, 167, .7)
+    }/* SCREENS */
+    .screen {
+        display: none;
+        flex: 1;
+        min-height: 0;
+        flex-direction: column;
+        overflow: hidden
+    }
+
+    .screen.active {
+        display: flex
+    }
+
+    .scroll {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain
+    }/* BOTTOM NAV */
+    .bottom-nav {
+        display: flex;
+        background: var(--navy2);
+        border-top: 1px solid var(--b2);
+        flex-shrink: 0;
+        padding-bottom: var(--safe-b);
+        z-index: 200
+    }
+
+    .bn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 7px 2px;
+        cursor: pointer;
+        border: none;
+        background: none;
+        min-height: var(--bn-h);
+        position: relative
+    }
+
+    .bn-ico {
+        font-size: 1.05rem;
+        line-height: 1
+    }
+
+    .bn-lbl {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .38rem;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: var(--slate)
+    }
+
+    .bn.active .bn-lbl {
+        color: var(--teal)
+    }
+
+    .bn::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 20%;
+        right: 20%;
+        height: 2px;
+        border-radius: 0 0 2px 2px;
+        background: var(--teal);
+        transform: scaleX(0);
+        transition: transform .2s
+    }
+
+    .bn.active::after {
+        transform: scaleX(1)
+    }
+
+    .bn-badge {
+        position: absolute;
+        top: 5px;
+        right: calc(50% - 20px);
+        background: var(--gold);
+        color: #0b1524;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .4rem;
+        font-weight: 700;
+        border-radius: 8px;
+        padding: 1px 5px;
+        min-width: 15px;
+        text-align: center;
+        display: none
+    }
+
+    .bn-badge.show {
+        display: block
+    }/* SECTION HEADER */
+    .sec-hd {
+        padding: 11px 13px 8px;
+        border-bottom: 1px solid var(--b2);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px
+    }
+
+    .sec-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: .04em
+    }
+
+    .sec-sub {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .5rem;
+        color: var(--slate);
+        margin-top: 1px
+    }
+
+    .sec-act {
+        background: rgba(0, 201, 167, .1);
+        border: 1px solid rgba(0, 201, 167, .25);
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .52rem;
+        color: var(--teal);
+        cursor: pointer;
+        white-space: nowrap;
+        flex-shrink: 0
+    }/* SEARCH BAR */
+    .search-bar {
+        padding: 7px 11px;
+        border-bottom: 1px solid var(--b2);
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0
+    }
+
+    .sinput {
+        flex: 1;
+        background: rgba(255, 255, 255, .05);
+        border: 1px solid var(--b2);
+        border-radius: 7px;
+        padding: 8px 10px;
+        font-size: 16px;
+        color: var(--white);
+        font-family: 'IBM Plex Sans', sans-serif;
+        outline: none
+    }
+
+    .fsel {
+        background: rgba(255, 255, 255, .04);
+        border: 1px solid var(--b2);
+        border-radius: 7px;
+        padding: 7px 8px;
+        font-size: .62rem;
+        color: var(--slate);
+        font-family: 'IBM Plex Mono', monospace;
+        appearance: none;
+        -webkit-appearance: none;
+        min-height: 38px;
+        min-width: 82px
+    }
+
+    .fsel option {
+        background: #111e30;
+        color: var(--white)
+    }/* BADGES */
+    .badge {
+        border-radius: 4px;
+        padding: 2px 7px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .5rem;
+        letter-spacing: .04em;
+        text-transform: uppercase
+    }
+
+    .b-red {
+        background: rgba(232, 65, 90, .12);
+        color: var(--red);
+        border: 1px solid rgba(232, 65, 90, .25)
+    }
+
+    .b-gold {
+        background: rgba(245, 166, 35, .1);
+        color: var(--gold);
+        border: 1px solid rgba(245, 166, 35, .22)
+    }
+
+    .b-teal {
+        background: rgba(0, 201, 167, .08);
+        color: var(--teal);
+        border: 1px solid rgba(0, 201, 167, .2)
+    }
+
+    .b-arch {
+        background: rgba(255, 255, 255, .06);
+        color: var(--slate);
+        border: 1px solid var(--b2)
+    }/* INCIDENT CARDS */
+    .inc-list {
+        padding: 8px 0 88px
+    }
+
+    .inc-card {
+        margin: 0 11px 7px;
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 10px;
+        padding: 11px 12px;
+        cursor: pointer;
+        transition: border-color .15s
+    }
+
+    .inc-card:active {
+        background: rgba(255, 255, 255, .03);
+        border-color: rgba(0, 201, 167, .2)
+    }
+
+    .inc-card.archived {
+        opacity: .6
+    }
+
+    .inc-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4px
+    }
+
+    .inc-time {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .48rem;
+        color: var(--slate)
+    }
+
+    .inc-addr {
+        font-size: .7rem;
+        color: var(--slate);
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis
+    }
+
+    .inc-desc {
+        font-size: .72rem;
+        color: var(--slate);
+        margin-top: 4px;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden
+    }
+
+    .inc-footer {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-top: 6px
+    }
+
+    .itag {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .44rem;
+        letter-spacing: .03em;
+        background: rgba(255, 255, 255, .05);
+        border: 1px solid var(--b2);
+        border-radius: 3px;
+        padding: 2px 5px;
+        color: var(--slate)
+    }
+
+    .itag.vfd {
+        background: rgba(0, 201, 167, .08);
+        border-color: rgba(0, 201, 167, .2);
+        color: var(--teal)
+    }
+
+    .itag.rec {
+        background: rgba(245, 166, 35, .06);
+        border-color: rgba(245, 166, 35, .2);
+        color: var(--gold)
+    }
+
+    .empty-st {
+        text-align: center;
+        padding: 48px 20px;
+        color: var(--slate)
+    }
+
+    .empty-ico {
+        font-size: 2.4rem;
+        margin-bottom: 9px
+    }/* DETAIL SHEET */
+    .sheet {
+        position: fixed;
+        inset: 0;
+        z-index: 500;
+        display: none
+    }
+
+    .sheet.open {
+        display: block
+    }
+
+    .sheet-bg {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, .6);
+        backdrop-filter: blur(4px)
+    }
+
+    .sheet-wrap {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--navy2);
+        border-radius: 16px 16px 0 0;
+        border-top: 1px solid var(--border);
+        max-height: 93dvh;
+        display: flex;
+        flex-direction: column;
+        transform: translateY(100%);
+        transition: transform .3s cubic-bezier(.32, .72, 0, 1)
+    }
+
+    .sheet.open .sheet-wrap {
+        transform: translateY(0)
+    }
+
+    .drag-h {
+        width: 34px;
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, .18);
+        margin: 9px auto 3px;
+        flex-shrink: 0
+    }
+
+    .sheet-hd {
+        padding: 5px 13px 11px;
+        border-bottom: 1px solid var(--b2);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-shrink: 0
+    }
+
+    .sheet-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: .04em
+    }
+
+    .sheet-close {
+        background: rgba(255, 255, 255, .08);
+        border: none;
+        border-radius: 7px;
+        width: 30px;
+        height: 30px;
+        font-size: .85rem;
+        color: var(--white);
+        cursor: pointer;
+        flex-shrink: 0
+    }
+
+    .sheet-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 11px 13px;
+        padding-bottom: calc(16px + var(--safe-b))
+    }
+
+    .sheet-acts {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+        padding: 9px 13px;
+        padding-bottom: calc(9px + var(--safe-b));
+        border-top: 1px solid var(--b2);
+        flex-shrink: 0
+    }/* DETAIL ROWS */
+    .dr {
+        padding: 8px 0;
+        border-bottom: 1px solid var(--b2)
+    }
+
+    .dr:last-child {
+        border-bottom: none
+    }
+
+    .dr-lbl {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .48rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--slate);
+        margin-bottom: 3px
+    }
+
+    .dr-val {
+        font-size: .8rem;
+        line-height: 1.6
+    }
+
+    .suspect-box {
+        background: rgba(232, 65, 90, .06);
+        border: 1px solid rgba(232, 65, 90, .18);
+        border-radius: 7px;
+        padding: 9px 11px;
+        margin-top: 5px
+    }
+
+    .vehicle-box {
+        background: rgba(245, 166, 35, .06);
+        border: 1px solid rgba(245, 166, 35, .18);
+        border-radius: 7px;
+        padding: 9px 11px;
+        margin-top: 5px
+    }
+
+    .media-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        margin-top: 6px
+    }
+
+    .media-item {
+        aspect-ratio: 1;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid var(--b2);
+        cursor: pointer
+    }
+
+    .media-item img, .media-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover
+    }
+
+    .cap-card {
+        background: rgba(0, 201, 167, .06);
+        border: 1px solid rgba(0, 201, 167, .2);
+        border-radius: 7px;
+        padding: 9px 11px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 5px
+    }
+
+    .cap-av {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0
+    }
+
+    .cap-av-i {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .85rem;
+        font-weight: 700
+    }/* NOTES */
+    .notes-box {
+        background: rgba(0, 201, 167, .05);
+        border: 1px solid rgba(0, 201, 167, .15);
+        border-radius: 7px;
+        padding: 9px 11px;
+        margin-top: 5px
+    }
+
+    .note-item {
+        padding: 7px 0;
+        border-bottom: 1px solid var(--b2)
+    }
+
+    .note-item:last-child {
+        border-bottom: none
+    }
+
+    .note-meta {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .5rem;
+        color: var(--slate2);
+        margin-bottom: 2px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center
+    }
+
+    .note-del {
+        background: none;
+        border: none;
+        color: var(--slate2);
+        cursor: pointer;
+        font-size: .68rem;
+        padding: 2px
+    }
+
+    .note-text {
+        font-size: .76rem;
+        line-height: 1.5
+    }
+
+    .note-form {
+        display: flex;
+        gap: 6px;
+        margin-top: 7px
+    }
+
+    .note-inp {
+        flex: 1;
+        background: rgba(255, 255, 255, .05);
+        border: 1px solid var(--b2);
+        border-radius: 6px;
+        padding: 8px 9px;
+        font-size: 16px;
+        color: var(--white);
+        font-family: 'IBM Plex Sans', sans-serif;
+        outline: none
+    }
+
+    .note-sub {
+        background: rgba(0, 201, 167, .15);
+        border: 1px solid rgba(0, 201, 167, .3);
+        border-radius: 6px;
+        padding: 8px 11px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .58rem;
+        color: var(--teal);
+        cursor: pointer;
+        white-space: nowrap
+    }/* BUTTONS */
+    .btn {
+        border-radius: 7px;
+        padding: 8px 13px;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .78rem;
+        font-weight: 700;
+        letter-spacing: .05em;
+        cursor: pointer;
+        border: none;
+        white-space: nowrap;
+        min-height: 36px
+    }
+
+    .btn-teal {
+        background: linear-gradient(135deg, var(--teal), var(--teal2));
+        color: var(--navy)
+    }
+
+    .btn-gold {
+        background: rgba(245, 166, 35, .15);
+        border: 1px solid rgba(245, 166, 35, .3);
+        color: var(--gold)
+    }
+
+    .btn-red {
+        background: rgba(232, 65, 90, .12);
+        border: 1px solid rgba(232, 65, 90, .25);
+        color: var(--red)
+    }
+
+    .btn-green {
+        background: rgba(46, 204, 113, .12);
+        border: 1px solid rgba(46, 204, 113, .25);
+        color: var(--green)
+    }
+
+    .btn-ghost {
+        background: rgba(255, 255, 255, .05);
+        border: 1px solid var(--b2);
+        color: var(--slate)
+    }
+
+    .btn:disabled {
+        opacity: .5
+    }/* STATS */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        padding: 11px 13px 7px
+    }
+
+    .stat-card {
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 9px;
+        padding: 11px;
+        text-align: center
+    }
+
+    .stat-card.acc {
+        border-color: rgba(0, 201, 167, .2);
+        background: rgba(0, 201, 167, .06)
+    }
+
+    .stat-num {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--teal);
+        line-height: 1
+    }
+
+    .stat-lbl {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .46rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--slate);
+        margin-top: 2px
+    }
+
+    .bk-sec {
+        padding: 11px 13px;
+        border-top: 1px solid var(--b2)
+    }
+
+    .bk-title {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .52rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--slate);
+        margin-bottom: 9px
+    }
+
+    .type-row {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 5px
+    }
+
+    .type-label {
+        font-size: .7rem;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap
+    }
+
+    .type-bar-w {
+        width: 72px;
+        height: 5px;
+        background: var(--b2);
+        border-radius: 3px;
+        overflow: hidden;
+        flex-shrink: 0
+    }
+
+    .type-bar {
+        height: 100%;
+        border-radius: 3px;
+        transition: width .4s
+    }
+
+    .type-cnt {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .58rem;
+        color: var(--slate);
+        width: 20px;
+        text-align: right;
+        flex-shrink: 0
+    }/* MEMBER CARDS */
+    .mem-card {
+        margin: 0 11px 7px;
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 10px;
+        padding: 11px 12px
+    }
+
+    .mem-name {
+        font-weight: 600;
+        font-size: .86rem
+    }
+
+    .mem-biz {
+        font-size: .7rem;
+        color: var(--slate);
+        margin-top: 2px
+    }
+
+    .mem-email {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .6rem;
+        color: var(--slate);
+        margin-top: 2px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap
+    }
+
+    .mem-dist {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .48rem;
+        letter-spacing: .07em;
+        border-radius: 3px;
+        padding: 2px 6px;
+        display: inline-block;
+        margin-top: 3px
+    }
+
+    .mem-acts {
+        display: flex;
+        gap: 5px;
+        margin-top: 7px
+    }/* APPLICATION CARDS */
+    .app-card {
+        margin: 0 11px 7px;
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 10px;
+        padding: 11px 12px
+    }
+
+    .app-card.pending {
+        border-color: rgba(245, 166, 35, .25)
+    }
+
+    .app-name {
+        font-weight: 600;
+        font-size: .88rem
+    }
+
+    .app-biz {
+        font-size: .72rem;
+        color: var(--slate);
+        margin-top: 1px
+    }
+
+    .app-detail {
+        font-size: .7rem;
+        color: var(--slate);
+        margin-top: 5px;
+        line-height: 1.7
+    }
+
+    .app-st {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .48rem;
+        letter-spacing: .05em;
+        border-radius: 3px;
+        padding: 2px 6px
+    }
+
+    .app-st.pending {
+        background: rgba(245, 166, 35, .1);
+        color: var(--gold);
+        border: 1px solid rgba(245, 166, 35, .25)
+    }
+
+    .app-st.approved {
+        background: rgba(0, 201, 167, .1);
+        color: var(--teal);
+        border: 1px solid rgba(0, 201, 167, .25)
+    }
+
+    .app-st.rejected {
+        background: rgba(232, 65, 90, .1);
+        color: var(--red);
+        border: 1px solid rgba(232, 65, 90, .25)
+    }
+
+    .app-acts {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-top: 7px
+    }/* CAPTAIN CARDS */
+    .capt-card {
+        margin: 0 11px 7px;
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 10px;
+        padding: 13px
+    }
+
+    .capt-card.mine {
+        box-shadow: 0 0 0 2px var(--teal)
+    }
+
+    .capt-top {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin-bottom: 9px
+    }
+
+    .capt-av {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0
+    }
+
+    .capt-av-i {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700
+    }
+
+    .capt-name {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .92rem;
+        font-weight: 700;
+        letter-spacing: .02em
+    }
+
+    .capt-biz {
+        font-size: .7rem;
+        color: var(--slate);
+        margin-top: 1px
+    }
+
+    .capt-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        border-top: 1px solid var(--b2);
+        padding-top: 8px;
+        margin-top: 4px
+    }
+
+    .cstat {
+        text-align: center;
+        background: var(--navy3);
+        border-radius: 5px;
+        padding: 5px 3px
+    }
+
+    .cstat-n {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--teal);
+        line-height: 1
+    }
+
+    .cstat-l {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .4rem;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--slate2);
+        margin-top: 1px
+    }
+
+    .capt-contact {
+        border-top: 1px solid var(--b2);
+        padding-top: 8px;
+        margin-top: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px
+    }
+
+    .capt-contact a {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .62rem;
+        color: var(--slate);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 5px
+    }
+
+    .capt-acts {
+        display: flex;
+        gap: 5px;
+        margin-top: 8px;
+        border-top: 1px solid var(--b2);
+        padding-top: 8px
+    }/* MODALS */
+    .moverlay {
+        position: fixed;
+        inset: 0;
+        z-index: 800;
+        display: none;
+        align-items: flex-end
+    }
+
+    .moverlay.open {
+        display: flex
+    }
+
+    .mbg {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, .65);
+        backdrop-filter: blur(4px)
+    }
+
+    .mbox {
+        position: relative;
+        width: 100%;
+        background: var(--navy2);
+        border-radius: 16px 16px 0 0;
+        border-top: 1px solid var(--border);
+        max-height: 90dvh;
+        display: flex;
+        flex-direction: column;
+        transform: translateY(100%);
+        transition: transform .3s cubic-bezier(.32, .72, 0, 1)
+    }
+
+    .moverlay.open .mbox {
+        transform: translateY(0)
+    }
+
+    .mhd {
+        padding: 13px 15px 9px;
+        border-bottom: 1px solid var(--b2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0
+    }
+
+    .mtitle {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .98rem;
+        font-weight: 700;
+        letter-spacing: .04em
+    }
+
+    .mclose {
+        background: rgba(255, 255, 255, .08);
+        border: none;
+        border-radius: 6px;
+        width: 29px;
+        height: 29px;
+        font-size: .82rem;
+        color: var(--white);
+        cursor: pointer
+    }
+
+    .mbody {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 11px 13px;
+        display: flex;
+        flex-direction: column;
+        gap: 11px
+    }
+
+    .mfoot {
+        padding: 9px 13px;
+        padding-bottom: calc(9px + var(--safe-b));
+        border-top: 1px solid var(--b2);
+        display: flex;
+        gap: 7px;
+        justify-content: flex-end;
+        flex-shrink: 0
+    }
+
+    .fld label {
+        display: block;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .5rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--slate);
+        margin-bottom: 5px
+    }
+
+    .fld input, .fld select {
+        width: 100%;
+        background: rgba(255, 255, 255, .04);
+        border: 1px solid rgba(255, 255, 255, .1);
+        border-radius: 7px;
+        padding: 10px 11px;
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-size: 16px;
+        color: var(--white);
+        outline: none;
+        transition: border-color .15s;
+        -webkit-appearance: none;
+        appearance: none
+    }
+
+    .fld input:focus, .fld select:focus {
+        border-color: rgba(0, 201, 167, .5)
+    }
+
+    .fld select option {
+        background: #111e30;
+        color: var(--white)
+    }
+
+    .fld-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px
+    }/* TOAST */
+    .toast {
+        position: fixed;
+        bottom: calc(var(--bn-h) + var(--safe-b) + 9px);
+        left: 11px;
+        right: 11px;
+        z-index: 9000;
+        background: var(--navy3);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all .25s cubic-bezier(.32, .72, 0, 1);
+        pointer-events: none
+    }
+
+    .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto
+    }
+
+    .toast.err {
+        border-color: rgba(232, 65, 90, .4);
+        background: rgba(232, 65, 90, .08)
+    }
+
+    .t-ico {
+        font-size: .95rem;
+        flex-shrink: 0
+    }
+
+    .t-title {
+        font-size: .7rem;
+        font-weight: 600;
+        margin-bottom: 1px
+    }
+
+    .t-body {
+        font-size: .65rem;
+        color: var(--slate)
+    }/* LIGHTBOX */
+    .lightbox {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, .95);
+        display: none;
+        align-items: center;
+        justify-content: center
+    }
+
+    .lightbox.open {
+        display: flex
+    }
+
+    .lightbox img, .lightbox video {
+        max-width: 100%;
+        max-height: 100dvh;
+        object-fit: contain
+    }
+
+    .lb-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: rgba(255, 255, 255, .1);
+        border: none;
+        border-radius: 7px;
+        width: 35px;
+        height: 35px;
+        font-size: .95rem;
+        color: var(--white);
+        cursor: pointer
+    }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <div id="loginScreen">
+        <div class="lbox">
+            <div class="llogo">
+                <div class="lshield">HIBCW</div>
+                <div class="ltitle">HIBCW Admin</div>
+                <div class="lsub">Hawaii Island Business Crime Watch</div>
+            </div>
+            <div id="loginFormWrap">
+                <div class="lfield">
+                    <label>Email</label>
+                    <input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" autocapitalize="none">
+                </div>
+                <div class="lfield">
+                    <label>Password</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+                </div>
+                <button class="lbtn" id="loginBtn" onclick="doLogin()">Sign In →</button>
+                <div class="lerr" id="loginErr"></div>
+                <div class="llink">
+                    <a onclick="showReset()">Forgot password?</a>
+                </div>
+            </div>
+            <div id="resetWrap" style="display:none">
+                <div class="lfield">
+                    <label>Your Email</label>
+                    <input type="email" id="resetEmail" placeholder="you@email.com">
+                </div>
+                <button class="lbtn" id="resetBtn" onclick="doReset()">Send Reset Email →</button>
+                <div class="lerr" id="resetErr"></div>
+                <div class="llink">
+                    <a onclick="showLogin()">← Back to sign in</a>
+                </div>
+            </div>
+            <div id="setPwWrap" style="display:none">
+                <div class="lfield">
+                    <label>Set New Password</label>
+                    <input type="password" id="newPwInput" placeholder="Min 8 characters" autocomplete="new-password">
+                </div>
+                <button class="lbtn" id="setPwBtn" onclick="doSetPw()">Set Password →</button>
+                <div class="lerr" id="setPwErr"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app">
+        <div class="status-bar"></div>
+        <header class="app-hd">
+            <div class="hd-l">
+                <div class="hd-shield">H</div>
+                <div>
+                    <div class="hd-title">HIBCW Admin</div>
+                    <div class="hd-sub" id="hdSub">Loading…</div>
+                </div>
+            </div>
+            <div class="hd-r">
+                <div class="rt-dot" id="rtDot"></div>
+                <div class="rpill" id="rolePill"></div>
+                <button class="hd-out" onclick="logout()">Out</button>
+            </div>
+        </header>
+
+        <!-- INCIDENTS -->
+        <div id="scIncidents" class="screen active">
+            <div class="sec-hd">
+                <div>
+                    <div class="sec-title">Incidents</div>
+                    <div class="sec-sub" id="incSub">Active reports</div>
+                </div>
+                <button class="sec-act captain-hidden" onclick="exportCSV()">⬇ CSV</button>
+            </div>
+            <div class="search-bar">
+                <input class="sinput" type="search" id="incSearch" placeholder="Search…" oninput="renderInc()">
+                <select class="fsel" id="incType" onchange="renderInc()">
+                    <option value="">All Types</option>
+                    <option>Robbery</option>
+                    <option>Burglary</option>
+                    <option>Assault</option>
+                    <option>Drug Activity</option>
+                    <option>Theft / Shoplifting</option>
+                    <option>Vandalism</option>
+                    <option>Vehicle Break-In</option>
+                    <option>Fraud / Scam</option>
+                    <option>Trespassing</option>
+                    <option>Suspicious Activity</option>
+                    <option>Graffiti</option>
+                    <option>Other</option>
+                </select>
+                <select class="fsel" id="incStatus" onchange="renderInc()">
+                    <option value="active">Active</option>
+                    <option value="archived">Archived</option>
+                    <option value="">All</option>
+                </select>
+            </div>
+            <div class="scroll">
+                <div class="inc-list" id="incList"></div>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div id="scStats" class="screen">
+            <div class="sec-hd">
+                <div>
+                    <div class="sec-title">Statistics</div>
+                    <div class="sec-sub" id="statsSub">Incident summary</div>
+                </div>
+                <select class="fsel" id="statsDF" onchange="renderStats()" style="min-width:105px">
+                    <option value="">All Districts</option>
+                </select>
+            </div>
+            <div class="scroll" style="padding-bottom:80px">
+                <div class="stats-grid" id="statsGrid"></div>
+                <div class="bk-sec">
+                    <div class="bk-title" id="typeBreakTitle">By Type (Active)</div>
+                    <div id="typeBreak"></div>
+                </div>
+                <div class="bk-sec" id="distBreakWrap">
+                    <div class="bk-title">By District (Active)</div>
+                    <div id="distBreak"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MEMBERS -->
+        <div id="scMembers" class="screen admin-only">
+            <div class="sec-hd">
+                <div>
+                    <div class="sec-title">Members</div>
+                    <div class="sec-sub" id="memSub">Verified members</div>
+                </div>
+                <button class="sec-act" onclick="openAddMem()">+ Add</button>
+            </div>
+            <div class="search-bar">
+                <input class="sinput" type="search" id="memSearch" placeholder="Search members…" oninput="renderMem()">
+                <select class="fsel" id="memDistF" onchange="renderMem()" style="min-width:100px">
+                    <option value="">All Districts</option>
+                </select>
+            </div>
+            <div class="scroll">
+                <div id="memList" style="padding:7px 0 88px"></div>
+            </div>
+        </div>
+
+        <!-- APPLICATIONS -->
+        <div id="scApps" class="screen">
+            <div class="sec-hd">
+                <div>
+                    <div class="sec-title">Applications</div>
+                    <div class="sec-sub" id="appSub">Membership applications</div>
+                </div>
+                <select class="fsel" id="appStatusF" onchange="renderApps()" style="min-width:85px">
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="">All</option>
+                </select>
+            </div>
+            <div class="scroll">
+                <div id="appList" style="padding:7px 0 88px"></div>
+            </div>
+        </div>
+
+        <!-- CAPTAINS -->
+        <div id="scCaptains" class="screen">
+            <div class="sec-hd">
+                <div>
+                    <div class="sec-title">District Captains</div>
+                    <div class="sec-sub">All 9 Hawaii Island districts</div>
+                </div>
+            </div>
+            <div class="scroll">
+                <div id="captList" style="padding:7px 0 88px"></div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <nav class="bottom-nav">
+            <button class="bn active" id="bn-incidents" onclick="goTo('incidents')">
+                <div class="bn-ico">📋</div>
+                <div class="bn-lbl">Incidents</div>
+                <div class="bn-badge" id="bInc"></div>
+            </button>
+            <button class="bn" id="bn-stats" onclick="goTo('stats')">
+                <div class="bn-ico">📊</div>
+                <div class="bn-lbl">Stats</div>
+            </button>
+            <button class="bn admin-only" id="bn-members" onclick="goTo('members')">
+                <div class="bn-ico">👥</div>
+                <div class="bn-lbl">Members</div>
+            </button>
+            <button class="bn" id="bn-apps" onclick="goTo('apps')">
+                <div class="bn-ico">📬</div>
+                <div class="bn-lbl">Apps</div>
+                <div class="bn-badge" id="bApps"></div>
+            </button>
+            <button class="bn" id="bn-captains" onclick="goTo('captains')">
+                <div class="bn-ico">👮</div>
+                <div class="bn-lbl">Captains</div>
+            </button>
+        </nav>
+    </div>
+
+    <!-- DETAIL SHEET -->
+    <div class="sheet" id="detSheet">
+        <div class="sheet-bg" onclick="closeDetail()"></div>
+        <div class="sheet-wrap">
+            <div class="drag-h"></div>
+            <div class="sheet-hd">
+                <div>
+                    <div class="sheet-title" id="detTitle"></div>
+                    <div id="detBadge" style="margin-top:3px"></div>
+                </div>
+                <button class="sheet-close" onclick="closeDetail()">✕</button>
+            </div>
+            <div class="sheet-body" id="detBody"></div>
+            <div class="sheet-acts" id="detActs"></div>
+        </div>
+    </div>
+
+    <!-- EDIT MEMBER MODAL -->
+    <div class="moverlay" id="memModal">
+        <div class="mbg" onclick="closeMemModal()"></div>
+        <div class="mbox">
+            <div class="mhd">
+                <div class="mtitle" id="memModalTitle">Edit Member</div>
+                <button class="mclose" onclick="closeMemModal()">✕</button>
+            </div>
+            <div class="mbody">
+                <input type="hidden" id="meId">
+                <input type="hidden" id="meOrigEmail">
+                <div class="fld">
+                    <label>Full Name</label>
+                    <input type="text" id="meFullName" placeholder="Full name">
+                </div>
+                <div class="fld">
+                    <label>Email *</label>
+                    <input type="email" id="meEmail" placeholder="email@example.com" autocapitalize="none">
+                </div>
+                <div class="fld">
+                    <label>Phone</label>
+                    <input type="tel" id="mePhone" placeholder="(808) 000-0000">
+                </div>
+                <div class="fld">
+                    <label>Business Name</label>
+                    <input type="text" id="meBiz" placeholder="Business name">
+                </div>
+                <div class="fld">
+                    <label>Address</label>
+                    <input type="text" id="meAddr" placeholder="123 Kamehameha Ave">
+                </div>
+                <div class="fld-row">
+                    <div class="fld">
+                        <label>City</label>
+                        <input type="text" id="meCity" placeholder="Hilo">
+                    </div>
+                    <div class="fld">
+                        <label>State</label>
+                        <input type="text" id="meState" placeholder="HI" maxlength="2">
+                    </div>
+                </div>
+                <div class="fld">
+                    <label>Zip</label>
+                    <input type="text" id="meZip" placeholder="96720" maxlength="10">
+                </div>
+                <div class="fld">
+                    <label>District</label>
+                    <select id="meDist">
+                        <option value="">— Assign district…</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label>Captain Name</label>
+                    <input type="text" id="meCaptain" placeholder="Captain's full name">
+                </div>
+            </div>
+            <div class="mfoot">
+                <button class="btn btn-ghost" onclick="closeMemModal()">Cancel</button>
+                <button class="btn btn-teal" id="meSaveBtn" onclick="saveMem()">💾 Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD MEMBER MODAL -->
+    <div class="moverlay" id="addMemModal">
+        <div class="mbg" onclick="closeAddMem()"></div>
+        <div class="mbox">
+            <div class="mhd">
+                <div class="mtitle">Add Member Email</div>
+                <button class="mclose" onclick="closeAddMem()">✕</button>
+            </div>
+            <div class="mbody">
+                <div class="fld">
+                    <label>Email Address</label>
+                    <input type="email" id="newMemEmail" placeholder="member@email.com" autocapitalize="none">
+                </div>
+            </div>
+            <div class="mfoot">
+                <button class="btn btn-ghost" onclick="closeAddMem()">Cancel</button>
+                <button class="btn btn-teal" onclick="addMem()">Add Member</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SET CAPTAIN MODAL -->
+    <div class="moverlay" id="setCaptModal">
+        <div class="mbg" onclick="closeSetCapt()"></div>
+        <div class="mbox">
+            <div class="mhd">
+                <div class="mtitle" id="setCaptTitle">Set Captain</div>
+                <button class="mclose" onclick="closeSetCapt()">✕</button>
+            </div>
+            <div class="mbody">
+                <div id="setCaptInfo" style="padding:8px 11px;border-radius:7px;font-size:.78rem;margin-bottom:2px"></div>
+                <div class="fld">
+                    <label>Select Member</label>
+                    <select id="captMemSel">
+                        <option value="">— Select a member —</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label>Captain Display Name</label>
+                    <input type="text" id="captNameInp" placeholder="e.g. Jane Smith">
+                </div>
+                <div id="removeCaptWrap" style="display:none">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.8rem;color:var(--slate)">
+                        <input type="checkbox" id="removeCaptChk" style="accent-color:var(--teal)">
+                         Remove current captain
+                                
+                    </label>
+                </div>
+            </div>
+            <div class="mfoot">
+                <button class="btn btn-ghost" onclick="closeSetCapt()">Cancel</button>
+                <button class="btn btn-teal" id="saveCaptBtn" onclick="saveCapt()">💾 Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="lb-close">✕</button>
+        <img id="lbImg" src="" alt="" style="display:none">
+        <video id="lbVid" src="" controls style="display:none"></video>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+        <div class="t-ico" id="tIco"></div>
+        <div>
+            <div class="t-title" id="tTitle"></div>
+            <div class="t-body" id="tBody"></div>
+        </div>
+    </div>
+
+    <script>
+    /* ── STATE ── */
+    let sb = null,
+        currentRole = null,
+        captainDistrict = null,
+        currentUserEmail = null,
+        currentUserName = null;
+    let allInc = [],
+        members = [],
+        allApps = [],
+        currentScreen = 'incidents',
+        _setCaptDist = null;
+
+    const DISTRICTS = [
+    ['hamakua', 'District 1 - Hāmākua'], ['north-hilo', 'District 2 - North Hilo'],
+    ['south-hilo', 'District 3 - South Hilo'], ['lower-puna', 'District 4 - Lower Puna'],
+    ['upper-puna', 'District 5 - Upper Puna'], ['kau', "District 6 - Kaʻū"],
+    ['south-kona', 'District 7 - South Kona'], ['north-kona', 'District 8 - North Kona'],
+    ['north-kohala', 'District 9 - Kohala'],
+    ];
+    const DC = {
+        'hamakua': '#84cc16',
+        'north-hilo': '#3b82f6',
+        'south-hilo': '#00c9a7',
+        'lower-puna': '#c084fc',
+        'upper-puna': '#a855f7',
+        'kau': '#ef4444',
+        'south-kona': '#f59e0b',
+        'north-kona': '#f97316',
+        'north-kohala': '#10b981'
+    };
+    const TE = {
+        'Robbery': '🔫',
+        'Burglary': '🏠',
+        'Assault': '🤜',
+        'Drug Activity': '💊',
+        'Theft / Shoplifting': '🛍',
+        'Vandalism': '🔨',
+        'Vehicle Break-In': '🚗',
+        'Fraud / Scam': '💳',
+        'Trespassing': '🚫',
+        'Suspicious Activity': '👁',
+        'Graffiti': '🎨',
+        'Other': '📋'
+    };
+
+    const dLabel = id => DISTRICTS.find(([v]) => v === id)?.[1] || id;
+    const dColor = id => DC[id] || '#00c9a7';
+    const esc = s => {
+        const d = document.createElement('div');
+        d.textContent = s || '';
+        return d.innerHTML;
+    };
+    const fmt = iso => new Date(iso).toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+    });
+    const fmtL = iso => new Date(iso).toLocaleString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+    });
+    const age = iso => {
+        const m = (Date.now() - new Date(iso)) / 60000;
+        return m < 60 ? Math.round(m) + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : m < 10080 ? Math.round(m / 1440) + 'd ago' : Math.round(m / 10080) + 'w ago';
+    };
+
+    /* ── AUTH ── */
+    const showLogin = () => {
+        document.getElementById('loginFormWrap').style.display = '';
+        document.getElementById('resetWrap').style.display = 'none';
+        document.getElementById('setPwWrap').style.display = 'none';
+    };
+    const showReset = () => {
+        document.getElementById('loginFormWrap').style.display = 'none';
+        document.getElementById('resetWrap').style.display = '';
+    };
+
+    async function doLogin() {
+        const email = (document.getElementById('authEmail').value || '').trim().toLowerCase();
+        const pw = document.getElementById('authPassword').value;
+        const err = document.getElementById('loginErr');
+        const btn = document.getElementById('loginBtn');
+        err.style.display = 'none';
+        if (!email || !pw) {
+            err.textContent = 'Email and password required.';
+            err.style.display = 'block';
+            return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Signing in…';
+        try {
+            const {data, error} = await sb.auth.signInWithPassword({
+                email,
+                password: pw
+            });
+            if (error)
+                throw error;
+            await handleSession(data.session);
+        } catch (e) {
+            err.textContent = e.message === 'Invalid login credentials' ? 'Invalid email or password.' : e.message;
+            err.style.display = 'block';
+        }
+        finally {
+            btn.disabled = false;
+            btn.textContent = 'Sign In →';
+        }
+    }
+
+    async function handleSession(session) {
+        if (!session)
+            return;
+        const email = session.user.email;
+        const {data: role, error} = await sb.from('admin_roles').select('*').eq('email', email).maybeSingle();
+        if (error || !role) {
+            document.getElementById('loginErr').textContent = 'No admin access for this account.';
+            document.getElementById('loginErr').style.display = 'block';
+            await sb.auth.signOut();
+            return;
+        }
+        currentRole = role.role;
+        captainDistrict = role.district || null;
+        currentUserEmail = email;
+        currentUserName = role.full_name || email;
+        await sb.from('admin_roles').update({
+            last_sign_in_at: new Date().toISOString()
+        }).eq('email', email);
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('app').classList.add('visible');
+        document.getElementById('hdSub').textContent = currentUserName;
+        const rp = document.getElementById('rolePill');
+        rp.textContent = currentRole === 'superadmin' ? '⭐ Superadmin' : currentRole === 'captain' ? '👮 Captain' : '👤 Admin';
+        rp.className = 'rpill ' + currentRole;
+        applyRoleUI();
+        populateSelects();
+        await loadAll();
+        await loadMembers();
+        await loadApplications();
+        startRealtime();
+    }
+
+    async function doReset() {
+        const email = (document.getElementById('resetEmail').value || '').trim().toLowerCase();
+        const err = document.getElementById('resetErr');
+        const btn = document.getElementById('resetBtn');
+        err.style.display = 'none';
+        if (!email) {
+            err.textContent = 'Enter your email.';
+            err.style.display = 'block';
+            return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        try {
+            const {error} = await sb.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.href
+            });
+            if (error)
+                throw error;
+            err.style.cssText = 'display:block;color:var(--teal)';
+            err.textContent = '✅ Reset email sent!';
+        }
+        catch (e) {
+            err.textContent = e.message;
+            err.style.display = 'block';
+        }
+        finally {
+            btn.disabled = false;
+            btn.textContent = 'Send Reset Email →';
+        }
+    }
+
+    async function doSetPw() {
+        const pw = (document.getElementById('newPwInput').value || '').trim();
+        const err = document.getElementById('setPwErr');
+        const btn = document.getElementById('setPwBtn');
+        err.style.display = 'none';
+        if (!pw || pw.length < 8) {
+            err.textContent = 'Password must be at least 8 characters.';
+            err.style.display = 'block';
+            return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+        try {
+            const {error} = await sb.auth.updateUser({
+                password: pw
+            });
+            if (error)
+                throw error;
+            err.style.cssText = 'display:block;color:var(--teal)';
+            err.textContent = '✅ Password set! Signing you in…';
+            setTimeout(async () => {
+                const {data} = await sb.auth.getSession();
+                if (data?.session)
+                    await handleSession(data.session);
+            }, 1200);
+        }
+        catch (e) {
+            err.textContent = e.message;
+            err.style.display = 'block';
+        }
+        finally {
+            btn.disabled = false;
+            btn.textContent = 'Set Password →';
+        }
+    }
+
+    async function logout() {
+        if (sb)
+            await sb.auth.signOut();
+        currentRole = null;
+        captainDistrict = null;
+        currentUserEmail = null;
+        allInc = [];
+        members = [];
+        allApps = [];
+        document.getElementById('app').classList.remove('visible');
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('authEmail').value = '';
+        document.getElementById('authPassword').value = '';
+        document.getElementById('loginErr').style.display = 'none';
+        showLogin();
+    }
+
+    function applyRoleUI() {
+        const isAdmin = currentRole === 'admin' || currentRole === 'superadmin';
+        const isCaptain = currentRole === 'captain';
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? '' : 'none');
+        document.querySelectorAll('.captain-hidden').forEach(el => el.style.display = isCaptain ? 'none' : '');
+        document.querySelectorAll('.superadmin-only').forEach(el => el.style.display = currentRole === 'superadmin' ? '' : 'none');
+    }
+
+    function populateSelects() {
+        ['statsDF', 'memDistF', 'meDist'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el || el.options.length > 1)
+                return;
+            DISTRICTS.forEach(([v, l]) => {
+                const o = document.createElement('option');
+                o.value = v;
+                o.textContent = l;
+                el.appendChild(o);
+            });
+        });
+    }
+
+    /* ── NAV ── */
+    const SCREENS = {
+        incidents: 'scIncidents',
+        stats: 'scStats',
+        members: 'scMembers',
+        apps: 'scApps',
+        captains: 'scCaptains'
+    };
+    function goTo(name) {
+        currentScreen = name;
+        Object.entries(SCREENS).forEach(([k, v]) => {
+            document.getElementById(v)?.classList.toggle('active', k === name);
+            document.getElementById('bn-' + k)?.classList.toggle('active', k === name);
+        });
+        if (name === 'stats')
+            renderStats();
+        if (name === 'members') {
+            if (currentRole === 'captain' && captainDistrict)
+                document.getElementById('memDistF').value = captainDistrict;
+            renderMem();
+        }
+        if (name === 'apps')
+            renderApps();
+        if (name === 'captains')
+            renderCapts();
+    }
+
+    /* ── LOAD ── */
+    async function loadAll() {
+        if (!sb)
+            return;
+        const {data, error} = await sb.from('incidents').select('*,incident_media(*)').order('occurred_at', {
+            ascending: false
+        });
+        if (error) {
+            showToast('⚠️', 'Load failed: ' + error.message, 'err');
+            return;
+        }
+        allInc = data || [];
+        renderInc();
+        renderStats();
+        updateCounts();
+    }
+
+    async function loadMembers() {
+        if (!sb)
+            return;
+        try {
+            const {data: emails, error} = await sb.from('member_emails').select('*').order('created_at', {
+                ascending: false
+            });
+            if (error) {
+                members = [];
+                return;
+            }
+            const {data: apps} = await sb.from('member_applications').select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name,photo_url').eq('status', 'approved');
+            const am = {};
+            (apps || []).forEach(a => am[a.email.toLowerCase()] = a);
+            members = (emails || []).map(m => {
+                const a = am[m.email.toLowerCase()] || {};
+                return {
+                    ...m,
+                    ...a,
+                    app_id: a.id || null,
+                    id: m.id
+                };
+            });
+            renderMem();
+            renderCapts();
+            const s = document.getElementById('memSub');
+            if (s)
+                s.textContent = members.length + ' verified member' + (members.length !== 1 ? 's' : '');
+        } catch (e) {
+            members = [];
+        }
+    }
+
+    async function loadApplications() {
+        if (!sb)
+            return;
+        try {
+            const {data, error} = await sb.from('member_applications').select('*').order('created_at', {
+                ascending: false
+            });
+            if (error) {
+                allApps = [];
+                return;
+            }
+            allApps = data || [];
+            renderApps();
+            updateCounts();
+        } catch (e) {
+            allApps = [];
+        }
+    }
+
+    function updateCounts() {
+        const active = allInc.filter(i => i.status === 'active').length;
+        const pending = allApps.filter(a => a.status === 'pending').length;
+        const archived = allInc.filter(i => i.status === 'archived').length;
+        document.getElementById('incSub').textContent = active + ' active, ' + archived + ' archived';
+        const bInc = document.getElementById('bInc');
+        bInc.textContent = active;
+        bInc.classList.toggle('show', active > 0);
+        const bApps = document.getElementById('bApps');
+        bApps.textContent = pending;
+        bApps.classList.toggle('show', pending > 0);
+        const as = document.getElementById('appSub');
+        if (as)
+            as.textContent = (pending ? pending + ' pending · ' : '') + allApps.length + ' total';
+    }
+
+    /* ── INCIDENTS ── */
+    function renderInc() {
+        const el = document.getElementById('incList');
+        const q = (document.getElementById('incSearch').value || '').toLowerCase().trim();
+        const type = document.getElementById('incType').value;
+        const status = document.getElementById('incStatus').value;
+        let rows = allInc;
+        if (status)
+            rows = rows.filter(i => i.status === status);
+        if (type)
+            rows = rows.filter(i => i.type === type);
+        if (q)
+            rows = rows.filter(i => [i.type, i.address, i.description, i.reporter_name || ''].join(' ').toLowerCase().includes(q));
+        if (currentRole === 'captain' && captainDistrict)
+            rows = rows.filter(i => i.district === captainDistrict);
+        if (!rows.length) {
+            el.innerHTML = `<div class="empty-st"><div class="empty-ico">📋</div><div>No incidents found.</div></div>`;
+            return;
+        }
+        el.innerHTML = rows.map(inc => {
+            const bc = inc.type_color === 'red' ? 'b-red' : inc.type_color === 'gold' ? 'b-gold' : 'b-teal';
+            const mc = inc.incident_media?.length || 0;
+            return `<div class="inc-card${inc.status === 'archived' ? ' archived' : ''}" onclick="openDetail('${inc.id}')">
+      <div class="inc-top"><span class="badge ${bc}">${TE[inc.type] || ''} ${inc.type}</span><span class="inc-time">${age(inc.occurred_at)}</span></div>
+      <div class="inc-addr">📍 ${esc(inc.address)}</div>
+      <div class="inc-desc">${esc(inc.description)}</div>
+      <div class="inc-footer">
+        ${
+            inc.district ? `<span class="itag">${dLabel(inc.district)}</span>` : ''}
+        ${inc.is_verified_member ? `<span class="itag vfd">✅ Member</span>` : ''}
+        ${inc.is_recurring ? `<span class="itag rec">🔁 Recurring</span>` : ''}
+        ${mc ? `<span class="itag">📎 ${mc}</span>` : ''}
+        ${inc.status === 'archived' ? `<span class="itag">📦 Archived</span>` : ''}
+        ${inc.police_report ? `<span class="itag">📋 ${esc(inc.police_report)}</span>` : ''}
+      </div>
+    </div>`
+
+            ;
+        }).join('');
+    }
+
+    /* ── DETAIL ── */
+    function openDetail(id) {
+        const inc = allInc.find(i => i.id === id);
+        if (!inc)
+            return;
+        const bc = inc.type_color === 'red' ? 'b-red' : inc.type_color === 'gold' ? 'b-gold' : 'b-teal';
+        document.getElementById('detTitle').textContent = inc.type;
+        document.getElementById('detBadge').innerHTML = `<span class="badge ${bc}">${TE[inc.type] || ''} ${inc.type}</span>`;
+
+        // Captain card
+        const cap = members.find(m => m.district === inc.district && m.captain_name && m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase());
+        const capHtml = cap ? (() => {
+            const c = dColor(inc.district);
+            const init = (cap.full_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            const av = cap.photo_url ? `<img src="${cap.photo_url}" alt="${init}" class="cap-av" style="border:2px solid ${c}55">` : `<div class="cap-av-i" style="background:${c}18;border:2px solid ${c}44;color:${c}">${init}</div>`;
+            return `<div class="cap-card">${av}<div><div style="font-family:'IBM Plex Mono',monospace;font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;color:${c};margin-bottom:1px">👮 Captain</div><div style="font-weight:600;font-size:.82rem">${esc(cap.full_name)}</div>${cap.phone ? `<div style="font-size:.7rem;color:var(--slate);margin-top:1px"><a href="tel:${esc(cap.phone)}" style="color:var(--slate);text-decoration:none">📞 ${esc(cap.phone)}</a></div>` : ''}${cap.email ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate);margin-top:1px"><a href="mailto:${esc(cap.email)}" style="color:var(--slate);text-decoration:none">✉️ ${esc(cap.email)}</a></div>` : ''}</div></div>`;
+        })() : '';
+
+        const media = inc.incident_media || [];
+        const hasSusp = inc.suspect_height || inc.suspect_build || inc.suspect_age || inc.suspect_gender || inc.suspect_race || inc.suspect_clothing || inc.suspect_other;
+        const hasVeh = inc.vehicle_make || inc.vehicle_model || inc.vehicle_color || inc.vehicle_plate;
+
+        document.getElementById('detBody').innerHTML = `
+    <div class="dr"><div class="dr-lbl">Date &amp; Time</div><div class="dr-val">${fmtL(inc.occurred_at)} · ${age(inc.occurred_at)}</div></div>
+    <div class="dr"><div class="dr-lbl">Location</div><div class="dr-val">${esc(inc.address)}${inc.lat ? `<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal)">${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span> <a href="https://www.google.com/maps?q=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal);text-decoration:none;margin-left:5px">🗺 Maps ↗</a>` : ''}</div></div>
+    ${inc.district ? `<div class="dr"><div class="dr-lbl">District</div><div class="dr-val"><span style="background:${dColor(inc.district)}18;border:1px solid ${dColor(inc.district)}40;color:${dColor(inc.district)};font-family:'IBM Plex Mono',monospace;font-size:.6rem;border-radius:3px;padding:2px 7px">${dLabel(inc.district)}</span>${capHtml}</div></div>` : ''}
+    <div class="dr"><div class="dr-lbl">Description</div><div class="dr-val">${esc(inc.description)}</div></div>
+    <div class="dr"><div class="dr-lbl">Reported By</div><div class="dr-val">${esc(inc.reporter_name || 'Anonymous')}${inc.is_verified_member ? ' <span class="itag vfd" style="font-size:.58rem;padding:1px 5px;vertical-align:middle">✅ Member</span>' : ''}</div></div>
+    ${inc.police_report ? `<div class="dr"><div class="dr-lbl">Police Report #</div><div class="dr-val">${esc(inc.police_report)}</div></div>` : ''}
+    ${inc.is_recurring ? `<div class="dr"><span class="itag rec" style="font-size:.62rem;padding:3px 8px">🔁 Reported as Recurring</span></div>` : ''}
+    ${hasSusp ? `<div class="dr"><div class="dr-lbl" style="color:var(--red)">Suspect</div><div class="suspect-box">${[[inc.suspect_gender, inc.suspect_age].filter(Boolean).join(', '), [inc.suspect_height, inc.suspect_build].filter(Boolean).join(', '), inc.suspect_race || '', inc.suspect_clothing ? '🧥 ' + inc.suspect_clothing : '', inc.suspect_other ? '🔍 ' + inc.suspect_other : ''].filter(Boolean).map(s => `<div style="font-size:.76rem;margin-bottom:2px">${esc(s)}</div>`).join('')}</div></div>` : ''}
+    ${hasVeh ? `<div class="dr"><div class="dr-lbl" style="color:var(--gold)">Vehicle</div><div class="vehicle-box">${[[inc.vehicle_color, inc.vehicle_year, inc.vehicle_make, inc.vehicle_model].filter(Boolean).join(' '), inc.vehicle_plate ? '🪪 ' + inc.vehicle_plate : '', inc.vehicle_notes ? '📝 ' + inc.vehicle_notes : ''].filter(Boolean).map(s => `<div style="font-size:.76rem;margin-bottom:2px">${esc(s)}</div>`).join('')}</div></div>` : ''}
+    ${media.length ? `<div class="dr"><div class="dr-lbl">Media (${media.length})</div><div class="media-grid">${media.map(m => `<div class="media-item" onclick="openLB('${m.public_url}','${m.file_type}')">${m.file_type === 'image' ? `<img src="${m.public_url}" alt="">` : `<video src="${m.public_url}" muted></video>`}</div>`).join('')}</div></div>` : ''}
+    <div class="dr">
+      <div class="dr-lbl">📝 Notes</div>
+      <div class="notes-box">
+        <div id="notes-${
+
+
+        id}" style="font-size:.72rem;color:var(--slate2)">Loading…</div>
+        <div class="note-form">
+          <input class="note-inp" type="text" id="noteInp-${
+        id}" placeholder="Add a note…" onkeydown="if(event.key==='Enter')addNote('${id}')">
+          <button class="note-sub" onclick="addNote('${id}')">Add</button>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:.5rem;color:var(--slate2);padding-top:5px">Submitted ${
+
+
+        fmtL(inc.created_at)}</div>`;
+
+        const canAct = currentRole !== 'captain';
+        document.getElementById('detActs').innerHTML = `
+    ${canAct && inc.status === 'active' ? `<button class="btn btn-gold" onclick="archiveOne('${id}');closeDetail()">📦 Archive</button>` : ''}
+    ${canAct && inc.status === 'archived' ? `<button class="btn btn-green" onclick="restoreOne('${id}');closeDetail()">↩ Restore</button>` : ''}
+    ${canAct ? `<button class="btn btn-red" onclick="deleteOne('${id}')">🗑 Delete</button>` : ''}
+    <button class="btn btn-ghost" onclick="closeDetail()">Close</button>`
+        ;
+
+        const s = document.getElementById('detSheet');
+        s.style.display = 'block';
+        requestAnimationFrame(() => s.classList.add('open'));
+        loadNotes(id);
+    }
+
+    function closeDetail() {
+        const s = document.getElementById('detSheet');
+        s.classList.remove('open');
+        setTimeout(() => s.style.display = 'none', 300);
+    }
+
+    /* ── INCIDENT ACTIONS ── */
+    async function archiveOne(id) {
+        const {error} = await sb.from('incidents').update({
+            status: 'archived'
+        }).eq('id', id);
+        if (!error) {
+            mutate(id, 'status', 'archived');
+            showToast('📦', 'Archived.');
+        } else
+            showToast('⚠️', error.message, 'err');
+    }
+    async function restoreOne(id) {
+        const {error} = await sb.from('incidents').update({
+            status: 'active'
+        }).eq('id', id);
+        if (!error) {
+            mutate(id, 'status', 'active');
+            showToast('✅', 'Restored.');
+        } else
+            showToast('⚠️', error.message, 'err');
+    }
+    async function deleteOne(id) {
+        if (!confirm('Permanently delete this incident and all media?'))
+            return;
+        const inc = allInc.find(i => i.id === id);
+        if (inc?.incident_media?.length)
+            await sb.storage.from('incident-media').remove(inc.incident_media.map(m => m.file_path));
+        const {error} = await sb.from('incidents').delete().eq('id', id);
+        if (!error) {
+            allInc = allInc.filter(i => i.id !== id);
+            closeDetail();
+            renderInc();
+            renderStats();
+            updateCounts();
+            showToast('🗑', 'Deleted.');
+        }
+        else
+            showToast('⚠️', error.message, 'err');
+    }
+    function mutate(id, k, v) {
+        const i = allInc.find(i => i.id === id);
+        if (i)
+            i[k] = v;
+        renderInc();
+        renderStats();
+        updateCounts();
+    }
+
+    /* ── NOTES ── */
+    async function loadNotes(incId) {
+        const el = document.getElementById(`notes-${incId}`);
+        if (!el || !sb)
+            return;
+        const {data, error} = await sb.from('incident_notes').select('*').eq('incident_id', incId).order('created_at', {
+            ascending: true
+        });
+        if (error) {
+            el.innerHTML = `<div style="color:var(--red);font-size:.7rem">Failed to load.</div>`;
+            return;
+        }
+        if (!data.length) {
+            el.innerHTML = `<div style="font-size:.7rem;color:var(--slate2)">No notes yet.</div>`;
+            return;
+        }
+        el.innerHTML = data.map(n => `<div class="note-item" id="note-${n.id}">
+    <div class="note-meta"><span>👤 ${esc(n.author)} · ${fmt(n.created_at)}</span><button class="note-del" onclick="delNote('${n.id}','${incId}')">🗑</button></div>
+    <div class="note-text">${esc(n.note)}</div></div>`).join('');
+    }
+    async function addNote(incId) {
+        const inp = document.getElementById(`noteInp-${incId}`);
+        const note = inp?.value.trim();
+        if (!note)
+            return;
+        inp.disabled = true;
+        const {error} = await sb.from('incident_notes').insert({
+            incident_id: incId,
+            note,
+            author: currentUserName || 'Admin'
+        });
+        if (error)
+            showToast('⚠️', error.message, 'err');
+        else {
+            inp.value = '';
+            await loadNotes(incId);
+            showToast('✅', 'Note added.');
+        }
+        inp.disabled = false;
+        inp.focus();
+    }
+    async function delNote(noteId, incId) {
+        if (!confirm('Delete this note?'))
+            return;
+        const {error} = await sb.from('incident_notes').delete().eq('id', noteId);
+        if (!error) {
+            await loadNotes(incId);
+            showToast('🗑', 'Deleted.');
+        }
+        else
+            showToast('⚠️', error.message, 'err');
+    }
+
+    /* ── STATS ── */
+    function renderStats() {
+        const df = document.getElementById('statsDF')?.value || '';
+        const scope = df ? allInc.filter(i => i.district === df) : allInc;
+        const active = scope.filter(i => i.status === 'active');
+        const archived = scope.filter(i => i.status === 'archived');
+        const last30 = scope.filter(i => new Date(i.occurred_at) >= new Date(Date.now() - 30 * 864e5));
+        const withPin = scope.filter(i => i.lat);
+        const withMedia = scope.filter(i => i.incident_media?.length);
+        document.getElementById('statsSub').textContent = df ? 'Filtered: ' + (DISTRICTS.find(([v]) => v === df)?.[1] || df) : 'Incident summary';
+        document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card acc"><div class="stat-num">${active.length}</div><div class="stat-lbl">Active</div></div>
+    <div class="stat-card"><div class="stat-num">${archived.length}</div><div class="stat-lbl">Archived</div></div>
+    <div class="stat-card"><div class="stat-num">${scope.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card"><div class="stat-num">${last30.length}</div><div class="stat-lbl">Last 30 Days</div></div>
+    <div class="stat-card"><div class="stat-num">${withPin.length}</div><div class="stat-lbl">With GPS</div></div>
+    <div class="stat-card"><div class="stat-num">${withMedia.length}</div><div class="stat-lbl">With Media</div></div>`;
+        const clr = {
+            red: '#e8415a',
+            gold: '#f5a623',
+            teal: '#00c9a7'
+        };
+        const tc = {};
+        allInc.forEach(i => tc[i.type] = i.type_color);
+        const tCounts = {};
+        active.forEach(i => tCounts[i.type] = (tCounts[i.type] || 0) + 1);
+        const tSorted = Object.entries(tCounts).sort((a, b) => b[1] - a[1]);
+        const tMax = tSorted[0]?.[1] || 1;
+        document.getElementById('typeBreakTitle').textContent = df ? 'By Type — ' + (DISTRICTS.find(([v]) => v === df)?.[1] || df) : 'By Type (Active)';
+        document.getElementById('typeBreak').innerHTML = tSorted.map(([type, count]) => `<div class="type-row"><div class="type-label">${type}</div><div class="type-bar-w"><div class="type-bar" style="width:${(count / tMax * 100).toFixed(1)}%;background:${clr[tc[type]] || '#00c9a7'}"></div></div><div class="type-cnt">${count}</div></div>`).join('') || '<div style="font-size:.75rem;color:var(--slate2);padding:6px 0">No active incidents.</div>';
+        const dbw = document.getElementById('distBreakWrap');
+        if (df) {
+            if (dbw)
+                dbw.style.display = 'none';
+            return;
+        }
+        if (dbw)
+            dbw.style.display = '';
+        const dCounts = {};
+        DISTRICTS.forEach(([v]) => dCounts[v] = 0);
+        allInc.filter(i => i.status === 'active').forEach(i => {
+            if (i.district)
+                dCounts[i.district] = (dCounts[i.district] || 0) + 1;
+        });
+        const dSorted = DISTRICTS.map(([v, l]) => [v, l, dCounts[v] || 0]).sort((a, b) => b[2] - a[2]);
+        const dMax = dSorted[0]?.[2] || 1;
+        document.getElementById('distBreak').innerHTML = dSorted.map(([v, l, count]) => `<div class="type-row" style="cursor:pointer" onclick="document.getElementById('statsDF').value='${v}';renderStats()"><div class="type-label" style="font-size:.66rem">${l}</div><div class="type-bar-w"><div class="type-bar" style="width:${count ? (count / dMax * 100).toFixed(1) : '0'}%;background:${dColor(v)}"></div></div><div class="type-cnt">${count}</div></div>`).join('');
+    }
+
+    /* ── MEMBERS ── */
+    function renderMem() {
+        const el = document.getElementById('memList');
+        const q = (document.getElementById('memSearch').value || '').toLowerCase().trim();
+        const df = document.getElementById('memDistF').value;
+        let rows = members;
+        if (df)
+            rows = rows.filter(m => m.district === df);
+        if (q)
+            rows = rows.filter(m => [m.email, m.full_name || '', m.business_name || '', m.phone || ''].join(' ').toLowerCase().includes(q));
+        if (currentRole === 'captain' && captainDistrict)
+            rows = rows.filter(m => m.district === captainDistrict);
+        if (!rows.length) {
+            el.innerHTML = `<div class="empty-st"><div class="empty-ico">👥</div><div>No members found.</div></div>`;
+            return;
+        }
+        const isAdmin = currentRole !== 'captain';
+        el.innerHTML = rows.map(m => {
+            const dc = m.district ? dColor(m.district) : 'var(--teal)';
+            const isCap = !!(m.captain_name && m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase());
+            return `<div class="mem-card">
+      <div class="mem-name">${esc(m.full_name || '—')} ${isCap ? '<span style="font-size:.58rem;color:var(--teal)">👮</span>' : ''}</div>
+      ${m.business_name ? `<div class="mem-biz">🏢 ${esc(m.business_name)}</div>` : ''}
+      <div class="mem-email">✉️ ${esc(m.email)}</div>
+      ${m.phone ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate);margin-top:1px"><a href="tel:${esc(m.phone)}" style="color:var(--slate);text-decoration:none">📞 ${esc(m.phone)}</a></div>` : ''}
+      ${m.district ? `<div class="mem-dist" style="background:${dc}14;border:1px solid ${dc}30;color:${dc}">${dLabel(m.district)}</div>` : ''}
+      ${isAdmin ? `<div class="mem-acts">
+        <button class="btn btn-ghost" style="font-size:.7rem;padding:5px 11px" onclick="openEditMem('${m.id}')">✏️ Edit</button>
+        <button class="btn btn-red" style="font-size:.7rem;padding:5px 11px" onclick="removeMem('${m.id}')">Remove</button>
+      </div>` : ''}
+    </div>`
+            ;
+        }).join('');
+    }
+
+    function openAddMem() {
+        document.getElementById('newMemEmail').value = '';
+        openModal('addMemModal');
+    }
+    function closeAddMem() {
+        closeModal('addMemModal');
+    }
+    async function addMem() {
+        const email = (document.getElementById('newMemEmail').value || '').trim().toLowerCase();
+        if (!email || !email.includes('@')) {
+            showToast('⚠️', 'Enter a valid email.', 'err');
+            return;
+        }
+        if (members.find(m => m.email === email)) {
+            showToast('ℹ️', 'Already in the list.');
+            return;
+        }
+        const {error} = await sb.from('member_emails').insert({
+            email
+        });
+        if (error) {
+            showToast('⚠️', error.message, 'err');
+            return;
+        }
+        closeAddMem();
+        await loadMembers();
+        showToast('✅', email + ' added.');
+    }
+
+    function openEditMem(id) {
+        const m = members.find(m => m.id == id || String(m.id) === String(id));
+        if (!m)
+            return;
+        document.getElementById('meId').value = m.id;
+        document.getElementById('meOrigEmail').value = m.email;
+        document.getElementById('meFullName').value = m.full_name || '';
+        document.getElementById('meEmail').value = m.email || '';
+        document.getElementById('mePhone').value = m.phone || '';
+        document.getElementById('meBiz').value = m.business_name || '';
+        document.getElementById('meAddr').value = m.business_address || '';
+        document.getElementById('meCity').value = m.business_city || '';
+        document.getElementById('meState').value = m.business_state || '';
+        document.getElementById('meZip').value = m.business_zip || '';
+        document.getElementById('meCaptain').value = m.captain_name || '';
+        document.getElementById('meDist').value = m.district || '';
+        document.getElementById('memModalTitle').textContent = 'Edit: ' + (m.full_name || m.email);
+        openModal('memModal');
+    }
+    function closeMemModal() {
+        closeModal('memModal');
+    }
+    async function saveMem() {
+        const id = document.getElementById('meId').value;
+        const origEmail = document.getElementById('meOrigEmail').value.toLowerCase();
+        const newEmail = (document.getElementById('meEmail').value || '').trim().toLowerCase();
+        if (!newEmail || !newEmail.includes('@')) {
+            showToast('⚠️', 'Valid email required.', 'err');
+            return;
+        }
+        const btn = document.getElementById('meSaveBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Saving…';
+        try {
+            await sb.from('member_emails').update({
+                email: newEmail
+            }).eq('id', id);
+            const profile = {
+                email: newEmail,
+                full_name: document.getElementById('meFullName').value.trim() || null,
+                phone: document.getElementById('mePhone').value.trim() || null,
+                business_name: document.getElementById('meBiz').value.trim() || null,
+                business_address: document.getElementById('meAddr').value.trim() || null,
+                business_city: document.getElementById('meCity').value.trim() || null,
+                business_state: document.getElementById('meState').value.trim().toUpperCase() || null,
+                business_zip: document.getElementById('meZip').value.trim() || null,
+                district: document.getElementById('meDist').value || null,
+                captain_name: document.getElementById('meCaptain').value.trim() || null,
+                status: 'approved'
+            };
+            const {data: ex} = await sb.from('member_applications').select('id').eq('email', origEmail).maybeSingle();
+            if (ex)
+                await sb.from('member_applications').update(profile).eq('id', ex.id);
+            else
+                await sb.from('member_applications').insert(profile);
+            closeMemModal();
+            await loadMembers();
+            showToast('✅', newEmail + ' updated.');
+        } catch (e) {
+            showToast('⚠️', e.message, 'err');
+        }
+        finally {
+            btn.disabled = false;
+            btn.textContent = '💾 Save';
+        }
+    }
+    async function removeMem(id) {
+        if (!confirm('Remove this member?'))
+            return;
+        const {error} = await sb.from('member_emails').delete().eq('id', id);
+        if (!error) {
+            await loadMembers();
+            showToast('🗑', 'Removed.');
+        } else
+            showToast('⚠️', error.message, 'err');
+    }
+
+    /* ── APPLICATIONS ── */
+    function renderApps() {
+        const el = document.getElementById('appList');
+        const filter = document.getElementById('appStatusF').value;
+        let rows = currentRole === 'captain' && captainDistrict ? allApps.filter(a => a.district === captainDistrict) : allApps;
+        if (filter)
+            rows = rows.filter(a => a.status === filter);
+        if (!rows.length) {
+            el.innerHTML = `<div class="empty-st"><div class="empty-ico">📬</div><div>No ${filter || ''} applications.</div></div>`;
+            return;
+        }
+        const isAdmin = currentRole !== 'captain';
+        el.innerHTML = rows.map(a => `<div class="app-card ${a.status}" id="apc-${a.id}">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:7px;margin-bottom:4px">
+      <div class="app-name">${
+        esc(a.full_name)}</div>
+      <span class="app-st ${a.status}">${a.status === 'pending' ? '⏳' : a.status === 'approved' ? '✅' : '❌'} ${a.status}</span>
+    </div>
+    ${
+        a.business_name ? `<div class="app-biz">🏢 ${esc(a.business_name)}</div>` : ''}
+    <div class="app-detail">
+      ${
+        a.business_address ? `<div>📍 ${esc(a.business_address)}</div>` : ''}
+      ${a.email ? `<div>✉️ ${esc(a.email)}</div>` : ''}
+      ${a.phone ? `<div>📞 ${esc(a.phone)}</div>` : ''}
+      ${a.district ? `<div>🗺 ${dLabel(a.district)}</div>` : ''}
+    </div>
+    ${
+        a.notes ? `<div style="font-size:.7rem;color:var(--slate);font-style:italic;margin-top:4px;line-height:1.5">"${esc(a.notes)}"</div>` : ''}
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:.48rem;color:var(--slate2);margin-top:4px">Submitted ${fmt(a.created_at)}</div>
+    <div class="app-acts">
+      ${
+        a.status === 'pending' && isAdmin ? `<button class="btn btn-teal" style="font-size:.7rem;padding:5px 10px" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">✅ Approve</button><button class="btn btn-red" style="font-size:.7rem;padding:5px 10px" onclick="rejectApp('${a.id}')">❌ Reject</button>` : ''}
+      ${a.status === 'approved' && isAdmin ? `<button class="btn btn-ghost" style="font-size:.7rem;padding:5px 10px" onclick="rejectApp('${a.id}')">Revoke</button>` : ''}
+      ${a.status === 'rejected' && isAdmin ? `<button class="btn btn-teal" style="font-size:.7rem;padding:5px 10px" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">Re-approve</button>` : ''}
+      ${isAdmin ? `<button class="btn btn-ghost" style="font-size:.7rem;padding:5px 10px" onclick="deleteApp('${a.id}')">Delete</button>` : ''}
+    </div></div>`
+        ).join('');
+    }
+
+    const getCaptForDist = id => {
+        const c = members.find(m => m.district === id && m.captain_name?.trim());
+        return c ? c.captain_name.trim() : null;
+    };
+
+    async function approveApp(id, email, name) {
+        if (!confirm(`Approve ${name} and add ${email} to verified members?`))
+            return;
+        const app = allApps.find(a => a.id === id);
+        const dc = app?.district ? getCaptForDist(app.district) : null;
+        const upd = {
+            status: 'approved'
+        };
+        if (dc && !app?.captain_name)
+            upd.captain_name = dc;
+        const {error} = await sb.from('member_applications').update(upd).eq('id', id);
+        if (error) {
+            showToast('⚠️', error.message, 'err');
+            return;
+        }
+        await sb.from('member_emails').upsert({
+            email: email.toLowerCase()
+        }, {
+            onConflict: 'email',
+            ignoreDuplicates: true
+        });
+        if (app)
+            app.status = 'approved';
+        await loadMembers();
+        renderApps();
+        updateCounts();
+        showToast('✅', name + ' approved.');
+    }
+    async function rejectApp(id) {
+        const app = allApps.find(a => a.id === id);
+        if (!confirm(app?.status === 'approved' ? "Revoke approval?" : 'Reject this application?'))
+            return;
+        const {error} = await sb.from('member_applications').update({
+            status: 'rejected'
+        }).eq('id', id);
+        if (error) {
+            showToast('⚠️', error.message, 'err');
+            return;
+        }
+        if (app?.status === 'approved' && app?.email) {
+            await sb.from('member_emails').delete().eq('email', app.email.toLowerCase());
+            await loadMembers();
+        }
+        if (app)
+            app.status = 'rejected';
+        renderApps();
+        updateCounts();
+        showToast('🗑', 'Rejected.');
+    }
+    async function deleteApp(id) {
+        if (!confirm('Permanently delete this application?'))
+            return;
+        const {error} = await sb.from('member_applications').delete().eq('id', id);
+        if (!error) {
+            allApps = allApps.filter(a => a.id !== id);
+            renderApps();
+            updateCounts();
+            showToast('🗑', 'Deleted.');
+        }
+        else
+            showToast('⚠️', error.message, 'err');
+    }
+
+    /* ── CAPTAINS ── */
+    function renderCapts() {
+        const el = document.getElementById('captList');
+        if (!el)
+            return;
+        const dm = {};
+        DISTRICTS.forEach(([v]) => dm[v] = {
+            captain: null,
+            cm: null,
+            members: []
+        });
+        members.forEach(m => {
+            if (m.district && dm[m.district]) {
+                dm[m.district].members.push(m);
+                const isCap = m.captain_name && m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase();
+                if (isCap) {
+                    dm[m.district].captain = m.captain_name;
+                    dm[m.district].cm = m;
+                }
+                else if (m.captain_name && !dm[m.district].captain)
+                    dm[m.district].captain = m.captain_name;
+            }
+        });
+        const ibd = {};
+        DISTRICTS.forEach(([v]) => ibd[v] = 0);
+        allInc.filter(i => i.status === 'active').forEach(i => {
+            if (i.district)
+                ibd[i.district] = (ibd[i.district] || 0) + 1;
+        });
+        const isAdmin = currentRole === 'admin' || currentRole === 'superadmin';
+        el.innerHTML = DISTRICTS.map(([v, label]) => {
+            const info = dm[v];
+            const cap = info.captain;
+            const cm = info.cm;
+            const dc = dColor(v);
+            const isMine = currentRole === 'captain' && captainDistrict === v;
+            const init = cap ? cap.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() : '?';
+            const av = cm?.photo_url ? `<img src="${cm.photo_url}" alt="${init}" class="capt-av" style="border:2px solid ${dc}55">` : `<div class="capt-av-i" style="background:${dc}18;border:2px solid ${dc}44;color:${dc}">${cap ? init : '?'}</div>`;
+            return `<div class="capt-card${isMine ? ' mine' : ''}" style="border-color:${cap ? dc + '30' : 'var(--b2)'}">
+      ${isMine ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:${dc};background:${dc}15;border-radius:3px;padding:2px 7px;text-align:center;margin-bottom:5px">★ Your District</div>` : ''}
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;background:${dc}14;border:1px solid ${dc}30;color:${dc};border-radius:3px;padding:2px 6px;display:inline-block;margin-bottom:7px">${label}</div>
+      <div class="capt-top">${av}
+        <div style="min-width:0;flex:1">
+          ${
+            cap ? `<div class="capt-name">👮 ${esc(cap)}</div>${cm?.business_name ? `<div class="capt-biz">🏢 ${esc(cm.business_name)}</div>` : ''}` : `<div style="color:var(--slate2);font-style:italic;font-size:.78rem">No captain assigned</div>`}
+        </div>
+      </div>
+      ${
+
+            cm && (cm.phone || cm.email) ? `<div class="capt-contact">
+        ${cm.phone ? `<a href="tel:${esc(cm.phone)}"><span>📞</span>${esc(cm.phone)}</a>` : ''}
+        ${cm.email ? `<a href="mailto:${esc(cm.email)}"><span>✉️</span>${esc(cm.email)}</a>` : ''}
+      </div>` : ''}
+      <div class="capt-stats">
+        <div class="cstat"><div class="cstat-n" style="color:${
+            dc}">${info.members.length}</div><div class="cstat-l">Members</div></div>
+        <div class="cstat"><div class="cstat-n">${ibd[v] || 0}</div><div class="cstat-l">Active</div></div>
+        <div class="cstat"><div class="cstat-n">${allInc.filter(i => i.district === v && new Date(i.occurred_at) >= new Date(Date.now() - 30 * 864e5)).length}</div><div class="cstat-l">30 Days</div></div>
+      </div>
+      ${
+            isAdmin || isMine ? `<div class="capt-acts">
+        ${isAdmin ? `<button class="btn btn-ghost" style="flex:1;font-size:.7rem;padding:6px" onclick="openSetCapt('${v}')">👮 Set Captain</button>` : ''}
+        <button class="btn btn-ghost" style="flex:1;font-size:.7rem;padding:6px" onclick="goTo('members');setTimeout(()=>{document.getElementById('memDistF').value='${v}';renderMem();},80)">👥 Members</button>
+      </div>` : ''}
+    </div>`
+            ;
+        }).join('');
+    }
+
+    /* ── SET CAPTAIN MODAL ── */
+    function openSetCapt(distId) {
+        _setCaptDist = distId;
+        document.getElementById('setCaptTitle').textContent = 'Set Captain — ' + dLabel(distId);
+        const dm = members.filter(m => m.district === distId && m.full_name);
+        const curCap = dm.find(m => m.captain_name)?.captain_name || '';
+        const info = document.getElementById('setCaptInfo');
+        if (curCap) {
+            info.style.cssText = 'padding:8px 11px;border-radius:7px;font-size:.78rem;background:rgba(0,201,167,.07);border:1px solid rgba(0,201,167,.2);color:var(--teal)';
+            info.textContent = '👮 Current captain: ' + curCap;
+        }
+        else {
+            info.style.cssText = 'padding:8px 11px;border-radius:7px;font-size:.78rem;background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.2);color:var(--gold)';
+            info.textContent = '⚠️ No captain currently assigned.';
+        }
+        const sel = document.getElementById('captMemSel');
+        sel.innerHTML = '<option value="">— Select a member —</option>' + dm.map(m => `<option value="${esc(m.email)}" ${dm.find(m => m.captain_name)?.email === m.email ? 'selected' : ''}>${esc(m.full_name)}${m.business_name ? ' · ' + esc(m.business_name) : ''}</option>`).join('');
+        document.getElementById('captNameInp').value = curCap;
+        document.getElementById('removeCaptWrap').style.display = curCap ? '' : 'none';
+        document.getElementById('removeCaptChk').checked = false;
+        sel.onchange = function() {
+            const m = dm.find(m => m.email === this.value);
+            if (m)
+                document.getElementById('captNameInp').value = m.full_name || '';
+        };
+        openModal('setCaptModal');
+    }
+    function closeSetCapt() {
+        closeModal('setCaptModal');
+    }
+    async function saveCapt() {
+        const distId = _setCaptDist;
+        const memberEmail = document.getElementById('captMemSel').value;
+        const captainName = (document.getElementById('captNameInp').value || '').trim();
+        const removeCheck = document.getElementById('removeCaptChk').checked;
+        const btn = document.getElementById('saveCaptBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Saving…';
+        try {
+            if (removeCheck) {
+                await sb.from('member_applications').update({
+                    captain_name: null
+                }).eq('district', distId).eq('status', 'approved');
+                showToast('✅', 'Captain removed.');
+            }
+            else {
+                if (!memberEmail) {
+                    showToast('⚠️', 'Select a member.', 'err');
+                    return;
+                }
+                if (!captainName) {
+                    showToast('⚠️', 'Enter a captain name.', 'err');
+                    return;
+                }
+                await sb.from('member_applications').update({
+                    captain_name: null
+                }).eq('district', distId).eq('status', 'approved').neq('email', memberEmail);
+                const {error} = await sb.from('member_applications').update({
+                    captain_name: captainName
+                }).eq('email', memberEmail).eq('status', 'approved');
+                if (error)
+                    throw error;
+                showToast('👮', captainName + ' set as captain.');
+            }
+            closeSetCapt();
+            await loadMembers();
+            renderCapts();
+        } catch (e) {
+            showToast('⚠️', e.message, 'err');
+        }
+        finally {
+            btn.disabled = false;
+            btn.textContent = '💾 Save';
+        }
+    }
+
+    /* ── CSV EXPORT ── */
+    function exportCSV() {
+        const status = document.getElementById('incStatus').value || 'active';
+        let rows = allInc;
+        if (status)
+            rows = rows.filter(i => i.status === status);
+        if (currentRole === 'captain' && captainDistrict)
+            rows = rows.filter(i => i.district === captainDistrict);
+        const hdr = ['ID', 'Type', 'Status', 'Date/Time', 'Address', 'Description', 'Reporter', 'Police Report', 'District', 'Lat', 'Lng', 'Media', 'Submitted'];
+        const csv = [hdr, ...rows.map(i => [i.id, i.type, i.status, new Date(i.occurred_at).toLocaleString(), i.address, `"${(i.description || '').replace(/"/g, '""')}"`, i.reporter_name || '', i.police_report || '', i.district ? dLabel(i.district) : '', i.lat || '', i.lng || '', i.incident_media?.length || 0, new Date(i.created_at).toLocaleString()])].map(r => r.join(',')).join('\n');
+        const a = document.createElement('a');
+        a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+        a.download = `HIBCW_${status}_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+    }
+
+    /* ── MODAL HELPERS ── */
+    function openModal(id) {
+        const el = document.getElementById(id);
+        el.style.display = 'flex';
+        requestAnimationFrame(() => el.classList.add('open'));
+    }
+    function closeModal(id) {
+        const el = document.getElementById(id);
+        el.classList.remove('open');
+        setTimeout(() => el.style.display = 'none', 300);
+    }
+
+    /* ── LIGHTBOX ── */
+    function openLB(url, type) {
+        const img = document.getElementById('lbImg'),
+            vid = document.getElementById('lbVid');
+        if (type === 'image') {
+            img.src = url;
+            img.style.display = 'block';
+            vid.style.display = 'none';
+        }
+        else {
+            vid.src = url;
+            vid.style.display = 'block';
+            img.style.display = 'none';
+        }
+        document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('open');
+        document.getElementById('lbVid').pause?.();
+    }
+
+    /* ── TOAST ── */
+    let toastTimer;
+    function showToast(ico, body, type='') {
+        const t = document.getElementById('toast');
+        document.getElementById('tIco').textContent = ico;
+        document.getElementById('tTitle').textContent = type === 'err' ? 'Error' : 'Done';
+        document.getElementById('tBody').textContent = body;
+        t.classList.toggle('err', type === 'err');
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), 3800);
+    }
+
+    /* ── REALTIME ── */
+    function startRealtime() {
+        const dot = document.getElementById('rtDot');
+        sb.channel('admin-mobile')
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'incidents'
+        }, async p => {
+            const {data} = await sb.from('incidents').select('*,incident_media(*)').eq('id', p.new.id).single();
+            if (data) {
+                allInc.unshift(data);
+                renderInc();
+                renderStats();
+                updateCounts();
+                showToast('🔔', 'New: ' + data.type + ' — ' + data.address);
+            }
+        })
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'incidents'
+        }, async p => {
+            const {data} = await sb.from('incidents').select('*,incident_media(*)').eq('id', p.new.id).single();
+            if (data) {
+                const idx = allInc.findIndex(i => i.id === data.id);
+                if (idx !== -1)
+                    allInc[idx] = data;
+                else
+                    allInc.unshift(data);
+                renderInc();
+                renderStats();
+                updateCounts();
+            }
+        })
+        .on('postgres_changes', {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'incidents'
+        }, p => {
+            allInc = allInc.filter(i => i.id !== p.old.id);
+            renderInc();
+            renderStats();
+            updateCounts();
+        })
+        .subscribe(status => {
+            if (dot)
+                dot.classList.toggle('live', status === 'SUBSCRIBED');
+        });
+    }
+
+    /* ── INIT ── */
+    (async function init() {
+        if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
+            document.getElementById('loginErr').textContent = 'Configure Supabase in config.js';
+            document.getElementById('loginErr').style.display = 'block';
+            return;
+        }
+        sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const hash = window.location.hash;
+        if (hash && hash.includes('type=recovery')) {
+            document.getElementById('loginFormWrap').style.display = 'none';
+            document.getElementById('setPwWrap').style.display = '';
+            return;
+        }
+        if (hash && hash.includes('type=invite')) {
+            document.getElementById('loginFormWrap').style.display = 'none';
+            document.getElementById('setPwWrap').style.display = '';
+            return;
+        }
+        const {data} = await sb.auth.getSession();
+        if (data?.session) {
+            document.getElementById('loginScreen').style.display = 'none';
+            await handleSession(data.session);
+        }
+    })();
+    </script>
+</body>
+</html>
