@@ -512,6 +512,179 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
   font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate2);
   padding:6px 24px 0;flex-shrink:0;
 }
+
+/* ── Theme toggle button ───────────────────────────────────── */
+.theme-toggle-btn{
+  background:none;border:1px solid var(--b2);border-radius:4px;
+  padding:4px 10px;color:var(--slate);font-size:.72rem;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;gap:6px;white-space:nowrap;
+  font-family:'IBM Plex Mono',monospace;letter-spacing:.04em;
+}
+.theme-toggle-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+/* ── Light mode overrides ──────────────────────────────────── */
+body.light{
+  --navy:  #f0f4f8;
+  --navy2: #e2ecf5;
+  --navy3: #d4e2ef;
+  --teal:  #007a65;
+  --gold:  #b87c0a;
+  --red:   #c0273d;
+  --green: #1a9950;
+  --slate: #4a5f72;
+  --slate2:#7a95a8;
+  --white: #0f1e2e;
+  --border:rgba(0,122,101,.2);
+  --b2:    rgba(0,0,0,.1);
+  background:#f0f4f8;color:#0f1e2e;
+}
+/* Login */
+body.light #loginScreen{background:radial-gradient(ellipse at 40% 40%,#d4e2ef 0%,#e8f0f8 70%)}
+body.light .login-box{background:#fff;border-color:rgba(0,122,101,.2)}
+body.light .login-title{color:#0f1e2e}
+body.light .login-field label{color:#4a5f72}
+body.light .login-field input{background:#f0f4f8;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .login-field input::placeholder{color:#7a95a8}
+body.light .login-err{color:#c0273d}
+/* Header */
+body.light header{background:linear-gradient(180deg,#dce8f5,#eaf1f8)!important;border-bottom:1px solid rgba(0,0,0,.1)!important}
+body.light .hd-sub{color:#007a65}
+body.light .hd-user{color:#4a5f72}
+body.light .logout-btn{border-color:rgba(0,0,0,.15);color:#4a5f72}
+body.light .logout-btn:hover{border-color:#c0273d;color:#c0273d}
+body.light .theme-toggle-btn{border-color:rgba(0,0,0,.15);color:#4a5f72}
+body.light .theme-toggle-btn:hover{border-color:#007a65;color:#007a65}
+/* Sidebar */
+body.light .sidebar{background:#e2ecf5;border-right-color:rgba(0,0,0,.1)}
+body.light .nav-section{color:#7a95a8}
+body.light .nav-btn{color:#4a5f72}
+body.light .nav-btn:hover{color:#0f1e2e;background:rgba(0,0,0,.04)}
+body.light .nav-btn.on{color:#007a65;border-left-color:#007a65;background:rgba(0,122,101,.08)}
+body.light .nav-count{background:rgba(0,122,101,.12);color:#007a65}
+/* Main scrollbar */
+body.light main::-webkit-scrollbar-thumb{background:#7a95a8}
+/* Page header */
+body.light .page-sub{color:#4a5f72}
+/* Toolbar */
+body.light .tb-search{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .tb-search::placeholder{color:#7a95a8}
+body.light .tb-search:focus{border-color:#007a65}
+body.light .tb-select{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .tb-select option{background:#fff;color:#0f1e2e}
+body.light select option{background:#fff;color:#0f1e2e}
+/* Bulk bar */
+body.light .bulk-bar{background:rgba(0,122,101,.08);border-bottom-color:rgba(0,122,101,.2)}
+/* Table */
+body.light thead tr{background:#f0f4f8}
+body.light th{border-bottom-color:rgba(0,0,0,.1);color:#7a95a8}
+body.light td{border-bottom-color:rgba(0,0,0,.07)}
+body.light tr:hover td{background:rgba(0,0,0,.02)}
+body.light .td-addr{color:#4a5f72}
+body.light .td-desc{color:rgba(15,30,46,.7)}
+body.light .td-time{color:#4a5f72}
+/* Stats */
+body.light .stat-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .stat-num{color:#0f1e2e}
+body.light .stat-lbl{color:#4a5f72}
+body.light .stat-card.accent .stat-num{color:#007a65}
+body.light .type-row-label{color:#0f1e2e}
+body.light .type-bar-wrap{background:rgba(0,0,0,.08)}
+body.light .type-count{color:#4a5f72}
+/* Buttons */
+body.light .btn-ghost{background:rgba(0,0,0,.04);color:#4a5f72;border-color:rgba(0,0,0,.15)}
+body.light .btn-ghost:hover{background:rgba(0,0,0,.08);color:#0f1e2e}
+/* Modal */
+body.light .modal{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .modal-hd{background:#e8eef5;border-bottom-color:rgba(0,0,0,.1)}
+body.light .modal-title{color:#0f1e2e}
+body.light .modal-close{color:#4a5f72}
+body.light .modal-close:hover{color:#0f1e2e}
+body.light .mf-label{color:#4a5f72}
+body.light .mf-val{color:#0f1e2e}
+body.light .mf-row{border-bottom-color:rgba(0,0,0,.07)}
+body.light .modal-actions{border-top-color:rgba(0,0,0,.1)}
+body.light .modal-media-item{border-color:rgba(0,0,0,.1)}
+/* Notes */
+body.light .note-item{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1)}
+body.light .note-meta{color:#7a95a8}
+body.light .note-text{color:#0f1e2e}
+body.light .note-input{background:#f0f4f8;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .note-input::placeholder{color:#7a95a8}
+body.light .note-input:focus{border-color:#007a65}
+body.light .note-submit{background:rgba(0,122,101,.1);border-color:rgba(0,122,101,.25);color:#007a65}
+body.light .note-submit:hover{background:rgba(0,122,101,.2)}
+body.light .note-del{color:#7a95a8}
+body.light .note-del:hover{color:#c0273d}
+/* Member management */
+body.light .member-input{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .member-input::placeholder{color:#7a95a8}
+body.light .member-input:focus{border-color:#007a65}
+body.light .member-search{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .member-search::placeholder{color:#7a95a8}
+body.light .member-search:focus{border-color:#007a65}
+body.light .member-search option{background:#fff;color:#0f1e2e}
+body.light .member-count{color:#4a5f72}
+body.light .member-table th{background:#e2ecf5;border-bottom-color:rgba(0,0,0,.1);color:#7a95a8}
+body.light .member-table td{border-bottom-color:rgba(0,0,0,.07)}
+body.light .member-table tbody tr:hover td{background:rgba(0,0,0,.02)}
+body.light .mem-email{color:#0f1e2e}
+body.light .mem-dot{background:#007a65}
+body.light .mem-date{color:#4a5f72}
+body.light .mem-num{color:#7a95a8}
+body.light .member-empty{color:#4a5f72}
+/* Applications */
+body.light .app-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .app-name{color:#0f1e2e}
+body.light .app-biz{color:#007a65}
+body.light .app-detail{color:#4a5f72}
+body.light .app-detail span{color:#0f1e2e}
+body.light .app-notes{color:#7a95a8;border-top-color:rgba(0,0,0,.08)}
+body.light .app-meta{color:#7a95a8}
+body.light .app-filter-select{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .app-filter-select option{background:#fff;color:#0f1e2e}
+body.light .app-empty{color:#4a5f72}
+/* Filter panel */
+body.light .filter-panel{background:#e2ecf5;border-bottom-color:rgba(0,0,0,.1)}
+body.light .fg-label{color:#4a5f72}
+body.light .tb-input{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .tb-input::placeholder{color:#7a95a8}
+body.light .tb-input:focus{border-color:#007a65}
+body.light .tb-input option{background:#fff;color:#0f1e2e}
+body.light .tb-input[type="date"]{color-scheme:light}
+body.light .filter-toggle-btn{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.15);color:#4a5f72}
+body.light .filter-toggle-btn:hover{border-color:#007a65;color:#007a65}
+body.light .filter-toggle-btn.active{border-color:#007a65;color:#007a65;background:rgba(0,122,101,.08)}
+body.light .filter-chips{border-bottom-color:rgba(0,0,0,.08)}
+body.light .result-count{color:#7a95a8}
+/* Map view */
+body.light .map-sidebar{background:#e2ecf5;border-left-color:rgba(0,0,0,.1)}
+body.light .map-sidebar-hd{border-bottom-color:rgba(0,0,0,.1)}
+body.light .map-sidebar-count{color:#007a65}
+body.light .map-inc-card{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1)}
+body.light .map-inc-card:hover{background:rgba(0,0,0,.06)}
+body.light .map-inc-card.hl{border-left-color:#007a65;background:rgba(0,122,101,.08)}
+body.light .map-card-addr{color:#4a5f72}
+body.light .map-card-desc{color:rgba(15,30,46,.7)}
+body.light .map-card-time{color:#7a95a8}
+body.light .map-controls .map-btn{background:rgba(240,244,248,.95)!important;border-color:rgba(0,0,0,.15)!important;color:#2a4560!important}
+body.light .map-controls .map-btn:hover{border-color:#007a65!important;color:#007a65!important}
+body.light .map-controls .map-btn.on{border-color:#007a65!important;color:#007a65!important;background:rgba(0,122,101,.1)!important}
+body.light .map-empty{color:#4a5f72}
+body.light .leaflet-popup-content-wrapper{background:#fff;color:#0f1e2e;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+body.light .leaflet-popup-tip{background:#fff}
+body.light .pu-type{color:#007a65}
+body.light .pu-addr{color:#4a5f72}
+body.light .pu-time{color:#7a95a8}
+/* Toast */
+body.light .toast{background:#fff;border-color:rgba(0,0,0,.1);box-shadow:0 8px 28px rgba(0,0,0,.12)}
+body.light .toast-title{color:#0f1e2e}
+body.light .toast-msg{color:#4a5f72}
+/* Empty state */
+body.light .empty-state .empty-text{color:#4a5f72}
+/* Captain directory (in districts view) */
+body.light #captainDirGrid table thead tr{background:#e2ecf5}
+body.light #captainDirGrid table th{color:#7a95a8;border-bottom-color:rgba(0,0,0,.1)}
+body.light #captainDirGrid table tbody tr{border-bottom-color:rgba(0,0,0,.07)}
 </style>
 </head>
 <body>
@@ -623,6 +796,7 @@ input[type="checkbox"]{accent-color:var(--teal);cursor:pointer}
       </div>
       <div class="hd-user" id="hdUser">👤 Admin</div>
       <div id="captainBadge" style="display:none;font-family:IBM Plex Mono,monospace;font-size:.62rem;padding:3px 10px;border-radius:4px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--gold)">CAPTAIN VIEW</div>
+      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">🌙 Dark</button>
       <button class="logout-btn" onclick="logout()">Sign Out</button>
     </div>
   </header>
@@ -1323,6 +1497,20 @@ async function doSetNewPassword() {
 }
 
 /* ── Logout ───────────────────────────────────────────────── */
+/* ── Theme toggle ────────────────────────────────────────── */
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('hibcw-admin-theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeToggleBtn').textContent = isLight ? '☀️ Light' : '🌙 Dark';
+}
+(function initTheme() {
+  if (localStorage.getItem('hibcw-admin-theme') === 'light') {
+    document.body.classList.add('light');
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.textContent = '☀️ Light';
+  }
+})();
+
 async function logout() {
   if (sb) await sb.auth.signOut();
   currentRole      = null;
