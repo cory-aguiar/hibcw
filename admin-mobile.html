@@ -464,11 +464,21 @@ body.light .strip-cell{background:#fff}
 
     <!-- DISTRICTS SCREEN -->
     <div class="screen" id="sc-districts">
-      <div class="list-hdr" style="justify-content:space-between">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate)">District Captains</span>
-        <button class="btn btn-ghost" style="font-size:.62rem;padding:5px 10px" onclick="loadMembers()">🔄 Refresh</button>
+      <!-- Tab bar -->
+      <div style="display:flex;border-bottom:1px solid var(--b2);background:var(--navy2);flex-shrink:0;position:sticky;top:0;z-index:10">
+        <button id="distTabOverview" onclick="switchDistTab('overview')" style="flex:1;padding:10px 6px;background:none;border:none;border-bottom:2px solid var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);cursor:pointer">📊 Overview</button>
+        <button id="distTabDirectory" onclick="switchDistTab('directory')" style="flex:1;padding:10px 6px;background:none;border:none;border-bottom:2px solid transparent;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);cursor:pointer">📇 Directory</button>
+        <button id="distPrintBtn" onclick="printCaptainDirectory()" style="display:none;padding:10px 14px;background:none;border:none;border-bottom:2px solid transparent;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate);cursor:pointer">🖨️</button>
       </div>
-      <div id="distList"></div>
+      <!-- Overview cards -->
+      <div id="distOverview"></div>
+      <!-- Directory list -->
+      <div id="distDirectory" style="display:none">
+        <div style="padding:8px 12px;background:var(--navy2);border-bottom:1px solid var(--b2);flex-shrink:0">
+          <input class="srch" id="dirSearch" placeholder="🔍 Search captains…" oninput="renderDistDirectory()" style="width:100%">
+        </div>
+        <div id="dirList"></div>
+      </div>
     </div>
 
     <!-- MORE SCREEN -->
@@ -1125,45 +1135,292 @@ async function deleteApp(id) {
 /* ════════════════════════════════════════════════
    DISTRICTS
 ════════════════════════════════════════════════ */
+let currentDistTab = 'overview';
+
+function switchDistTab(tab) {
+  currentDistTab = tab;
+  const isDir = tab === 'directory';
+  document.getElementById('distOverview').style.display   = isDir ? 'none' : '';
+  document.getElementById('distDirectory').style.display  = isDir ? '' : 'none';
+  document.getElementById('distPrintBtn').style.display   = isDir ? 'block' : 'none';
+  const ov = document.getElementById('distTabOverview');
+  const di = document.getElementById('distTabDirectory');
+  ov.style.borderBottomColor = isDir ? 'transparent' : 'var(--teal)';
+  ov.style.color             = isDir ? 'var(--slate)'  : 'var(--teal)';
+  di.style.borderBottomColor = isDir ? 'var(--teal)'   : 'transparent';
+  di.style.color             = isDir ? 'var(--teal)'   : 'var(--slate)';
+  if (isDir) renderDistDirectory();
+  else renderDistOverview();
+}
+
 function renderDistricts() {
-  const el=document.getElementById('distList');
-  if(!el) return;
-  const distCaptainMap={};
-  DISTRICTS.forEach(([v])=>{distCaptainMap[v]=null;});
-  memberList.forEach(m=>{
-    if(!m.district||!m.captain_name) return;
-    if(m.full_name&&m.captain_name.trim().toLowerCase()===m.full_name.trim().toLowerCase()&&!distCaptainMap[m.district])
-      distCaptainMap[m.district]=m;
+  if (currentDistTab === 'directory') renderDistDirectory();
+  else renderDistOverview();
+}
+
+function buildCaptainMap() {
+  const distMap = {};
+  DISTRICTS.forEach(([v]) => { distMap[v] = { captain: null, captainMember: null, members: [], photo_url: null }; });
+  memberList.forEach(m => {
+    if (m.district && distMap[m.district]) {
+      distMap[m.district].members.push(m);
+      if (m.captain_name && !distMap[m.district].captain) {
+        distMap[m.district].captain = m.captain_name;
+        if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()) {
+          distMap[m.district].photo_url     = m.photo_url || null;
+          distMap[m.district].captainMember = m;
+        }
+      }
+    }
   });
-  el.innerHTML=DISTRICTS.map(([v,label])=>{
-    const c=distCaptainMap[v];
-    const color=DISTRICT_COLORS[v]||'#00c9a7';
-    const num=label.match(/\d+/)?.[0]||'';
-    const initials=c?(c.full_name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase():'?';
-    const avatar=c?.photo_url
-      ?`<img src="${c.photo_url}" alt="${initials}" class="dist-avatar" style="border:2px solid ${color}66">`
-      :`<div class="dist-avatar-init" style="background:${color}22;border:2px solid ${color}44;color:${color}">${initials}</div>`;
-    return `<div class="dist-card">
-      <div class="dist-hd" style="border-bottom:1px solid ${color}22">
-        <div class="dist-num" style="background:${color}22;border:1px solid ${color}55;color:${color}">${num}</div>
-        <div class="dist-label" style="color:${color}">${esc(label)}</div>
+  return distMap;
+}
+
+function renderDistOverview() {
+  const el = document.getElementById('distOverview');
+  if (!el) return;
+
+  const distMap = buildCaptainMap();
+
+  // Incident counts
+  const incByDist = {}, lastByDist = {};
+  DISTRICTS.forEach(([v]) => { incByDist[v] = 0; lastByDist[v] = null; });
+  allIncidents.forEach(inc => {
+    if (inc.district && incByDist[inc.district] !== undefined) {
+      incByDist[inc.district]++;
+      const t = new Date(inc.occurred_at || inc.created_at);
+      if (!lastByDist[inc.district] || t > lastByDist[inc.district]) lastByDist[inc.district] = t;
+    }
+  });
+
+  const typeColors = { red:'#e8415a', gold:'#f5a623', teal:'#00c9a7' };
+
+  el.innerHTML = DISTRICTS.map(([v, fullLabel]) => {
+    const info       = distMap[v] || { captain:null, captainMember:null, members:[] };
+    const captain    = info.captain;
+    const cm         = info.captainMember;
+    const memCount   = info.members.length;
+    const hasCaptain = !!captain;
+    const color      = DISTRICT_COLORS[v] || 'var(--teal)';
+    const num        = fullLabel.match(/\d+/)?.[0] || '';
+    const isMine     = currentRole === 'captain' && captainDistrict === v;
+    const photoUrl   = info.photo_url;
+    const initials   = captain ? captain.split(' ').map(w=>w[0]).slice(0,2).join('') : '?';
+    const lastActive = lastByDist[v];
+
+    // Stats
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const weekStart  = new Date(now); weekStart.setHours(0,0,0,0); weekStart.setDate(weekStart.getDate()-((weekStart.getDay()+6)%7));
+    const todayStart = new Date(now); todayStart.setHours(0,0,0,0);
+    const incMonth = allIncidents.filter(i=>i.district===v&&new Date(i.occurred_at)>=monthStart).length;
+    const incWeek  = allIncidents.filter(i=>i.district===v&&new Date(i.occurred_at)>=weekStart).length;
+    const incToday = allIncidents.filter(i=>i.district===v&&new Date(i.occurred_at)>=todayStart).length;
+
+    // Type bars (top 4 active)
+    const tc={},tcm={};
+    allIncidents.filter(i=>i.district===v&&i.status==='active').forEach(i=>{tc[i.type]=(tc[i.type]||0)+1;tcm[i.type]=i.type_color;});
+    const sorted=Object.entries(tc).sort((a,b)=>b[1]-a[1]).slice(0,4);
+    const mx=sorted[0]?.[1]||1;
+    const typeBars = sorted.length
+      ? sorted.map(([t,c])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <div style="font-size:.68rem;color:var(--white);width:110px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t)}</div>
+          <div style="flex:1;height:5px;background:var(--b2);border-radius:3px;overflow:hidden">
+            <div style="height:100%;border-radius:3px;background:${typeColors[tcm[t]]||'#00c9a7'};width:${(c/mx*100).toFixed(1)}%"></div>
+          </div>
+          <div style="font-family:IBM Plex Mono,monospace;font-size:.6rem;color:var(--slate);width:18px;text-align:right">${c}</div>
+        </div>`).join('')
+      : `<div style="font-size:.68rem;color:var(--slate2);font-style:italic">No active incidents</div>`;
+
+    // Avatar
+    const avatar = photoUrl
+      ? `<img src="${photoUrl}" alt="${initials}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid ${color}66;display:block;box-shadow:0 4px 12px rgba(0,0,0,.35)">`
+      : `<div style="width:80px;height:80px;border-radius:50%;background:${color}20;border:3px solid ${color}44;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-size:1.6rem;font-weight:700;color:${color}">${hasCaptain?initials:'?'}</div>`;
+
+    return `<div style="background:var(--navy2);border:1px solid ${isMine?color:(hasCaptain?'rgba(0,201,167,.2)':'var(--b2)')};${isMine?'box-shadow:0 0 0 2px '+color+'44;':''};border-radius:10px;margin:8px 12px;overflow:hidden">
+
+      <!-- District header band -->
+      <div style="background:${color}12;border-bottom:1px solid ${color}22;padding:10px 14px;display:flex;align-items:center;gap:10px">
+        <div style="width:30px;height:30px;border-radius:7px;background:${color}22;border:1px solid ${color}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:800;font-size:.85rem;color:${color};flex-shrink:0">${num}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:Rajdhani,sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.03em;color:${color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(fullLabel)}</div>
+          ${isMine?`<div style="font-family:IBM Plex Mono,monospace;font-size:.5rem;letter-spacing:.1em;color:${color};opacity:.8">★ YOUR DISTRICT</div>`:''}
+        </div>
       </div>
-      <div class="dist-body">
-        ${c?`<div class="dist-captain-row" style="margin-top:12px">
+
+      <div style="padding:14px">
+        <!-- Captain photo + info -->
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
           ${avatar}
-          <div style="min-width:0">
-            <div style="font-weight:600;font-size:.88rem;margin-bottom:2px">${esc(c.full_name)}</div>
-            ${c.business_name?`<div style="font-size:.72rem;color:var(--teal)">${esc(c.business_name)}</div>`:''}
+          <div style="flex:1;min-width:0">
+            ${hasCaptain ? `
+              <div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:700;margin-bottom:2px">👮 ${esc(captain)}</div>
+              ${cm?.business_name?`<div style="font-size:.7rem;color:var(--teal);margin-bottom:4px">🏢 ${esc(cm.business_name)}</div>`:''}
+              ${cm?.phone?`<a href="tel:${esc(cm.phone)}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--slate);text-decoration:none;margin-bottom:2px">📞 ${esc(cm.phone)}</a>`:''}
+              ${cm?.email?`<a href="mailto:${esc(cm.email)}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none;word-break:break-all">✉️ ${esc(cm.email)}</a>`:''}
+              ${!cm?.phone&&!cm?.email?`<div style="font-size:.68rem;color:var(--slate2);font-style:italic">No contact info</div>`:''}
+            ` : `<div style="font-size:.78rem;color:var(--slate2);font-style:italic">No captain assigned</div>`}
           </div>
         </div>
-        <div class="dist-contact">
-          ${c.phone?`📞 <a href="tel:${esc(c.phone)}">${esc(c.phone)}</a><br>`:''}
-          ${c.email?`✉️ <a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`:''}
-        </div>`
-        :`<div style="padding:10px 0;font-style:italic;font-size:.78rem;color:var(--slate2)">No captain assigned</div>`}
+
+        <!-- Stats grid -->
+        <div style="border-top:1px solid ${color}22;padding-top:12px;margin-bottom:12px">
+          <div style="font-family:IBM Plex Mono,monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:${color};margin-bottom:8px">📊 District Stats</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
+            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
+              <div style="font-family:IBM Plex Mono,monospace;font-size:.95rem;font-weight:700;color:${color}">${memCount}</div>
+              <div style="font-size:.5rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Member${memCount!==1?'s':''}</div>
+            </div>
+            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
+              <div style="font-family:IBM Plex Mono,monospace;font-size:.95rem;font-weight:700;color:var(--gold)">${incMonth}</div>
+              <div style="font-size:.5rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Month</div>
+            </div>
+            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
+              <div style="font-family:IBM Plex Mono,monospace;font-size:.95rem;font-weight:700;color:var(--white)">${incWeek}</div>
+              <div style="font-size:.5rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Week</div>
+            </div>
+            <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
+              <div style="font-family:IBM Plex Mono,monospace;font-size:.95rem;font-weight:700;color:var(--white)">${incToday}</div>
+              <div style="font-size:.5rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Today</div>
+            </div>
+          </div>
+
+          <!-- Last reported -->
+          <div style="font-family:IBM Plex Mono,monospace;font-size:.62rem;color:var(--slate2);margin-bottom:10px">
+            Last report: <span style="color:${lastActive?'var(--white)':'var(--slate2)'}">${lastActive?lastActive.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'None'}</span>
+          </div>
+
+          <!-- Type breakdown bars -->
+          ${typeBars}
+        </div>
       </div>
     </div>`;
   }).join('');
+}
+
+function renderDistDirectory() {
+  const el = document.getElementById('dirList');
+  if (!el) return;
+  const q = (document.getElementById('dirSearch')?.value || '').toLowerCase().trim();
+
+  const distCaptainMap = {};
+  DISTRICTS.forEach(([v]) => { distCaptainMap[v] = null; });
+  memberList.forEach(m => {
+    if (!m.district || !m.captain_name) return;
+    if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() && !distCaptainMap[m.district])
+      distCaptainMap[m.district] = m;
+  });
+
+  let entries = DISTRICTS.map(([v, fullLabel]) => {
+    const c = distCaptainMap[v];
+    return { v, fullLabel, c, color: DISTRICT_COLORS[v] || '#00c9a7', num: fullLabel.match(/\d+/)?.[0] || '' };
+  });
+
+  if (q) entries = entries.filter(({ fullLabel, c }) => {
+    return fullLabel.toLowerCase().includes(q)
+      || (c?.full_name||'').toLowerCase().includes(q)
+      || (c?.email||'').toLowerCase().includes(q)
+      || (c?.phone||'').toLowerCase().includes(q)
+      || (c?.business_name||'').toLowerCase().includes(q);
+  });
+
+  if (!entries.length) { el.innerHTML = `<div class="empty"><div class="empty-ico">🔍</div>No results.</div>`; return; }
+
+  el.innerHTML = entries.map(({ v, fullLabel, c, color, num }) => `
+    <div style="padding:12px 14px;border-bottom:1px solid var(--b2);display:flex;gap:12px;align-items:center">
+      <div style="width:28px;height:28px;border-radius:6px;background:${color}22;border:1px solid ${color}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:800;font-size:.78rem;color:${color};flex-shrink:0">${num}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:Rajdhani,sans-serif;font-size:.8rem;font-weight:700;color:${color};margin-bottom:2px">${esc(fullLabel)}</div>
+        ${c ? `
+          <div style="font-size:.78rem;font-weight:600">${esc(c.full_name)}</div>
+          ${c.business_name?`<div style="font-size:.68rem;color:var(--teal)">${esc(c.business_name)}</div>`:''}
+          ${c.email?`<a href="mailto:${esc(c.email)}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.email)}</a>`:''}
+          ${c.phone?`<a href="tel:${esc(c.phone)}" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);text-decoration:none">${esc(c.phone)}</a>`:''}
+        ` : `<div style="font-size:.72rem;color:var(--slate2);font-style:italic">No captain assigned</div>`}
+      </div>
+    </div>`).join('');
+}
+
+function printCaptainDirectory() {
+  const distCaptainMap = {};
+  DISTRICTS.forEach(([v]) => { distCaptainMap[v] = null; });
+  memberList.forEach(m => {
+    if (!m.district || !m.captain_name) return;
+    if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() && !distCaptainMap[m.district])
+      distCaptainMap[m.district] = m;
+  });
+  const distCaptainNameFallback = {};
+  memberList.forEach(m => {
+    if (m.district && m.captain_name && !distCaptainMap[m.district])
+      distCaptainNameFallback[m.district] = m.captain_name;
+  });
+
+  const rows = DISTRICTS.map(([v, fullLabel]) => {
+    const c  = distCaptainMap[v];
+    const fb = distCaptainNameFallback[v];
+    const name  = c?.full_name || fb || '—';
+    const phone = c?.phone || '—';
+    const email = c?.email || '—';
+    const biz   = c?.business_name || '—';
+    const addr  = [c?.business_address, c?.business_city, c?.business_state, c?.business_zip].filter(Boolean).join(', ') || '—';
+    return `<tr>
+      <td class="dist">${esc(fullLabel)}</td>
+      <td>${esc(name)}</td>
+      <td>${esc(phone)}</td>
+      <td>${esc(email)}</td>
+      <td>${esc(biz)}</td>
+      <td>${esc(addr)}</td>
+    </tr>`;
+  }).join('');
+
+  const now = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const html = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<title>HIBCW District Captains Directory</title>
+<style>
+  @page{size:letter landscape;margin:.65in .6in}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Helvetica Neue',Arial,sans-serif;font-size:10pt;color:#1a1a2e;background:#fff}
+  .header{display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid #0b3d91;padding-bottom:10px;margin-bottom:18px}
+  .header-left{display:flex;align-items:center;gap:12px}
+  .shield{width:38px;height:38px;background:linear-gradient(160deg,#002266,#001133);border:2px solid #c8960c;clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);display:flex;align-items:center;justify-content:center;font-size:8pt;font-weight:800;color:#c8960c}
+  .org-name{font-size:14pt;font-weight:800;color:#0b3d91;letter-spacing:.04em;text-transform:uppercase}
+  .org-sub{font-size:7.5pt;color:#555;letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
+  .header-right{text-align:right;font-size:8pt;color:#555;line-height:1.6}
+  .header-right strong{color:#0b3d91;font-size:11pt;display:block}
+  table{width:100%;border-collapse:collapse}
+  thead tr{background:#0b3d91;color:#fff}
+  thead th{padding:7px 10px;text-align:left;font-size:8pt;font-weight:700;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+  tbody tr{border-bottom:1px solid #e0e4ea}
+  tbody tr:nth-child(even){background:#f4f7fb}
+  tbody tr:last-child{border-bottom:2px solid #0b3d91}
+  td{padding:7px 10px;vertical-align:top;line-height:1.4;font-size:9.5pt}
+  td.dist{font-weight:700;color:#0b3d91;white-space:nowrap}
+  .footer{margin-top:14px;display:flex;justify-content:space-between;font-size:7.5pt;color:#888;border-top:1px solid #dde2ea;padding-top:8px}
+  .confidential{font-weight:700;color:#c0392b;text-transform:uppercase;letter-spacing:.08em}
+</style></head><body>
+  <div class="header">
+    <div class="header-left">
+      <div class="shield">HIBCW</div>
+      <div><div class="org-name">HIBCW</div><div class="org-sub">Hawaii Island Business Crime Watch</div></div>
+    </div>
+    <div class="header-right"><strong>District Captains Directory</strong>Generated ${now}</div>
+  </div>
+  <table>
+    <thead><tr><th>District</th><th>Captain</th><th>Phone</th><th>Email</th><th>Business</th><th>Address</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="footer">
+    <span class="confidential">🔒 Confidential — for internal use only</span>
+    <span>HIBCW District Captains Directory · ${now} · ${DISTRICTS.length} districts</span>
+  </div>
+  <script>window.onload=()=>{window.print();}<\/script>
+</body></html>`;
+
+  const win = window.open('','_blank');
+  if (!win) { showToast('⚠️','Pop-ups blocked — please allow pop-ups and try again.','err'); return; }
+  win.document.write(html);
+  win.document.close();
 }
 
 /* ════════════════════════════════════════════════
