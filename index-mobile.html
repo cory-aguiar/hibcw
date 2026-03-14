@@ -625,10 +625,13 @@ a.nav-btn{text-decoration:none;color:inherit}
 /* District alert banner */
 .alert-banner{
   position:fixed;bottom:calc(var(--nav-h) + var(--safe-bot) + 10px);left:10px;right:10px;
-  z-index:800;background:linear-gradient(135deg,rgba(245,166,35,.18),rgba(245,166,35,.08));
-  border:1px solid rgba(245,166,35,.45);border-radius:10px;
+  z-index:800;
+  background:var(--navy2);
+  border:1px solid rgba(245,166,35,.6);
+  border-top:3px solid var(--gold);
+  border-radius:10px;
   padding:12px 14px;display:flex;gap:10px;align-items:flex-start;
-  box-shadow:0 4px 20px rgba(0,0,0,.35);
+  box-shadow:0 6px 24px rgba(0,0,0,.5);
   animation:alertSlideUp .35s cubic-bezier(.34,1.2,.64,1);
 }
 .alert-banner.hidden{display:none}
@@ -639,7 +642,7 @@ a.nav-btn{text-decoration:none;color:inherit}
 .alert-banner-msg{font-size:.78rem;line-height:1.5;color:var(--white)}
 .alert-banner-meta{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate);margin-top:4px}
 .alert-banner-close{background:none;border:none;color:var(--slate);font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;line-height:1}
-body.light .alert-banner{background:linear-gradient(135deg,rgba(184,124,10,.12),rgba(184,124,10,.06));border-color:rgba(184,124,10,.35)}
+body.light .alert-banner{background:#fff;border-color:rgba(184,124,10,.5);border-top-color:var(--gold);box-shadow:0 6px 24px rgba(0,0,0,.15)}
 body.light .alert-banner-msg{color:var(--white)}
 
 /* Alert feed in More screen */
