@@ -29,7 +29,7 @@
   --hdr-h: 52px;
 }
 
-html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white);overscroll-behavior:none}
+html,body{height:100%;max-height:100vh;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white);overscroll-behavior:none}
 
 /* ── Light mode ── */
 body.light{
@@ -107,7 +107,7 @@ body.light #loginScreen{background:radial-gradient(ellipse at 40% 40%,#d4e2ef,#e
 .login-err{color:var(--red);font-size:.75rem;text-align:center;margin-top:10px;display:none}
 
 /* ── App shell ── */
-#appShell{display:none;height:100vh;flex-direction:column}
+#appShell{display:none;height:100%;max-height:100vh;flex-direction:column;overflow:hidden}
 #appShell.visible{display:flex}
 
 /* ── Header ── */
@@ -128,9 +128,10 @@ header{
 .theme-btn:active{opacity:.7}
 
 /* ── Screens ── */
-.screens{flex:1;overflow:hidden;position:relative;min-height:0}
+.screens{flex:1;min-height:0;position:relative;overflow:hidden}
 .screen{
-  position:absolute;inset:0;overflow-y:auto;
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
   background:var(--navy);display:none;flex-direction:column;
   padding-bottom:16px;
 }
@@ -144,6 +145,7 @@ header{
   background:linear-gradient(0deg,#0a1320,#0e1a2c);
   border-top:1px solid var(--b2);
   display:flex;z-index:300;
+  position:relative;
 }
 .nav-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
