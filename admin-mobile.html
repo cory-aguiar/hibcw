@@ -590,6 +590,28 @@ body.light .strip-cell{background:#fff}
 
 <!-- INCIDENT DETAIL MODAL -->
 <div class="modal-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+
+<!-- DISTRICT MEMBERS MODAL -->
+<div class="modal-overlay" id="distMembersOverlay" onclick="if(event.target===this)closeDistMembers()">
+  <div class="modal-sheet" id="distMembersSheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="distMembersTitle">District Members</div>
+        <div style="font-size:.65rem;color:var(--slate);margin-top:2px" id="distMembersCount"></div>
+      </div>
+      <button class="modal-close" onclick="closeDistMembers()">✕</button>
+    </div>
+    <div style="padding:8px 12px;border-bottom:1px solid var(--b2);flex-shrink:0">
+      <input class="srch" id="distMembersSearch" placeholder="🔍 Search members…" oninput="filterDistMembers()" style="width:100%">
+    </div>
+    <div id="distMembersBody" style="overflow-y:auto;flex:1"></div>
+    <div style="padding:10px 12px;border-top:1px solid var(--b2);display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost" style="flex:1;font-size:.72rem" onclick="printDistrictRoster()">🖨 Print Roster</button>
+      <button class="btn btn-ghost captain-hidden" style="flex:1;font-size:.72rem" onclick="closeDistMembers();showScreen('members')">✏️ Manage Members</button>
+    </div>
+  </div>
+</div>
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-hd">
@@ -1296,6 +1318,12 @@ function renderDistOverview() {
           <!-- Type breakdown bars -->
           ${typeBars}
         </div>
+
+        <!-- Action button -->
+        <button class="btn btn-ghost btn-full" style="font-size:.72rem;border-color:${color}33;color:${color}" onclick="openDistMembers('${v}')">
+          👥 View Members (${memCount})
+        </button>
+
       </div>
     </div>`;
   }).join('');
@@ -1542,6 +1570,148 @@ function ageTag(iso){
   if(session) await handleAuthSession(session);
   sb.auth.onAuthStateChange(async(_,session)=>{if(session&&!document.getElementById('appShell').classList.contains('visible'))await handleAuthSession(session);});
 })();
+
+/* ════════════════════════════════════════════════
+   DISTRICT MEMBERS MODAL
+════════════════════════════════════════════════ */
+let _distMembersId = null;
+
+function openDistMembers(districtId) {
+  _distMembersId = districtId;
+  const distLabel = districtLabel(districtId);
+  const color     = DISTRICT_COLORS[districtId] || '#00c9a7';
+  const members   = memberList.filter(m => m.district === districtId);
+
+  document.getElementById('distMembersTitle').textContent = distLabel;
+  document.getElementById('distMembersTitle').style.color = color;
+  document.getElementById('distMembersCount').textContent =
+    members.length + ' registered member' + (members.length !== 1 ? 's' : '');
+  document.getElementById('distMembersSearch').value = '';
+
+  renderDistMemberRows(members);
+  document.getElementById('distMembersOverlay').classList.add('open');
+}
+
+function renderDistMemberRows(members) {
+  const el = document.getElementById('distMembersBody');
+  if (!members.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ico">👥</div>No members registered in this district yet.</div>`;
+    return;
+  }
+  const color = DISTRICT_COLORS[_distMembersId] || '#00c9a7';
+  el.innerHTML = members.map(m => `
+    <div style="padding:12px 14px;border-bottom:1px solid var(--b2)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div style="min-width:0;flex:1">
+          <div style="font-weight:600;font-size:.85rem;margin-bottom:1px">${m.full_name ? esc(m.full_name) : '<span style="color:var(--slate2);font-style:italic">No name</span>'}</div>
+          ${m.captain_name && m.full_name && m.captain_name.trim().toLowerCase()===m.full_name.trim().toLowerCase()
+            ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:${color};margin-bottom:4px">👮 District Captain</div>`
+            : m.captain_name ? `<div style="font-size:.65rem;color:var(--slate);margin-bottom:4px">Captain: ${esc(m.captain_name)}</div>` : ''}
+          ${m.business_name ? `<div style="font-size:.72rem;color:var(--teal);margin-bottom:3px">🏢 ${esc(m.business_name)}</div>` : ''}
+          ${m.phone ? `<a href="tel:${esc(m.phone)}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--slate);text-decoration:none;margin-bottom:2px">📞 ${esc(m.phone)}</a>` : ''}
+          ${m.email ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);word-break:break-all">✉️ ${esc(m.email)}</div>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterDistMembers() {
+  const q = (document.getElementById('distMembersSearch')?.value || '').toLowerCase().trim();
+  const all = memberList.filter(m => m.district === _distMembersId);
+  const filtered = q ? all.filter(m =>
+    [m.full_name, m.email, m.business_name, m.phone].filter(Boolean).join(' ').toLowerCase().includes(q)
+  ) : all;
+  renderDistMemberRows(filtered);
+}
+
+function closeDistMembers() {
+  document.getElementById('distMembersOverlay').classList.remove('open');
+  _distMembersId = null;
+}
+
+function printDistrictRoster() {
+  if (!_distMembersId) return;
+  const distLabel_ = districtLabel(_distMembersId);
+  const members    = memberList.filter(m => m.district === _distMembersId);
+  const captain    = members.find(m => m.captain_name)?.captain_name || '—';
+  const today      = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+
+  const rows = members.map((m, i) => `
+    <tr>
+      <td class="num">${i+1}</td>
+      <td>${esc(m.full_name||'—')}${m.captain_name&&m.full_name&&m.captain_name.trim().toLowerCase()===m.full_name.trim().toLowerCase()?' <span class="cap-badge">★ Captain</span>':''}</td>
+      <td>${esc(m.business_name||'—')}</td>
+      <td>${esc([m.business_address,m.business_city,m.business_state,m.business_zip].filter(Boolean).join(', ')||'—')}</td>
+      <td>${m.phone?`<a href="tel:${esc(m.phone)}" style="color:inherit;text-decoration:none">${esc(m.phone)}</a>`:'—'}</td>
+      <td>${esc(m.email||'—')}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>HIBCW ${esc(distLabel_)} — Member Roster</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'IBM Plex Sans',sans-serif;color:#0f1e2e;background:#fff;padding:36px 44px;font-size:11px}
+  .header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #0f1e2e}
+  .header-left{display:flex;align-items:center;gap:14px}
+  .shield{width:44px;height:44px;background:#0f1e2e;clip-path:polygon(50% 0%,100% 15%,100% 60%,50% 100%,0% 60%,0% 15%);display:flex;align-items:center;justify-content:center}
+  .shield span{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:9px;color:#c9a84c;letter-spacing:.05em}
+  .org-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .org-sub{font-size:9px;color:#556;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+  .header-right{text-align:right}
+  .doc-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+  .doc-date{font-size:9px;color:#778;margin-top:3px;font-family:'IBM Plex Mono',monospace}
+  .district-banner{background:#f0f4f8;border-left:4px solid #0f1e2e;padding:12px 18px;margin-bottom:20px;border-radius:0 6px 6px 0;display:flex;justify-content:space-between;align-items:center}
+  .district-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:.04em}
+  .district-meta{font-size:10px;color:#445}
+  .district-meta span{font-weight:600;color:#0f1e2e}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  thead tr{background:#0f1e2e;color:#fff}
+  thead th{padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:8.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase}
+  tbody tr{border-bottom:1px solid #e2e8f0}
+  tbody tr:nth-child(even){background:#f8fafc}
+  tbody tr:last-child{border-bottom:2px solid #0f1e2e}
+  td{padding:7px 10px;vertical-align:top;line-height:1.4}
+  td.num{width:28px;text-align:center;font-family:'IBM Plex Mono',monospace;color:#889;font-size:10px}
+  .cap-badge{display:inline-block;background:#0f1e2e;color:#c9a84c;font-size:7.5px;padding:1px 5px;border-radius:3px;letter-spacing:.06em;font-family:'IBM Plex Mono',monospace;vertical-align:middle;margin-left:4px}
+  .footer{margin-top:28px;padding-top:10px;border-top:1px solid #ccc;display:flex;justify-content:space-between;font-size:9px;color:#889;font-family:'IBM Plex Mono',monospace}
+  .empty{text-align:center;padding:40px;color:#889;font-style:italic}
+  @media print{body{padding:20px 28px}@page{margin:.5in;size:letter landscape}}
+</style></head><body>
+  <div class="header">
+    <div class="header-left">
+      <div class="shield"><span>HIBCW</span></div>
+      <div>
+        <div class="org-name">Hawaii Island Business Crime Watch</div>
+        <div class="org-sub">A Program of KIAA · kiaahilo.org · (808) 961-5422</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="doc-title">Member Roster</div>
+      <div class="doc-date">Generated ${today}</div>
+    </div>
+  </div>
+  <div class="district-banner">
+    <div class="district-name">${esc(distLabel_)}</div>
+    <div class="district-meta">District Captain: <span>${esc(captain)}</span> &nbsp;·&nbsp; Total Members: <span>${members.length}</span></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Name</th><th>Business</th><th>Address</th><th>Phone</th><th>Email</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="6" class="empty">No members registered in this district yet.</td></tr>'}</tbody>
+  </table>
+  <div class="footer">
+    <span>HIBCW · Hawaii Island Business Crime Watch · CONFIDENTIAL — For authorized use only</span>
+    <span>Crime Stoppers (808) 961-8300 · HPD Non-Emergency (808) 935-3311</span>
+  </div>
+  <script>window.onload=()=>window.print();<\/script>
+</body></html>`;
+
+  const win = window.open('','_blank','width=1000,height=700');
+  if (!win) { showToast('⚠️','Pop-ups blocked — please allow pop-ups and try again.','err'); return; }
+  win.document.write(html);
+  win.document.close();
+}
 </script>
 </body>
 </html>
