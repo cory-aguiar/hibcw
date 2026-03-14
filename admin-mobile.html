@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>HIBCW Admin — Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:  #0b1524;
+  --navy2: #111e30;
+  --navy3: #18293f;
+  --teal:  #00c9a7;
+  --teal2: #00a589;
+  --gold:  #f5a623;
+  --red:   #e8415a;
+  --green: #2ecc71;
+  --slate: #7a8fa6;
+  --slate2:#4a6070;
+  --white: #eef3f8;
+  --border:rgba(0,201,167,.15);
+  --b2:    rgba(255,255,255,.07);
+  --safe-top: env(safe-area-inset-top,0px);
+  --safe-bot: env(safe-area-inset-bottom,0px);
+  --nav-h: 60px;
+  --hdr-h: 52px;
+}
+
+html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white);overscroll-behavior:none}
+
+/* ── Light mode ── */
+body.light{
+  --navy:#f0f4f8;--navy2:#e2ecf5;--navy3:#d4e2ef;
+  --teal:#007a65;--teal2:#005c4c;--gold:#b87c0a;--red:#c0273d;--green:#1a9950;
+  --slate:#4a5f72;--slate2:#7a95a8;--white:#0f1e2e;
+  --border:rgba(0,122,101,.2);--b2:rgba(0,0,0,.1);
+  background:#f0f4f8;color:#0f1e2e;
+}
+body.light header{background:linear-gradient(180deg,#dce8f5,#eaf1f8)!important;border-bottom-color:rgba(0,0,0,.1)!important}
+body.light .bot-nav{background:linear-gradient(0deg,#dce8f5,#e8f0f8);border-top-color:rgba(0,0,0,.1)}
+body.light .nav-btn .nav-lbl{color:var(--slate2)}
+body.light .nav-btn.on .nav-lbl{color:var(--teal)}
+body.light .screen{background:var(--navy)}
+body.light .card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .modal-sheet{background:#fff;border-top-color:rgba(0,0,0,.1)}
+body.light .modal-hd{background:#e8eef5;border-bottom-color:rgba(0,0,0,.1)}
+body.light .mf-label{color:var(--slate)}
+body.light .mf-val{color:var(--white)}
+body.light .mf-row{border-bottom-color:rgba(0,0,0,.07)}
+body.light .list-hdr{background:#e2ecf5;border-bottom-color:rgba(0,0,0,.08)}
+body.light .srch{background:#fff;border-color:rgba(0,0,0,.15);color:var(--white)}
+body.light .srch::placeholder{color:var(--slate2)}
+body.light .flt{background:#fff;border-color:rgba(0,0,0,.15);color:var(--white)}
+body.light .flt option{background:#fff;color:var(--white)}
+body.light .stat-tile{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .stat-val{color:var(--teal)}
+body.light .stat-lbl{color:var(--slate)}
+body.light .inc-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .inc-card:active{background:#eaf3fb}
+body.light .section-hdr{color:var(--slate2);border-bottom-color:rgba(0,0,0,.08)}
+body.light .note-item{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1)}
+body.light .note-meta{color:var(--slate2)}
+body.light .note-text{color:var(--white)}
+body.light .note-input{background:#f0f4f8;border-color:rgba(0,0,0,.15);color:var(--white)}
+body.light .mem-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .app-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .dist-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .login-box{background:#fff;border-color:rgba(0,122,101,.2)}
+body.light .lf-input{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.15);color:var(--white)}
+body.light .lf-input::placeholder{color:var(--slate2)}
+body.light .lf-label{color:var(--slate)}
+body.light .toast{background:#fff;border-color:rgba(0,0,0,.1);box-shadow:0 4px 20px rgba(0,0,0,.12)}
+body.light .toast-title{color:var(--white)}
+body.light .toast-msg{color:var(--slate)}
+
+/* ── Login ── */
+#loginScreen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:radial-gradient(ellipse at 40% 40%,#112240,#0b1524);
+}
+body.light #loginScreen{background:radial-gradient(ellipse at 40% 40%,#d4e2ef,#e8f0f8)}
+.login-box{
+  background:var(--navy2);border:1px solid var(--border);border-radius:14px;
+  padding:32px 24px;width:100%;max-width:360px;
+}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-title{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:.08em;color:var(--white)}
+.login-sub{font-size:.72rem;color:var(--slate);margin-top:3px}
+.lf-label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:6px}
+.lf-input{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b2);
+  border-radius:6px;padding:12px 14px;color:var(--white);font-size:.9rem;
+  outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;
+}
+.lf-input:focus{border-color:var(--teal)}
+.lf-field{margin-bottom:16px}
+.login-btn{
+  width:100%;padding:13px;border:none;border-radius:6px;cursor:pointer;
+  background:linear-gradient(135deg,var(--teal),var(--teal2));
+  color:#0b1524;font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;transition:filter .2s;margin-top:4px;
+}
+.login-btn:active{filter:brightness(.9)}
+.login-err{color:var(--red);font-size:.75rem;text-align:center;margin-top:10px;display:none}
+
+/* ── App shell ── */
+#appShell{display:none;height:100vh;flex-direction:column}
+#appShell.visible{display:flex}
+
+/* ── Header ── */
+header{
+  height:var(--hdr-h);flex-shrink:0;
+  background:linear-gradient(180deg,#0d1a2e,#111e30);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;padding-top:var(--safe-top);
+}
+.hd-left{display:flex;align-items:center;gap:10px}
+.hd-title{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.08em}
+.hd-sub{font-family:'IBM Plex Mono',monospace;font-size:.5rem;color:var(--teal);letter-spacing:.1em}
+.hd-right{display:flex;align-items:center;gap:10px}
+.hd-live{display:flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--teal);letter-spacing:.08em}
+.hd-dot{width:6px;height:6px;border-radius:50%;background:var(--slate2);transition:background .5s;flex-shrink:0}
+.theme-btn{background:none;border:1px solid var(--b2);border-radius:4px;padding:4px 8px;color:var(--slate);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace}
+.theme-btn:active{opacity:.7}
+
+/* ── Screens ── */
+.screens{flex:1;overflow:hidden;position:relative}
+.screen{
+  position:absolute;inset:0;overflow-y:auto;
+  background:var(--navy);display:none;flex-direction:column;
+  padding-bottom:calc(var(--nav-h) + var(--safe-bot) + 16px);
+}
+.screen.active{display:flex}
+.screen::-webkit-scrollbar{display:none}
+
+/* ── Bottom nav ── */
+.bot-nav{
+  height:var(--nav-h);flex-shrink:0;
+  padding-bottom:var(--safe-bot);
+  background:linear-gradient(0deg,#0a1320,#0e1a2c);
+  border-top:1px solid var(--b2);
+  display:flex;z-index:300;
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;background:none;border:none;cursor:pointer;padding:6px 4px 2px;
+  transition:all .15s;position:relative;text-decoration:none;color:inherit;
+}
+.nav-btn .nav-ico{font-size:1.2rem;line-height:1;transition:transform .15s}
+.nav-btn .nav-lbl{font-family:'IBM Plex Mono',monospace;font-size:.42rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate2);transition:color .15s}
+.nav-btn.on .nav-ico{transform:scale(1.1)}
+.nav-btn.on .nav-lbl{color:var(--teal)}
+.nav-btn.on::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:var(--teal);border-radius:0 0 2px 2px}
+.nav-badge{position:absolute;top:3px;right:50%;margin-right:-16px;background:var(--gold);color:#0b1524;border-radius:8px;font-size:.45rem;font-weight:700;padding:1px 5px;font-family:'IBM Plex Mono',monospace;min-width:14px;text-align:center}
+
+/* ── Shared components ── */
+.page-hd{padding:18px 16px 10px;flex-shrink:0}
+.page-title{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:.05em}
+.page-sub{font-size:.72rem;color:var(--slate);margin-top:2px}
+
+.section-hdr{
+  font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--slate2);
+  padding:10px 16px 6px;border-bottom:1px solid var(--b2);
+  display:flex;align-items:center;justify-content:space-between;
+}
+
+.card{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:8px;
+  margin:0 12px 8px;overflow:hidden;
+}
+
+.list-hdr{
+  padding:10px 12px;background:var(--navy2);border-bottom:1px solid var(--b2);
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0;position:sticky;top:0;z-index:10;
+}
+.srch{
+  flex:1;min-width:120px;background:rgba(255,255,255,.05);border:1px solid var(--b2);
+  border-radius:5px;padding:8px 11px;color:var(--white);font-size:.82rem;outline:none;
+}
+.srch::placeholder{color:var(--slate2)}
+.flt{
+  background:rgba(255,255,255,.05);border:1px solid var(--b2);border-radius:5px;
+  padding:8px 10px;color:var(--white);font-size:.75rem;outline:none;
+}
+.flt option{background:#1a2b45;color:#c8d8e8}
+
+/* Badges */
+.badge{padding:2px 8px;border-radius:3px;font-size:.62rem;font-weight:600;font-family:'Rajdhani',sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.b-red{background:rgba(232,65,90,.15);color:var(--red);border:1px solid rgba(232,65,90,.3)}
+.b-gold{background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
+.b-teal{background:rgba(0,201,167,.12);color:var(--teal);border:1px solid rgba(0,201,167,.25)}
+.b-arch{background:rgba(122,143,166,.1);color:var(--slate);border:1px solid rgba(122,143,166,.2)}
+.age-tag{font-family:'IBM Plex Mono',monospace;font-size:.55rem;border-radius:3px;padding:1px 5px}
+.age-fresh{background:rgba(232,65,90,.15);color:var(--red);border:1px solid rgba(232,65,90,.25)}
+.age-recent{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.2)}
+.age-old{background:rgba(122,143,166,.08);color:var(--slate);border:1px solid rgba(122,143,166,.15)}
+.verified-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:1px 6px;font-size:.58rem;color:var(--teal);font-family:'IBM Plex Mono',monospace}
+.recurring-flag{display:inline-flex;align-items:center;gap:3px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 6px;font-size:.58rem;color:var(--gold);font-family:'IBM Plex Mono',monospace}
+
+/* Buttons */
+.btn{border:none;border-radius:5px;padding:8px 14px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;transition:all .15s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--slate);border:1px solid var(--b2)}
+.btn-teal{background:rgba(0,201,167,.15);color:var(--teal);border:1px solid rgba(0,201,167,.3)}
+.btn-gold{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.25)}
+.btn-red{background:rgba(232,65,90,.12);color:var(--red);border:1px solid rgba(232,65,90,.25)}
+.btn-green{background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.25)}
+.btn-full{width:100%;text-align:center;padding:11px}
+
+/* ── SCREEN: INCIDENTS ── */
+.inc-card{
+  background:var(--navy2);border-left:3px solid transparent;border-bottom:1px solid var(--b2);
+  padding:12px 14px;cursor:pointer;transition:background .12s;display:flex;gap:12px;align-items:flex-start;
+}
+.inc-card:active{background:rgba(255,255,255,.04)}
+.inc-card-body{flex:1;min-width:0}
+.inc-title{font-size:.85rem;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inc-addr{font-size:.72rem;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.inc-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.inc-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.inc-time{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);white-space:nowrap}
+
+/* ── SCREEN: STATS ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.stat-tile{background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:16px 14px}
+.stat-tile.accent{border-color:var(--border)}
+.stat-val{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--white)}
+.stat-tile.accent .stat-val{color:var(--teal)}
+.stat-lbl{font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-top:3px}
+.type-row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--b2)}
+.type-row:last-child{border-bottom:none}
+.type-label{font-size:.78rem;color:var(--white);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.type-bar-wrap{width:80px;height:6px;background:var(--b2);border-radius:3px;overflow:hidden;flex-shrink:0}
+.type-bar{height:100%;border-radius:3px;transition:width .5s}
+.type-cnt{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate);width:24px;text-align:right;flex-shrink:0}
+
+/* ── SCREEN: MEMBERS ── */
+.mem-card{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:8px;
+  margin:0 12px 8px;padding:14px;
+}
+.mem-name{font-weight:600;font-size:.88rem;margin-bottom:2px}
+.mem-email-row{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--teal);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mem-detail{font-size:.72rem;color:var(--slate);line-height:1.7}
+.mem-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--b2)}
+
+/* ── SCREEN: APPLICATIONS ── */
+.app-card{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:8px;
+  margin:0 12px 8px;padding:14px;
+}
+.app-card.pending{border-left:3px solid var(--gold)}
+.app-card.approved{border-left:3px solid var(--teal);opacity:.8}
+.app-card.rejected{border-left:3px solid var(--red);opacity:.65}
+.app-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.04em}
+.app-biz{font-size:.78rem;color:var(--teal);margin:2px 0 8px}
+.app-info{font-size:.72rem;color:var(--slate);line-height:1.8}
+.app-info span{color:var(--white)}
+.app-actions-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+
+/* ── SCREEN: DISTRICTS ── */
+.dist-card{
+  background:var(--navy2);border:1px solid var(--b2);border-radius:8px;
+  margin:0 12px 8px;overflow:hidden;
+}
+.dist-hd{padding:12px 14px;display:flex;align-items:center;gap:10px}
+.dist-num{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:800;font-size:.85rem;flex-shrink:0}
+.dist-label{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.03em;flex:1}
+.dist-body{padding:0 14px 14px}
+.dist-captain-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.dist-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.dist-avatar-init{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;flex-shrink:0}
+.dist-contact{font-size:.72rem;color:var(--slate);line-height:1.8}
+.dist-contact a{color:var(--teal);text-decoration:none}
+
+/* ── DETAIL MODAL (bottom sheet) ── */
+.modal-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:var(--navy2);border-top:1px solid var(--b2);border-radius:14px 14px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding-bottom:calc(24px + var(--safe-bot))}
+.modal-sheet::-webkit-scrollbar{display:none}
+.modal-handle{width:36px;height:3px;border-radius:2px;background:var(--b2);margin:10px auto 0}
+.modal-hd{padding:14px 16px;border-bottom:1px solid var(--b2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--navy2);z-index:1}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700}
+.modal-close{background:none;border:none;color:var(--slate);font-size:1.2rem;cursor:pointer;padding:2px 4px}
+.modal-body{padding:16px}
+.mf-row{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--b2)}
+.mf-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.mf-label{font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px}
+.mf-val{font-size:.82rem;color:var(--white);line-height:1.6}
+.modal-actions{padding:12px 16px;border-top:1px solid var(--b2);display:flex;gap:8px;flex-wrap:wrap}
+.modal-actions .btn{flex:1}
+
+/* ── NOTES ── */
+.note-item{background:rgba(255,255,255,.03);border:1px solid var(--b2);border-radius:5px;padding:10px 12px;margin-bottom:8px}
+.note-meta{font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--slate2);margin-bottom:4px;display:flex;justify-content:space-between}
+.note-text{font-size:.8rem;color:var(--white);line-height:1.5}
+.note-del{background:none;border:none;color:var(--slate2);cursor:pointer;font-size:.7rem}
+.note-form{display:flex;gap:7px;margin-top:8px}
+.note-input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--b2);border-radius:5px;padding:9px 11px;color:var(--white);font-size:.82rem;outline:none;font-family:'IBM Plex Sans',sans-serif}
+.note-input:focus{border-color:var(--teal)}
+.note-submit{background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);border-radius:5px;padding:9px 14px;color:var(--teal);cursor:pointer;font-size:.78rem}
+
+/* ── MORE SCREEN ── */
+.more-scroll{overflow-y:auto;flex:1}
+.more-section-title{font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:var(--slate2);padding:16px 16px 6px}
+.more-card{background:var(--navy2);border-radius:8px;border:1px solid var(--b2);margin:0 12px 16px;overflow:hidden}
+.more-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--b2);cursor:pointer;text-decoration:none;color:inherit;transition:background .12s}
+.more-row:last-child{border-bottom:none}
+.more-row:active{background:rgba(255,255,255,.04)}
+.more-ico{font-size:1.1rem;width:24px;text-align:center;flex-shrink:0}
+.more-label{font-size:.85rem;font-weight:500;flex:1}
+.more-sub{font-size:.68rem;color:var(--slate);margin-top:1px}
+.more-arrow{color:var(--slate2);font-size:.85rem}
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b2);border-top:1px solid var(--b2)}
+.strip-cell{background:var(--navy2);padding:12px 10px;text-align:center}
+.strip-val{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:var(--teal)}
+.strip-lbl{font-family:'IBM Plex Mono',monospace;font-size:.48rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-top:1px}
+body.light .stats-strip{background:rgba(0,0,0,.08)}
+body.light .strip-cell{background:#fff}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe-bot) + 12px);left:12px;right:12px;z-index:3000;background:var(--navy3);border:1px solid var(--b2);border-radius:10px;padding:12px 14px;display:flex;gap:10px;transform:translateY(120px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err-toast{border-color:rgba(232,65,90,.4)}
+.toast-ico{font-size:.9rem;flex-shrink:0;margin-top:1px}
+.toast-msg{flex:1;font-size:.75rem;color:var(--slate)}
+.toast-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.8rem;color:var(--white);margin-bottom:1px}
+
+/* ── EMPTY ── */
+.empty{padding:48px 16px;text-align:center;color:var(--slate);font-size:.82rem;line-height:1.8}
+.empty-ico{font-size:2.2rem;margin-bottom:10px}
+
+/* ── CAPTAIN VIEW BANNER ── */
+.captain-banner{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:6px;padding:10px 14px;margin:8px 12px 0;font-size:.72rem;color:var(--gold);line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg width="72" height="86" viewBox="0 0 110 130" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 12px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))">
+        <defs>
+          <linearGradient id="lsg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1e3550"/><stop offset="100%" style="stop-color:#0a1520"/></linearGradient>
+          <linearGradient id="lgg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#f0b429"/><stop offset="100%" style="stop-color:#c8960c"/></linearGradient>
+          <linearGradient id="lif" x1="10%" y1="0%" x2="90%" y2="100%"><stop offset="0%" style="stop-color:#00c9a7"/><stop offset="100%" style="stop-color:#006b56"/></linearGradient>
+          <clipPath id="lsc"><path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z"/></clipPath>
+        </defs>
+        <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z" fill="url(#lsg)"/>
+        <rect x="5" y="5" width="100" height="3.5" fill="url(#lgg)" opacity="0.95"/>
+        <path d="M 5 5 L 105 5 L 105 75 Q 105 112 55 125 Q 5 112 5 75 Z" fill="none" stroke="#00c9a7" stroke-width="2.5" opacity="0.8"/>
+        <text x="55" y="72" font-family="'Barlow Condensed','Arial Black',Impact,sans-serif" font-size="26" font-weight="800" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="1">HIBCW</text>
+      </svg>
+      <div class="login-title">Admin</div>
+      <div class="login-sub">Hawaii Island Business Crime Watch</div>
+    </div>
+    <div id="loginFormWrap">
+      <div class="lf-field"><label class="lf-label">Email</label><input type="email" id="authEmail" class="lf-input" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPassword').focus()"></div>
+      <div class="lf-field"><label class="lf-label">Password</label><input type="password" id="authPassword" class="lf-input" placeholder="Your password" onkeydown="if(event.key==='Enter')doAuthLogin()"></div>
+      <button class="login-btn" onclick="doAuthLogin()" id="loginBtn">Sign In →</button>
+      <div style="text-align:center;margin-top:12px"><button onclick="showForgotPassword()" style="background:none;border:none;color:var(--slate);font-size:.72rem;cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans',sans-serif">Forgot password?</button></div>
+    </div>
+    <div id="forgotWrap" style="display:none">
+      <div style="font-size:.78rem;color:var(--slate);margin-bottom:14px;line-height:1.6">Enter your email and we'll send a reset link.</div>
+      <div class="lf-field"><label class="lf-label">Email</label><input type="email" id="resetEmail" class="lf-input" placeholder="you@example.com"></div>
+      <button class="login-btn" onclick="doPasswordReset()" id="resetBtn">Send Reset Email →</button>
+      <div style="text-align:center;margin-top:12px"><button onclick="showLoginForm()" style="background:none;border:none;color:var(--slate);font-size:.72rem;cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans',sans-serif">← Back to sign in</button></div>
+    </div>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+
+  <!-- Header -->
+  <header>
+    <div class="hd-left">
+      <div>
+        <div class="hd-title">HIBCW Admin</div>
+        <div class="hd-sub">Hawaii Island Business Crime Watch</div>
+      </div>
+    </div>
+    <div class="hd-right">
+      <div class="hd-live"><span class="hd-dot" id="realtimeDot"></span>LIVE</div>
+      <button class="theme-btn" id="themeToggleBtn" onclick="toggleTheme()">🌙</button>
+    </div>
+  </header>
+
+  <!-- Screens -->
+  <div class="screens">
+
+    <!-- INCIDENTS SCREEN -->
+    <div class="screen active" id="sc-incidents">
+      <div id="captainWelcomeBanner" style="display:none" class="captain-banner">
+        👮 <strong id="captainBannerName">Captain</strong> — you're viewing your district only.
+      </div>
+      <div class="list-hdr">
+        <input class="srch" id="incSearch" placeholder="🔍 Search incidents…" oninput="filterIncidents()">
+        <select class="flt" id="incTypeFlt" onchange="filterIncidents()">
+          <option value="">All Types</option>
+          <option>Robbery</option><option>Burglary</option><option>Assault</option><option>Drug Activity</option>
+          <option>Theft / Shoplifting</option><option>Vandalism</option><option>Vehicle Break-In</option>
+          <option>Fraud / Scam</option><option>Trespassing</option><option>Suspicious Activity</option>
+          <option>Graffiti</option><option>Other</option>
+        </select>
+        <select class="flt" id="incStatusFlt" onchange="filterIncidents()">
+          <option value="active">Active</option>
+          <option value="archived">Archived</option>
+          <option value="">All</option>
+        </select>
+      </div>
+      <div id="incList"></div>
+    </div>
+
+    <!-- STATS SCREEN -->
+    <div class="screen" id="sc-stats">
+      <div class="page-hd">
+        <div class="page-title">Statistics</div>
+        <div class="page-sub" id="statsSubtitle">Incident summary</div>
+      </div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="card" style="margin:0 12px 12px">
+        <div class="section-hdr">By Type (Active)</div>
+        <div id="typeBreakdown"></div>
+      </div>
+      <div class="card" style="margin:0 12px 12px" id="distBreakdownCard">
+        <div class="section-hdr">By District (Active)</div>
+        <div id="distBreakdown"></div>
+      </div>
+    </div>
+
+    <!-- MEMBERS SCREEN -->
+    <div class="screen admin-only" id="sc-members">
+      <div class="list-hdr">
+        <input class="srch" id="memSearch" placeholder="🔍 Search members…" oninput="renderMembers()">
+        <select class="flt" id="memDistFlt" onchange="renderMembers()">
+          <option value="">All Districts</option>
+        </select>
+      </div>
+      <div id="memList"></div>
+    </div>
+
+    <!-- APPLICATIONS SCREEN -->
+    <div class="screen" id="sc-apps">
+      <div class="list-hdr">
+        <select class="flt" id="appStatusFlt" onchange="renderApps()" style="flex:1">
+          <option value="pending">⏳ Pending</option>
+          <option value="approved">✅ Approved</option>
+          <option value="rejected">❌ Rejected</option>
+          <option value="">All</option>
+        </select>
+      </div>
+      <div id="appList"></div>
+    </div>
+
+    <!-- DISTRICTS SCREEN -->
+    <div class="screen" id="sc-districts">
+      <div class="list-hdr" style="justify-content:space-between">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate)">District Captains</span>
+        <button class="btn btn-ghost" style="font-size:.62rem;padding:5px 10px" onclick="loadMembers()">🔄 Refresh</button>
+      </div>
+      <div id="distList"></div>
+    </div>
+
+    <!-- MORE SCREEN -->
+    <div class="screen" id="sc-more">
+      <div class="more-scroll">
+        <div class="card" style="margin:12px 12px 0;overflow:hidden">
+          <div class="stats-strip" id="moreStatsStrip">
+            <div class="strip-cell"><div class="strip-val" id="moreActive">—</div><div class="strip-lbl">Active</div></div>
+            <div class="strip-cell"><div class="strip-val" id="moreMembers">—</div><div class="strip-lbl">Members</div></div>
+            <div class="strip-cell"><div class="strip-val" id="morePending">—</div><div class="strip-lbl">Pending</div></div>
+          </div>
+        </div>
+
+        <div class="more-section-title">Account</div>
+        <div class="more-card">
+          <div class="more-row" style="cursor:default">
+            <div class="more-ico">👤</div>
+            <div><div class="more-label" id="moreUserName">—</div><div class="more-sub" id="moreUserRole">—</div></div>
+          </div>
+          <div class="more-row" onclick="toggleTheme()">
+            <div class="more-ico" id="moreThemeIco">🌙</div>
+            <div><div class="more-label" id="moreThemeLbl">Dark Mode</div><div class="more-sub">Toggle light / dark</div></div>
+            <div class="more-arrow">›</div>
+          </div>
+          <div class="more-row" onclick="logout()">
+            <div class="more-ico">🚪</div>
+            <div><div class="more-label" style="color:var(--red)">Sign Out</div></div>
+            <div class="more-arrow" style="color:var(--red)">›</div>
+          </div>
+        </div>
+
+        <div class="more-section-title">Tools</div>
+        <div class="more-card">
+          <div class="more-row admin-only" onclick="exportCSV('active')">
+            <div class="more-ico">📥</div>
+            <div><div class="more-label">Export Active CSV</div><div class="more-sub">Download active incidents</div></div>
+            <div class="more-arrow">›</div>
+          </div>
+          <div class="more-row admin-only" onclick="exportCSV('archived')">
+            <div class="more-ico">📦</div>
+            <div><div class="more-label">Export Archived CSV</div><div class="more-sub">Download archived incidents</div></div>
+            <div class="more-arrow">›</div>
+          </div>
+          <div class="more-row admin-only" onclick="exportMembersCSV()">
+            <div class="more-ico">👥</div>
+            <div><div class="more-label">Export Members CSV</div><div class="more-sub">Download member list</div></div>
+            <div class="more-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="more-section-title">Site</div>
+        <div class="more-card">
+          <a class="more-row" href="admin.html">
+            <div class="more-ico">🖥️</div>
+            <div><div class="more-label">Desktop Admin</div><div class="more-sub">Switch to full desktop view</div></div>
+            <div class="more-arrow">›</div>
+          </a>
+          <a class="more-row" href="index-mobile.html">
+            <div class="more-ico">🗺️</div>
+            <div><div class="more-label">Public Map</div><div class="more-sub">View the public-facing site</div></div>
+            <div class="more-arrow">›</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- Bottom nav -->
+  <nav class="bot-nav">
+    <button class="nav-btn on" id="nav-incidents" onclick="showScreen('incidents')">
+      <span class="nav-ico">🚨</span>
+      <span class="nav-lbl">Incidents</span>
+    </button>
+    <button class="nav-btn" id="nav-stats" onclick="showScreen('stats')">
+      <span class="nav-ico">📊</span>
+      <span class="nav-lbl">Stats</span>
+    </button>
+    <button class="nav-btn admin-only" id="nav-members" onclick="showScreen('members')">
+      <span class="nav-ico">👥</span>
+      <span class="nav-lbl">Members</span>
+    </button>
+    <button class="nav-btn" id="nav-apps" onclick="showScreen('apps')">
+      <span class="nav-ico">📋</span>
+      <span class="nav-lbl">Apply</span>
+      <span class="nav-badge" id="appBadge" style="display:none">0</span>
+    </button>
+    <button class="nav-btn" id="nav-districts" onclick="showScreen('districts')">
+      <span class="nav-ico">📍</span>
+      <span class="nav-lbl">Districts</span>
+    </button>
+    <button class="nav-btn" id="nav-more" onclick="showScreen('more')">
+      <span class="nav-ico">☰</span>
+      <span class="nav-lbl">More</span>
+    </button>
+  </nav>
+
+</div><!-- /appShell -->
+
+<!-- INCIDENT DETAIL MODAL -->
+<div class="modal-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="detailTitle">Incident</div>
+        <div style="margin-top:3px" id="detailBadge"></div>
+      </div>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-actions" id="detailActions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-ico" id="toastIco"></div>
+  <div><div class="toast-title" id="toastTitle"></div><div class="toast-msg" id="toastMsg"></div></div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════ */
+let sb, allIncidents = [], memberList = [], allApplications = [];
+let currentRole = '', currentUserName = '', currentUserEmail = '', captainDistrict = null;
+let currentScreen = 'incidents';
+let toastTimer;
+
+/* ════════════════════════════════════════════════
+   DISTRICT DATA
+════════════════════════════════════════════════ */
+const DISTRICTS = [
+  ["hamakua","District 1 - Hāmākua"],
+  ["north-hilo","District 2 - North Hilo"],
+  ["south-hilo","District 3 - South Hilo"],
+  ["lower-puna","District 4 - Lower Puna"],
+  ["upper-puna","District 5 - Upper Puna"],
+  ["kau","District 6 - Kaʻū"],
+  ["south-kona","District 7 - South Kona"],
+  ["north-kona","District 8 - North Kona"],
+  ["north-kohala","District 9 - Kohala"]
+];
+const DISTRICT_COLORS = {
+  "hamakua":"#84cc16","north-hilo":"#3b82f6","south-hilo":"#00c9a7",
+  "lower-puna":"#c084fc","upper-puna":"#a855f7","kau":"#ef4444",
+  "south-kona":"#f59e0b","north-kona":"#f97316","north-kohala":"#10b981"
+};
+
+function districtLabel(v) {
+  return DISTRICTS.find(d=>d[0]===v)?.[1] || v;
+}
+
+/* ════════════════════════════════════════════════
+   LOGIN
+════════════════════════════════════════════════ */
+function showLoginForm() {
+  document.getElementById('loginFormWrap').style.display='';
+  document.getElementById('forgotWrap').style.display='none';
+  document.getElementById('loginErr').style.display='none';
+}
+function showForgotPassword() {
+  document.getElementById('loginFormWrap').style.display='none';
+  document.getElementById('forgotWrap').style.display='';
+}
+async function doAuthLogin() {
+  const btn = document.getElementById('loginBtn');
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.style.display='none';
+  btn.textContent='Signing in…'; btn.disabled=true;
+  try {
+    if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const {data,error} = await sb.auth.signInWithPassword({email,password});
+    if (error) throw error;
+    await handleAuthSession(data.session);
+  } catch(e) {
+    errEl.textContent = e.message || 'Sign in failed.';
+    errEl.style.display='block';
+  } finally {
+    btn.textContent='Sign In →'; btn.disabled=false;
+  }
+}
+async function doPasswordReset() {
+  const btn = document.getElementById('resetBtn');
+  const email = document.getElementById('resetEmail').value.trim();
+  if (!email) { showToast('⚠️','Enter your email first.','err'); return; }
+  btn.textContent='Sending…'; btn.disabled=true;
+  try {
+    const {error} = await sb.auth.resetPasswordForEmail(email);
+    if (error) throw error;
+    showToast('✅','Reset email sent — check your inbox.');
+    showLoginForm();
+  } catch(e) {
+    showToast('⚠️',e.message,'err');
+  } finally {
+    btn.textContent='Send Reset Email →'; btn.disabled=false;
+  }
+}
+async function handleAuthSession(session) {
+  if (!session) return;
+  if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const {data:roleData,error} = await sb.from('admin_roles').select('role,full_name,district').eq('user_id',session.user.id).maybeSingle();
+  if (error || !roleData) {
+    await sb.auth.signOut();
+    const e = document.getElementById('loginErr');
+    e.textContent='No role assigned. Contact your HIBCW superadmin.'; e.style.display='block'; return;
+  }
+  currentRole=roleData.role; currentUserEmail=session.user.email;
+  currentUserName=roleData.full_name||session.user.email; captainDistrict=roleData.district||null;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').classList.add('visible');
+  applyRoleUI();
+  await initApp();
+  if (currentRole==='captain') showScreen('incidents');
+}
+
+/* ════════════════════════════════════════════════
+   ROLE UI
+════════════════════════════════════════════════ */
+function applyRoleUI() {
+  const isAdmin = currentRole==='admin'||currentRole==='superadmin';
+  const isCaptain = currentRole==='captain';
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display=isAdmin?'':'none');
+  document.querySelectorAll('.captain-hidden').forEach(el => el.style.display=isCaptain?'none':'');
+  const banner = document.getElementById('captainWelcomeBanner');
+  if (banner) banner.style.display=isCaptain?'block':'none';
+  if (isCaptain) {
+    const distLbl = districtLabel(captainDistrict);
+    const n = document.getElementById('captainBannerName');
+    if (n) n.textContent=currentUserName+' · '+distLbl;
+  }
+  // Populate member district filter
+  const mdf = document.getElementById('memDistFlt');
+  if (mdf && mdf.options.length===1) {
+    DISTRICTS.forEach(([v,l])=>{ const o=document.createElement('option'); o.value=v;o.textContent=l; mdf.appendChild(o); });
+  }
+  // More screen user info
+  document.getElementById('moreUserName').textContent=currentUserName;
+  document.getElementById('moreUserRole').textContent=currentRole==='superadmin'?'⭐ Superadmin':currentRole==='captain'?'👮 Captain':'👤 Admin';
+}
+
+/* ════════════════════════════════════════════════
+   INIT / LOAD
+════════════════════════════════════════════════ */
+async function initApp() {
+  if (typeof SUPABASE_URL==='undefined'||SUPABASE_URL.includes('YOUR_')) {
+    showToast('⚙️','Configure Supabase in config.js','err'); return;
+  }
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  await Promise.all([loadAll(), loadMembers(), loadApplications()]);
+  startRealtime();
+}
+async function loadAll() {
+  if (!sb) return;
+  const {data,error}=await sb.from('incidents').select('*,incident_media(*)').order('occurred_at',{ascending:false});
+  if (error) { showToast('⚠️','Load failed: '+error.message,'err'); return; }
+  allIncidents = data||[];
+  filterIncidents();
+  renderStats();
+  updateMoreStrip();
+}
+function startRealtime() {
+  sb.channel('adm-mob').on('postgres_changes',{event:'INSERT',schema:'public',table:'incidents'},async p=>{
+    const {data}=await sb.from('incidents').select('*,incident_media(*)').eq('id',p.new.id).single();
+    if(data){allIncidents.unshift(data);filterIncidents();renderStats();updateMoreStrip();showToast('🔔',`New: ${data.type} — ${data.address}`);}
+    const dot=document.getElementById('realtimeDot'); if(dot) dot.style.background='var(--teal)';
+  }).on('postgres_changes',{event:'UPDATE',schema:'public',table:'incidents'},async p=>{
+    const {data}=await sb.from('incidents').select('*,incident_media(*)').eq('id',p.new.id).single();
+    if(data){const idx=allIncidents.findIndex(i=>i.id===data.id);if(idx!==-1)allIncidents[idx]=data;else allIncidents.unshift(data);filterIncidents();renderStats();updateMoreStrip();}
+  }).on('postgres_changes',{event:'DELETE',schema:'public',table:'incidents'},p=>{
+    allIncidents=allIncidents.filter(i=>i.id!==p.old.id);filterIncidents();renderStats();updateMoreStrip();
+  }).subscribe(s=>{
+    const dot=document.getElementById('realtimeDot');
+    if(dot) dot.style.background=s==='SUBSCRIBED'?'var(--teal)':'var(--gold)';
+  });
+}
+
+/* ════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════ */
+function showScreen(name) {
+  currentScreen=name;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  const sc=document.getElementById('sc-'+name);
+  if(sc) sc.classList.add('active');
+  const nb=document.getElementById('nav-'+name);
+  if(nb) nb.classList.add('on');
+  if(name==='members') loadMembers();
+  if(name==='apps') loadApplications();
+  if(name==='districts') renderDistricts();
+  if(name==='stats') renderStats();
+}
+
+/* ════════════════════════════════════════════════
+   INCIDENTS
+════════════════════════════════════════════════ */
+function filterIncidents() {
+  const q=(document.getElementById('incSearch')?.value||'').toLowerCase().trim();
+  const tf=document.getElementById('incTypeFlt')?.value||'';
+  const sf=document.getElementById('incStatusFlt')?.value;
+  let rows=allIncidents;
+  if(sf) rows=rows.filter(i=>i.status===sf);
+  if(currentRole==='captain'&&captainDistrict) rows=rows.filter(i=>i.district===captainDistrict);
+  if(tf) rows=rows.filter(i=>i.type===tf);
+  if(q) rows=rows.filter(i=>[i.type,i.address,i.description,i.reporter_name||''].join(' ').toLowerCase().includes(q));
+  renderIncidentList(rows);
+}
+function renderIncidentList(rows) {
+  const el=document.getElementById('incList');
+  if(!rows.length){el.innerHTML=`<div class="empty"><div class="empty-ico">🗺️</div>No incidents match.</div>`;return;}
+  const bc={red:'b-red',gold:'b-gold',teal:'b-teal'};
+  const color={red:'var(--red)',gold:'var(--gold)',teal:'var(--teal)'};
+  el.innerHTML=rows.map(inc=>`
+    <div class="inc-card" style="border-left-color:${color[inc.type_color]||'var(--teal)'};${inc.status==='archived'?'opacity:.6':''}" onclick="openDetail('${inc.id}')">
+      <div class="inc-card-body">
+        <div class="inc-title">${esc(inc.type)}</div>
+        <div class="inc-addr">${esc(inc.address)}</div>
+        <div class="inc-meta">
+          <span class="badge ${bc[inc.type_color]||'b-teal'}">${esc(inc.type)}</span>
+          ${inc.is_recurring?'<span class="recurring-flag">🔁 Recurring</span>':''}
+          ${inc.is_verified_member?'<span class="verified-badge">✅ Member</span>':''}
+          ${inc.status==='archived'?'<span class="badge b-arch">Archived</span>':''}
+        </div>
+      </div>
+      <div class="inc-right">
+        <div class="inc-time">${fmt(inc.occurred_at)}</div>
+        ${ageTag(inc.occurred_at)}
+        ${inc.incident_media?.length?`<span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--gold)">📎 ${inc.incident_media.length}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════════════
+   DETAIL MODAL
+════════════════════════════════════════════════ */
+function openDetail(id) {
+  const inc=allIncidents.find(i=>i.id===id);
+  if(!inc) return;
+  const bc=inc.type_color==='red'?'b-red':inc.type_color==='gold'?'b-gold':'b-teal';
+  const media=inc.incident_media||[];
+  document.getElementById('detailTitle').textContent=inc.type;
+  document.getElementById('detailBadge').innerHTML=`<span class="badge ${bc}">${esc(inc.type)}</span>`;
+
+  // Captain card
+  const captainHtml = (()=>{
+    if(!inc.district) return '';
+    const cm=memberList.find(m=>m.district===inc.district&&m.captain_name&&m.full_name&&m.captain_name.trim().toLowerCase()===m.full_name.trim().toLowerCase());
+    if(!cm) return '';
+    const dc=DISTRICT_COLORS[inc.district]||'#00c9a7';
+    const initials=(cm.full_name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const avatar=cm.photo_url
+      ?`<img src="${cm.photo_url}" alt="${initials}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid ${dc}66;flex-shrink:0">`
+      :`<div style="width:42px;height:42px;border-radius:50%;background:${dc}22;border:2px solid ${dc}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-size:1rem;font-weight:700;color:${dc};flex-shrink:0">${initials}</div>`;
+    return `<div class="mf-row" style="background:${dc}0d;border:1px solid ${dc}30;border-radius:6px;padding:10px 12px">
+      <div class="mf-label" style="color:${dc}">👮 District Captain</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+        ${avatar}
+        <div>
+          <div style="font-weight:600;font-size:.82rem">${esc(cm.full_name)}</div>
+          ${cm.phone?`<a href="tel:${esc(cm.phone)}" style="font-size:.72rem;color:var(--slate);text-decoration:none">📞 ${esc(cm.phone)}</a>`:''}
+          ${cm.email?`<div><a href="mailto:${esc(cm.email)}" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none">✉️ ${esc(cm.email)}</a></div>`:''}
+        </div>
+      </div>
+    </div>`;
+  })();
+
+  document.getElementById('detailBody').innerHTML=`
+    <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)} &nbsp;${ageTag(inc.occurred_at)}</div></div>
+    ${inc.district?`<div class="mf-row"><div class="mf-label">District</div><div class="mf-val">${esc(districtLabel(inc.district))}</div></div>`:''}
+    ${captainHtml}
+    <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${esc(inc.address)}${inc.lat?`<br><a href="https://www.google.com/maps?q=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);text-decoration:none">📍 Open in Maps ↗</a>`:''}</div></div>
+    <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${esc(inc.description)}</div></div>
+    <div class="mf-row"><div class="mf-label">Reported By</div><div class="mf-val">${esc(inc.reporter_name||'Anonymous')}</div></div>
+    ${inc.police_report?`<div class="mf-row"><div class="mf-label">Police Report #</div><div class="mf-val">${esc(inc.police_report)}</div></div>`:''}
+    ${inc.is_recurring?`<div class="mf-row"><span class="recurring-flag">🔁 Reported as Recurring</span></div>`:''}
+    ${inc.is_verified_member?`<div class="mf-row"><span class="verified-badge">✅ Verified KIAA Member</span></div>`:''}
+    ${(inc.suspect_height||inc.suspect_build||inc.suspect_age||inc.suspect_gender||inc.suspect_race||inc.suspect_clothing||inc.suspect_other)?`
+    <div class="mf-row" style="background:rgba(232,65,90,.05);border:1px solid rgba(232,65,90,.15);border-radius:6px;padding:10px 12px">
+      <div class="mf-label" style="color:var(--red)">Suspect Description</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:.75rem;margin-top:6px">
+        ${inc.suspect_gender?`<span><span style="color:var(--slate)">Gender:</span> ${esc(inc.suspect_gender)}</span>`:''}
+        ${inc.suspect_age?`<span><span style="color:var(--slate)">Age:</span> ${esc(inc.suspect_age)}</span>`:''}
+        ${inc.suspect_height?`<span><span style="color:var(--slate)">Height:</span> ${esc(inc.suspect_height)}</span>`:''}
+        ${inc.suspect_build?`<span><span style="color:var(--slate)">Build:</span> ${esc(inc.suspect_build)}</span>`:''}
+        ${inc.suspect_race?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Race:</span> ${esc(inc.suspect_race)}</span>`:''}
+        ${inc.suspect_clothing?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Clothing:</span> ${esc(inc.suspect_clothing)}</span>`:''}
+        ${inc.suspect_other?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Other:</span> ${esc(inc.suspect_other)}</span>`:''}
+      </div>
+    </div>`:''}
+    ${(inc.vehicle_make||inc.vehicle_model||inc.vehicle_color||inc.vehicle_plate)?`
+    <div class="mf-row" style="background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.15);border-radius:6px;padding:10px 12px">
+      <div class="mf-label" style="color:var(--gold)">Vehicle Description</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:.75rem;margin-top:6px">
+        ${inc.vehicle_color?`<span><span style="color:var(--slate)">Color:</span> ${esc(inc.vehicle_color)}</span>`:''}
+        ${inc.vehicle_year?`<span><span style="color:var(--slate)">Year:</span> ${esc(inc.vehicle_year)}</span>`:''}
+        ${inc.vehicle_make?`<span><span style="color:var(--slate)">Make:</span> ${esc(inc.vehicle_make)}</span>`:''}
+        ${inc.vehicle_model?`<span><span style="color:var(--slate)">Model:</span> ${esc(inc.vehicle_model)}</span>`:''}
+        ${inc.vehicle_plate?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Plate:</span> <strong style="color:var(--gold)">${esc(inc.vehicle_plate)}</strong></span>`:''}
+        ${inc.vehicle_notes?`<span style="grid-column:1/-1"><span style="color:var(--slate)">Notes:</span> ${esc(inc.vehicle_notes)}</span>`:''}
+      </div>
+    </div>`:''}
+    ${media.length?`<div class="mf-row"><div class="mf-label">Media (${media.length})</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${media.map(m=>`
+        <a href="${m.public_url}" target="_blank" style="width:72px;height:72px;border-radius:6px;overflow:hidden;display:block;border:1px solid var(--b2)">
+          ${m.file_type==='image'?`<img src="${m.public_url}" style="width:100%;height:100%;object-fit:cover">`:`<video src="${m.public_url}" style="width:100%;height:100%;object-fit:cover" muted></video>`}
+        </a>`).join('')}
+      </div></div>`:''}
+    <div class="mf-row notes-section">
+      <div class="mf-label" style="margin-bottom:8px">📝 Follow-Up Notes</div>
+      <div id="notesList-${id}"><div style="font-size:.75rem;color:var(--slate2)">Loading…</div></div>
+      <div class="note-form">
+        <input class="note-input" type="text" id="noteInput-${id}" placeholder="Add a note…" onkeydown="if(event.key==='Enter')addNote('${id}')">
+        <button class="note-submit" onclick="addNote('${id}')">Add</button>
+      </div>
+    </div>`;
+
+  const canAct=currentRole!=='captain';
+  document.getElementById('detailActions').innerHTML=`
+    ${canAct?(inc.status==='active'
+      ?`<button class="btn btn-gold" onclick="archiveOne('${id}');closeDetail()">📦 Archive</button>`
+      :`<button class="btn btn-green" onclick="restoreOne('${id}');closeDetail()">↩ Restore</button>`):''}
+    ${canAct?`<button class="btn btn-red" onclick="deleteOne('${id}');closeDetail()">🗑 Delete</button>`:''}
+    <button class="btn btn-ghost" onclick="closeDetail()">Close</button>`;
+
+  document.getElementById('detailOverlay').classList.add('open');
+  loadNotes(id);
+}
+function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');}
+
+/* ════════════════════════════════════════════════
+   INCIDENT ACTIONS
+════════════════════════════════════════════════ */
+async function archiveOne(id) {
+  if(!confirm('Archive this incident?')) return;
+  const {error}=await sb.from('incidents').update({status:'archived'}).eq('id',id);
+  if(!error){const inc=allIncidents.find(i=>i.id===id);if(inc)inc.status='archived';filterIncidents();renderStats();updateMoreStrip();showToast('📦','Incident archived.');}
+  else showToast('⚠️',error.message,'err');
+}
+async function restoreOne(id) {
+  const {error}=await sb.from('incidents').update({status:'active'}).eq('id',id);
+  if(!error){const inc=allIncidents.find(i=>i.id===id);if(inc)inc.status='active';filterIncidents();renderStats();updateMoreStrip();showToast('✅','Incident restored.');}
+  else showToast('⚠️',error.message,'err');
+}
+async function deleteOne(id) {
+  if(!confirm('Permanently delete this incident? This cannot be undone.')) return;
+  const inc=allIncidents.find(i=>i.id===id);
+  if(inc?.incident_media?.length) await sb.storage.from('incident-media').remove(inc.incident_media.map(m=>m.file_path));
+  const {error}=await sb.from('incidents').delete().eq('id',id);
+  if(!error){allIncidents=allIncidents.filter(i=>i.id!==id);filterIncidents();renderStats();updateMoreStrip();showToast('🗑','Incident deleted.');}
+  else showToast('⚠️',error.message,'err');
+}
+
+/* ════════════════════════════════════════════════
+   STATS
+════════════════════════════════════════════════ */
+function renderStats() {
+  const active=allIncidents.filter(i=>i.status==='active');
+  const archived=allIncidents.filter(i=>i.status==='archived');
+  const last30=allIncidents.filter(i=>new Date(i.occurred_at)>=new Date(Date.now()-30*864e5));
+  const withMedia=allIncidents.filter(i=>i.incident_media?.length);
+
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat-tile accent"><div class="stat-val">${active.length}</div><div class="stat-lbl">Active</div></div>
+    <div class="stat-tile"><div class="stat-val">${archived.length}</div><div class="stat-lbl">Archived</div></div>
+    <div class="stat-tile"><div class="stat-val">${allIncidents.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-tile"><div class="stat-val">${last30.length}</div><div class="stat-lbl">Last 30 Days</div></div>
+    <div class="stat-tile"><div class="stat-val">${allIncidents.filter(i=>i.lat).length}</div><div class="stat-lbl">With GPS</div></div>
+    <div class="stat-tile"><div class="stat-val">${withMedia.length}</div><div class="stat-lbl">With Media</div></div>`;
+
+  const colors={red:'#e8415a',gold:'#f5a623',teal:'#00c9a7'};
+  const tc={};active.forEach(i=>tc[i.type]={count:(tc[i.type]?.count||0)+1,color:i.type_color});
+  const sorted=Object.entries(tc).sort((a,b)=>b[1].count-a[1].count);
+  const max=sorted[0]?.[1].count||1;
+  document.getElementById('typeBreakdown').innerHTML=sorted.map(([t,{count,color}])=>`
+    <div class="type-row">
+      <div class="type-label">${esc(t)}</div>
+      <div class="type-bar-wrap"><div class="type-bar" style="width:${(count/max*100).toFixed(1)}%;background:${colors[color]||'#00c9a7'}"></div></div>
+      <div class="type-cnt">${count}</div>
+    </div>`).join('')||'<div style="padding:12px;color:var(--slate2);font-size:.78rem">No active incidents.</div>';
+
+  const dc={};DISTRICTS.forEach(([v])=>dc[v]=0);
+  active.forEach(i=>{if(i.district&&dc[i.district]!==undefined)dc[i.district]++;});
+  const dsorted=DISTRICTS.map(([v,l])=>[v,l,dc[v]||0]).sort((a,b)=>b[2]-a[2]);
+  const dmax=dsorted[0]?.[2]||1;
+  document.getElementById('distBreakdown').innerHTML=dsorted.map(([v,l,count])=>`
+    <div class="type-row">
+      <div class="type-label" style="color:${DISTRICT_COLORS[v]||'var(--teal)'}">${l}</div>
+      <div class="type-bar-wrap"><div class="type-bar" style="width:${count?((count/dmax*100).toFixed(1)):'0'}%;background:${DISTRICT_COLORS[v]||'var(--teal)'}"></div></div>
+      <div class="type-cnt">${count}</div>
+    </div>`).join('');
+}
+
+function updateMoreStrip() {
+  const active=allIncidents.filter(i=>i.status==='active').length;
+  const pending=allApplications.filter(a=>a.status==='pending').length;
+  document.getElementById('moreActive').textContent=active;
+  document.getElementById('moreMembers').textContent=memberList.length;
+  document.getElementById('morePending').textContent=pending;
+}
+
+/* ════════════════════════════════════════════════
+   MEMBERS
+════════════════════════════════════════════════ */
+async function loadMembers() {
+  if(!sb) return;
+  try {
+    const {data:emails,error:eErr}=await sb.from('member_emails').select('*').order('created_at',{ascending:false});
+    if(eErr){memberList=[];return;}
+    const {data:apps}=await sb.from('member_applications').select('id,email,full_name,phone,business_name,business_address,business_city,business_state,business_zip,district,captain_name,photo_url').eq('status','approved');
+    const appMap={};(apps||[]).forEach(a=>{appMap[a.email.toLowerCase()]=a;});
+    memberList=(emails||[]).map(m=>{const app=appMap[m.email.toLowerCase()]||{};return{...m,...app,app_id:app.id||null,id:m.id};});
+    renderMembers();
+    renderDistricts();
+    updateMoreStrip();
+    const nc=document.getElementById('moreMembers');
+    if(nc) nc.textContent=memberList.length;
+  } catch(e){memberList=[];}
+}
+function renderMembers() {
+  const el=document.getElementById('memList');
+  if(!el) return;
+  const q=(document.getElementById('memSearch')?.value||'').toLowerCase().trim();
+  const df=document.getElementById('memDistFlt')?.value||'';
+  let rows=memberList;
+  if(currentRole==='captain'&&captainDistrict) rows=rows.filter(m=>m.district===captainDistrict);
+  if(df) rows=rows.filter(m=>m.district===df);
+  if(q) rows=rows.filter(m=>[m.email,m.full_name,m.business_name,m.phone,m.business_city].filter(Boolean).join(' ').toLowerCase().includes(q));
+  if(!rows.length){el.innerHTML=`<div class="empty"><div class="empty-ico">👥</div>No members found.</div>`;return;}
+  el.innerHTML=rows.map(m=>`
+    <div class="mem-card">
+      <div class="mem-name">${m.full_name?esc(m.full_name):'<span style="color:var(--slate2);font-style:italic">No name</span>'}</div>
+      <div class="mem-email-row">${esc(m.email)}</div>
+      <div class="mem-detail">
+        ${m.business_name?`🏢 ${esc(m.business_name)}<br>`:''}
+        ${m.phone?`📞 ${esc(m.phone)}<br>`:''}
+        ${m.district?`📍 <span style="color:var(--teal)">${esc(districtLabel(m.district))}</span><br>`:''}
+        ${m.captain_name?`👮 Captain: ${esc(m.captain_name)}<br>`:''}
+      </div>
+      <div class="mem-actions captain-hidden">
+        <button class="btn btn-red" style="font-size:.68rem" onclick="removeMember('${m.id}')">Remove</button>
+      </div>
+    </div>`).join('');
+}
+async function removeMember(id) {
+  const m=memberList.find(x=>x.id===id);
+  if(!m||!confirm(`Remove ${m.email} from verified members?`)) return;
+  const {error}=await sb.from('member_emails').delete().eq('id',id);
+  if(!error){memberList=memberList.filter(x=>x.id!==id);renderMembers();updateMoreStrip();showToast('🗑','Member removed.');}
+  else showToast('⚠️',error.message,'err');
+}
+function exportMembersCSV() {
+  if(!memberList.length){showToast('ℹ️','No members to export.');return;}
+  const rows=[['Full Name','Email','Phone','Business','District','Captain']];
+  memberList.forEach(m=>rows.push([m.full_name||'',m.email||'',m.phone||'',m.business_name||'',districtLabel(m.district)||'',m.captain_name||'']));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='HIBCW_Members.csv';a.click();
+}
+
+/* ════════════════════════════════════════════════
+   APPLICATIONS
+════════════════════════════════════════════════ */
+async function loadApplications() {
+  if(!sb) return;
+  try {
+    const {data,error}=await sb.from('member_applications').select('*').order('created_at',{ascending:false});
+    if(error){allApplications=[];return;}
+    allApplications=data||[];
+    renderApps();
+    updateAppBadge();
+    updateMoreStrip();
+  } catch(e){allApplications=[];}
+}
+function updateAppBadge() {
+  const pending=allApplications.filter(a=>a.status==='pending').length;
+  const badge=document.getElementById('appBadge');
+  if(badge){badge.textContent=pending;badge.style.display=pending?'block':'none';}
+}
+function renderApps() {
+  const el=document.getElementById('appList');
+  if(!el) return;
+  const filter=document.getElementById('appStatusFlt')?.value||'pending';
+  let rows=(currentRole==='captain'&&captainDistrict)?allApplications.filter(a=>a.district===captainDistrict):allApplications;
+  if(filter) rows=rows.filter(a=>a.status===filter);
+  if(!rows.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div>No applications found.</div>`;return;}
+  const statusLabel={pending:'⏳ Pending',approved:'✅ Approved',rejected:'❌ Rejected'};
+  el.innerHTML=rows.map(a=>`
+    <div class="app-card ${a.status}" id="appcard-${a.id}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px">
+        <div class="app-name">${esc(a.full_name)}</div>
+        <span class="badge ${a.status==='pending'?'b-gold':a.status==='approved'?'b-teal':'b-red'}" style="flex-shrink:0">${statusLabel[a.status]||a.status}</span>
+      </div>
+      <div class="app-biz">🏢 ${esc(a.business_name)}</div>
+      <div class="app-info">
+        ${a.business_address?`📍 <span>${esc(a.business_address)}</span><br>`:''}
+        ✉️ <span>${esc(a.email)}</span><br>
+        📞 <span>${esc(a.phone)}</span>
+        ${a.district?`<br>📍 <span style="color:var(--teal)">${esc(districtLabel(a.district))}</span>`:''}
+      </div>
+      ${a.notes?`<div style="font-size:.72rem;color:var(--slate2);font-style:italic;margin-top:6px;padding-top:6px;border-top:1px solid var(--b2)">"${esc(a.notes)}"</div>`:''}
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);margin-top:6px">${fmt(a.created_at)}</div>
+      <div class="app-actions-row captain-hidden">
+        ${a.status==='pending'?`
+          <button class="btn btn-teal" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">✅ Approve</button>
+          <button class="btn btn-red" onclick="rejectApp('${a.id}')">❌ Reject</button>`:''}
+        ${a.status==='approved'?`<button class="btn btn-ghost" onclick="rejectApp('${a.id}')">Revoke</button>`:''}
+        ${a.status==='rejected'?`<button class="btn btn-teal" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">Re-approve</button>`:''}
+        <button class="btn btn-ghost" onclick="deleteApp('${a.id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+function getCaptainForDistrict(districtId) {
+  if(!districtId) return null;
+  const c=memberList.find(m=>m.district===districtId&&m.captain_name&&m.captain_name.trim());
+  return c?c.captain_name.trim():null;
+}
+async function approveApp(id,email,name) {
+  if(!confirm(`Approve ${name} and add to verified members?`)) return;
+  const app=allApplications.find(a=>a.id===id);
+  const dc=app?.district?getCaptainForDistrict(app.district):null;
+  const upd={status:'approved'};if(dc&&!app?.captain_name)upd.captain_name=dc;
+  const {error}=await sb.from('member_applications').update(upd).eq('id',id);
+  if(error){showToast('⚠️',error.message,'err');return;}
+  await sb.from('member_emails').upsert({email:email.toLowerCase()},{onConflict:'email',ignoreDuplicates:true});
+  if(app)app.status='approved';
+  await loadMembers();renderApps();updateAppBadge();updateMoreStrip();
+  showToast('✅',`${name} approved.`);
+}
+async function rejectApp(id) {
+  const app=allApplications.find(a=>a.id===id);
+  if(!confirm(app?.status==='approved'?"Revoke this member's approval?":'Reject this application?')) return;
+  const {error}=await sb.from('member_applications').update({status:'rejected'}).eq('id',id);
+  if(error){showToast('⚠️',error.message,'err');return;}
+  if(app?.status==='approved'&&app?.email){await sb.from('member_emails').delete().eq('email',app.email.toLowerCase());await loadMembers();}
+  if(app)app.status='rejected';renderApps();updateAppBadge();updateMoreStrip();showToast('🗑','Application rejected.');
+}
+async function deleteApp(id) {
+  if(!confirm('Permanently delete this application?')) return;
+  const {error}=await sb.from('member_applications').delete().eq('id',id);
+  if(!error){allApplications=allApplications.filter(a=>a.id!==id);renderApps();updateAppBadge();updateMoreStrip();showToast('🗑','Application deleted.');}
+  else showToast('⚠️',error.message,'err');
+}
+
+/* ════════════════════════════════════════════════
+   DISTRICTS
+════════════════════════════════════════════════ */
+function renderDistricts() {
+  const el=document.getElementById('distList');
+  if(!el) return;
+  const distCaptainMap={};
+  DISTRICTS.forEach(([v])=>{distCaptainMap[v]=null;});
+  memberList.forEach(m=>{
+    if(!m.district||!m.captain_name) return;
+    if(m.full_name&&m.captain_name.trim().toLowerCase()===m.full_name.trim().toLowerCase()&&!distCaptainMap[m.district])
+      distCaptainMap[m.district]=m;
+  });
+  el.innerHTML=DISTRICTS.map(([v,label])=>{
+    const c=distCaptainMap[v];
+    const color=DISTRICT_COLORS[v]||'#00c9a7';
+    const num=label.match(/\d+/)?.[0]||'';
+    const initials=c?(c.full_name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase():'?';
+    const avatar=c?.photo_url
+      ?`<img src="${c.photo_url}" alt="${initials}" class="dist-avatar" style="border:2px solid ${color}66">`
+      :`<div class="dist-avatar-init" style="background:${color}22;border:2px solid ${color}44;color:${color}">${initials}</div>`;
+    return `<div class="dist-card">
+      <div class="dist-hd" style="border-bottom:1px solid ${color}22">
+        <div class="dist-num" style="background:${color}22;border:1px solid ${color}55;color:${color}">${num}</div>
+        <div class="dist-label" style="color:${color}">${esc(label)}</div>
+      </div>
+      <div class="dist-body">
+        ${c?`<div class="dist-captain-row" style="margin-top:12px">
+          ${avatar}
+          <div style="min-width:0">
+            <div style="font-weight:600;font-size:.88rem;margin-bottom:2px">${esc(c.full_name)}</div>
+            ${c.business_name?`<div style="font-size:.72rem;color:var(--teal)">${esc(c.business_name)}</div>`:''}
+          </div>
+        </div>
+        <div class="dist-contact">
+          ${c.phone?`📞 <a href="tel:${esc(c.phone)}">${esc(c.phone)}</a><br>`:''}
+          ${c.email?`✉️ <a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`:''}
+        </div>`
+        :`<div style="padding:10px 0;font-style:italic;font-size:.78rem;color:var(--slate2)">No captain assigned</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════
+   NOTES
+════════════════════════════════════════════════ */
+async function loadNotes(incidentId) {
+  const el=document.getElementById(`notesList-${incidentId}`);
+  if(!el) return;
+  const {data,error}=await sb.from('incident_notes').select('*').eq('incident_id',incidentId).order('created_at',{ascending:true});
+  if(error){el.innerHTML=`<div style="color:var(--red);font-size:.75rem">Failed to load notes.</div>`;return;}
+  if(!data.length){el.innerHTML=`<div style="font-size:.75rem;color:var(--slate2)">No notes yet.</div>`;return;}
+  el.innerHTML=data.map(n=>`
+    <div class="note-item" id="note-${n.id}">
+      <div class="note-meta"><span>👤 ${esc(n.author)} — ${fmt(n.created_at)}</span><button class="note-del" onclick="deleteNote('${n.id}','${incidentId}')">🗑</button></div>
+      <div class="note-text">${esc(n.note)}</div>
+    </div>`).join('');
+}
+async function addNote(incidentId) {
+  const input=document.getElementById(`noteInput-${incidentId}`);
+  const note=input?.value.trim();
+  if(!note) return;
+  input.disabled=true;
+  const {error}=await sb.from('incident_notes').insert({incident_id:incidentId,note,author:currentUserName||currentUserEmail});
+  input.disabled=false;
+  if(!error){input.value='';loadNotes(incidentId);}
+  else showToast('⚠️',error.message,'err');
+}
+async function deleteNote(noteId,incidentId) {
+  if(!confirm('Delete this note?')) return;
+  const {error}=await sb.from('incident_notes').delete().eq('id',noteId);
+  if(!error) loadNotes(incidentId);
+  else showToast('⚠️',error.message,'err');
+}
+
+/* ════════════════════════════════════════════════
+   CSV EXPORT
+════════════════════════════════════════════════ */
+function exportCSV(view) {
+  let rows=allIncidents;
+  if(view==='active') rows=rows.filter(i=>i.status==='active');
+  if(view==='archived') rows=rows.filter(i=>i.status==='archived');
+  const header=['Type','Status','Date','Address','Description','Reporter','Police Report'];
+  const csv=[header,...rows.map(i=>[i.type,i.status,new Date(i.occurred_at).toLocaleString(),i.address,`"${(i.description||'').replace(/"/g,'""')}"`,i.reporter_name||'',i.police_report||''])].map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`HIBCW_${view}_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
+/* ════════════════════════════════════════════════
+   THEME
+════════════════════════════════════════════════ */
+function toggleTheme() {
+  const isLight=document.body.classList.toggle('light');
+  localStorage.setItem('hibcw-admin-theme',isLight?'light':'dark');
+  const btn=document.getElementById('themeToggleBtn');
+  if(btn) btn.textContent=isLight?'☀️':'🌙';
+  const mIco=document.getElementById('moreThemeIco');
+  const mLbl=document.getElementById('moreThemeLbl');
+  if(mIco) mIco.textContent=isLight?'☀️':'🌙';
+  if(mLbl) mLbl.textContent=isLight?'Light Mode':'Dark Mode';
+}
+(function initTheme(){
+  if(localStorage.getItem('hibcw-admin-theme')==='light'){
+    document.body.classList.add('light');
+    const btn=document.getElementById('themeToggleBtn');
+    if(btn) btn.textContent='☀️';
+    const mIco=document.getElementById('moreThemeIco');
+    const mLbl=document.getElementById('moreThemeLbl');
+    if(mIco) mIco.textContent='☀️';
+    if(mLbl) mLbl.textContent='Light Mode';
+  }
+})();
+
+/* ════════════════════════════════════════════════
+   LOGOUT
+════════════════════════════════════════════════ */
+async function logout() {
+  if(!confirm('Sign out?')) return;
+  if(sb) await sb.auth.signOut();
+  location.reload();
+}
+
+/* ════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════ */
+function showToast(ico,body,type='') {
+  const t=document.getElementById('toast');
+  document.getElementById('toastIco').textContent=ico;
+  document.getElementById('toastTitle').textContent=type==='err'?'Error':'Done';
+  document.getElementById('toastMsg').textContent=body;
+  t.classList.toggle('err-toast',type==='err');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3800);
+}
+
+/* ════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════ */
+function fmt(iso){return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});}
+function fmtLong(iso){return new Date(iso).toLocaleString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'});}
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function ageTag(iso){
+  const mins=(Date.now()-new Date(iso))/60000;
+  if(mins<60) return `<span class="age-tag age-fresh">${Math.round(mins)}m ago</span>`;
+  if(mins<1440) return `<span class="age-tag age-fresh">${Math.round(mins/60)}h ago</span>`;
+  if(mins<10080) return `<span class="age-tag age-recent">${Math.round(mins/1440)}d ago</span>`;
+  return `<span class="age-tag age-old">${Math.round(mins/10080)}w ago</span>`;
+}
+
+/* ════════════════════════════════════════════════
+   AUTH INIT
+════════════════════════════════════════════════ */
+(async function(){
+  if(typeof SUPABASE_URL==='undefined'||SUPABASE_URL.includes('YOUR_')) return;
+  sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  const {data:{session}}=await sb.auth.getSession();
+  if(session) await handleAuthSession(session);
+  sb.auth.onAuthStateChange(async(_,session)=>{if(session&&!document.getElementById('appShell').classList.contains('visible'))await handleAuthSession(session);});
+})();
+</script>
+</body>
+</html>
