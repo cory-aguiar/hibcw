@@ -115,3 +115,66 @@ create policy "read media storage"
 
 create policy "delete media storage"
   on storage.objects for delete using (bucket_id = 'incident-media');
+
+-- ── INCIDENT NOTES TABLE ─────────────────────────────────────
+-- (if not already created)
+create table if not exists public.incident_notes (
+  id          uuid primary key default uuid_generate_v4(),
+  created_at  timestamptz not null default now(),
+  incident_id uuid not null references public.incidents(id) on delete cascade,
+  note        text not null,
+  author      text
+);
+create index if not exists incident_notes_incident_id_idx on public.incident_notes (incident_id);
+alter table public.incident_notes enable row level security;
+create policy "admin read notes"   on public.incident_notes for select using (auth.role() = 'authenticated');
+create policy "admin insert notes" on public.incident_notes for insert with check (auth.role() = 'authenticated');
+create policy "admin delete notes" on public.incident_notes for delete using (auth.role() = 'authenticated');
+
+-- ── ADMIN ROLES TABLE ────────────────────────────────────────
+-- (if not already created)
+create table if not exists public.admin_roles (
+  id              uuid primary key default uuid_generate_v4(),
+  created_at      timestamptz not null default now(),
+  user_id         uuid not null references auth.users(id) on delete cascade,
+  role            text not null default 'captain',  -- 'superadmin' | 'admin' | 'captain'
+  email           text,
+  full_name       text,
+  district        text,
+  last_sign_in_at timestamptz
+);
+create index if not exists admin_roles_user_id_idx on public.admin_roles (user_id);
+alter table public.admin_roles enable row level security;
+create policy "admin read roles"   on public.admin_roles for select using (auth.role() = 'authenticated');
+create policy "admin insert roles" on public.admin_roles for insert with check (auth.role() = 'authenticated');
+create policy "admin update roles" on public.admin_roles for update using (auth.role() = 'authenticated');
+create policy "admin delete roles" on public.admin_roles for delete using (auth.role() = 'authenticated');
+
+-- ── MEMBER EMAILS TABLE ──────────────────────────────────────
+-- (if not already created)
+create table if not exists public.member_emails (
+  id         uuid primary key default uuid_generate_v4(),
+  created_at timestamptz not null default now(),
+  email      text not null unique
+);
+alter table public.member_emails enable row level security;
+create policy "admin read member_emails"   on public.member_emails for select using (auth.role() = 'authenticated');
+create policy "admin insert member_emails" on public.member_emails for insert with check (auth.role() = 'authenticated');
+create policy "admin delete member_emails" on public.member_emails for delete using (auth.role() = 'authenticated');
+create policy "public check email"         on public.member_emails for select using (true);
+
+-- ── DISTRICT ALERTS TABLE ────────────────────────────────────
+create table public.district_alerts (
+  id             uuid primary key default uuid_generate_v4(),
+  created_at     timestamptz not null default now(),
+  district       text not null,
+  message        text not null,
+  sent_by_email  text,
+  sent_by_name   text
+);
+create index district_alerts_district_idx   on public.district_alerts (district);
+create index district_alerts_created_at_idx on public.district_alerts (created_at desc);
+alter table public.district_alerts enable row level security;
+create policy "admin read alerts"   on public.district_alerts for select using (auth.role() = 'authenticated');
+create policy "admin insert alerts" on public.district_alerts for insert with check (auth.role() = 'authenticated');
+create policy "admin delete alerts" on public.district_alerts for delete using (auth.role() = 'authenticated');
