@@ -536,6 +536,7 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
   margin:10px 0 0;text-decoration:none;
   transition:opacity .15s;
 }
+.glossary-link + * { margin-top: 16px; }
 .glossary-link:hover{opacity:.75}
 .glossary-link::before{content:'';flex:1;height:1px;background:var(--border2)}
 .glossary-link::after{content:'';flex:1;height:1px;background:var(--border2)}
@@ -2350,6 +2351,82 @@ function toggleTheme() {
     </div>
   </div>
 </div>
+
+<!-- Mobile redirect banner -->
+<div id="mobilePrompt" style="
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;
+  background:var(--navy2);border-top:1px solid var(--border2);
+  padding:14px 16px 20px;box-shadow:0 -8px 32px rgba(0,0,0,.45);
+  animation:slideUpPrompt .35s cubic-bezier(.34,1.2,.64,1);
+">
+  <style>
+    @keyframes slideUpPrompt{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+    #mobilePrompt .mp-title{
+      font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;
+      letter-spacing:.05em;color:var(--white);margin-bottom:4px;
+    }
+    #mobilePrompt .mp-sub{
+      font-size:.72rem;line-height:1.5;color:var(--slate);margin-bottom:14px;
+    }
+    #mobilePrompt .mp-actions{display:flex;gap:8px;}
+    #mobilePrompt .mp-yes{
+      flex:1;background:var(--teal);border:none;border-radius:6px;
+      padding:10px;cursor:pointer;font-family:'Rajdhani',sans-serif;
+      font-size:.85rem;font-weight:700;letter-spacing:.05em;
+      color:#0b1524;transition:filter .15s;
+    }
+    #mobilePrompt .mp-yes:hover{filter:brightness(1.1)}
+    #mobilePrompt .mp-no{
+      background:rgba(255,255,255,.06);border:1px solid var(--border2);
+      border-radius:6px;padding:10px 16px;cursor:pointer;
+      font-family:'IBM Plex Mono',monospace;font-size:.65rem;
+      color:var(--slate);transition:all .15s;white-space:nowrap;
+    }
+    #mobilePrompt .mp-no:hover{color:var(--white);border-color:var(--slate2)}
+    body.light #mobilePrompt{background:#fff;border-top-color:rgba(0,0,0,.1);box-shadow:0 -8px 32px rgba(0,0,0,.12)}
+    body.light #mobilePrompt .mp-no{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.15);color:#4a5f72}
+  </style>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px">
+    <div>
+      <div class="mp-title">📱 Mobile Site Available</div>
+      <div class="mp-sub">We have a version built for phones — faster, touch-friendly, and easier to use on the go.</div>
+    </div>
+    <button onclick="dismissMobilePrompt()" style="background:none;border:none;color:var(--slate);font-size:1.1rem;cursor:pointer;padding:0 0 0 8px;line-height:1;flex-shrink:0">✕</button>
+  </div>
+  <div class="mp-actions">
+    <button class="mp-yes" onclick="goMobileSite()">📲 Take me to the mobile site</button>
+    <button class="mp-no" onclick="dismissMobilePrompt()">Stay here</button>
+  </div>
+</div>
+
+<script>
+(function checkMobilePrompt() {
+  // Only show on genuinely mobile-sized screens, not tablets in landscape
+  const isMobile = /Android|iPhone|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || (window.innerWidth <= 600);
+  if (!isMobile) return;
+  // Don't show if they've already dismissed or chosen in this session
+  if (sessionStorage.getItem('hibcw-mobile-prompt') === 'done') return;
+  // Small delay so the page renders first
+  setTimeout(function() {
+    document.getElementById('mobilePrompt').style.display = 'block';
+  }, 800);
+})();
+
+function goMobileSite() {
+  sessionStorage.setItem('hibcw-mobile-prompt', 'done');
+  window.location.href = 'index-mobile.html';
+}
+
+function dismissMobilePrompt() {
+  sessionStorage.setItem('hibcw-mobile-prompt', 'done');
+  const el = document.getElementById('mobilePrompt');
+  el.style.transition = 'transform .25s ease, opacity .25s ease';
+  el.style.transform = 'translateY(100%)';
+  el.style.opacity = '0';
+  setTimeout(function(){ el.style.display = 'none'; }, 260);
+}
+</script>
 
 </body>
 </html>
