@@ -590,6 +590,19 @@ body.light .strip-cell{background:#fff}
 
 <!-- INCIDENT DETAIL MODAL -->
 <div class="modal-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="detailTitle">Incident</div>
+        <div style="margin-top:3px" id="detailBadge"></div>
+      </div>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-actions" id="detailActions"></div>
+  </div>
+</div>
 
 <!-- DISTRICT MEMBERS MODAL -->
 <div class="modal-overlay" id="distMembersOverlay" onclick="if(event.target===this)closeDistMembers()">
@@ -610,19 +623,6 @@ body.light .strip-cell{background:#fff}
       <button class="btn btn-ghost" style="flex:1;font-size:.72rem" onclick="printDistrictRoster()">🖨 Print Roster</button>
       <button class="btn btn-ghost captain-hidden" style="flex:1;font-size:.72rem" onclick="closeDistMembers();showScreen('members')">✏️ Manage Members</button>
     </div>
-  </div>
-</div>
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-hd">
-      <div>
-        <div class="modal-title" id="detailTitle">Incident</div>
-        <div style="margin-top:3px" id="detailBadge"></div>
-      </div>
-      <button class="modal-close" onclick="closeDetail()">✕</button>
-    </div>
-    <div class="modal-body" id="detailBody"></div>
-    <div class="modal-actions" id="detailActions"></div>
   </div>
 </div>
 
