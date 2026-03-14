@@ -49,6 +49,151 @@ html,body{
   overscroll-behavior:none;
 }
 
+/* ── LIGHT MODE ─────────────────────────────────────────── */
+body.light{
+  --navy:    #f0f4f8;
+  --navy2:   #e2ecf5;
+  --navy3:   #d4e2ef;
+  --teal:    #007a65;
+  --teal2:   #005c4c;
+  --gold:    #b87c0a;
+  --red:     #c0273d;
+  --slate:   #4a5f72;
+  --slate2:  #7a95a8;
+  --white:   #0f1e2e;
+  --border:  rgba(0,122,101,.2);
+  --border2: rgba(0,0,0,.1);
+  background:#f0f4f8;color:#0f1e2e;
+}
+/* Header */
+body.light header{background:linear-gradient(180deg,#dce8f5,#eaf1f8)!important;border-bottom:1px solid rgba(0,122,101,.2)!important}
+body.light .hdr-sub{color:#4a5f72}
+body.light .live-pill{background:rgba(0,122,101,.12);border-color:rgba(0,122,101,.25);color:#007a65}
+body.light .dot{background:#007a65!important}
+body.light .beta-tag{background:rgba(0,122,101,.12);border-color:rgba(0,122,101,.25);color:#007a65}
+/* Bottom nav */
+body.light .bot-nav{background:linear-gradient(0deg,#dce8f5,#e8f0f8);border-top:1px solid rgba(0,0,0,.1)}
+body.light .nav-btn .nav-lbl{color:#7a95a8}
+body.light .nav-btn.on .nav-lbl{color:#007a65}
+body.light .nav-report-btn .nav-lbl{color:#007a65}
+/* Map screen */
+body.light .map-fab{background:rgba(240,244,248,.95)!important;border-color:rgba(0,0,0,.15)!important;color:#2a4560!important}
+body.light .map-fab.on{background:rgba(0,122,101,.12)!important;border-color:rgba(0,122,101,.4)!important;color:#007a65!important}
+body.light .map-filter-pill{background:rgba(240,244,248,.95);border-color:rgba(0,0,0,.15);color:#2a4560}
+body.light .leaflet-popup-content-wrapper{background:#fff;color:#0f1e2e;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+body.light .leaflet-popup-tip{background:#fff}
+body.light .pu-type{color:#007a65}
+body.light .pu-addr,body.light .pu-time{color:#4a5f72}
+body.light .pu-btn{background:rgba(0,122,101,.1);border-color:rgba(0,122,101,.3);color:#007a65}
+/* Incident sheet (map bottom sheet) */
+body.light .inc-sheet{background:#f0f4f8;border-top:1px solid rgba(0,0,0,.1)}
+body.light .sheet-handle-bar{background:rgba(0,0,0,.15)}
+body.light .sheet-title{color:#0f1e2e}
+body.light .sheet-count{color:#4a5f72}
+body.light .sheet-srch{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .sheet-srch::placeholder{color:#7a95a8}
+body.light .sheet-filt{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .sheet-filt option{background:#fff;color:#0f1e2e}
+/* Incident cards */
+body.light .inc-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .inc-card.hl{background:#eaf3fb;border-color:rgba(0,122,101,.3)}
+body.light .card-time{color:#4a6070}
+body.light .card-addr{color:#2a4560}
+body.light .card-desc{color:#1a2f45}
+body.light .card-meta{color:#4a5f72}
+body.light .tag{background:rgba(0,122,101,.12);color:#007a65}
+body.light .meta-tag{background:rgba(0,0,0,.06);color:#4a5f72}
+body.light .recurring-flag{color:#b87c0a}
+body.light .verified-badge{color:#007a65}
+/* List screen */
+body.light .list-hdr{background:#e2ecf5;border-bottom:1px solid rgba(0,0,0,.08)}
+body.light .list-srch{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .list-srch::placeholder{color:#7a95a8}
+body.light .list-filt{background:#fff;border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .list-filt option{background:#fff;color:#0f1e2e}
+body.light .list-stats-banner{background:#e2ecf5;border-bottom:1px solid rgba(0,0,0,.08)}
+body.light .stat-num{color:#007a65}
+body.light .stat-lbl{color:#4a5f72}
+/* Report form */
+body.light .form-scroll{background:#f0f4f8}
+body.light .form-inner{background:#f0f4f8}
+body.light .sec-label{color:#4a5f72}
+body.light .sec-label::after{background:rgba(0,0,0,.1)}
+body.light .fld label{color:#4a5f72}
+body.light .fld input,body.light .fld textarea,body.light .fld select{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.15);color:#0f1e2e}
+body.light .fld input::placeholder,body.light .fld textarea::placeholder{color:#7a95a8}
+body.light .fld select option{background:#fff!important;color:#0f1e2e!important}
+body.light .fld-check label{color:#4a5f72}
+body.light .fld-verify-hint{color:#7a95a8}
+body.light .fld-verify-hint.ok{color:#007a65}
+body.light .fld-verify-hint.no{color:#c0273d}
+body.light .section{border-color:rgba(0,0,0,.06)}
+body.light .pin-hint{color:#4a5f72;background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1)}
+body.light .coords-bar{color:#4a5f72}
+body.light .district-badge{background:rgba(0,122,101,.1);border-color:rgba(0,122,101,.25);color:#007a65}
+body.light .mini-map-hint{color:#7a95a8}
+body.light .geocode-btn{background:rgba(0,122,101,.1);border-color:rgba(0,122,101,.3);color:#007a65}
+body.light .disc-emergency .disc-text{color:#0f1e2e}
+body.light .disc-emergency .disc-text strong{color:#c0273d}
+body.light .disc-notice{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1);color:#4a5f72}
+body.light .disc-privacy{background:rgba(0,122,101,.04);border-color:rgba(0,122,101,.15);color:#4a5f72}
+body.light .disc-suspect{background:rgba(184,124,10,.05);border-color:rgba(184,124,10,.2);color:#4a5f72}
+body.light .type-btn{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.12);color:#4a5f72}
+body.light .type-btn:hover{border-color:#7a95a8;color:#0f1e2e}
+body.light .dropzone{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.15)}
+body.light .dz-label{color:#4a5f72}
+body.light .submit-btn{box-shadow:0 4px 16px rgba(0,122,101,.3)}
+body.light .fld input[type="datetime-local"]{color-scheme:light}
+/* Modal */
+body.light .modal-sheet{background:#fff}
+body.light .modal-hd{background:#e8eef5;border-bottom:1px solid rgba(0,0,0,.1)}
+body.light .modal-title{color:#0f1e2e}
+body.light .modal-close{color:#4a5f72}
+body.light .modal-handle{background:rgba(0,0,0,.15)}
+body.light .mf-label{color:#4a5f72}
+body.light .mf-val{color:#0f1e2e}
+body.light .mf-row{border-bottom-color:rgba(0,0,0,.06)}
+/* Glossary sheet */
+body.light .glossary-sheet{background:#fff;border-top:1px solid rgba(0,0,0,.1)}
+body.light .glossary-handle{background:rgba(0,0,0,.15)}
+body.light .glossary-title{color:#0f1e2e}
+body.light .glossary-close{color:#4a5f72}
+body.light .glossary-intro{color:#4a5f72}
+body.light .glossary-item{border-bottom-color:rgba(0,0,0,.07)}
+body.light .glossary-item-name{color:#0f1e2e}
+body.light .glossary-item-desc{color:#4a5f72}
+body.light .glossary-group-label::after{background:rgba(0,0,0,.1)}
+/* More screen */
+body.light .more-scroll{background:#f0f4f8}
+body.light .more-section-title{color:#7a95a8}
+body.light .more-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .more-row{border-bottom-color:rgba(0,0,0,.07)}
+body.light .more-label{color:#0f1e2e}
+body.light .more-sub{color:#7a95a8}
+body.light .more-arrow{color:#7a95a8}
+body.light .theme-toggle-lbl{color:#0f1e2e}
+body.light .toggle-track{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.15)}
+body.light .stats-tile{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .st-val{color:#007a65}
+body.light .st-lbl{color:#4a5f72}
+body.light .captain-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .captain-name{color:#0f1e2e}
+body.light .captain-dist{color:#4a5f72}
+body.light .captain-email a{color:#007a65}
+body.light .contact-label{color:#7a95a8}
+body.light .contact-num{color:#0f1e2e}
+/* Thank-you overlay */
+body.light .ty-card{background:#fff;border-color:rgba(0,0,0,.1)}
+body.light .ty-title{color:#0f1e2e}
+body.light .ty-sub{color:#4a5f72}
+body.light .ty-body p{color:#4a5f72}
+body.light .ty-contact{background:rgba(0,122,101,.06);border-color:rgba(0,122,101,.2)}
+body.light .ty-contact-lbl{color:#4a5f72}
+body.light .ty-contact a{color:#007a65}
+/* Upload progress */
+body.light .uprog{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1)}
+body.light .uprog-label{color:#4a5f72}
+
 /* ══════════════════════════════════════════════════════
    APP SHELL
 ══════════════════════════════════════════════════════ */
@@ -189,6 +334,7 @@ html,body{
   background:var(--teal);
   border-radius:0 0 2px 2px;
 }
+a.nav-btn{text-decoration:none;color:inherit}
 .nav-report-btn{
   flex:1;
   display:flex;
@@ -475,6 +621,66 @@ html,body{
 .type-btn.sel-gold{background:rgba(245,166,35,.12);border-color:var(--gold);color:var(--gold)}
 .type-btn.sel-teal{background:rgba(0,201,167,.12);border-color:var(--teal);color:var(--teal)}
 .type-icon{font-size:1.4rem;line-height:1}
+
+/* Incident glossary */
+.glossary-link{
+  display:flex;align-items:center;gap:7px;
+  font-family:'IBM Plex Mono',monospace;font-size:.65rem;
+  color:var(--teal);letter-spacing:.05em;
+  cursor:pointer;background:none;border:none;padding:0;
+  margin:10px 0 0;text-decoration:none;
+  transition:opacity .15s;width:100%;
+}
+.glossary-link:hover{opacity:.75}
+.glossary-link::before{content:'';flex:1;height:1px;background:var(--border2)}
+.glossary-link::after{content:'';flex:1;height:1px;background:var(--border2)}
+.glossary-overlay{
+  display:none;position:fixed;inset:0;z-index:900;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(3px);
+  align-items:flex-end;justify-content:center;
+}
+.glossary-overlay.open{display:flex}
+.glossary-sheet{
+  background:var(--navy);border-top:1px solid var(--border2);
+  border-radius:14px 14px 0 0;width:100%;
+  max-height:85vh;overflow-y:auto;padding:0 0 32px;
+}
+.glossary-handle{
+  width:36px;height:3px;border-radius:2px;
+  background:var(--border2);margin:10px auto 0;
+}
+.glossary-title{
+  font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--white);
+  padding:14px 18px 4px;display:flex;align-items:center;justify-content:space-between;
+}
+.glossary-close{
+  background:none;border:none;color:var(--slate);font-size:1.1rem;
+  cursor:pointer;padding:2px 4px;line-height:1;
+}
+.glossary-close:active{color:var(--white)}
+.glossary-intro{
+  font-size:.7rem;line-height:1.55;color:var(--slate);
+  padding:0 18px 12px;
+}
+.glossary-group-label{
+  font-family:'IBM Plex Mono',monospace;font-size:.55rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  padding:8px 18px 4px;
+  display:flex;align-items:center;gap:8px;
+}
+.glossary-group-label::after{content:'';flex:1;height:1px;background:var(--border2)}
+.glossary-item{
+  padding:9px 18px;display:flex;gap:12px;align-items:flex-start;
+  border-bottom:1px solid var(--border2);
+}
+.glossary-item:last-child{border-bottom:none}
+.glossary-item-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;width:22px;text-align:center}
+.glossary-item-name{
+  font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;
+  font-weight:600;color:var(--white);margin-bottom:2px;
+}
+.glossary-item-desc{font-size:.7rem;line-height:1.55;color:var(--slate)}
 
 /* Fields */
 .fld{margin-bottom:13px}
@@ -1045,6 +1251,80 @@ html,body{
           </div>
         </div>
 
+        <!-- Glossary link -->
+        <button class="glossary-link" onclick="document.getElementById('glossaryOverlay').classList.add('open')">
+          📖 Not sure which type to pick? View incident glossary
+        </button>
+
+        <!-- Glossary modal -->
+        <div class="glossary-overlay" id="glossaryOverlay" onclick="if(event.target===this)this.classList.remove('open')">
+          <div class="glossary-sheet">
+            <div class="glossary-handle"></div>
+            <div class="glossary-title">
+              Incident Type Glossary
+              <button class="glossary-close" onclick="document.getElementById('glossaryOverlay').classList.remove('open')">✕</button>
+            </div>
+            <div class="glossary-intro">Use these definitions to select the most accurate incident type. When in doubt, choose <strong>Suspicious Activity</strong> or <strong>Other</strong> and describe the situation in detail.</div>
+
+            <!-- Serious / Red -->
+            <div class="glossary-group-label" style="color:var(--red)">🔴 Serious Incidents</div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">🔫</div>
+              <div><div class="glossary-item-name">Robbery</div><div class="glossary-item-desc">Taking property directly from a person by force, threat, or intimidation — e.g. a mugging, armed hold-up, or carjacking. The victim is present during the crime. <em>Always call 911 if in progress.</em></div></div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">🏠</div>
+              <div><div class="glossary-item-name">Burglary</div><div class="glossary-item-desc">Unlawful entry into a building, home, or structure to commit a crime inside — typically theft. The victim does not need to be present. Includes break-ins to sheds, garages, and storage units.</div></div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">🤜</div>
+              <div><div class="glossary-item-name">Assault</div><div class="glossary-item-desc">Physical attack or credible threat of bodily harm against a person — includes hitting, fighting, brandishing a weapon, or threatening language accompanied by aggressive behavior.</div></div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">💊</div>
+              <div><div class="glossary-item-name">Drug Activity</div><div class="glossary-item-desc">Visible or suspected drug use, sales, or distribution in a public or community space — e.g. open use in a parking lot, repeated foot-traffic consistent with dealing, or drug paraphernalia left in a shared area.</div></div>
+            </div>
+
+            <!-- Moderate / Gold -->
+            <div class="glossary-group-label" style="color:var(--gold)">🟡 Moderate Incidents</div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">🛍</div>
+              <div><div class="glossary-item-name">Theft / Shoplifting</div><div class="glossary-item-desc">Taking property without force and without confronting the victim — includes shoplifting from a store, stealing items left unattended, or theft from an unlocked vehicle or yard.</div></div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">🔨</div>
+              <div><div class="glossary-item-name">Vandalism</div><div class="glossary-item-desc">Intentional destruction or defacement of property — broken windows, slashed tires, damaged fencing, graffiti tags on private or commercial property, or destruction of signage.</div></div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">🚗</div>
+              <div><div class="glossary-item-name">Vehicle Break-In</div><div class="glossary-item-desc">Forced or unauthorized entry into a parked vehicle — smashed windows, pried doors, or evidence of someone rummaging through a car, truck, or other vehicle. Use <em>Robbery</em> if the owner was present and confronted.</div></div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">💳</div>
+              <div><div class="glossary-item-name">Fraud / Scam</div><div class="glossary-item-desc">Deceptive schemes intended to obtain money, goods, or personal information — includes phone or email scams targeting community members, skimming devices on ATMs or gas pumps, identity theft, or contractor fraud.</div></div>
+            </div>
+
+            <!-- Low / Teal -->
+            <div class="glossary-group-label" style="color:var(--teal)">🔵 Observation & Other</div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">🚫</div>
+              <div><div class="glossary-item-name">Trespassing</div><div class="glossary-item-desc">Someone entering or remaining on private property without permission — including posted "No Trespassing" areas, fenced lots, closed business premises after hours, or repeatedly accessing a neighbor's property uninvited.</div></div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">👁</div>
+              <div><div class="glossary-item-name">Suspicious Activity</div><div class="glossary-item-desc">Behavior that seems out of place or concerning but doesn't clearly fit another category — e.g. someone casing businesses, unfamiliar vehicles parked for long periods, individuals looking into cars or peering into homes.</div></div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">🎨</div>
+              <div><div class="glossary-item-name">Graffiti</div><div class="glossary-item-desc">Unsanctioned writing, tags, or artwork on public or private surfaces — walls, utility boxes, road signs, restrooms, or business exteriors. Use <em>Vandalism</em> if other property damage accompanied it.</div></div>
+            </div>
+            <div class="glossary-item">
+              <div class="glossary-item-icon">📋</div>
+              <div><div class="glossary-item-name">Other</div><div class="glossary-item-desc">An incident that doesn't fit any of the above categories. Please use the description field (section 04) to explain what occurred in as much detail as possible so it can be properly reviewed.</div></div>
+            </div>
+          </div>
+        </div>
+
         <!-- 02 · When -->
         <div class="section">
           <div class="sec-label">02 · When</div>
@@ -1314,6 +1594,10 @@ html,body{
     <div class="nav-ico-wrap">➕</div>
     <span class="nav-lbl">Report</span>
   </button>
+  <a class="nav-btn" href="apply.html">
+    <span class="nav-ico">✅</span>
+    <span class="nav-lbl">Join HIBCW</span>
+  </a>
   <button class="nav-btn" id="nav-more" onclick="showScreen('more')">
     <span class="nav-ico">☰</span>
     <span class="nav-lbl">More</span>
