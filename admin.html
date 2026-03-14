@@ -6941,8 +6941,8 @@
             esc(a.message)}</div>
         <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
           <span>👤 ${
-            esc(a.sent_by_name || 'Captain')}</span>
-          <span>${fmt(a.created_at)}</span>
+            esc(a.sent_by_name || 'Captain')} · ${fmt(a.created_at)}</span>
+          <button onclick="deleteDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(232,65,90,.3);border-radius:3px;padding:2px 8px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s" onmouseover="this.style.background='rgba(232,65,90,.1)'" onmouseout="this.style.background='none'">✕ Cancel</button>
         </div>
       </div>`
 
@@ -6950,6 +6950,18 @@
         } catch (e) {
             el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load alerts — make sure the district_alerts table exists in your database.</div>`;
         }
+    }
+
+    async function deleteDistrictAlert(id) {
+        if (!confirm('Cancel and remove this alert? It will no longer appear on the public site.'))
+            return;
+        const {error} = await sb.from('district_alerts').delete().eq('id', id);
+        if (!error) {
+            showToast('🗑', 'Alert cancelled.');
+            loadDistrictAlerts();
+        }
+        else
+            showToast('⚠️', error.message, 'err');
     }
 
     async function sendDistrictAlert() {
