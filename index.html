@@ -674,6 +674,7 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
       <div class="tabs">
         <button class="tab on" id="tab-report" onclick="showTab('report')">📝 Report</button>
         <button class="tab"    id="tab-list"   onclick="showTab('list')">📋 Incidents</button>
+        <button class="tab"    id="tab-alerts" onclick="showTab('alerts')">📢 Alerts <span id="alertTabBadge" style="display:none;background:var(--gold);color:#0b1524;border-radius:8px;font-size:.55rem;font-weight:700;padding:1px 5px;margin-left:3px;vertical-align:middle">!</span></button>
       </div>
 
       <!-- REPORT TAB -->
@@ -1061,11 +1062,39 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
         <div id="listEl"></div>
       </div>
 
+      <!-- ALERTS TAB -->
+      <div class="tab-body" id="body-alerts" style="display:none;padding:0">
+        <div style="padding:14px 16px 10px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.05em">District Alerts</div>
+            <div style="font-size:.68rem;color:var(--slate);margin-top:1px">Messages from district captains to the community</div>
+          </div>
+          <button onclick="loadDistrictAlerts()" style="background:none;border:1px solid var(--border2);border-radius:4px;padding:4px 8px;color:var(--slate);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--slate)'">🔄 Refresh</button>
+        </div>
+        <div id="alertFeedEl" style="padding:0"></div>
+      </div>
+
     </div><!-- /panel -->
 
     <!-- MAP -->
     <div class="map-wrap">
       <div id="map"></div>
+
+      <!-- District alert banner -->
+      <div id="alertBanner" style="display:none;position:absolute;bottom:70px;left:50%;transform:translateX(-50%);z-index:800;width:calc(100% - 32px);max-width:520px;background:linear-gradient(135deg,rgba(245,166,35,.18),rgba(245,166,35,.08));border:1px solid rgba(245,166,35,.45);border-radius:10px;padding:12px 14px;display:none;gap:10px;align-items:flex-start;box-shadow:0 4px 20px rgba(0,0,0,.35);animation:alertSlideUp .35s cubic-bezier(.34,1.2,.64,1)">
+        <style>
+          @keyframes alertSlideUp{from{transform:translateX(-50%) translateY(10px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+          body.light #alertBanner{background:linear-gradient(135deg,rgba(184,124,10,.12),rgba(184,124,10,.06));border-color:rgba(184,124,10,.35)}
+          #alertBanner .ab-msg{color:var(--white)}
+        </style>
+        <div style="font-size:1.1rem;flex-shrink:0;margin-top:1px">📢</div>
+        <div style="flex:1;min-width:0">
+          <div id="alertBannerDistrict" style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:3px">District Alert</div>
+          <div id="alertBannerMsg" class="ab-msg" style="font-size:.78rem;line-height:1.5"></div>
+          <div id="alertBannerMeta" style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate);margin-top:4px"></div>
+        </div>
+        <button onclick="dismissAlertBanner()" style="background:none;border:none;color:var(--slate);font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;line-height:1">✕</button>
+      </div>
       <div class="map-controls">
         <button class="map-btn on" id="btnStreet"  onclick="setLayer('street')">STREET</button>
         <button class="map-btn"    id="btnSat"     onclick="setLayer('sat')">SATELLITE</button>
@@ -1521,10 +1550,16 @@ function addMarker(inc) {
    TABS
 ════════════════════════════════════════════════════ */
 function showTab(t) {
-  ['report','list'].forEach(id => {
-    document.getElementById(`tab-${id}`).classList.toggle('on', id===t);
-    document.getElementById(`body-${id}`).style.display = id===t ? 'block' : 'none';
+  ['report','list','alerts'].forEach(id => {
+    document.getElementById(`tab-${id}`)?.classList.toggle('on', id===t);
+    const body = document.getElementById(`body-${id}`);
+    if (body) body.style.display = id===t ? 'block' : 'none';
   });
+  if (t === 'alerts') {
+    // Hide the new-alert badge when user opens the tab
+    const badge = document.getElementById('alertTabBadge');
+    if (badge) badge.style.display = 'none';
+  }
 }
 
 /* ════════════════════════════════════════════════════
@@ -2271,6 +2306,7 @@ function clearMapFilter() {
   if (!initSB()) return;
   await loadIncidents();
   await loadCaptains();
+  await loadDistrictAlerts();
 
   // Realtime — new incidents appear instantly
   sb.channel('incidents').on('postgres_changes',{event:'INSERT',schema:'public',table:'incidents'}, async p => {
@@ -2283,7 +2319,105 @@ function clearMapFilter() {
       showToast('🔔','New incident: '+data.type);
     }
   }).subscribe();
+
+  // Realtime — new alerts appear instantly
+  sb.channel('district-alerts-public').on('postgres_changes',{event:'INSERT',schema:'public',table:'district_alerts'}, async () => {
+    await loadDistrictAlerts();
+  }).subscribe();
 })();
+
+/* ════════════════════════════════════════════════════
+   DISTRICT ALERTS
+════════════════════════════════════════════════════ */
+const DISTRICT_COLORS_PUBLIC = {
+  "hamakua":"#84cc16","north-hilo":"#3b82f6","south-hilo":"#00c9a7",
+  "lower-puna":"#c084fc","upper-puna":"#a855f7","kau":"#ef4444",
+  "south-kona":"#f59e0b","north-kona":"#f97316","north-kohala":"#10b981"
+};
+const DISTRICT_LABELS_PUBLIC = {
+  "hamakua":"District 1 - Hāmākua","north-hilo":"District 2 - North Hilo",
+  "south-hilo":"District 3 - South Hilo","lower-puna":"District 4 - Lower Puna",
+  "upper-puna":"District 5 - Upper Puna","kau":"District 6 - Kaʻū",
+  "south-kona":"District 7 - South Kona","north-kona":"District 8 - North Kona",
+  "north-kohala":"District 9 - Kohala"
+};
+
+async function loadDistrictAlerts() {
+  if (!sb) return;
+  try {
+    const { data, error } = await sb
+      .from('district_alerts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (error) throw error;
+    renderAlertFeed(data || []);
+    showLatestAlertBanner(data || []);
+  } catch(e) {
+    const el = document.getElementById('alertFeedEl');
+    if (el) el.innerHTML = '<div style="padding:20px;font-size:.75rem;color:var(--slate2);font-style:italic;text-align:center">Alerts unavailable.</div>';
+  }
+}
+
+function renderAlertFeed(alerts) {
+  const el = document.getElementById('alertFeedEl');
+  if (!el) return;
+  if (!alerts.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;font-size:.78rem;color:var(--slate2);font-style:italic">No district alerts at this time.</div>';
+    return;
+  }
+  el.innerHTML = alerts.map(a => {
+    const color = DISTRICT_COLORS_PUBLIC[a.district] || 'var(--teal)';
+    const label = DISTRICT_LABELS_PUBLIC[a.district] || a.district;
+    const date  = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+    return `<div style="padding:14px 16px;border-bottom:1px solid var(--border2)">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;padding:1px 6px;display:inline-block;margin-bottom:6px;background:${color}18;color:${color};border:1px solid ${color}44">${escHtml(label)}</span>
+      <div style="font-size:.8rem;line-height:1.55;color:var(--white);margin-bottom:5px">${escHtml(a.message)}</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">👤 ${escHtml(a.sent_by_name||'HIBCW')} · ${date}</div>
+    </div>`;
+  }).join('');
+
+  // Show badge on Alerts tab if user isn't already viewing it
+  const activeTab = document.querySelector('.tab.on')?.id;
+  if (activeTab !== 'tab-alerts') {
+    const badge = document.getElementById('alertTabBadge');
+    if (badge && alerts.length) badge.style.display = 'inline';
+  }
+}
+
+function showLatestAlertBanner(alerts) {
+  if (!alerts.length) return;
+  // Only show alerts from the last 48 hours
+  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
+  const recent = alerts.find(a => new Date(a.created_at).getTime() > cutoff);
+  if (!recent) return;
+  if (sessionStorage.getItem('hibcw-alert-dismissed') === recent.id) return;
+
+  const color = DISTRICT_COLORS_PUBLIC[recent.district] || '#f5a623';
+  const label = DISTRICT_LABELS_PUBLIC[recent.district] || recent.district;
+  const date  = new Date(recent.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+
+  const banner = document.getElementById('alertBanner');
+  document.getElementById('alertBannerDistrict').textContent = label;
+  document.getElementById('alertBannerDistrict').style.color = color;
+  document.getElementById('alertBannerMsg').textContent = recent.message;
+  document.getElementById('alertBannerMeta').textContent = '👤 ' + (recent.sent_by_name||'HIBCW') + ' · ' + date;
+  banner.dataset.alertId = recent.id;
+  banner.style.display = 'flex';
+}
+
+function dismissAlertBanner() {
+  const banner = document.getElementById('alertBanner');
+  const id = banner.dataset.alertId;
+  if (id) sessionStorage.setItem('hibcw-alert-dismissed', id);
+  banner.style.transition = 'opacity .2s, transform .2s';
+  banner.style.opacity = '0';
+  setTimeout(() => { banner.style.display = 'none'; banner.style.opacity = ''; }, 220);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div'); d.textContent = s||''; return d.innerHTML;
+}
 
 /* ════════════════════════════════════════════════════
    THEME TOGGLE
