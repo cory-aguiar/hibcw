@@ -1676,15 +1676,22 @@ async function loadDistrictAlerts() {
     }
     el.innerHTML = data.map(a => `
       <div style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.18);border-radius:6px;padding:10px 12px;margin-bottom:8px">
-        <div style="font-size:.8rem;line-height:1.5;color:var(--white);margin-bottom:5px">${esc(a.message)}</div>
-        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2)">
-          <span>👤 ${esc(a.sent_by_name||'Captain')}</span>
-          <span>${fmt(a.created_at)}</span>
+        <div style="font-size:.8rem;line-height:1.5;color:var(--white);margin-bottom:6px">${esc(a.message)}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2)">
+          <span>👤 ${esc(a.sent_by_name||'Captain')} · ${fmt(a.created_at)}</span>
+          <button onclick="deleteDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(232,65,90,.3);border-radius:3px;padding:2px 8px;color:var(--red);font-size:.58rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Cancel</button>
         </div>
       </div>`).join('');
   } catch(e) {
     el.innerHTML = `<div style="font-size:.68rem;color:var(--slate2)">Could not load alerts — ensure the district_alerts table exists.</div>`;
   }
+}
+
+async function deleteDistrictAlert(id) {
+  if (!confirm('Cancel and remove this alert? It will no longer appear on the public site.')) return;
+  const { error } = await sb.from('district_alerts').delete().eq('id', id);
+  if (!error) { showToast('🗑', 'Alert cancelled.'); loadDistrictAlerts(); }
+  else showToast('⚠️', error.message, 'err');
 }
 
 async function sendDistrictAlert() {
