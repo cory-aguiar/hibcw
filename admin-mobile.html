@@ -403,8 +403,39 @@ body.light .strip-cell{background:#fff}
 
     <!-- INCIDENTS SCREEN -->
     <div class="screen active" id="sc-incidents">
-      <div id="captainWelcomeBanner" style="display:none" class="captain-banner">
-        👮 <strong id="captainBannerName">Captain</strong> — you're viewing your district only.
+      <div id="captainWelcomeBanner" style="display:none;padding:12px 12px 4px">
+
+        <!-- Welcome row -->
+        <div style="padding:4px 0 12px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;letter-spacing:.05em">Welcome, <span id="captainDashName">Captain</span></div>
+          <div style="font-size:.72rem;color:var(--slate);margin-top:1px" id="captainDashDistrict">Your District</div>
+        </div>
+
+        <!-- Stats grid -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px" id="captainDashStats"></div>
+
+        <!-- Alert composer -->
+        <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:8px">📢 Send District Alert</div>
+          <textarea id="captainAlertMsg" placeholder="Type a message to alert your district members…" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:5px;padding:9px 11px;color:var(--white);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:70px;outline:none"></textarea>
+          <button class="btn btn-teal" onclick="sendDistrictAlert()" style="width:100%;margin-top:8px">📤 Send Alert</button>
+        </div>
+
+        <!-- Recent alerts -->
+        <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:12px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate)">📋 Recent Alerts</div>
+            <button class="btn btn-ghost" style="font-size:.62rem;padding:3px 8px" onclick="loadDistrictAlerts()">🔄</button>
+          </div>
+          <div id="captainAlertLog"><div style="font-size:.72rem;color:var(--slate2);font-style:italic">No alerts sent yet.</div></div>
+        </div>
+
+        <!-- Recent incidents -->
+        <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:12px;margin-bottom:10px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:8px">🚨 Recent Incidents</div>
+          <div id="captainRecentInc"></div>
+        </div>
+
       </div>
       <div class="list-hdr">
         <input class="srch" id="incSearch" placeholder="🔍 Search incidents…" oninput="filterIncidents()">
@@ -472,6 +503,7 @@ body.light .strip-cell{background:#fff}
         <button id="distTabOverview" onclick="switchDistTab('overview')" style="flex:1;padding:10px 6px;background:none;border:none;border-bottom:2px solid var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);cursor:pointer">📊 Overview</button>
         <button id="distTabDirectory" onclick="switchDistTab('directory')" style="flex:1;padding:10px 6px;background:none;border:none;border-bottom:2px solid transparent;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);cursor:pointer">📇 Directory</button>
         <button id="distPrintBtn" onclick="printCaptainDirectory()" style="display:none;padding:10px 14px;background:none;border:none;border-bottom:2px solid transparent;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate);cursor:pointer">🖨️</button>
+        <button class="admin-only" onclick="openAdminAlertModal()" style="padding:10px 12px;background:none;border:none;border-bottom:2px solid transparent;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal);cursor:pointer;white-space:nowrap">📢 Alert</button>
       </div>
       <!-- Overview cards -->
       <div id="distOverview"></div>
@@ -587,6 +619,37 @@ body.light .strip-cell{background:#fff}
   </nav>
 
 </div><!-- /appShell -->
+
+<!-- DISTRICT ALERT MODAL (admin) -->
+<div class="modal-overlay" id="adminAlertOverlay" onclick="if(event.target===this)closeAdminAlertModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hd">
+      <div class="modal-title">📢 Send District Alert</div>
+      <button class="modal-close" onclick="closeAdminAlertModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="mf-row">
+        <div class="mf-label">District</div>
+        <select id="adminAlertDistrict" class="flt" style="width:100%">
+          <option value="">— Select a district —</option>
+        </select>
+      </div>
+      <div class="mf-row">
+        <div class="mf-label">Message</div>
+        <textarea id="adminAlertMsg" placeholder="Type your alert message…" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b2);border-radius:5px;padding:10px 12px;color:var(--white);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:90px;outline:none"></textarea>
+      </div>
+      <div class="mf-row">
+        <div class="mf-label" style="margin-bottom:8px">Recent Alerts</div>
+        <div id="adminAlertLogBody" style="max-height:220px;overflow-y:auto"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-teal" style="flex:1" onclick="sendAdminDistrictAlert()">📤 Send</button>
+      <button class="btn btn-ghost" onclick="closeAdminAlertModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- INCIDENT DETAIL MODAL -->
 <div class="modal-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
@@ -742,8 +805,10 @@ function applyRoleUI() {
   if (banner) banner.style.display=isCaptain?'block':'none';
   if (isCaptain) {
     const distLbl = districtLabel(captainDistrict);
-    const n = document.getElementById('captainBannerName');
-    if (n) n.textContent=currentUserName+' · '+distLbl;
+    const nameEl = document.getElementById('captainDashName');
+    const distEl = document.getElementById('captainDashDistrict');
+    if (nameEl) nameEl.textContent = currentUserName;
+    if (distEl) distEl.textContent = '👮 ' + distLbl;
   }
   // Populate member district filter
   const mdf = document.getElementById('memDistFlt');
@@ -774,6 +839,7 @@ async function loadAll() {
   filterIncidents();
   renderStats();
   updateMoreStrip();
+  if (currentRole==='captain' && currentScreen==='districts') renderCaptainDashboard();
 }
 function startRealtime() {
   sb.channel('adm-mob').on('postgres_changes',{event:'INSERT',schema:'public',table:'incidents'},async p=>{
@@ -804,7 +870,7 @@ function showScreen(name) {
   if(nb) nb.classList.add('on');
   if(name==='members') loadMembers();
   if(name==='apps') loadApplications();
-  if(name==='districts') renderDistricts();
+  if(name==='districts') { renderDistricts(); if(currentRole==='captain') renderCaptainDashboard(); }
   if(name==='stats') renderStats();
 }
 
@@ -931,12 +997,12 @@ function openDetail(id) {
       </div>
     </div>`;
 
-  const canAct=currentRole!=='captain';
+  const canAct=currentRole!=='captain'||(captainDistrict&&inc.district===captainDistrict);
   document.getElementById('detailActions').innerHTML=`
     ${canAct?(inc.status==='active'
       ?`<button class="btn btn-gold" onclick="archiveOne('${id}');closeDetail()">📦 Archive</button>`
       :`<button class="btn btn-green" onclick="restoreOne('${id}');closeDetail()">↩ Restore</button>`):''}
-    ${canAct?`<button class="btn btn-red" onclick="deleteOne('${id}');closeDetail()">🗑 Delete</button>`:''}
+    ${currentRole!=='captain'?`<button class="btn btn-red" onclick="deleteOne('${id}');closeDetail()">🗑 Delete</button>`:''}
     <button class="btn btn-ghost" onclick="closeDetail()">Close</button>`;
 
   document.getElementById('detailOverlay').classList.add('open');
@@ -1530,6 +1596,182 @@ async function logout() {
   if(!confirm('Sign out?')) return;
   if(sb) await sb.auth.signOut();
   location.reload();
+}
+
+/* ════════════════════════════════════════════════
+   CAPTAIN DASHBOARD
+════════════════════════════════════════════════ */
+function renderCaptainDashboard() {
+  if (!captainDistrict) return;
+  const color = DISTRICT_COLORS[captainDistrict] || 'var(--teal)';
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const weekStart  = new Date(now); weekStart.setHours(0,0,0,0); weekStart.setDate(weekStart.getDate()-((weekStart.getDay()+6)%7));
+  const todayStart = new Date(now); todayStart.setHours(0,0,0,0);
+  const distInc  = allIncidents.filter(i => i.district === captainDistrict);
+  const active   = distInc.filter(i => i.status === 'active').length;
+  const month    = distInc.filter(i => new Date(i.occurred_at) >= monthStart).length;
+  const week     = distInc.filter(i => new Date(i.occurred_at) >= weekStart).length;
+  const memCount = memberList.filter(m => m.district === captainDistrict).length;
+
+  // Stats tiles
+  const statsEl = document.getElementById('captainDashStats');
+  if (statsEl) {
+    const tile = (val, lbl, accent) => `
+      <div style="background:var(--navy2);border:1px solid ${accent?`${color}44`:'var(--b2)'};border-radius:8px;padding:12px 8px;text-align:center">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:${accent?color:'var(--white)'}">${val}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-top:2px">${lbl}</div>
+      </div>`;
+    statsEl.innerHTML =
+      tile(active,   'Active',   true)  +
+      tile(month,    'Month',    false) +
+      tile(week,     'Week',     false) +
+      tile(memCount, 'Members',  false);
+  }
+
+  // Recent incidents
+  const recentEl = document.getElementById('captainRecentInc');
+  if (recentEl) {
+    const recent = distInc.slice(0, 8);
+    if (!recent.length) {
+      recentEl.innerHTML = `<div style="font-size:.75rem;color:var(--slate2);font-style:italic">No incidents in your district yet.</div>`;
+    } else {
+      const tc = { red:'var(--red)', gold:'var(--gold)', teal:'var(--teal)' };
+      recentEl.innerHTML = recent.map(inc => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b2);cursor:pointer" onclick="openDetail('${inc.id}')">
+          <span style="width:8px;height:8px;border-radius:50%;background:${tc[inc.type_color]||'var(--teal)'};flex-shrink:0"></span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.82rem;font-weight:500">${esc(inc.type)}</div>
+            <div style="font-size:.68rem;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(inc.address)}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            ${ageTag(inc.occurred_at)}
+            ${inc.status==='archived'?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--slate2)">archived</div>`:''}
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  loadDistrictAlerts();
+}
+
+/* ════════════════════════════════════════════════
+   DISTRICT ALERTS
+════════════════════════════════════════════════ */
+async function loadDistrictAlerts() {
+  if (!sb || !captainDistrict) return;
+  const el = document.getElementById('captainAlertLog');
+  if (!el) return;
+  try {
+    const { data, error } = await sb
+      .from('district_alerts')
+      .select('*')
+      .eq('district', captainDistrict)
+      .order('created_at', { ascending: false })
+      .limit(10);
+    if (error) throw error;
+    if (!data || !data.length) {
+      el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2);font-style:italic">No alerts sent yet.</div>`;
+      return;
+    }
+    el.innerHTML = data.map(a => `
+      <div style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.18);border-radius:6px;padding:10px 12px;margin-bottom:8px">
+        <div style="font-size:.8rem;line-height:1.5;color:var(--white);margin-bottom:5px">${esc(a.message)}</div>
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2)">
+          <span>👤 ${esc(a.sent_by_name||'Captain')}</span>
+          <span>${fmt(a.created_at)}</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    el.innerHTML = `<div style="font-size:.68rem;color:var(--slate2)">Could not load alerts — ensure the district_alerts table exists.</div>`;
+  }
+}
+
+async function sendDistrictAlert() {
+  const msg = document.getElementById('captainAlertMsg')?.value.trim();
+  if (!msg) { showToast('⚠️','Please enter a message.','err'); return; }
+  if (!captainDistrict) return;
+  try {
+    const { error } = await sb.from('district_alerts').insert({
+      district:      captainDistrict,
+      message:       msg,
+      sent_by_email: currentUserEmail,
+      sent_by_name:  currentUserName,
+    });
+    if (error) throw error;
+    document.getElementById('captainAlertMsg').value = '';
+    showToast('📢','Alert sent to your district.');
+    loadDistrictAlerts();
+  } catch(e) {
+    showToast('⚠️', e.message || 'Failed to send alert.', 'err');
+  }
+}
+
+function openAdminAlertModal() {
+  const sel = document.getElementById('adminAlertDistrict');
+  if (sel && sel.options.length <= 1) {
+    DISTRICTS.forEach(([v,l]) => {
+      const o = document.createElement('option'); o.value=v; o.textContent=l; sel.appendChild(o);
+    });
+  }
+  document.getElementById('adminAlertMsg').value = '';
+  document.getElementById('adminAlertOverlay').classList.add('open');
+  loadAdminAlertLog();
+}
+
+function closeAdminAlertModal() {
+  document.getElementById('adminAlertOverlay').classList.remove('open');
+}
+
+async function loadAdminAlertLog() {
+  const el = document.getElementById('adminAlertLogBody');
+  if (!el || !sb) return;
+  try {
+    const { data, error } = await sb
+      .from('district_alerts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (error) throw error;
+    if (!data || !data.length) {
+      el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2);font-style:italic">No alerts sent yet.</div>`;
+      return;
+    }
+    el.innerHTML = data.map(a => {
+      const dc = DISTRICT_COLORS[a.district] || 'var(--teal)';
+      return `
+        <div style="padding:9px 0;border-bottom:1px solid var(--b2)">
+          <div style="display:flex;gap:7px;align-items:flex-start;margin-bottom:4px">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap;flex-shrink:0">${esc(districtLabel(a.district))}</span>
+            <span style="font-size:.78rem;line-height:1.4">${esc(a.message)}</span>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2)">👤 ${esc(a.sent_by_name||'Admin')} · ${fmt(a.created_at)}</div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div style="font-size:.68rem;color:var(--slate2)">Could not load alerts.</div>`;
+  }
+}
+
+async function sendAdminDistrictAlert() {
+  const district = document.getElementById('adminAlertDistrict')?.value;
+  const msg      = document.getElementById('adminAlertMsg')?.value.trim();
+  if (!district) { showToast('⚠️','Select a district first.','err'); return; }
+  if (!msg)      { showToast('⚠️','Please enter a message.','err'); return; }
+  try {
+    const { error } = await sb.from('district_alerts').insert({
+      district,
+      message:       msg,
+      sent_by_email: currentUserEmail,
+      sent_by_name:  currentUserName,
+    });
+    if (error) throw error;
+    document.getElementById('adminAlertMsg').value = '';
+    showToast('📢', `Alert sent to ${districtLabel(district)}.`);
+    loadAdminAlertLog();
+  } catch(e) {
+    showToast('⚠️', e.message || 'Failed to send alert.', 'err');
+  }
 }
 
 /* ════════════════════════════════════════════════
