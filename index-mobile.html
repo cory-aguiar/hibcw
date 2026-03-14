@@ -622,6 +622,36 @@ a.nav-btn{text-decoration:none;color:inherit}
 .type-btn.sel-teal{background:rgba(0,201,167,.12);border-color:var(--teal);color:var(--teal)}
 .type-icon{font-size:1.4rem;line-height:1}
 
+/* District alert banner */
+.alert-banner{
+  position:fixed;bottom:calc(var(--nav-h) + var(--safe-bot) + 10px);left:10px;right:10px;
+  z-index:800;background:linear-gradient(135deg,rgba(245,166,35,.18),rgba(245,166,35,.08));
+  border:1px solid rgba(245,166,35,.45);border-radius:10px;
+  padding:12px 14px;display:flex;gap:10px;align-items:flex-start;
+  box-shadow:0 4px 20px rgba(0,0,0,.35);
+  animation:alertSlideUp .35s cubic-bezier(.34,1.2,.64,1);
+}
+.alert-banner.hidden{display:none}
+@keyframes alertSlideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.alert-banner-ico{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.alert-banner-body{flex:1;min-width:0}
+.alert-banner-district{font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.alert-banner-msg{font-size:.78rem;line-height:1.5;color:var(--white)}
+.alert-banner-meta{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate);margin-top:4px}
+.alert-banner-close{background:none;border:none;color:var(--slate);font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;line-height:1}
+body.light .alert-banner{background:linear-gradient(135deg,rgba(184,124,10,.12),rgba(184,124,10,.06));border-color:rgba(184,124,10,.35)}
+body.light .alert-banner-msg{color:var(--white)}
+
+/* Alert feed in More screen */
+.alert-feed-item{
+  padding:12px 14px;border-bottom:1px solid var(--border2);
+}
+.alert-feed-item:last-child{border-bottom:none}
+.alert-feed-district{font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;padding:1px 6px;display:inline-block;margin-bottom:5px}
+.alert-feed-msg{font-size:.78rem;line-height:1.5;color:var(--white);margin-bottom:4px}
+.alert-feed-meta{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)}
+body.light .alert-feed-msg{color:var(--white)}
+
 /* Incident glossary */
 .glossary-link{
   display:flex;align-items:center;gap:7px;
@@ -1531,6 +1561,14 @@ a.nav-btn{text-decoration:none;color:inherit}
         </div>
       </div>
 
+      <!-- District Alerts -->
+      <div class="more-section">
+        <div class="more-section-title">📢 District Alerts</div>
+        <div class="more-card" id="alertFeedEl">
+          <div style="padding:16px;text-align:center;font-size:.78rem;color:var(--slate2);font-style:italic">Loading alerts…</div>
+        </div>
+      </div>
+
       <!-- District Captains -->
       <div class="more-section">
         <div class="more-section-title">👮 District Captains</div>
@@ -1580,6 +1618,17 @@ a.nav-btn{text-decoration:none;color:inherit}
   </div><!-- /sc-more -->
 
 </div><!-- /app -->
+
+<!-- DISTRICT ALERT BANNER -->
+<div class="alert-banner hidden" id="alertBanner">
+  <div class="alert-banner-ico">📢</div>
+  <div class="alert-banner-body">
+    <div class="alert-banner-district" id="alertBannerDistrict">District Alert</div>
+    <div class="alert-banner-msg" id="alertBannerMsg"></div>
+    <div class="alert-banner-meta" id="alertBannerMeta"></div>
+  </div>
+  <button class="alert-banner-close" onclick="dismissAlertBanner()">✕</button>
+</div>
 
 <!-- BOTTOM NAV -->
 <nav class="bot-nav">
@@ -2543,6 +2592,7 @@ function toggleDistrictOverlay(mapObj, btn) {
   if (!initSB()) return;
   await loadIncidents();
   await loadCaptains();
+  await loadDistrictAlerts();
 
   sb.channel('incidents').on('postgres_changes',{event:'INSERT',schema:'public',table:'incidents'}, async p => {
     const {data} = await sb.from('incidents').select('*,incident_media(*)').eq('id',p.new.id).single();
@@ -2554,7 +2604,102 @@ function toggleDistrictOverlay(mapObj, btn) {
       showToast('🔔','New incident: '+data.type);
     }
   }).subscribe();
+
+  // Listen for new alerts in real time
+  sb.channel('district-alerts-public').on('postgres_changes',{event:'INSERT',schema:'public',table:'district_alerts'}, async () => {
+    await loadDistrictAlerts();
+  }).subscribe();
 })();
+
+/* ════════════════════════════════════════════════
+   DISTRICT ALERTS
+════════════════════════════════════════════════ */
+const DISTRICT_COLORS_PUBLIC = {
+  "hamakua":"#84cc16","north-hilo":"#3b82f6","south-hilo":"#00c9a7",
+  "lower-puna":"#c084fc","upper-puna":"#a855f7","kau":"#ef4444",
+  "south-kona":"#f59e0b","north-kona":"#f97316","north-kohala":"#10b981"
+};
+const DISTRICT_LABELS_PUBLIC = {
+  "hamakua":"District 1 - Hāmākua","north-hilo":"District 2 - North Hilo",
+  "south-hilo":"District 3 - South Hilo","lower-puna":"District 4 - Lower Puna",
+  "upper-puna":"District 5 - Upper Puna","kau":"District 6 - Kaʻū",
+  "south-kona":"District 7 - South Kona","north-kona":"District 8 - North Kona",
+  "north-kohala":"District 9 - Kohala"
+};
+
+async function loadDistrictAlerts() {
+  if (!sb) return;
+  try {
+    const { data, error } = await sb
+      .from('district_alerts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (error) throw error;
+    renderAlertFeed(data || []);
+    showLatestAlertBanner(data || []);
+  } catch(e) {
+    const el = document.getElementById('alertFeedEl');
+    if (el) el.innerHTML = '<div style="padding:14px;font-size:.75rem;color:var(--slate2);font-style:italic">Alerts unavailable.</div>';
+  }
+}
+
+function renderAlertFeed(alerts) {
+  const el = document.getElementById('alertFeedEl');
+  if (!el) return;
+  if (!alerts.length) {
+    el.innerHTML = '<div style="padding:16px;text-align:center;font-size:.78rem;color:var(--slate2);font-style:italic">No alerts at this time.</div>';
+    return;
+  }
+  el.innerHTML = alerts.map(a => {
+    const color = DISTRICT_COLORS_PUBLIC[a.district] || 'var(--teal)';
+    const label = DISTRICT_LABELS_PUBLIC[a.district] || a.district;
+    const date  = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+    return `<div class="alert-feed-item">
+      <span class="alert-feed-district" style="background:${color}18;color:${color};border:1px solid ${color}44">${label}</span>
+      <div class="alert-feed-msg">${escHtml(a.message)}</div>
+      <div class="alert-feed-meta">👤 ${escHtml(a.sent_by_name||'HIBCW')} · ${date}</div>
+    </div>`;
+  }).join('');
+}
+
+function showLatestAlertBanner(alerts) {
+  if (!alerts.length) return;
+  // Only show alerts from the last 48 hours
+  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
+  const recent = alerts.find(a => new Date(a.created_at).getTime() > cutoff);
+  if (!recent) return;
+  // Don't re-show if user already dismissed this alert
+  if (sessionStorage.getItem('hibcw-alert-dismissed') === recent.id) return;
+
+  const color = DISTRICT_COLORS_PUBLIC[recent.district] || 'var(--gold)';
+  const label = DISTRICT_LABELS_PUBLIC[recent.district] || recent.district;
+  const date  = new Date(recent.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+
+  document.getElementById('alertBannerDistrict').textContent = label;
+  document.getElementById('alertBannerDistrict').style.color = color;
+  document.getElementById('alertBannerMsg').textContent = recent.message;
+  document.getElementById('alertBannerMeta').textContent = '👤 ' + (recent.sent_by_name||'HIBCW') + ' · ' + date;
+
+  // Store the id so we can dismiss it
+  const banner = document.getElementById('alertBanner');
+  banner.dataset.alertId = recent.id;
+  banner.classList.remove('hidden');
+}
+
+function dismissAlertBanner() {
+  const banner = document.getElementById('alertBanner');
+  const id = banner.dataset.alertId;
+  if (id) sessionStorage.setItem('hibcw-alert-dismissed', id);
+  banner.style.transition = 'opacity .2s, transform .2s';
+  banner.style.opacity = '0';
+  banner.style.transform = 'translateY(10px)';
+  setTimeout(() => banner.classList.add('hidden'), 220);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div'); d.textContent = s||''; return d.innerHTML;
+}
 </script>
 </body>
 </html>
