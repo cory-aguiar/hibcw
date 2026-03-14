@@ -128,11 +128,11 @@ header{
 .theme-btn:active{opacity:.7}
 
 /* ── Screens ── */
-.screens{flex:1;overflow:hidden;position:relative}
+.screens{flex:1;overflow:hidden;position:relative;min-height:0}
 .screen{
   position:absolute;inset:0;overflow-y:auto;
   background:var(--navy);display:none;flex-direction:column;
-  padding-bottom:calc(var(--nav-h) + var(--safe-bot) + 16px);
+  padding-bottom:16px;
 }
 .screen.active{display:flex}
 .screen::-webkit-scrollbar{display:none}
@@ -530,6 +530,13 @@ body.light .strip-cell{background:#fff}
             <div class="more-arrow">›</div>
           </a>
         </div>
+
+        <div style="padding:8px 16px 4px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.54rem;color:var(--slate2);line-height:1.8">
+          HIBCW Admin · Public Beta<br>
+          Hawaii Island Business Crime Watch · A Program of KIAA
+        </div>
+        <div style="height:8px"></div>
+
       </div>
     </div>
 
