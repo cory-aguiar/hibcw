@@ -1691,7 +1691,7 @@ async function loadDistrictAlerts() {
     if (error) throw error;
     if (!data || !data.length) { el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2);font-style:italic">No alerts sent yet.</div>`; return; }
     el.innerHTML = data.map(a => `
-      <div style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.18);border-radius:6px;padding:10px 12px;margin-bottom:8px">
+      <div data-id="${a.id}" data-msg="${a.message.replace(/"/g,'&quot;')}" data-media="${a.media_url||''}" data-mtype="${a.media_type||''}" style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.18);border-radius:6px;padding:10px 12px;margin-bottom:8px">
         <div style="font-size:.8rem;line-height:1.5;color:var(--white);margin-bottom:6px">${esc(a.message)}</div>
         ${a.media_url ? `
           <div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2)">
@@ -1702,7 +1702,7 @@ async function loadDistrictAlerts() {
         <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2)">
           <span>👤 ${esc(a.sent_by_name||'Captain')} · ${fmt(a.created_at)}${a.is_edited?' · <em>edited</em>':''}</span>
           <div style="display:flex;gap:5px">
-            <button onclick="startAlertEdit('${a.id}',${JSON.stringify(esc(a.message))},${JSON.stringify(a.media_url||'')})" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 7px;color:var(--teal);font-size:.58rem;cursor:pointer">✏️</button>
+            <button data-alert-id="${a.id}" onclick="startAlertEditById(this)" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 7px;color:var(--teal);font-size:.58rem;cursor:pointer">✏️</button>
             <button onclick="deleteDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(232,65,90,.3);border-radius:3px;padding:2px 7px;color:var(--red);font-size:.58rem;cursor:pointer">✕</button>
           </div>
         </div>
@@ -1752,7 +1752,16 @@ async function uploadAlertMedia(file, district) {
   return { url: urlData.publicUrl, type: file.type.startsWith('video/') ? 'video' : 'image' };
 }
 
-function startAlertEdit(id, message, mediaUrl) {
+function startAlertEditById(btn) {
+  const card     = btn.closest('[data-id]');
+  const id       = card?.dataset.id    || '';
+  const message  = card?.dataset.msg   || '';
+  const mediaUrl = card?.dataset.media || '';
+  const mediaType= card?.dataset.mtype || '';
+  startAlertEdit(id, message, mediaUrl, mediaType);
+}
+
+function startAlertEdit(id, message, mediaUrl, mediaType) {
   document.getElementById('alertEditId').value = id;
   document.getElementById('captainAlertMsg').value = message;
   document.getElementById('alertComposerLabel').textContent = '✏️ Edit Alert';
