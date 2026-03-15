@@ -6645,18 +6645,17 @@
         a.notes ? `<div class="app-notes">"${esc(a.notes)}"</div>` : ''}
       <div class="app-meta">Submitted ${fmt(a.created_at)}</div>
       <div class="app-actions">
-        ${
-        a.status === 'pending' ? `
-          <button class="btn btn-teal captain-hidden" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">✅ Approve</button>
-          <button class="btn btn-red captain-hidden"  onclick="rejectApp('${a.id}')">❌ Reject</button>
+        ${a.status === 'pending' ? `
+          <button class="btn btn-teal ${currentRole==='captain'&&a.district!==captainDistrict?'captain-hidden':''}" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">✅ Approve</button>
+          <button class="btn btn-red ${currentRole==='captain'&&a.district!==captainDistrict?'captain-hidden':''}"  onclick="rejectApp('${a.id}')">❌ Reject</button>
         ` : ''}
         ${a.status === 'approved' ? `
-          <button class="btn btn-ghost captain-hidden" onclick="rejectApp('${a.id}')">Revoke</button>
+          <button class="btn btn-ghost ${currentRole==='captain'&&a.district!==captainDistrict?'captain-hidden':''}" onclick="rejectApp('${a.id}')">Revoke</button>
         ` : ''}
         ${a.status === 'rejected' ? `
-          <button class="btn btn-teal captain-hidden" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">Re-approve</button>
+          <button class="btn btn-teal ${currentRole==='captain'&&a.district!==captainDistrict?'captain-hidden':''}" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">Re-approve</button>
         ` : ''}
-        <button class="btn btn-ghost" onclick="deleteApp('${a.id}')">Delete</button>
+        <button class="btn btn-ghost captain-hidden" onclick="deleteApp('${a.id}')">Delete</button>
       </div>
     </div>`
 
