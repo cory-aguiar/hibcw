@@ -133,7 +133,7 @@ header{
   position:absolute;top:0;left:0;right:0;bottom:0;
   overflow-y:auto;-webkit-overflow-scrolling:touch;
   background:var(--navy);display:none;flex-direction:column;
-  padding-bottom:16px;
+  padding-bottom:calc(var(--nav-h) + var(--safe-bot) + 16px);
 }
 .screen.active{display:flex}
 .screen::-webkit-scrollbar{display:none}
@@ -173,7 +173,7 @@ header{
 
 .card{
   background:var(--navy2);border:1px solid var(--b2);border-radius:8px;
-  margin:0 12px 8px;overflow:hidden;
+  margin:0 12px 8px;
 }
 
 .list-hdr{
