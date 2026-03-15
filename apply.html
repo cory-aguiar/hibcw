@@ -519,7 +519,7 @@
                     Phone Number 
                     <span class="req">*</span>
                 </label>
-                <input type="tel" id="aPhone" placeholder="(808) 000-0000">
+                <input type="tel" id="aPhone" placeholder="(808) 000-0000" oninput="phoneMask(this)" maxlength="14">
             </div>
 
             <div class="fld">
@@ -566,7 +566,7 @@
                     Business District 
                     <span class="req">*</span>
                 </label>
-                <select id="aDistrict" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:10px 13px;color:var(--white);font-size:.88rem;outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;-webkit-appearance:none">
+                <select id="aDistrict" onchange="lookupDistrictCaptain(this.value)" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:10px 13px;color:var(--white);font-size:.88rem;outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;-webkit-appearance:none">
                     <option value="">— Select your district…</option>
                     <option value="hamakua">District 1 - Hāmākua</option>
                     <option value="north-hilo">District 2 - North Hilo</option>
@@ -578,6 +578,10 @@
                     <option value="north-kona">District 8 - North Kona</option>
                     <option value="north-kohala">District 9 - North Kohala</option>
                 </select>
+                <!-- Captain preview shown after district selection -->
+                <div id="captainPreview" style="display:none;margin-top:8px;padding:9px 12px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.25);border-radius:5px;font-size:.78rem;color:rgba(238,243,248,.85);line-height:1.5">
+                  👮 Your district captain is <strong id="captainPreviewName" style="color:#00c9a7"></strong>
+                </div>
             </div>
 
             <div class="fld">
@@ -626,10 +630,59 @@
         sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     })();
 
+    // ── Phone mask ────────────────────────────────────────
+    function phoneMask(input) {
+      let v = input.value.replace(/\D/g, '').slice(0, 10);
+      if (v.length >= 7)      v = '(' + v.slice(0,3) + ') ' + v.slice(3,6) + '-' + v.slice(6);
+      else if (v.length >= 4) v = '(' + v.slice(0,3) + ') ' + v.slice(3);
+      else if (v.length > 0)  v = '(' + v;
+      input.value = v;
+    }
+
+    // Cache for looked-up captain names by district
+    const captainCache = {};
+
+    async function lookupDistrictCaptain(districtValue) {
+      const preview = document.getElementById('captainPreview');
+      const previewName = document.getElementById('captainPreviewName');
+      if (!districtValue || !sb) { preview.style.display = 'none'; return; }
+
+      // Use cache if available
+      if (captainCache[districtValue] !== undefined) {
+        if (captainCache[districtValue]) {
+          previewName.textContent = captainCache[districtValue];
+          preview.style.display = 'block';
+        } else {
+          preview.style.display = 'none';
+        }
+        return;
+      }
+
+      // Query approved applications in this district that have a captain_name set
+      const { data } = await sb
+        .from('member_applications')
+        .select('captain_name')
+        .eq('district', districtValue)
+        .eq('status', 'approved')
+        .not('captain_name', 'is', null)
+        .limit(1)
+        .single();
+
+      const name = data?.captain_name?.trim() || null;
+      captainCache[districtValue] = name;
+
+      if (name) {
+        previewName.textContent = name;
+        preview.style.display = 'block';
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
     async function submitApplication() {
         const name = document.getElementById('aName').value.trim();
         const email = document.getElementById('aEmail').value.trim().toLowerCase();
-        const phone = document.getElementById('aPhone').value.trim();
+        const phone = document.getElementById('aPhone').value.trim().replace(/\D/g, '');
         const bizName = document.getElementById('aBizName').value.trim();
         const bizAddr = document.getElementById('aBizAddr').value.trim();
         const bizCity = document.getElementById('aBizCity').value.trim();
@@ -667,6 +720,20 @@
         btn.disabled = true;
         btn.textContent = '⏳ Submitting…';
 
+        // Look up captain for selected district (use cache if already fetched)
+        let captainName = captainCache[district] || null;
+        if (captainName === undefined) {
+          const { data } = await sb
+            .from('member_applications')
+            .select('captain_name')
+            .eq('district', district)
+            .eq('status', 'approved')
+            .not('captain_name', 'is', null)
+            .limit(1)
+            .single();
+          captainName = data?.captain_name?.trim() || null;
+        }
+
         const {error} = await sb.from('member_applications').insert({
             full_name: name,
             email: email,
@@ -677,6 +744,7 @@
             business_state: bizState || null,
             business_zip: bizZip || null,
             district: district || null,
+            captain_name: captainName || null,
             notes: notes || null,
             status: 'pending'
         });
