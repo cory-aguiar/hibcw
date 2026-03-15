@@ -1150,7 +1150,7 @@ function renderMembers() {
       <div class="mem-detail">
         ${m.business_name?`🏢 ${esc(m.business_name)}<br>`:''}
         ${m.phone?`📞 ${fmtPhone(m.phone)}<br>`:''}
-        ${m.district?`📍 <span style="color:var(--teal)">${esc(districtLabel(m.district))}</span><br>`:''}
+        ${m.district?`📍 <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${DISTRICT_COLORS[m.district]||'var(--teal)'}18;border:1px solid ${DISTRICT_COLORS[m.district]||'var(--teal)'}44;border-radius:3px;padding:1px 6px;color:${DISTRICT_COLORS[m.district]||'var(--teal)'}">${esc(districtLabel(m.district))}</span><br>`:''}
         ${m.captain_name?`👮 Captain: ${esc(m.captain_name)}<br>`:''}
       </div>
       <div class="mem-actions captain-hidden">
