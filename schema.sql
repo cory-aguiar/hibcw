@@ -167,8 +167,12 @@ create policy "public check email"         on public.member_emails for select us
 create table public.district_alerts (
   id             uuid primary key default uuid_generate_v4(),
   created_at     timestamptz not null default now(),
+  updated_at     timestamptz,
   district       text not null,
   message        text not null,
+  media_url      text,
+  media_type     text,  -- 'image' | 'video'
+  is_edited      boolean default false,
   sent_by_email  text,
   sent_by_name   text
 );
@@ -177,4 +181,12 @@ create index district_alerts_created_at_idx on public.district_alerts (created_a
 alter table public.district_alerts enable row level security;
 create policy "admin read alerts"   on public.district_alerts for select using (auth.role() = 'authenticated');
 create policy "admin insert alerts" on public.district_alerts for insert with check (auth.role() = 'authenticated');
+create policy "admin update alerts" on public.district_alerts for update using (auth.role() = 'authenticated');
 create policy "admin delete alerts" on public.district_alerts for delete using (auth.role() = 'authenticated');
+
+-- ── MIGRATION: add media/edit columns if table already exists ─
+-- Run these if you created district_alerts before this update:
+-- alter table public.district_alerts add column if not exists media_url text;
+-- alter table public.district_alerts add column if not exists media_type text;
+-- alter table public.district_alerts add column if not exists updated_at timestamptz;
+-- alter table public.district_alerts add column if not exists is_edited boolean default false;
