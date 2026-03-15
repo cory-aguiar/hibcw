@@ -4594,15 +4594,13 @@
       <td class="mem-date" style="white-space:nowrap">${m.business_state ? esc(m.business_state) : na}</td>
       <td class="mem-date" style="white-space:nowrap">${m.business_zip ? esc(m.business_zip) : na}</td>
       <td>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;
-          background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);
-          border-radius:3px;padding:2px 7px;color:var(--teal);white-space:nowrap">
-          ${
-
-
-
-            m.district ? districtLabel(m.district) : na}
-        </span>
+        ${(() => {
+          const dc = KIAA_DISTRICTS.find(d => d.id === m.district);
+          const c = dc?.color || 'var(--teal)';
+          return m.district
+            ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;background:${c}18;border:1px solid ${c}44;border-radius:3px;padding:2px 7px;color:${c};white-space:nowrap">${dc?.label || districtLabel(m.district)}</span>`
+            : na;
+        })()} 
       </td>
       <td style="font-size:.78rem;color:var(--slate);white-space:nowrap">
         ${
