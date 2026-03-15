@@ -592,6 +592,7 @@ body.light .strip-cell{background:#fff}
 
         <div class="more-section-title">📚 Resources</div>
         <div id="mobileResourceCards"></div>
+        <div id="mobileResourceFiles"></div>
 
         <div style="padding:8px 16px 4px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.54rem;color:var(--slate2);line-height:1.8">
           HIBCW Admin · Public Beta<br>
@@ -1976,54 +1977,89 @@ async function sendAdminDistrictAlert() {
 /* ════════════════════════════════════════════════
    RESOURCES
 ════════════════════════════════════════════════ */
+const RESOURCE_FILES = [
+  { category:'District Flyers', icon:'🗺', title:'District 1 — Hāmākua Flyer',    desc:'Promotional flyer for Hāmākua businesses.',    file:'files/flyer-d1-hamakua.pdf',    roles:['admin','superadmin','captain'], district:'hamakua'     },
+  { category:'District Flyers', icon:'🗺', title:'District 2 — North Hilo Flyer',  desc:'Promotional flyer for North Hilo businesses.',  file:'files/flyer-d2-north-hilo.pdf', roles:['admin','superadmin','captain'], district:'north-hilo'  },
+  { category:'District Flyers', icon:'🗺', title:'District 3 — South Hilo Flyer',  desc:'Promotional flyer for South Hilo businesses.',  file:'files/flyer-d3-south-hilo.pdf', roles:['admin','superadmin','captain'], district:'south-hilo'  },
+  { category:'District Flyers', icon:'🗺', title:'District 4 — Lower Puna Flyer',  desc:'Promotional flyer for Lower Puna businesses.',  file:'files/flyer-d4-lower-puna.pdf', roles:['admin','superadmin','captain'], district:'lower-puna'  },
+  { category:'District Flyers', icon:'🗺', title:'District 5 — Upper Puna Flyer',  desc:'Promotional flyer for Upper Puna businesses.',  file:'files/flyer-d5-upper-puna.pdf', roles:['admin','superadmin','captain'], district:'upper-puna'  },
+  { category:'District Flyers', icon:'🗺', title:"District 6 — Kaʻū Flyer",        desc:"Promotional flyer for Kaʻū businesses.",         file:'files/flyer-d6-kau.pdf',        roles:['admin','superadmin','captain'], district:'kau'         },
+  { category:'District Flyers', icon:'🗺', title:'District 7 — South Kona Flyer',  desc:'Promotional flyer for South Kona businesses.',  file:'files/flyer-d7-south-kona.pdf', roles:['admin','superadmin','captain'], district:'south-kona'  },
+  { category:'District Flyers', icon:'🗺', title:'District 8 — North Kona Flyer',  desc:'Promotional flyer for North Kona businesses.',  file:'files/flyer-d8-north-kona.pdf', roles:['admin','superadmin','captain'], district:'north-kona'  },
+  { category:'District Flyers', icon:'🗺', title:'District 9 — Kohala Flyer',      desc:'Promotional flyer for Kohala businesses.',      file:'files/flyer-d9-kohala.pdf',     roles:['admin','superadmin','captain'], district:'north-kohala'},
+  { category:'General Flyers',  icon:'📄', title:'HIBCW General Awareness Flyer',  desc:'General flyer suitable for any district.',      file:'files/flyer-general.pdf',       roles:['admin','superadmin','captain'] },
+  { category:'General Flyers',  icon:'📄', title:'Join HIBCW — Recruitment Flyer', desc:'Encourage businesses to apply for membership.', file:'files/flyer-recruitment.pdf',   roles:['admin','superadmin','captain'] },
+  { category:'Forms & Templates',icon:'📝', title:'Incident Report Form (Paper)',  desc:'Paper form for capturing incidents offline.',   file:'files/form-incident-paper.pdf', roles:['admin','superadmin','captain'] },
+  { category:'Forms & Templates',icon:'📝', title:'Member Sign-Up Sheet',          desc:'Collect member info at community events.',      file:'files/form-member-signup.pdf',  roles:['admin','superadmin','captain'] },
+  { category:'Forms & Templates',icon:'📝', title:'Captain Introductory Letter',   desc:'Template letter introducing HIBCW to businesses.',file:'files/template-intro-letter.pdf',roles:['admin','superadmin','captain'] },
+  { category:'Admin Resources',  icon:'🔧', title:'HIBCW Data Export Guide',       desc:'Interpreting exported CSV data files.',         file:'files/guide-csv-export.pdf',    roles:['admin','superadmin'] },
+  { category:'Admin Resources',  icon:'🔧', title:'Supabase Database Reference',   desc:'Database table structure and RLS overview.',    file:'files/guide-database.pdf',      roles:['admin','superadmin'] },
+];
+
 function renderMobileResources() {
   const el = document.getElementById('mobileResourceCards');
+  const elFiles = document.getElementById('mobileResourceFiles');
   if (!el) return;
 
   const resources = [
-    {
-      title: 'Admin Handbook',
-      desc: 'Full guide for admins — incidents, members, applications, alerts, and more.',
-      icon: '📋',
-      color: '#00c9a7',
-      roles: ['admin','superadmin'],
-      url: 'handbook-admin.html',
-    },
-    {
-      title: "District Captain's Handbook",
-      desc: 'Role guide for captains — permissions, instructions, and getting help.',
-      icon: '👮',
-      color: '#f5a623',
-      roles: ['admin','superadmin','captain'],
-      url: 'handbook-captain.html',
-    },
-    {
-      title: 'Captain Quick Reference Card',
-      desc: 'One-page at-a-glance card — contacts, tasks, permissions, links. Print and keep on desk.',
-      icon: '⚡',
-      color: '#a855f7',
-      roles: ['admin','superadmin','captain'],
-      url: 'captain-quickref.html',
-    },
+    { title:'Admin Handbook',                 desc:'Full admin panel guide.',                           icon:'📋', color:'#00c9a7', roles:['admin','superadmin'],           url:'handbook-admin.html'   },
+    { title:"District Captain's Handbook",    desc:'Role guide for captains.',                          icon:'👮', color:'#f5a623', roles:['admin','superadmin','captain'],  url:'handbook-captain.html' },
+    { title:'Captain Quick Reference Card',   desc:'One-page contacts, tasks, permissions and links.',  icon:'⚡', color:'#a855f7', roles:['admin','superadmin','captain'],  url:'captain-quickref.html' },
   ];
 
   const visible = resources.filter(r => r.roles.includes(currentRole));
-  if (!visible.length) { el.innerHTML=''; return; }
-
-  el.innerHTML = visible.map(r => `
-    <div style="background:var(--navy2);border:1px solid ${r.color}33;border-left:3px solid ${r.color};border-radius:8px;margin:0 12px 10px;padding:14px 14px 12px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <div style="width:36px;height:36px;border-radius:8px;background:${r.color}18;border:1px solid ${r.color}33;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">${r.icon}</div>
-        <div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:var(--white)">${r.title}</div>
-          <div style="font-size:.7rem;color:var(--slate);line-height:1.45;margin-top:1px">${r.desc}</div>
+  if (!visible.length) { el.innerHTML=''; }
+  else {
+    el.innerHTML = visible.map(r => `
+      <div style="background:var(--navy2);border:1px solid ${r.color}33;border-left:3px solid ${r.color};border-radius:8px;margin:0 12px 10px;padding:14px 14px 12px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div style="width:36px;height:36px;border-radius:8px;background:${r.color}18;border:1px solid ${r.color}33;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">${r.icon}</div>
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:var(--white)">${r.title}</div>
+            <div style="font-size:.7rem;color:var(--slate);line-height:1.45;margin-top:1px">${r.desc}</div>
+          </div>
         </div>
-      </div>
-      <div style="display:flex;gap:7px">
-        <button onclick="window.open('${r.url}','_blank','noopener')" style="flex:1;background:${r.color};border:none;border-radius:5px;padding:7px 10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;cursor:pointer">📖 Open</button>
-        <button onclick="const w=window.open('${r.url}','_blank','noopener,width=900,height=700');w.addEventListener('load',()=>{w.focus();w.print();})" style="background:transparent;border:1px solid ${r.color}44;border-radius:5px;padding:7px 10px;color:${r.color};font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">🖨 Print</button>
-      </div>
-    </div>`).join('');
+        <div style="display:flex;gap:7px">
+          <button onclick="window.open('${r.url}','_blank','noopener')" style="flex:1;background:${r.color};border:none;border-radius:5px;padding:7px 10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;cursor:pointer">📖 Open</button>
+          <button onclick="const w=window.open('${r.url}','_blank','noopener,width=900,height=700');w.addEventListener('load',()=>{w.focus();w.print();})" style="background:transparent;border:1px solid ${r.color}44;border-radius:5px;padding:7px 10px;color:${r.color};font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">🖨 Print</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── File library ──────────────────────────────
+  if (!elFiles) return;
+  const isCaptain = currentRole === 'captain';
+  const visibleFiles = RESOURCE_FILES.filter(f => {
+    if (!f.roles.includes(currentRole)) return false;
+    if (f.district && isCaptain) return f.district === captainDistrict;
+    return true;
+  });
+  if (!visibleFiles.length) { elFiles.innerHTML=''; return; }
+
+  const categories = [...new Set(visibleFiles.map(f => f.category))];
+  const catColors = { 'District Flyers':'#3b82f6', 'General Flyers':'#00c9a7', 'Forms & Templates':'#f59e0b', 'Admin Resources':'#7a8fa6' };
+
+  elFiles.innerHTML = `
+    <div style="padding:10px 12px 4px;font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2);border-top:1px solid var(--b2);margin-top:4px">📁 Downloadable Files</div>
+    ${categories.map(cat => {
+      const files = visibleFiles.filter(f => f.category === cat);
+      const cc = catColors[cat] || 'var(--teal)';
+      return `
+        <div style="padding:6px 12px 2px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:${cc};margin-bottom:4px">${cat}</div>
+          <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;overflow:hidden">
+            ${files.map((f,i) => `
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;${i<files.length-1?'border-bottom:1px solid var(--b2)':''}">
+              <div style="font-size:.95rem;flex-shrink:0">${f.icon}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:.78rem;font-weight:500;color:var(--white);margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.title)}</div>
+                <div style="font-size:.67rem;color:var(--slate);line-height:1.35">${esc(f.desc)}</div>
+              </div>
+              <a href="${f.file}" download style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:5px;padding:5px 9px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);text-decoration:none;white-space:nowrap;flex-shrink:0">⬇ PDF</a>
+            </div>`).join('')}
+          </div>
+        </div>`;
+    }).join('')}`;
 }
 
 function showToast(ico,body,type='') {
