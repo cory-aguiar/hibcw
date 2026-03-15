@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HIBCW Captain Quick Reference Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:    #0b1524;
+  --navy2:   #111e30;
+  --navy3:   #18293f;
+  --teal:    #00c9a7;
+  --gold:    #f5a623;
+  --red:     #e8415a;
+  --green:   #22c55e;
+  --slate:   #7a8fa6;
+  --slate2:  #4a6070;
+  --white:   #eef3f8;
+  --border:  rgba(0,201,167,.15);
+  --b2:      rgba(255,255,255,.07);
+  --text:    rgba(238,243,248,.88);
+  --text-dim:rgba(238,243,248,.65);
+  --hover-bg:rgba(255,255,255,.025);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;line-height:1.6}
+
+/* ── Light mode ── */
+body.light {
+  --navy:    #f0f4f8;
+  --navy2:   #ffffff;
+  --navy3:   #e8f0f8;
+  --teal:    #007a65;
+  --gold:    #b07800;
+  --red:     #c0273d;
+  --green:   #16a34a;
+  --slate:   #4a6070;
+  --slate2:  #7a8fa6;
+  --white:   #0b1524;
+  --border:  rgba(0,122,101,.18);
+  --b2:      rgba(0,0,0,.08);
+  --text:    #1a2a3a;
+  --text-dim:#4a6070;
+  --hover-bg:rgba(0,0,0,.02);
+  background:#f0f4f8;
+  color:#1a2a3a;
+}
+body.light .qr-card     { background:#ffffff; border-color:rgba(0,0,0,.1); }
+body.light .qr-header   { background:#ffffff; border-color:rgba(0,0,0,.1); }
+body.light .qr-toolbar  { background:#ffffff; border-color:rgba(0,0,0,.1); }
+body.light .step-num    { background:rgba(0,122,101,.12); border-color:rgba(0,122,101,.3); color:var(--teal); }
+body.light .perm-yes    { color:var(--green); }
+body.light .perm-no     { color:var(--red); }
+body.light .tag-active  { background:rgba(200,39,61,.1); color:var(--red); border-color:rgba(200,39,61,.25); }
+body.light .tag-archived{ background:rgba(176,120,0,.1); color:var(--gold); border-color:rgba(176,120,0,.25); }
+body.light .tag-note    { background:rgba(0,122,101,.1); color:var(--teal); border-color:rgba(0,122,101,.25); }
+body.light .alert-tip   { background:rgba(59,130,246,.06); border-color:#3b82f6; }
+body.light .contact-num { background:rgba(0,122,101,.1); color:var(--teal); }
+body.light .url-text    { color:var(--teal); background:rgba(0,122,101,.08); }
+body.light .hb-btn-ghost{ border-color:rgba(0,0,0,.15); color:var(--slate); }
+body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); background:rgba(0,122,101,.06); }
+
+/* ── Toolbar ── */
+.qr-toolbar {
+  position:sticky; top:0; z-index:100;
+  background:var(--navy2); border-bottom:1px solid var(--b2);
+  padding:10px 20px; display:flex; align-items:center;
+  justify-content:space-between; gap:12px;
+}
+.qr-toolbar-brand {
+  font-family:'IBM Plex Mono',monospace; font-size:.58rem;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--teal);
+}
+.toolbar-actions{ display:flex; gap:8px; align-items:center; }
+.hb-btn {
+  display:inline-flex; align-items:center; gap:5px;
+  border-radius:5px; padding:6px 12px; cursor:pointer;
+  font-family:'IBM Plex Mono',monospace; font-size:.62rem; font-weight:600;
+  letter-spacing:.04em; transition:all .15s; white-space:nowrap;
+  text-decoration:none; border:none;
+}
+.hb-btn-ghost {
+  background:transparent; border:1px solid var(--b2); color:var(--slate);
+}
+.hb-btn-ghost:hover { border-color:var(--teal); color:var(--teal); background:rgba(0,201,167,.06); }
+.hb-btn-teal { background:var(--teal); color:#0b1524; }
+.hb-btn-teal:hover { opacity:.85; }
+
+/* ── Wrap ── */
+.qr-wrap{ max-width:960px; margin:0 auto; padding:20px 20px 40px; }
+
+/* ── Page header ── */
+.qr-header {
+  background:var(--navy2); border:1px solid var(--border);
+  border-top:3px solid var(--teal); border-radius:10px;
+  padding:16px 20px; margin-bottom:14px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+}
+.qr-header-left{}
+.qr-header-title {
+  font-family:'Rajdhani',sans-serif; font-size:1.3rem; font-weight:700;
+  letter-spacing:.03em; color:var(--white); margin-bottom:2px;
+}
+.qr-header-sub { font-size:.72rem; color:var(--slate); }
+.qr-badge {
+  font-family:'IBM Plex Mono',monospace; font-size:.58rem;
+  background:rgba(245,166,35,.12); border:1px solid rgba(245,166,35,.3);
+  border-radius:4px; padding:3px 9px; color:var(--gold); white-space:nowrap;
+}
+
+/* ── Grid layouts ── */
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+.grid-full{ margin-bottom:12px; }
+
+/* ── Cards ── */
+.qr-card {
+  background:var(--navy2); border:1px solid var(--b2);
+  border-radius:8px; padding:14px;
+}
+.card-title {
+  font-family:'IBM Plex Mono',monospace; font-size:.58rem;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--slate);
+  margin-bottom:10px; display:flex; align-items:center; gap:5px;
+}
+.card-title-icon{ font-size:.85rem; }
+
+/* ── Contact rows ── */
+.contact-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:5px 0; border-bottom:1px solid var(--b2);
+}
+.contact-row:last-child{ border-bottom:none; }
+.contact-name{ font-weight:600; font-size:.8rem; color:var(--white); }
+.contact-sub { font-size:.7rem; color:var(--slate); margin-top:1px; }
+.contact-num {
+  font-family:'IBM Plex Mono',monospace; font-size:.72rem;
+  background:rgba(0,201,167,.1); color:var(--teal);
+  border-radius:4px; padding:2px 8px; white-space:nowrap;
+}
+
+/* ── Step rows ── */
+.step-row {
+  display:flex; gap:9px; padding:5px 0;
+  border-bottom:1px solid var(--b2); align-items:flex-start;
+}
+.step-row:last-child{ border-bottom:none; }
+.step-num {
+  width:20px; height:20px; border-radius:50%;
+  background:rgba(0,201,167,.15); border:1px solid rgba(0,201,167,.35);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'IBM Plex Mono',monospace; font-size:.6rem;
+  font-weight:700; color:var(--teal); flex-shrink:0; margin-top:1px;
+}
+.step-text{ font-size:.78rem; line-height:1.5; color:var(--text); }
+.step-text strong{ font-weight:600; color:var(--white); }
+
+/* ── Permission rows ── */
+.perm-row{ display:flex; align-items:flex-start; gap:6px; padding:3px 0; font-size:.78rem; color:var(--text); }
+.perm-yes{ color:var(--green); flex-shrink:0; font-size:.8rem; }
+.perm-no { color:var(--red);   flex-shrink:0; font-size:.8rem; }
+
+/* ── Link rows ── */
+.link-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:4px 0; border-bottom:1px solid var(--b2); gap:8px;
+}
+.link-row:last-child{ border-bottom:none; }
+.link-label{ font-size:.78rem; color:var(--text); }
+.url-text {
+  font-family:'IBM Plex Mono',monospace; font-size:.68rem;
+  color:var(--teal); background:rgba(0,201,167,.08);
+  border-radius:3px; padding:1px 6px; white-space:nowrap;
+}
+
+/* ── Alert writing tip ── */
+.alert-tip {
+  background:rgba(59,130,246,.06); border-left:2px solid rgba(59,130,246,.6);
+  border-radius:0 5px 5px 0; padding:8px 10px;
+  font-size:.75rem; line-height:1.55; color:var(--text); margin-top:8px;
+}
+.alert-tip strong{ color:#60a5fa; font-weight:600; }
+
+/* ── Status tags ── */
+.status-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:4px; }
+.status-block{}
+.tag {
+  display:inline-block; font-family:'IBM Plex Mono',monospace;
+  font-size:.58rem; padding:2px 8px; border-radius:3px;
+  border:1px solid; font-weight:600; margin-bottom:5px;
+}
+.tag-active  { background:rgba(232,65,90,.12); color:var(--red);  border-color:rgba(232,65,90,.3); }
+.tag-archived{ background:rgba(245,166,35,.12); color:var(--gold); border-color:rgba(245,166,35,.3); }
+.tag-note    { background:rgba(0,201,167,.12); color:var(--teal); border-color:rgba(0,201,167,.3); }
+.status-desc { font-size:.74rem; color:var(--text-dim); line-height:1.5; }
+
+/* ── Districts quick ref ── */
+.dist-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:4px; }
+.dist-item{ display:flex; align-items:center; gap:7px; padding:4px 0; }
+.dist-dot{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.dist-name{ font-size:.74rem; color:var(--text); }
+.dist-num{ font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:var(--slate); margin-left:auto; }
+
+/* ── Footer ── */
+.qr-footer {
+  text-align:center; font-family:'IBM Plex Mono',monospace;
+  font-size:.58rem; color:var(--slate2); padding-top:10px;
+  border-top:1px solid var(--b2); margin-top:4px; line-height:1.8;
+}
+
+/* ── Print ── */
+@media print {
+  .qr-toolbar{ display:none !important; }
+  body{ background:#fff !important; color:#111 !important; font-size:7.5pt; }
+  .qr-wrap{ padding:8px; }
+  .qr-header{ background:#f5f5f5 !important; border-color:#ccc !important; }
+  .qr-header-title{ color:#0b1524 !important; font-size:13pt; }
+  .qr-card{ background:#fff !important; border-color:#ccc !important; padding:8px 10px; }
+  .contact-name,.step-text strong,.dist-name,.link-label,.perm-row{ color:#111 !important; }
+  .contact-sub,.step-text,.status-desc,.card-title{ color:#555 !important; }
+  .contact-num,.url-text{ background:#eee !important; color:#007a65 !important; }
+  .step-num{ background:#e8f0ee !important; color:#007a65 !important; }
+  .grid-3,.grid-2,.status-grid,.dist-grid{ gap:6px; }
+  .qr-footer{ color:#888 !important; }
+  .alert-tip{ background:#f0f8ff !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="qr-toolbar">
+  <div class="qr-toolbar-brand">HIBCW · Quick Reference</div>
+  <div class="toolbar-actions">
+    <button class="hb-btn hb-btn-ghost" onclick="toggleLight()" id="themeBtn">☀️ Light Mode</button>
+    <a class="hb-btn hb-btn-ghost" href="javascript:window.print()">🖨 Print</a>
+    <a class="hb-btn hb-btn-teal" href="captain-quickref.pdf" download>⬇ Download PDF</a>
+  </div>
+</div>
+
+<div class="qr-wrap">
+
+  <!-- HEADER -->
+  <div class="qr-header">
+    <div class="qr-header-left">
+      <div class="qr-header-title">👮 District Captain — Quick Reference Card</div>
+      <div class="qr-header-sub">Hawaii Island Business Crime Watch · A Program of KIAA · Keep this card accessible at all times</div>
+    </div>
+    <span class="qr-badge">⚡ Public Beta 2026</span>
+  </div>
+
+  <!-- ROW 1: 3 columns -->
+  <div class="grid-3">
+
+    <!-- Emergency Contacts -->
+    <div class="qr-card">
+      <div class="card-title"><span class="card-title-icon">🚨</span> Emergency contacts</div>
+      <div class="contact-row">
+        <div><div class="contact-name">Emergency</div><div class="contact-sub">Crimes in progress — call first</div></div>
+        <span class="contact-num">911</span>
+      </div>
+      <div class="contact-row">
+        <div><div class="contact-name">HPD Non-Emergency</div><div class="contact-sub">Hilo Police Department</div></div>
+        <span class="contact-num">(808) 935-3311</span>
+      </div>
+      <div class="contact-row">
+        <div><div class="contact-name">Crime Stoppers</div><div class="contact-sub">Anonymous tips</div></div>
+        <span class="contact-num">(808) 961-8300</span>
+      </div>
+      <div class="contact-row">
+        <div><div class="contact-name">Hawaii Civil Defense</div><div class="contact-sub">Disasters &amp; evacuations</div></div>
+        <span class="contact-num">(808) 935-0031</span>
+      </div>
+      <div class="contact-row">
+        <div><div class="contact-name">KIAA / HIBCW Admin</div><div class="contact-sub">Support &amp; escalations</div></div>
+        <span class="contact-num">(808) 961-5422</span>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="qr-card">
+      <div class="card-title"><span class="card-title-icon">⚡</span> Most common tasks</div>
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>Archive incident</strong> — Open incident → 📦 Archive → Add note first → Confirm</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>Send district alert</strong> — Districts → Composer → Type message → 📤 Send Alert</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Approve application</strong> — Applications → Pending → Review → ✅ Approve</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">4</div>
+        <div class="step-text"><strong>Add follow-up note</strong> — Open incident → Notes section → Type → Add</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">5</div>
+        <div class="step-text"><strong>Cancel alert</strong> — Districts → Recent Alerts log → ✕ Cancel → Confirm</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">6</div>
+        <div class="step-text"><strong>View members</strong> — Members tab → auto-filtered to your district</div>
+      </div>
+    </div>
+
+    <!-- My Permissions -->
+    <div class="qr-card">
+      <div class="card-title"><span class="card-title-icon">🔐</span> My permissions</div>
+      <div class="perm-row"><span class="perm-yes">✓</span> View &amp; archive incidents in my district</div>
+      <div class="perm-row"><span class="perm-yes">✓</span> Restore archived incidents</div>
+      <div class="perm-row"><span class="perm-yes">✓</span> Add follow-up notes to any incident</div>
+      <div class="perm-row"><span class="perm-yes">✓</span> Send &amp; cancel alerts to my district</div>
+      <div class="perm-row"><span class="perm-yes">✓</span> Approve / reject / revoke applications in my district</div>
+      <div class="perm-row"><span class="perm-yes">✓</span> View members in my district</div>
+      <div class="perm-row"><span class="perm-yes">✓</span> View all 9 district captain cards &amp; directory</div>
+      <div class="perm-row"><span class="perm-no">✗</span> Delete incidents or applications permanently</div>
+      <div class="perm-row"><span class="perm-no">✗</span> Edit member profiles or export CSV</div>
+      <div class="perm-row"><span class="perm-no">✗</span> Access other districts' data</div>
+      <div class="perm-row"><span class="perm-no">✗</span> Invite or remove admin accounts</div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: 2 columns -->
+  <div class="grid-2">
+
+    <!-- Useful Links -->
+    <div class="qr-card">
+      <div class="card-title"><span class="card-title-icon">🔗</span> Useful links</div>
+      <div class="link-row"><span class="link-label">Admin panel (desktop)</span><span class="url-text">hibcw.vercel.app/admin.html</span></div>
+      <div class="link-row"><span class="link-label">Admin panel (mobile)</span><span class="url-text">hibcw.vercel.app/admin-mobile.html</span></div>
+      <div class="link-row"><span class="link-label">Public map &amp; incident report</span><span class="url-text">hibcw.vercel.app</span></div>
+      <div class="link-row"><span class="link-label">Join HIBCW (application form)</span><span class="url-text">hibcw.vercel.app/apply.html</span></div>
+      <div class="link-row"><span class="link-label">KIAA</span><span class="url-text">kiaahilo.org</span></div>
+      <div class="link-row"><span class="link-label">HPD online report</span><span class="url-text">hawaiipolice.com</span></div>
+      <div class="link-row"><span class="link-label">Hawaii Crime Stoppers</span><span class="url-text">hawaiicrimestoppers.net</span></div>
+      <div class="link-row"><span class="link-label">Hawaii County Civil Defense</span><span class="url-text">hawaiicounty.gov/cd</span></div>
+    </div>
+
+    <!-- Alert Writing Guide -->
+    <div class="qr-card">
+      <div class="card-title"><span class="card-title-icon">📢</span> Writing an effective alert</div>
+      <div style="font-size:.74rem;color:var(--text-dim);margin-bottom:8px">Every alert should answer all four of these:</div>
+      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">What</strong> — type of incident or threat (e.g. vehicle break-ins, fraud calls)</div></div>
+      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">Where</strong> — street name, area, intersection, or business</div></div>
+      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">When</strong> — date and time, or "ongoing / reported this week"</div></div>
+      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">What to do</strong> — secure valuables, report suspicious activity, avoid area</div></div>
+      <div class="alert-tip">
+        <strong>Never include</strong> — names of suspects or victims, unconfirmed details, or sensitive personal info. Alerts are <strong>visible to the public</strong> within seconds of sending.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 3: Status Key + Districts -->
+  <div class="grid-2">
+
+    <!-- Incident Status Key -->
+    <div class="qr-card">
+      <div class="card-title"><span class="card-title-icon">📊</span> Incident status key</div>
+      <div class="status-grid">
+        <div class="status-block">
+          <span class="tag tag-active">Active</span>
+          <div class="status-desc">Visible on public map. Investigate, add notes, and archive when resolved. You can restore if archived by mistake.</div>
+        </div>
+        <div class="status-block">
+          <span class="tag tag-archived">Archived</span>
+          <div class="status-desc">Hidden from public map but kept in database. Restore anytime. Cannot permanently delete — contact admin if needed.</div>
+        </div>
+        <div class="status-block">
+          <span class="tag tag-note">Best practice</span>
+          <div class="status-desc">Always add a follow-up note before archiving. Log HPD contact, resolution, or community outcome for the record.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Districts Quick Ref -->
+    <div class="qr-card">
+      <div class="card-title"><span class="card-title-icon">📍</span> Hawaii Island districts</div>
+      <div class="dist-grid">
+        <div class="dist-item"><div class="dist-dot" style="background:#84cc16"></div><span class="dist-name">Hāmākua</span><span class="dist-num">D1</span></div>
+        <div class="dist-item"><div class="dist-dot" style="background:#3b82f6"></div><span class="dist-name">North Hilo</span><span class="dist-num">D2</span></div>
+        <div class="dist-item"><div class="dist-dot" style="background:#00c9a7"></div><span class="dist-name">South Hilo</span><span class="dist-num">D3</span></div>
+        <div class="dist-item"><div class="dist-dot" style="background:#c084fc"></div><span class="dist-name">Lower Puna</span><span class="dist-num">D4</span></div>
+        <div class="dist-item"><div class="dist-dot" style="background:#a855f7"></div><span class="dist-name">Upper Puna</span><span class="dist-num">D5</span></div>
+        <div class="dist-item"><div class="dist-dot" style="background:#ef4444"></div><span class="dist-name">Kaʻū</span><span class="dist-num">D6</span></div>
+        <div class="dist-item"><div class="dist-dot" style="background:#f59e0b"></div><span class="dist-name">South Kona</span><span class="dist-num">D7</span></div>
+        <div class="dist-item"><div class="dist-dot" style="background:#f97316"></div><span class="dist-name">North Kona</span><span class="dist-num">D8</span></div>
+        <div class="dist-item"><div class="dist-dot" style="background:#10b981"></div><span class="dist-name">Kohala</span><span class="dist-num">D9</span></div>
+      </div>
+      <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--b2)">
+        <div class="card-title" style="margin-bottom:6px"><span class="card-title-icon">🆘</span> Need admin help?</div>
+        <div style="font-size:.76rem;color:var(--text-dim);line-height:1.6">
+          Deleting records · Editing member profiles · Fixing data errors · Inviting new captains<br>
+          <strong style="color:var(--white)">Email:</strong> <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--teal)">hibcw@kiaahilo.org</span> &nbsp;·&nbsp;
+          <strong style="color:var(--white)">Phone:</strong> <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--teal)">(808) 961-5422</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="qr-footer">
+    HIBCW Public Beta · For authorized personnel only · Hawaii Island Business Crime Watch · A Program of KIAA<br>
+    kiaahilo.org · hibcw@kiaahilo.org · (808) 961-5422
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var saved = localStorage.getItem('hb-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('themeBtn').textContent = '🌙 Dark Mode';
+  }
+})();
+function toggleLight() {
+  var isLight = document.body.classList.toggle('light');
+  localStorage.setItem('hb-theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
+}
+</script>
+</body>
+</html>
