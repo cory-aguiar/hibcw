@@ -590,6 +590,9 @@ body.light .strip-cell{background:#fff}
           </a>
         </div>
 
+        <div class="more-section-title">📚 Resources</div>
+        <div id="mobileResourceCards"></div>
+
         <div style="padding:8px 16px 4px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.54rem;color:var(--slate2);line-height:1.8">
           HIBCW Admin · Public Beta<br>
           Hawaii Island Business Crime Watch · A Program of KIAA
@@ -842,6 +845,7 @@ function applyRoleUI() {
   // More screen user info
   document.getElementById('moreUserName').textContent=currentUserName;
   document.getElementById('moreUserRole').textContent=currentRole==='superadmin'?'⭐ Superadmin':currentRole==='captain'?'👮 Captain':'👤 Admin';
+  renderMobileResources();
 }
 
 /* ════════════════════════════════════════════════
@@ -1969,6 +1973,51 @@ async function sendAdminDistrictAlert() {
 /* ════════════════════════════════════════════════
    TOAST
 ════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════
+   RESOURCES
+════════════════════════════════════════════════ */
+function renderMobileResources() {
+  const el = document.getElementById('mobileResourceCards');
+  if (!el) return;
+
+  const resources = [
+    {
+      title: 'Admin Handbook',
+      desc: 'Full guide for admins — incidents, members, applications, alerts, and more.',
+      icon: '📋',
+      color: '#00c9a7',
+      roles: ['admin','superadmin'],
+      url: 'handbook-admin.html',
+    },
+    {
+      title: "District Captain's Handbook",
+      desc: 'Role guide for captains — permissions, instructions, and getting help.',
+      icon: '👮',
+      color: '#f5a623',
+      roles: ['admin','superadmin','captain'],
+      url: 'handbook-captain.html',
+    },
+  ];
+
+  const visible = resources.filter(r => r.roles.includes(currentRole));
+  if (!visible.length) { el.innerHTML=''; return; }
+
+  el.innerHTML = visible.map(r => `
+    <div style="background:var(--navy2);border:1px solid ${r.color}33;border-left:3px solid ${r.color};border-radius:8px;margin:0 12px 10px;padding:14px 14px 12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:36px;height:36px;border-radius:8px;background:${r.color}18;border:1px solid ${r.color}33;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">${r.icon}</div>
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:var(--white)">${r.title}</div>
+          <div style="font-size:.7rem;color:var(--slate);line-height:1.45;margin-top:1px">${r.desc}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:7px">
+        <button onclick="window.open('${r.url}','_blank','noopener')" style="flex:1;background:${r.color};border:none;border-radius:5px;padding:7px 10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;cursor:pointer">📖 Open</button>
+        <button onclick="const w=window.open('${r.url}','_blank','noopener,width=900,height=700');w.addEventListener('load',()=>{w.focus();w.print();})" style="background:transparent;border:1px solid ${r.color}44;border-radius:5px;padding:7px 10px;color:${r.color};font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">🖨 Print</button>
+      </div>
+    </div>`).join('');
+}
+
 function showToast(ico,body,type='') {
   const t=document.getElementById('toast');
   document.getElementById('toastIco').textContent=ico;
