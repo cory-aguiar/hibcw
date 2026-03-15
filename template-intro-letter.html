@@ -20,9 +20,20 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
 .t-btn-teal{background:#00c9a7;color:#0b1524}
 .t-btn-teal:hover{opacity:.85}
 .toolbar-hint{font-size:10px;color:rgba(255,255,255,.35);font-style:italic}
-@media print{.toolbar{display:none}}
+@media print{.toolbar{display:none}.setup-panel{display:none}}
 
-/* ── Page shell ── */
+/* ── Setup panel ── */
+.setup-panel{background:#111e30;border-bottom:2px solid #00c9a7;padding:16px 20px;display:none}
+.setup-panel.open{display:block}
+.setup-title{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#00c9a7;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.setup-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.setup-field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:#7a8fa6;margin-bottom:4px}
+.setup-field input,.setup-field select{width:100%;background:#0b1524;border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:7px 10px;color:#eef3f8;font-family:'IBM Plex Sans',sans-serif;font-size:.8rem;outline:none;transition:border-color .15s}
+.setup-field input:focus,.setup-field select:focus{border-color:#00c9a7}
+.setup-field input::placeholder{color:#4a6070}
+.setup-actions{display:flex;gap:8px;align-items:center}
+.setup-note{font-size:.72rem;color:#4a6070;font-style:italic}
+@media print{.toolbar{display:none}.setup-panel{display:none}}
 .page{width:816px;min-height:1056px;background:#fff;margin:0 auto;display:flex;flex-direction:column;position:relative;overflow:hidden}
 
 /* ── Accent bar top ── */
@@ -39,12 +50,17 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
 .lh-district{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6;margin-bottom:4px}
 
 /* Fill-in fields */
-.fill{display:inline-block;border-bottom:1px solid #b0c0cc;min-width:160px;height:16px;vertical-align:bottom;font-family:'IBM Plex Sans',sans-serif;font-size:11px;color:#0b1524}
+.fill{display:inline-block;border-bottom:1.5px solid #00c9a7;min-width:160px;height:16px;vertical-align:bottom;font-family:'IBM Plex Sans',sans-serif;font-size:11px;color:#0b1524;outline:none;cursor:text;transition:background .15s;border-radius:2px 2px 0 0;}
+.fill:empty::before{content:attr(data-hint);color:#b0c0cc;font-style:italic;pointer-events:none}
+.fill[data-field]:empty::before{content:attr(data-hint)}
+.fill:focus{background:rgba(0,201,167,.06);border-bottom-color:#0b1524}
 .fill-sm{min-width:80px}
 .fill-lg{min-width:220px}
 .fill-xl{min-width:280px}
-.fill-block{display:block;border-bottom:1px solid #b0c0cc;width:100%;height:18px;margin-top:2px}
-.fill-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;min-width:220px;height:22px;color:#0b1524;border-bottom:1.5px solid #0b1524}
+.fill-block{display:block;border-bottom:1.5px solid #00c9a7;width:100%;height:18px;margin-top:2px;outline:none;cursor:text}
+.fill-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;min-width:220px;height:22px;color:#0b1524;border-bottom:2px solid #00c9a7;outline:none;cursor:text;display:inline-block;}
+.fill-name:empty::before{content:'Your Full Name';color:#b0c0cc;font-style:italic;font-weight:400;font-size:14px}
+.fill-name:focus{background:rgba(0,201,167,.06)}
 
 /* ── Body ── */
 .letter-body{padding:24px 52px 0;flex:1}
@@ -105,10 +121,70 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
 <!-- TOOLBAR -->
 <div class="toolbar">
   <div class="toolbar-brand">HIBCW · Captain Introductory Letter</div>
-  <div class="toolbar-hint">Fill in the fields, then print or save as PDF</div>
   <div class="toolbar-actions">
+    <button class="t-btn t-btn-teal" onclick="toggleSetup()" id="setupBtn">✏️ Fill In My Info</button>
     <a class="t-btn t-btn-ghost" href="javascript:window.print()">🖨 Print / Save PDF</a>
-    <a class="t-btn t-btn-teal" href="template-intro-letter.pdf" download>⬇ Download PDF</a>
+    <a class="t-btn t-btn-ghost" href="template-intro-letter.pdf" download>⬇ Download PDF</a>
+  </div>
+</div>
+
+<!-- SETUP PANEL -->
+<div class="setup-panel" id="setupPanel">
+  <div class="setup-title">
+    <span>✏️ Fill in your information — the letter updates automatically everywhere</span>
+    <button onclick="toggleSetup()" style="background:none;border:none;color:#7a8fa6;cursor:pointer;font-size:.8rem">✕ Close</button>
+  </div>
+  <div class="setup-grid">
+    <div class="setup-field">
+      <label>Your Full Name</label>
+      <input type="text" id="sf-name" placeholder="e.g. Kainoa Kahananui" oninput="autoFill()">
+    </div>
+    <div class="setup-field">
+      <label>District</label>
+      <select id="sf-distnum" onchange="autoFill()">
+        <option value="">Select your district…</option>
+        <option value="1|Hāmākua">District 1 — Hāmākua</option>
+        <option value="2|North Hilo">District 2 — North Hilo</option>
+        <option value="3|South Hilo">District 3 — South Hilo</option>
+        <option value="4|Lower Puna">District 4 — Lower Puna</option>
+        <option value="5|Upper Puna">District 5 — Upper Puna</option>
+        <option value="6|Kaʻū">District 6 — Kaʻū</option>
+        <option value="7|South Kona">District 7 — South Kona</option>
+        <option value="8|North Kona">District 8 — North Kona</option>
+        <option value="9|Kohala">District 9 — Kohala</option>
+      </select>
+    </div>
+    <div class="setup-field">
+      <label>Your Phone Number</label>
+      <input type="tel" id="sf-phone" placeholder="(808) 000-0000" oninput="autoFill()">
+    </div>
+    <div class="setup-field">
+      <label>Your Email Address</label>
+      <input type="email" id="sf-email" placeholder="your@email.com" oninput="autoFill()">
+    </div>
+    <div class="setup-field">
+      <label>Today's Date</label>
+      <input type="text" id="sf-date" placeholder="e.g. March 15, 2026" oninput="autoFill()">
+    </div>
+    <div class="setup-field">
+      <label>Salutation Name</label>
+      <input type="text" id="sf-salutation" placeholder="e.g. Ms. Kealoha" oninput="autoFill()">
+    </div>
+    <div class="setup-field" style="grid-column:span 2">
+      <label>Recipient Name / Business Name</label>
+      <input type="text" id="sf-recipient" placeholder="e.g. Aloha Surf Shop" oninput="autoFill()">
+    </div>
+    <div class="setup-field">
+      <label>Street Address</label>
+      <input type="text" id="sf-street" placeholder="e.g. 123 Kamehameha Ave" oninput="autoFill()">
+    </div>
+    <div class="setup-field" style="grid-column:span 2">
+      <label>City, State  ZIP</label>
+      <input type="text" id="sf-citystate" placeholder="e.g. Hilo, HI  96720" oninput="autoFill()">
+    </div>
+  </div>
+  <div class="setup-actions">
+    <span class="setup-note">All fields optional — fill what you have. When ready, click 🖨 Print / Save PDF.</span>
   </div>
 </div>
 
@@ -125,7 +201,7 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
     </div>
     <div class="lh-right">
       <div class="lh-district">Your District Captain for</div>
-      <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#0b1524;line-height:1.2;margin-bottom:4px">District <span class="fill fill-sm"></span><br><span class="fill fill-lg"></span></div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#0b1524;line-height:1.2;margin-bottom:4px">District <span class="fill fill-sm" data-field="captain-distnum" data-hint="1–9"></span><br><span class="fill fill-lg" data-field="captain-distname" data-hint="District Name"></span></div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#b0c0cc;margin-top:4px">HIBCW · Hawaii Island</div>
     </div>
   </div>
@@ -134,22 +210,22 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
 
     <!-- DATE + RECIPIENT -->
     <div class="date-block" style="margin-top:18px">
-      <div class="date-line"><span class="fill fill-sm"></span></div>
+      <div class="date-line"><span class="fill fill-sm" data-field="letter-date" data-hint="Date"></span></div>
       <div class="addr-label">Recipient</div>
       <div class="addr-block">
-        <span class="fill fill-xl"></span><br>
-        <span class="fill fill-lg"></span><br>
-        <span class="fill fill-xl"></span>
+        <span class="fill fill-xl" data-field="recipient-name" data-hint="Recipient Name / Business Name"></span><br>
+        <span class="fill fill-lg" data-field="recipient-street" data-hint="Street Address"></span><br>
+        <span class="fill fill-xl" data-field="recipient-city" data-hint="City, State  ZIP"></span>
       </div>
     </div>
 
     <!-- SALUTATION -->
-    <div class="salutation">Dear <span class="fill fill-lg"></span>,</div>
+    <div class="salutation">Dear <span class="fill fill-lg" data-field="salutation-name" data-hint="Recipient Name"></span>,</div>
 
     <!-- BODY -->
     <div class="para">
-      My name is <strong><span class="fill fill-lg"></span></strong>, and I am the District Captain for 
-      <strong>HIBCW District <span class="fill fill-sm"></span> — <span class="fill fill-lg"></span></strong>. 
+      My name is <strong><span class="fill fill-lg" data-field="captain-name" data-hint="Your Full Name"></span></strong>, and I am the District Captain for 
+      <strong>HIBCW District <span class="fill fill-sm" data-field="captain-distnum" data-hint="D#"></span> — <span class="fill fill-lg" data-field="captain-distname" data-hint="District Name"></span></strong>. 
       I'm reaching out because I believe your business would be a valuable part of our community safety network — and I'd love to personally invite you to join.
     </div>
 
@@ -197,8 +273,8 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
       <div class="sig-area">
         <div class="sig-line"></div>
         <div style="margin-top:6px">
-          <div class="fill fill-name"></div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#7a8fa6;margin-top:3px">District Captain, HIBCW District <span class="fill fill-sm" style="height:12px;min-width:50px;font-size:9px"></span> — <span class="fill fill-lg" style="height:12px;font-size:9px"></span></div>
+          <div class="fill fill-name" data-field="captain-name" data-hint="Your Full Name"></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#7a8fa6;margin-top:3px">District Captain, HIBCW District <span class="fill fill-sm" data-field="captain-distnum" data-hint="D#" style="height:12px;min-width:50px;font-size:9px"></span> — <span class="fill fill-lg" data-field="captain-distname" data-hint="District Name" style="height:12px;font-size:9px"></span></div>
           <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#b0c0cc">A Program of KIAA</div>
         </div>
       </div>
@@ -206,11 +282,11 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
       <div class="contact-card">
         <div class="cc-name-row">
           <span class="cc-badge">👮 District Captain</span>
-          <span class="cc-name"><span class="fill fill-xl" style="border-bottom:none;height:20px"></span></span>
+          <span class="cc-name"><span class="fill fill-xl" data-field="captain-name" data-hint="Your Full Name" style="border-bottom:none;height:20px"></span></span>
         </div>
-        <div class="cc-row"><span class="cc-icon">📞</span><span class="fill fill-lg"></span></div>
-        <div class="cc-row"><span class="cc-icon">✉️</span><span class="fill fill-xl"></span></div>
-        <div class="cc-row"><span class="cc-icon">📍</span>HIBCW District <span class="fill fill-sm" style="min-width:40px"></span> — <span class="fill fill-lg"></span>, Hawaii Island</div>
+        <div class="cc-row"><span class="cc-icon">📞</span><span class="fill fill-lg" data-field="captain-phone" data-hint="(808) 000-0000"></span></div>
+        <div class="cc-row"><span class="cc-icon">✉️</span><span class="fill fill-xl" data-field="captain-email" data-hint="your@email.com"></span></div>
+        <div class="cc-row"><span class="cc-icon">📍</span>HIBCW District <span class="fill fill-sm" data-field="captain-distnum" data-hint="D#" style="min-width:40px"></span> — <span class="fill fill-lg" data-field="captain-distname" data-hint="District Name"></span>, Hawaii Island</div>
       </div>
     </div>
 
@@ -230,6 +306,77 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
   <div class="accent-bottom"></div>
   <div class="accent-bot2"></div>
 </div>
+
+
+<script>
+// ── Auto-fill setup ──────────────────────────────────────────
+// Each data-field attribute maps to a setup panel input ID
+// Multiple elements can share the same data-field and all update together
+
+function toggleSetup() {
+  const panel = document.getElementById('setupPanel');
+  const btn   = document.getElementById('setupBtn');
+  const open  = panel.classList.toggle('open');
+  btn.textContent = open ? '✕ Close Setup' : '✏️ Fill In My Info';
+  if (open) document.getElementById('sf-name').focus();
+}
+
+function autoFill() {
+  const name      = document.getElementById('sf-name').value.trim();
+  const distRaw   = document.getElementById('sf-distnum').value;
+  const distNum   = distRaw ? distRaw.split('|')[0] : '';
+  const distName  = distRaw ? distRaw.split('|')[1] : '';
+  const phone     = document.getElementById('sf-phone').value.trim();
+  const email     = document.getElementById('sf-email').value.trim();
+  const date      = document.getElementById('sf-date').value.trim();
+  const recipient = document.getElementById('sf-recipient').value.trim();
+  const salutation= document.getElementById('sf-salutation').value.trim();
+  const street    = document.getElementById('sf-street').value.trim();
+  const citystate = document.getElementById('sf-citystate').value.trim();
+
+  const map = {
+    'captain-name':     name,
+    'captain-distnum':  distNum,
+    'captain-distname': distName,
+    'captain-phone':    phone,
+    'captain-email':    email,
+    'letter-date':      date,
+    'recipient-name':   recipient,
+    'salutation-name':  salutation || recipient,
+    'recipient-street': street,
+    'recipient-city':   citystate,
+  };
+
+  Object.entries(map).forEach(([field, val]) => {
+    document.querySelectorAll(`[data-field="${field}"]`).forEach(el => {
+      if (val) {
+        el.textContent = val;
+        el.style.borderBottomColor = '#0b1524';
+        el.style.color = '#0b1524';
+      } else {
+        el.textContent = '';
+        el.style.borderBottomColor = '#00c9a7';
+        el.style.color = '#0b1524';
+      }
+    });
+  });
+}
+
+// Open setup panel automatically on first load
+window.addEventListener('load', function() {
+  // Pre-fill today's date
+  const today = new Date();
+  const months = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  document.getElementById('sf-date').value =
+    `${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+  autoFill();
+  // Open the panel
+  document.getElementById('setupPanel').classList.add('open');
+  document.getElementById('setupBtn').textContent = '✕ Close Setup';
+  setTimeout(() => document.getElementById('sf-name').focus(), 100);
+});
+</script>
 
 </body>
 </html>
