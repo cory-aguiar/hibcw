@@ -1996,7 +1996,8 @@ const RESOURCE_FILES = [
   { category:'General Flyers',  icon:'📄', title:'Join HIBCW — Recruitment Flyer', desc:'Encourage businesses to apply for membership.', file:'files/flyer-recruitment.pdf',   roles:['admin','superadmin','captain'] },
   { category:'Forms & Templates',icon:'📝', title:'Incident Report Form (Paper)',  desc:'Paper form for capturing incidents offline.',   file:'files/form-incident-paper.pdf', roles:['admin','superadmin','captain'] },
   { category:'Forms & Templates',icon:'📝', title:'Member Sign-Up Sheet',          desc:'Collect member info at community events.',      file:'files/form-member-signup.pdf',  roles:['admin','superadmin','captain'] },
-  { category:'Forms & Templates',icon:'📝', title:'Captain Introductory Letter',   desc:'Template letter introducing HIBCW to businesses.',file:'files/template-intro-letter.pdf',roles:['admin','superadmin','captain'] },
+  { category:'Forms & Templates',icon:'✍️', title:'Captain Introductory Letter — Fill & Print', desc:'Tap to open interactive letter — fill in your info and print.', file:'files/template-intro-letter.html', roles:['admin','superadmin','captain'], openInBrowser:true },
+  { category:'Forms & Templates',icon:'📝', title:'Captain Introductory Letter — Blank PDF', desc:'Blank printable letter for handwriting your info.', file:'files/template-intro-letter.pdf', roles:['admin','superadmin','captain'] },
   { category:'Admin Resources',  icon:'🔧', title:'HIBCW Data Export Guide',       desc:'Interpreting exported CSV data files.',         file:'files/guide-csv-export.pdf',    roles:['admin','superadmin'] },
   { category:'Admin Resources',  icon:'🔧', title:'Supabase Database Reference',   desc:'Database table structure and RLS overview.',    file:'files/guide-database.pdf',      roles:['admin','superadmin'] },
 ];
@@ -2060,7 +2061,7 @@ function renderMobileResources() {
                 <div style="font-size:.78rem;font-weight:500;color:var(--white);margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.title)}</div>
                 <div style="font-size:.67rem;color:var(--slate);line-height:1.35">${esc(f.desc)}</div>
               </div>
-              <a href="${f.file}" download style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:5px;padding:5px 9px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);text-decoration:none;white-space:nowrap;flex-shrink:0">⬇ PDF</a>
+              <a href="${f.file}" ${f.openInBrowser ? 'target="_blank" rel="noopener"' : 'download'} style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:5px;padding:5px 9px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);text-decoration:none;white-space:nowrap;flex-shrink:0">${f.openInBrowser ? '✍️ Fill In' : '⬇ PDF'}</a>
             </div>`).join('')}
           </div>
         </div>`;
