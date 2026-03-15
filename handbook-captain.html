@@ -584,10 +584,161 @@
         .hb-footer p {
             color: #555
         }
+    }/* ── Light mode ── */
+    body.light {
+        --navy: #f0f4f8;
+        --navy2: #ffffff;
+        --navy3: #e8f0f8;
+        --teal: #007a65;
+        --gold: #b07800;
+        --red: #c0273d;
+        --slate: #4a6070;
+        --slate2: #7a8fa6;
+        --white: #0b1524;
+        --border: rgba(0, 122, 101, .18);
+        --b2: rgba(0, 0, 0, .08);
+        background: #f0f4f8;
+        color: #0b1524;
+    }
+
+    body.light .hb-cover {
+        background: linear-gradient(160deg, #e4edf6 60%, rgba(0, 122, 101, .06) 100%);
+        border-color: rgba(0, 122, 101, .2);
+    }
+
+    body.light .hb-toc {
+        background: #ffffff;
+        border-color: rgba(0, 0, 0, .1);
+    }
+
+    body.light .hb-step {
+        background: #f8fbff;
+        border-color: rgba(0, 0, 0, .1);
+    }
+
+    body.light .hb-callout.tip {
+        background: rgba(0, 122, 101, .07);
+    }
+
+    body.light .hb-callout.warn {
+        background: rgba(176, 120, 0, .07);
+    }
+
+    body.light .hb-callout.danger {
+        background: rgba(192, 39, 61, .07);
+    }
+
+    body.light .hb-step-num {
+        background: rgba(0, 122, 101, .12);
+        border-color: rgba(0, 122, 101, .3);
+    }
+
+    body.light .hb-table th, body.light .hb-role-table th, body.light .hb-compare-table th, body.light .hb-help-table th {
+        background: #e4edf6;
+    }
+
+    body.light .hb-table tr:hover td, body.light .hb-role-table tr:hover td, body.light .hb-compare-table tr:hover td, body.light .hb-help-table tr:hover td {
+        background: rgba(0, 0, 0, .02);
+    }
+
+    body.light .hb-footer {
+        background: #ffffff;
+        border-color: rgba(0, 0, 0, .1);
+    }
+
+    body.light .hb-ol li::before {
+        background: rgba(0, 122, 101, .12);
+        border-color: rgba(0, 122, 101, .3);
+    }/* ── Toolbar ── */
+    .hb-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--navy2);
+        border-bottom: 1px solid var(--b2);
+        padding: 10px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .hb-toolbar-brand {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .6rem;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--teal);
+        white-space: nowrap;
+    }
+
+    .hb-toolbar-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .hb-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border-radius: 5px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .62rem;
+        font-weight: 600;
+        letter-spacing: .04em;
+        transition: all .15s;
+        white-space: nowrap;
+        text-decoration: none;
+    }
+
+    .hb-btn-ghost {
+        background: transparent;
+        border: 1px solid var(--b2);
+        color: var(--slate);
+    }
+
+    .hb-btn-ghost:hover {
+        border-color: var(--teal);
+        color: var(--teal);
+        background: rgba(0, 201, 167, .06);
+    }
+
+    .hb-btn-teal {
+        background: var(--teal);
+        border: 1px solid transparent;
+        color: #0b1524;
+    }
+
+    .hb-btn-teal:hover {
+        opacity: .85;
+    }
+
+    body.light .hb-toolbar {
+        background: #ffffff;
+        border-color: rgba(0, 0, 0, .1);
+    }
+
+    @media print {
+        .hb-toolbar {
+            display: none !important;
+        }
     }
     </style>
 </head>
 <body>
+    <!-- TOOLBAR -->
+    <div class="hb-toolbar">
+        <div class="hb-toolbar-brand">HIBCW · Handbook</div>
+        <div class="hb-toolbar-actions">
+            <button class="hb-btn hb-btn-ghost" onclick="toggleLight()" id="themeBtn">☀️ Light Mode</button>
+            <a class="hb-btn hb-btn-ghost" href="javascript:window.print()" id="printBtn">🖨 Print</a>
+            <a class="hb-btn hb-btn-teal" id="downloadBtn" href="handbook-captain.pdf" download>⬇ Download PDF</a>
+        </div>
+    </div>
+
     <div class="hb-wrap">
 
         <!-- COVER -->
@@ -1227,5 +1378,21 @@
         </div>
 
     </div>
+
+    <script>
+    (function() {
+        var saved = localStorage.getItem('hb-theme');
+        if (saved === 'light') {
+            document.body.classList.add('light');
+            document.getElementById('themeBtn').textContent = '🌙 Dark Mode';
+        }
+    })();
+    function toggleLight() {
+        var isLight = document.body.classList.toggle('light');
+        localStorage.setItem('hb-theme', isLight ? 'light' : 'dark');
+        document.getElementById('themeBtn').textContent = isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
+    }
+    </script>
+
 </body>
 </html>
