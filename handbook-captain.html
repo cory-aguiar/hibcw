@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>HIBCW District Captain's Handbook</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --navy: #0b1524;
+        --navy2: #111e30;
+        --navy3: #18293f;
+        --teal: #00c9a7;
+        --gold: #f5a623;
+        --red: #e8415a;
+        --slate: #7a8fa6;
+        --slate2: #4a6070;
+        --white: #eef3f8;
+        --border: rgba(0, 201, 167, .15);
+        --b2: rgba(255, 255, 255, .07);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box
+    }
+
+    html {
+        scroll-behavior: smooth
+    }
+
+    body {
+        background: var(--navy);
+        color: var(--white);
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-size: .9rem;
+        line-height: 1.7
+    }
+
+    .hb-wrap {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 0 24px 80px
+    }
+
+    .hb-cover {
+        background: linear-gradient(160deg, var(--navy2) 60%, rgba(0, 201, 167, .06) 100%);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 48px 40px 40px;
+        margin: 32px 0 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hb-cover::before {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(0, 201, 167, .08), transparent 70%);
+        pointer-events: none;
+    }
+
+    .hb-cover-eyebrow {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .6rem;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin-bottom: 12px
+    }
+
+    .hb-cover-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 2.4rem;
+        font-weight: 700;
+        letter-spacing: .02em;
+        color: var(--white);
+        line-height: 1.1;
+        margin-bottom: 8px
+    }
+
+    .hb-cover-sub {
+        font-size: .85rem;
+        color: var(--slate);
+        margin-bottom: 20px
+    }
+
+    .hb-cover-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(245, 166, 35, .12);
+        border: 1px solid rgba(245, 166, 35, .3);
+        border-radius: 5px;
+        padding: 4px 10px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .62rem;
+        color: var(--gold)
+    }
+
+    .hb-toc {
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 8px;
+        padding: 24px 28px;
+        margin-bottom: 40px
+    }
+
+    .hb-toc-title {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .62rem;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin-bottom: 14px
+    }
+
+    .hb-toc ol {
+        padding-left: 0;
+        list-style: none
+    }
+
+    .hb-toc > ol > li {
+        margin-bottom: 4px
+    }
+
+    .hb-toc a {
+        color: var(--slate);
+        text-decoration: none;
+        font-size: .82rem;
+        transition: color .15s
+    }
+
+    .hb-toc a:hover {
+        color: var(--teal)
+    }
+
+    .hb-toc-sub {
+        padding-left: 20px;
+        list-style: none;
+        margin-top: 3px
+    }
+
+    .hb-toc-sub li {
+        margin-bottom: 2px
+    }
+
+    .hb-toc-sub a {
+        font-size: .76rem;
+        color: var(--slate2)
+    }
+
+    .hb-toc-sub a:hover {
+        color: var(--teal)
+    }
+
+    .hb-section {
+        margin-bottom: 48px
+    }
+
+    .hb-h1 {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.55rem;
+        font-weight: 700;
+        letter-spacing: .03em;
+        color: var(--white);
+        padding-bottom: 10px;
+        margin-bottom: 18px;
+        border-bottom: 2px solid var(--teal)
+    }
+
+    .hb-h1 .hb-num {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .9rem;
+        color: var(--teal);
+        margin-right: 8px
+    }
+
+    .hb-h2 {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--teal);
+        margin: 24px 0 10px
+    }
+
+    .hb-h3 {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .72rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--slate);
+        margin: 18px 0 8px
+    }
+
+    .hb-p {
+        color: rgba(238, 243, 248, .85);
+        margin-bottom: 12px
+    }
+
+    .hb-ul {
+        padding-left: 0;
+        list-style: none;
+        margin-bottom: 12px
+    }
+
+    .hb-ul li {
+        padding: 4px 0 4px 18px;
+        color: rgba(238, 243, 248, .82);
+        font-size: .86rem;
+        position: relative
+    }
+
+    .hb-ul li::before {
+        content: '›';
+        position: absolute;
+        left: 0;
+        color: var(--teal);
+        font-weight: 700
+    }
+
+    .hb-ol {
+        padding-left: 0;
+        list-style: none;
+        counter-reset: hb-num;
+        margin-bottom: 12px
+    }
+
+    .hb-ol li {
+        counter-increment: hb-num;
+        padding: 5px 0 5px 32px;
+        color: rgba(238, 243, 248, .82);
+        font-size: .86rem;
+        position: relative
+    }
+
+    .hb-ol li::before {
+        content: counter(hb-num);
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 22px;
+        height: 22px;
+        background: rgba(0, 201, 167, .15);
+        border: 1px solid rgba(0, 201, 167, .3);
+        border-radius: 50%;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .6rem;
+        color: var(--teal);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600
+    }
+
+    .hb-callout {
+        border-radius: 7px;
+        padding: 14px 16px;
+        margin: 16px 0;
+        border-left: 3px solid var(--teal)
+    }
+
+    .hb-callout.tip {
+        background: rgba(0, 201, 167, .06);
+        border-color: var(--teal)
+    }
+
+    .hb-callout.warn {
+        background: rgba(245, 166, 35, .06);
+        border-color: var(--gold)
+    }
+
+    .hb-callout.danger {
+        background: rgba(232, 65, 90, .06);
+        border-color: var(--red)
+    }
+
+    .hb-callout-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .62rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 6px
+    }
+
+    .hb-callout.tip .hb-callout-label {
+        color: var(--teal)
+    }
+
+    .hb-callout.warn .hb-callout-label {
+        color: var(--gold)
+    }
+
+    .hb-callout.danger .hb-callout-label {
+        color: var(--red)
+    }
+
+    .hb-callout p {
+        font-size: .84rem;
+        color: rgba(238, 243, 248, .82);
+        margin: 0
+    }
+
+    .hb-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 12px 0
+    }
+
+    .hb-step {
+        display: flex;
+        gap: 14px;
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 7px;
+        padding: 14px
+    }
+
+    .hb-step-num {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(0, 201, 167, .15);
+        border: 1px solid rgba(0, 201, 167, .35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .7rem;
+        font-weight: 700;
+        color: var(--teal);
+        flex-shrink: 0;
+        margin-top: 1px
+    }
+
+    .hb-step-body {
+        flex: 1
+    }
+
+    .hb-step-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .95rem;
+        font-weight: 700;
+        color: var(--white);
+        margin-bottom: 5px
+    }
+
+    .hb-step-body ul {
+        list-style: none;
+        padding: 0;
+        margin: 0
+    }
+
+    .hb-step-body ul li {
+        font-size: .82rem;
+        color: rgba(238, 243, 248, .78);
+        padding: 2px 0 2px 14px;
+        position: relative
+    }
+
+    .hb-step-body ul li::before {
+        content: '·';
+        position: absolute;
+        left: 0;
+        color: var(--teal)
+    }
+
+    .hb-table-wrap {
+        overflow-x: auto;
+        margin: 16px 0
+    }
+
+    .hb-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .82rem
+    }
+
+    .hb-table th {
+        background: var(--navy3);
+        padding: 10px 14px;
+        text-align: left;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .62rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        border-bottom: 2px solid var(--border)
+    }
+
+    .hb-table th.can {
+        color: var(--teal)
+    }
+
+    .hb-table th.cannot {
+        color: var(--red)
+    }
+
+    .hb-table td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--b2);
+        vertical-align: top;
+        color: rgba(238, 243, 248, .82)
+    }
+
+    .hb-table tr:last-child td {
+        border-bottom: none
+    }
+
+    .hb-table tr:hover td {
+        background: rgba(255, 255, 255, .02)
+    }
+
+    .hb-compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .82rem;
+        margin: 16px 0
+    }
+
+    .hb-compare-table th {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 2px solid var(--b2);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .62rem;
+        letter-spacing: .1em;
+        text-transform: uppercase
+    }
+
+    .hb-compare-table th:first-child {
+        color: var(--slate)
+    }
+
+    .hb-compare-table th:nth-child(2) {
+        color: var(--teal)
+    }
+
+    .hb-compare-table th:nth-child(3) {
+        color: var(--gold)
+    }
+
+    .hb-compare-table td {
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--b2);
+        font-size: .82rem
+    }
+
+    .hb-compare-table td:first-child {
+        font-weight: 500;
+        color: var(--white)
+    }
+
+    .hb-compare-table tr:last-child td {
+        border-bottom: none
+    }
+
+    .hb-compare-table tr:hover td {
+        background: rgba(255, 255, 255, .02)
+    }
+
+    .hb-help-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .82rem;
+        margin: 16px 0
+    }
+
+    .hb-help-table th {
+        background: var(--navy3);
+        padding: 10px 14px;
+        text-align: left;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .62rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--white);
+        border-bottom: 2px solid var(--border)
+    }
+
+    .hb-help-table td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--b2);
+        vertical-align: top;
+        font-size: .82rem
+    }
+
+    .hb-help-table td:first-child {
+        font-weight: 600;
+        color: var(--white);
+        width: 34%
+    }
+
+    .hb-help-table td:last-child {
+        color: rgba(238, 243, 248, .78)
+    }
+
+    .hb-help-table tr:last-child td {
+        border-bottom: none
+    }
+
+    .hb-footer {
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 8px;
+        padding: 24px;
+        text-align: center;
+        margin-top: 48px
+    }
+
+    .hb-footer p {
+        font-size: .78rem;
+        color: var(--slate);
+        line-height: 1.9
+    }
+
+    .hb-footer strong {
+        color: var(--teal)
+    }
+
+    @media print {
+        body {
+            background: #fff;
+            color: #111;
+            font-size: 10pt
+        }
+
+        .hb-wrap {
+            max-width: 100%;
+            padding: 0
+        }
+
+        .hb-cover {
+            background: #f5f5f5;
+            border: 1px solid #ccc
+        }
+
+        .hb-cover-title, .hb-h1 {
+            color: #0b1524
+        }
+
+        .hb-h2 {
+            color: #007a65
+        }
+
+        .hb-toc {
+            background: #f9f9f9;
+            border: 1px solid #ddd
+        }
+
+        .hb-toc a, .hb-toc-sub a {
+            color: #333
+        }
+
+        .hb-callout {
+            background: #f9f9f9 !important
+        }
+
+        .hb-step {
+            background: #f9f9f9;
+            border: 1px solid #ddd
+        }
+
+        .hb-table th {
+            background: #e8f0f0
+        }
+
+        .hb-table td, .hb-compare-table td, .hb-help-table td {
+            color: #222
+        }
+
+        .hb-footer {
+            background: #f5f5f5;
+            border: 1px solid #ccc
+        }
+
+        .hb-footer p {
+            color: #555
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="hb-wrap">
+
+        <!-- COVER -->
+        <div class="hb-cover">
+            <div class="hb-cover-eyebrow">HIBCW · Hawaii Island Business Crime Watch</div>
+            <div class="hb-cover-title">District Captain's Handbook</div>
+            <div class="hb-cover-sub">Admin Panel Guide — Roles, Permissions &amp; Instructions</div>
+            <span class="hb-cover-badge">⚡ Public Beta Edition · 2026</span>
+        </div>
+
+        <!-- TOC -->
+        <div class="hb-toc">
+            <div class="hb-toc-title">Table of Contents</div>
+            <ol class="hb-toc">
+                <li>
+                    <a href="#s1">1. Your Role as District Captain</a>
+                </li>
+                <li>
+                    <a href="#s2">2. Signing In to the Admin Panel</a>
+                </li>
+                <li>
+                    <a href="#s3">3. Your Dashboard</a>
+                </li>
+                <li>
+                    <a href="#s4">4. What You CAN Do — Full Instructions</a>
+                    <ul class="hb-toc-sub">
+                        <li>
+                            <a href="#s4-1">4.1 Viewing &amp; Searching Incidents</a>
+                        </li>
+                        <li>
+                            <a href="#s4-2">4.2 Archiving &amp; Restoring Incidents</a>
+                        </li>
+                        <li>
+                            <a href="#s4-3">4.3 Adding Follow-Up Notes</a>
+                        </li>
+                        <li>
+                            <a href="#s4-4">4.4 Sending District Alerts</a>
+                        </li>
+                        <li>
+                            <a href="#s4-5">4.5 Cancelling an Alert</a>
+                        </li>
+                        <li>
+                            <a href="#s4-6">4.6 Viewing &amp; Searching Members</a>
+                        </li>
+                        <li>
+                            <a href="#s4-7">4.7 Managing Applications</a>
+                        </li>
+                        <li>
+                            <a href="#s4-8">4.8 Viewing the Districts &amp; Directory</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#s5">5. What You CANNOT Do</a>
+                </li>
+                <li>
+                    <a href="#s6">6. Permission Summary Table</a>
+                </li>
+                <li>
+                    <a href="#s7">7. Desktop vs. Mobile Admin</a>
+                </li>
+                <li>
+                    <a href="#s8">8. Tips &amp; Best Practices</a>
+                </li>
+                <li>
+                    <a href="#s9">9. Getting Help</a>
+                </li>
+            </ol>
+        </div>
+
+        <!-- SECTION 1 -->
+        <div class="hb-section" id="s1">
+            <div class="hb-h1">
+                <span class="hb-num">1.</span>
+                 Your Role as District Captain
+            </div>
+            <p class="hb-p">As a District Captain, you are the community liaison for your assigned HIBCW district. You serve as the first point of contact between local businesses, residents, and the broader HIBCW network. Your role is built around five core responsibilities:</p>
+            <ul class="hb-ul">
+                <li>Monitoring incidents reported within your district</li>
+                <li>Reviewing and acting on membership applications for your area</li>
+                <li>Keeping your district's members informed through timely alerts</li>
+                <li>Maintaining accurate member and captain records for your area</li>
+                <li>Coordinating with HIBCW admins when escalation is needed</li>
+            </ul>
+            <div class="hb-callout tip">
+                <div class="hb-callout-label">👮 Your Access is Scoped to Your District</div>
+                <p>When you sign in, the admin panel automatically filters everything to your district. You will only see incidents, members, and applications that belong to your assigned area. This is by design — it keeps things focused and ensures member privacy across districts.</p>
+            </div>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div class="hb-section" id="s2">
+            <div class="hb-h1">
+                <span class="hb-num">2.</span>
+                 Signing In to the Admin Panel
+            </div>
+            <p class="hb-p">There are two versions of the admin panel — a full desktop version and a mobile-optimized version. Both use the same login credentials.</p>
+            <div class="hb-h2">Desktop Admin</div>
+            <ul class="hb-ul">
+                <li>Go to your Vercel deployment URL and add "/admin.html" (e.g., hibcw.vercel.app/admin.html)</li>
+                <li>Enter your email address and password</li>
+                <li>Click "Sign In →"</li>
+            </ul>
+            <div class="hb-h2">Mobile Admin</div>
+            <ul class="hb-ul">
+                <li>Visit hibcw.vercel.app/admin-mobile.html on your phone or tablet</li>
+                <li>Alternatively, visit admin.html on a mobile device — a prompt will appear offering to redirect you</li>
+                <li>Same credentials as the desktop version</li>
+            </ul>
+            <div class="hb-callout warn">
+                <div class="hb-callout-label">🔑 Forgot Your Password?</div>
+                <p>On the sign-in screen, tap or click "Forgot password?" and enter your email address. A reset link will be sent to your inbox. If you do not receive it within a few minutes, check your spam folder or contact your HIBCW administrator.</p>
+            </div>
+            <div class="hb-h2">After Signing In</div>
+            <ul class="hb-ul">
+                <li>Identifies you as a Captain and scopes all data to your district</li>
+                <li>Takes you directly to the Incidents screen (desktop: Districts view)</li>
+                <li>Displays your name and district in the header or dashboard area</li>
+                <li>Hides buttons and features that are reserved for admins</li>
+            </ul>
+        </div>
+
+        <!-- SECTION 3 -->
+        <div class="hb-section" id="s3">
+            <div class="hb-h1">
+                <span class="hb-num">3.</span>
+                 Your Dashboard
+            </div>
+            <p class="hb-p">When you navigate to the Districts screen, your personal captain dashboard is displayed at the top before the district cards. This gives you a quick snapshot of your district at a glance.</p>
+            <div class="hb-h2">3.1 Stats Tiles</div>
+            <ul class="hb-ul">
+                <li>
+                    <strong>Active</strong>
+                     — number of currently active (unarchived) incidents in your district
+                </li>
+                <li>
+                    <strong>Month</strong>
+                     — incidents reported this calendar month
+                </li>
+                <li>
+                    <strong>Week</strong>
+                     — incidents reported in the current week
+                </li>
+                <li>
+                    <strong>Members</strong>
+                     — total verified HIBCW members in your district
+                </li>
+            </ul>
+            <div class="hb-h2">3.2 Recent Incidents</div>
+            <p class="hb-p">A quick list of the 8 most recent incidents in your district, color-coded by severity. Click or tap any row to open the full incident detail view. Archived incidents are noted inline.</p>
+            <div class="hb-h2">3.3 Alert Composer &amp; Log</div>
+            <p class="hb-p">The dashboard includes a text area to compose and send a district alert, as well as a log of your most recent alerts. See Section 4.4 for full instructions on sending alerts.</p>
+        </div>
+
+        <!-- SECTION 4 -->
+        <div class="hb-section" id="s4">
+            <div class="hb-h1">
+                <span class="hb-num">4.</span>
+                 What You CAN Do — Full Instructions
+            </div>
+
+            <div class="hb-h2" id="s4-1">4.1 Viewing &amp; Searching Incidents</div>
+            <p class="hb-p">The Incidents screen shows all active incidents in your district. You can search and filter to find specific reports.</p>
+            <div class="hb-h3">On Desktop (admin.html)</div>
+            <ol class="hb-ol">
+                <li>Click "Districts" in the left sidebar or navigate to the Incidents tab</li>
+                <li>Your district's incidents are automatically pre-filtered</li>
+                <li>Use the search bar to search by type, address, or description</li>
+                <li>Use the Type and Status dropdowns to narrow results</li>
+                <li>Click "View" on any row to open the full incident detail panel</li>
+            </ol>
+            <div class="hb-h3">On Mobile (admin-mobile.html)</div>
+            <ol class="hb-ol">
+                <li>The Incidents screen is the default landing screen after login</li>
+                <li>Use the search bar at the top to filter by keyword</li>
+                <li>Use the Type and Status dropdowns to narrow results</li>
+                <li>Tap any incident card to open the detail sheet</li>
+            </ol>
+            <div class="hb-callout tip">
+                <div class="hb-callout-label">💡 Tip</div>
+                <p>The Status dropdown defaults to "Active." Switch it to "Archived" to review resolved incidents, or choose "All" to see everything at once.</p>
+            </div>
+
+            <div class="hb-h2" id="s4-2">4.2 Archiving &amp; Restoring Incidents</div>
+            <p class="hb-p">You can archive incidents in your district when they have been resolved, are duplicates, or are no longer relevant. Archived incidents are removed from the public-facing map but are not deleted.</p>
+            <div class="hb-h3">To Archive an Incident</div>
+            <div class="hb-steps">
+                <div class="hb-step">
+                    <div class="hb-step-num">1</div>
+                    <div class="hb-step-body">
+                        <div class="hb-step-title">Open the Incident</div>
+                        <ul>
+                            <li>Find the incident in the list or dashboard</li>
+                            <li>Click or tap "View" to open the detail panel</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="hb-step">
+                    <div class="hb-step-num">2</div>
+                    <div class="hb-step-body">
+                        <div class="hb-step-title">Archive It</div>
+                        <ul>
+                            <li>Click or tap the "📦 Archive" button in the action row</li>
+                            <li>Confirm when prompted</li>
+                            <li>The incident will be removed from the active list and the public map</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hb-h3">To Restore an Archived Incident</div>
+            <ol class="hb-ol">
+                <li>Change the Status filter to "Archived"</li>
+                <li>Find the incident and open it</li>
+                <li>Click or tap "↩ Restore"</li>
+                <li>The incident returns to active status and reappears on the public map</li>
+            </ol>
+            <div class="hb-callout danger">
+                <div class="hb-callout-label">⚠️ Important</div>
+                <p>Archiving is reversible. Deleting is permanent and is reserved for admins only. If you believe an incident should be permanently deleted, contact your HIBCW administrator.</p>
+            </div>
+
+            <div class="hb-h2" id="s4-3">4.3 Adding Follow-Up Notes</div>
+            <p class="hb-p">Notes allow you to log follow-up information on an incident — such as police contact, community feedback, or status updates — without altering the original report.</p>
+            <div class="hb-steps">
+                <div class="hb-step">
+                    <div class="hb-step-num">1</div>
+                    <div class="hb-step-body">
+                        <div class="hb-step-title">Open the Incident Detail</div>
+                        <ul>
+                            <li>Find and open any incident in your district</li>
+                            <li>Scroll to the bottom of the detail panel to find the "📝 Follow-Up Notes" section</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="hb-step">
+                    <div class="hb-step-num">2</div>
+                    <div class="hb-step-body">
+                        <div class="hb-step-title">Write Your Note</div>
+                        <ul>
+                            <li>Type your note in the text field at the bottom</li>
+                            <li>Click "Add" or press Enter to save it</li>
+                            <li>Your note will appear in the log with your name and timestamp</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="hb-p">Notes are visible to all admin and captain users. They are not shown on the public-facing site.</p>
+
+            <div class="hb-h2" id="s4-4">4.4 Sending District Alerts</div>
+            <p class="hb-p">District alerts allow you to communicate directly with your community. Once sent, alerts appear on the public-facing site — on the map page and in the "📢 Alerts" section of the mobile app. Alerts are visible to everyone who visits the site.</p>
+            <div class="hb-h3">From the Desktop Dashboard</div>
+            <ol class="hb-ol">
+                <li>Navigate to the Districts screen (left sidebar)</li>
+                <li>Your dashboard appears at the top with the "📢 Send District Alert" box</li>
+                <li>Type your message in the text area</li>
+                <li>Optionally attach a photo or video using the 📎 Attach button</li>
+                <li>Click "📤 Send Alert"</li>
+            </ol>
+            <div class="hb-h3">From the Mobile Dashboard</div>
+            <ol class="hb-ol">
+                <li>Tap the "📍 Districts" tab in the bottom navigation</li>
+                <li>Your dashboard is shown at the top of the screen</li>
+                <li>Type your message in the alert composer box</li>
+                <li>Tap "📤 Send Alert"</li>
+            </ol>
+            <div class="hb-callout tip">
+                <div class="hb-callout-label">✍️ Writing Effective Alerts</div>
+                <p>Keep alerts concise and specific. Include: what happened or is happening, which area is affected, what members should do or watch for, and any relevant dates or times.</p>
+            </div>
+            <div class="hb-callout warn">
+                <div class="hb-callout-label">🌐 Public Visibility</div>
+                <p>Alerts appear on the public site within seconds of being sent. They are displayed with your name and the date/time. Do not include sensitive personal information, names of individuals, or unconfirmed details in an alert.</p>
+            </div>
+
+            <div class="hb-h2" id="s4-5">4.5 Cancelling an Alert</div>
+            <p class="hb-p">If an alert was sent in error or is no longer relevant, you can cancel it. Cancelling removes it from the public site immediately.</p>
+            <ol class="hb-ol">
+                <li>Open the Districts screen and scroll to your dashboard</li>
+                <li>Find the alert you want to remove in the "📋 Recent Alerts" log</li>
+                <li>Click or tap the "✕ Cancel" button on the right side of the alert</li>
+                <li>Confirm the cancellation when prompted</li>
+                <li>The alert is immediately removed from the public site</li>
+            </ol>
+            <div class="hb-callout danger">
+                <div class="hb-callout-label">⚠️ Note</div>
+                <p>Cancellation is permanent — the alert cannot be restored once removed. If you need to send a correction, cancel the original and send a new alert with updated information.</p>
+            </div>
+
+            <div class="hb-h2" id="s4-6">4.6 Viewing &amp; Searching Members</div>
+            <p class="hb-p">You can view all verified HIBCW members in your district.</p>
+            <div class="hb-h3">On Desktop</div>
+            <ol class="hb-ol">
+                <li>Click "Members" in the left sidebar — results are automatically filtered to your district</li>
+                <li>Use the search bar to find members by name, email, business, or phone</li>
+                <li>Member rows show name, email, business name, phone, and assigned captain</li>
+            </ol>
+            <div class="hb-h3">On Mobile</div>
+            <ol class="hb-ol">
+                <li>Tap the "👥 Members" tab in the bottom navigation</li>
+                <li>Use the search bar and district filter at the top to find members</li>
+                <li>Tap any member card to see their full contact details</li>
+            </ol>
+            <p class="hb-p">Member management (adding, editing, removing members) is reserved for admins. Contact your HIBCW administrator if a member needs to be updated or removed.</p>
+
+            <div class="hb-h2" id="s4-7">4.7 Managing Applications</div>
+            <p class="hb-p">You can view, approve, and reject membership applications submitted by businesses in your district. This gives you direct authority over who joins the HIBCW network in your area.</p>
+            <ul class="hb-ul">
+                <li>Applications are automatically filtered to your district</li>
+                <li>You can see pending, approved, and rejected applications</li>
+                <li>You can approve pending applicants, reject them, revoke approved members, or re-approve previously rejected ones</li>
+                <li>Deleting an application permanently is reserved for admins</li>
+            </ul>
+            <div class="hb-h3">To Approve an Application</div>
+            <div class="hb-steps">
+                <div class="hb-step">
+                    <div class="hb-step-num">1</div>
+                    <div class="hb-step-body">
+                        <div class="hb-step-title">Find the Application</div>
+                        <ul>
+                            <li>Navigate to the Applications screen (desktop: left sidebar → Applications; mobile: 📋 Apply tab)</li>
+                            <li>The filter defaults to "Pending" — pending applications for your district appear here</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="hb-step">
+                    <div class="hb-step-num">2</div>
+                    <div class="hb-step-body">
+                        <div class="hb-step-title">Review the Details</div>
+                        <ul>
+                            <li>Check the applicant's name, business name, address, email, and phone</li>
+                            <li>If they included a note, it appears below the contact details</li>
+                            <li>Verify this is a legitimate business in your district</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="hb-step">
+                    <div class="hb-step-num">3</div>
+                    <div class="hb-step-body">
+                        <div class="hb-step-title">Approve</div>
+                        <ul>
+                            <li>Click or tap "✅ Approve" and confirm</li>
+                            <li>The applicant is added to the verified members list</li>
+                            <li>Their report submissions will show a "✅ Verified Member" badge on the public map</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hb-h3">To Reject an Application</div>
+            <ol class="hb-ol">
+                <li>Find the pending application in your district</li>
+                <li>Click or tap "❌ Reject" and confirm — the application status changes to Rejected</li>
+            </ol>
+            <div class="hb-h3">To Revoke an Approved Member</div>
+            <ol class="hb-ol">
+                <li>Change the status filter to "Approved"</li>
+                <li>Find the member and click "Revoke"</li>
+                <li>Their verified status is removed and they are removed from the member list</li>
+            </ol>
+            <div class="hb-callout danger">
+                <div class="hb-callout-label">⚠️ Delete is Admin-Only</div>
+                <p>You can approve, reject, revoke, and re-approve applications in your district. Permanently deleting an application record is reserved for HIBCW administrators.</p>
+            </div>
+
+            <div class="hb-h2" id="s4-8">4.8 Viewing the Districts &amp; Directory</div>
+            <p class="hb-p">The Districts screen gives you a full picture of all nine HIBCW districts, their assigned captains, and contact information.</p>
+            <div class="hb-h3">Overview Tab</div>
+            <ul class="hb-ul">
+                <li>Shows a card for each district with the captain's photo, name, business, and contact information</li>
+                <li>Displays district stats: member count, incidents this month/week/today, and last reported date</li>
+                <li>Shows a type breakdown bar chart for active incidents in each district</li>
+                <li>Includes a "👥 View Members" button that opens the member roster for any district</li>
+            </ul>
+            <div class="hb-h3">Directory Tab</div>
+            <ul class="hb-ul">
+                <li>A searchable list view showing: district, captain name, business, email, and phone for all 9 districts</li>
+                <li>Tap the 🖨 print button to generate a printable PDF directory of all captains</li>
+            </ul>
+            <div class="hb-h3">Member Roster (from district card)</div>
+            <ul class="hb-ul">
+                <li>Tap "👥 View Members" on any district card to open the roster for that district</li>
+                <li>Includes a search bar and a "🖨 Print Roster" button to export a formatted PDF</li>
+            </ul>
+        </div>
+
+        <!-- SECTION 5 -->
+        <div class="hb-section" id="s5">
+            <div class="hb-h1">
+                <span class="hb-num">5.</span>
+                 What You CANNOT Do
+            </div>
+            <p class="hb-p">The following actions are reserved for HIBCW admins and superadmins. This ensures data integrity, member privacy, and consistent management of the platform across all districts.</p>
+            <ul class="hb-ul">
+                <li>Permanently delete incidents (archiving is the captain equivalent)</li>
+                <li>Add or remove verified member emails from the system</li>
+                <li>Edit member profile details (name, address, business info, district assignment)</li>
+                <li>Permanently delete applications</li>
+                <li>Export incident or member data as CSV</li>
+                <li>View incidents, members, or applications from other districts</li>
+                <li>Send district alerts to districts other than your own</li>
+                <li>Access the Manage Admins screen (superadmin only)</li>
+                <li>Invite or remove other captains or admin accounts</li>
+                <li>Upload or change the captain photo for other districts</li>
+            </ul>
+            <div class="hb-callout warn">
+                <div class="hb-callout-label">📞 Need an Admin Action?</div>
+                <p>If you need something done that is outside your permissions — such as removing a member, correcting a profile, or permanently deleting a record — contact your HIBCW administrator. They can act quickly on your behalf.</p>
+            </div>
+        </div>
+
+        <!-- SECTION 6 -->
+        <div class="hb-section" id="s6">
+            <div class="hb-h1">
+                <span class="hb-num">6.</span>
+                 Permission Summary Table
+            </div>
+            <p class="hb-p">This table summarizes everything a District Captain can and cannot do in the HIBCW admin panel.</p>
+            <div class="hb-table-wrap">
+                <table class="hb-table">
+                    <thead>
+                        <tr>
+                            <th class="can">✅ Captains CAN</th>
+                            <th class="cannot">🚫 Captains CANNOT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>View incidents in your district</td>
+                            <td>View incidents in other districts</td>
+                        </tr>
+                        <tr>
+                            <td>Archive incidents in your district</td>
+                            <td>Permanently delete incidents</td>
+                        </tr>
+                        <tr>
+                            <td>Restore archived incidents in your district</td>
+                            <td>Bulk archive or delete incidents</td>
+                        </tr>
+                        <tr>
+                            <td>Add follow-up notes to any incident</td>
+                            <td>Edit or delete original incident reports</td>
+                        </tr>
+                        <tr>
+                            <td>View verified members in your district</td>
+                            <td>Add or remove member email addresses</td>
+                        </tr>
+                        <tr>
+                            <td>View member contact details</td>
+                            <td>Edit member profiles or district assignments</td>
+                        </tr>
+                        <tr>
+                            <td>View applications in your district</td>
+                            <td>Permanently delete applications</td>
+                        </tr>
+                        <tr>
+                            <td>Approve or reject applications in your district</td>
+                            <td>Approve or reject applications from other districts</td>
+                        </tr>
+                        <tr>
+                            <td>Send district alerts to your district</td>
+                            <td>Send alerts to other districts</td>
+                        </tr>
+                        <tr>
+                            <td>Cancel alerts you have sent</td>
+                            <td>Delete alerts sent by admins or other captains</td>
+                        </tr>
+                        <tr>
+                            <td>View all 9 district captain cards</td>
+                            <td>Change captain assignments for other districts</td>
+                        </tr>
+                        <tr>
+                            <td>View &amp; print the captain directory</td>
+                            <td>Export incident or member CSVs</td>
+                        </tr>
+                        <tr>
+                            <td>View member roster for any district</td>
+                            <td>Manage admin or captain accounts</td>
+                        </tr>
+                        <tr>
+                            <td>Update your own captain photo</td>
+                            <td>Invite or remove other admin users</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION 7 -->
+        <div class="hb-section" id="s7">
+            <div class="hb-h1">
+                <span class="hb-num">7.</span>
+                 Desktop vs. Mobile Admin
+            </div>
+            <p class="hb-p">Both admin versions share the same data and permissions. The mobile version is optimized for phone use — it uses a bottom navigation bar and swipe-friendly bottom sheets instead of a sidebar and modals.</p>
+            <div class="hb-table-wrap">
+                <table class="hb-compare-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Desktop (admin.html)</th>
+                            <th>Mobile (admin-mobile.html)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Navigation</td>
+                            <td>Left sidebar with nav buttons</td>
+                            <td>Bottom tab bar (6 tabs)</td>
+                        </tr>
+                        <tr>
+                            <td>Incident details</td>
+                            <td>Right-side modal overlay</td>
+                            <td>Slide-up bottom sheet</td>
+                        </tr>
+                        <tr>
+                            <td>Captain dashboard</td>
+                            <td>Top of the Districts view</td>
+                            <td>Top of the Districts tab</td>
+                        </tr>
+                        <tr>
+                            <td>Send alert</td>
+                            <td>Dashboard text area</td>
+                            <td>Dashboard text area</td>
+                        </tr>
+                        <tr>
+                            <td>Member roster</td>
+                            <td>Click "View Members" on district card</td>
+                            <td>Tap "View Members" on district card</td>
+                        </tr>
+                        <tr>
+                            <td>Print directory</td>
+                            <td>Click 🖨 Print PDF in toolbar</td>
+                            <td>Tap 🖨 icon in Districts tab bar</td>
+                        </tr>
+                        <tr>
+                            <td>Theme toggle</td>
+                            <td>Button in header bar</td>
+                            <td>More tab → Theme toggle</td>
+                        </tr>
+                        <tr>
+                            <td>Sign out</td>
+                            <td>Button in header bar</td>
+                            <td>More tab → Sign Out</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION 8 -->
+        <div class="hb-section" id="s8">
+            <div class="hb-h1">
+                <span class="hb-num">8.</span>
+                 Tips &amp; Best Practices
+            </div>
+            <div class="hb-h2">Staying on Top of Your District</div>
+            <ul class="hb-ul">
+                <li>Check the admin panel at least once a day during active periods — new incidents appear in real time</li>
+                <li>Review the "Recent Incidents" section on your dashboard each morning for an overnight summary</li>
+                <li>Use the "This Week" stat tile to gauge whether activity is trending up or down in your district</li>
+            </ul>
+            <div class="hb-h2">Archiving Responsibly</div>
+            <ul class="hb-ul">
+                <li>Archive an incident when it has been resolved, confirmed as a duplicate, or is no longer relevant to active community awareness</li>
+                <li>Add a follow-up note before archiving to document why — e.g., "Resolved, HPD confirmed report filed"</li>
+                <li>Do not archive incidents solely because they are old — recurring patterns are valuable data</li>
+            </ul>
+            <div class="hb-h2">Sending Effective Alerts</div>
+            <ul class="hb-ul">
+                <li>Only send alerts for significant, actionable information — avoid over-alerting, which can cause members to tune out</li>
+                <li>Be specific: include location, type of incident, and what to watch for</li>
+                <li>Cancel outdated alerts promptly so the public feed stays current and relevant</li>
+                <li>If you're unsure whether something warrants an alert, consult your HIBCW administrator first</li>
+            </ul>
+            <div class="hb-h2">Keeping Your Profile Current</div>
+            <ul class="hb-ul">
+                <li>Make sure your captain photo is up to date — it appears on the district directory and builds community trust</li>
+                <li>If your phone number or email changes, contact your HIBCW admin to update your profile</li>
+            </ul>
+        </div>
+
+        <!-- SECTION 9 -->
+        <div class="hb-section" id="s9">
+            <div class="hb-h1">
+                <span class="hb-num">9.</span>
+                 Getting Help
+            </div>
+            <p class="hb-p">If you encounter a problem, need an action that is outside your permissions, or have questions about your role, use the following contacts:</p>
+            <div class="hb-table-wrap">
+                <table class="hb-help-table">
+                    <thead>
+                        <tr>
+                            <th>Issue</th>
+                            <th>Who to Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Can't log in / password reset</td>
+                            <td>Use the "Forgot password?" link on the sign-in screen, or contact your HIBCW administrator</td>
+                        </tr>
+                        <tr>
+                            <td>Need to delete an incident permanently</td>
+                            <td>Contact your HIBCW administrator with the incident ID or details</td>
+                        </tr>
+                        <tr>
+                            <td>Member profile needs updating</td>
+                            <td>Contact your HIBCW administrator with the member's email and the correction needed</td>
+                        </tr>
+                        <tr>
+                            <td>Technical bug or site issue</td>
+                            <td>Contact your HIBCW administrator or email hibcw@kiaahilo.org</td>
+                        </tr>
+                        <tr>
+                            <td>New business wants to join HIBCW</td>
+                            <td>Direct them to apply at hibcw.vercel.app — click "Join HIBCW"</td>
+                        </tr>
+                        <tr>
+                            <td>Emergency crime in progress</td>
+                            <td>Call 911 immediately. Do not use the admin panel for emergencies.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="hb-footer">
+            <p>
+                <strong>Thank you for your service to the Hawaii Island business community.</strong>
+                <br>
+
+                    HIBCW · Hawaii Island Business Crime Watch · A Program of KIAA
+                <br>
+
+                    kiaahilo.org · hibcw@kiaahilo.org · (808) 961-5422
+            </p>
+        </div>
+
+    </div>
+</body>
+</html>
