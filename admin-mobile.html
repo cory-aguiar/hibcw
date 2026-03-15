@@ -964,7 +964,7 @@ function openDetail(id) {
         ${avatar}
         <div>
           <div style="font-weight:600;font-size:.82rem">${esc(cm.full_name)}</div>
-          ${cm.phone?`<a href="tel:${esc(cm.phone)}" style="font-size:.72rem;color:var(--slate);text-decoration:none">📞 ${esc(cm.phone)}</a>`:''}
+          ${cm.phone?`<a href="tel:${cm.phone}" style="font-size:.72rem;color:var(--slate);text-decoration:none">📞 ${fmtPhone(cm.phone)}</a>`:''}
           ${cm.email?`<div><a href="mailto:${esc(cm.email)}" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none">✉️ ${esc(cm.email)}</a></div>`:''}
         </div>
       </div>
@@ -1139,7 +1139,7 @@ function renderMembers() {
       <div class="mem-email-row">${esc(m.email)}</div>
       <div class="mem-detail">
         ${m.business_name?`🏢 ${esc(m.business_name)}<br>`:''}
-        ${m.phone?`📞 ${esc(m.phone)}<br>`:''}
+        ${m.phone?`📞 ${fmtPhone(m.phone)}<br>`:''}
         ${m.district?`📍 <span style="color:var(--teal)">${esc(districtLabel(m.district))}</span><br>`:''}
         ${m.captain_name?`👮 Captain: ${esc(m.captain_name)}<br>`:''}
       </div>
@@ -1200,7 +1200,7 @@ function renderApps() {
       <div class="app-info">
         ${a.business_address?`📍 <span>${esc(a.business_address)}</span><br>`:''}
         ✉️ <span>${esc(a.email)}</span><br>
-        📞 <span>${esc(a.phone)}</span>
+        📞 <span>${fmtPhone(a.phone)}</span>
         ${a.district?`<br>📍 <span style="color:var(--teal)">${esc(districtLabel(a.district))}</span>`:''}
       </div>
       ${a.notes?`<div style="font-size:.72rem;color:var(--slate2);font-style:italic;margin-top:6px;padding-top:6px;border-top:1px solid var(--b2)">"${esc(a.notes)}"</div>`:''}
@@ -1373,7 +1373,7 @@ function renderDistOverview() {
             ${hasCaptain ? `
               <div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:700;margin-bottom:2px">👮 ${esc(captain)}</div>
               ${cm?.business_name?`<div style="font-size:.7rem;color:var(--teal);margin-bottom:4px">🏢 ${esc(cm.business_name)}</div>`:''}
-              ${cm?.phone?`<a href="tel:${esc(cm.phone)}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--slate);text-decoration:none;margin-bottom:2px">📞 ${esc(cm.phone)}</a>`:''}
+              ${cm?.phone?`<a href="tel:${cm.phone}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--slate);text-decoration:none;margin-bottom:2px">📞 ${fmtPhone(cm.phone)}</a>`:''}
               ${cm?.email?`<a href="mailto:${esc(cm.email)}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none;word-break:break-all">✉️ ${esc(cm.email)}</a>`:''}
               ${!cm?.phone&&!cm?.email?`<div style="font-size:.68rem;color:var(--slate2);font-style:italic">No contact info</div>`:''}
             ` : `<div style="font-size:.78rem;color:var(--slate2);font-style:italic">No captain assigned</div>`}
@@ -1458,7 +1458,7 @@ function renderDistDirectory() {
           <div style="font-size:.78rem;font-weight:600">${esc(c.full_name)}</div>
           ${c.business_name?`<div style="font-size:.68rem;color:var(--teal)">${esc(c.business_name)}</div>`:''}
           ${c.email?`<a href="mailto:${esc(c.email)}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.email)}</a>`:''}
-          ${c.phone?`<a href="tel:${esc(c.phone)}" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);text-decoration:none">${esc(c.phone)}</a>`:''}
+          ${c.phone?`<a href="tel:${c.phone}" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);text-decoration:none">${fmtPhone(c.phone)}</a>`:''}
         ` : `<div style="font-size:.72rem;color:var(--slate2);font-style:italic">No captain assigned</div>`}
       </div>
     </div>`).join('');
@@ -1489,7 +1489,7 @@ function printCaptainDirectory() {
     return `<tr>
       <td class="dist">${esc(fullLabel)}</td>
       <td>${esc(name)}</td>
-      <td>${esc(phone)}</td>
+      <td>${fmtPhone(phone)}</td>
       <td>${esc(email)}</td>
       <td>${esc(biz)}</td>
       <td>${esc(addr)}</td>
@@ -1980,7 +1980,7 @@ function renderDistMemberRows(members) {
             ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:${color};margin-bottom:4px">👮 District Captain</div>`
             : m.captain_name ? `<div style="font-size:.65rem;color:var(--slate);margin-bottom:4px">Captain: ${esc(m.captain_name)}</div>` : ''}
           ${m.business_name ? `<div style="font-size:.72rem;color:var(--teal);margin-bottom:3px">🏢 ${esc(m.business_name)}</div>` : ''}
-          ${m.phone ? `<a href="tel:${esc(m.phone)}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--slate);text-decoration:none;margin-bottom:2px">📞 ${esc(m.phone)}</a>` : ''}
+          ${m.phone ? `<a href="tel:${m.phone}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--slate);text-decoration:none;margin-bottom:2px">📞 ${fmtPhone(m.phone)}</a>` : ''}
           ${m.email ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);word-break:break-all">✉️ ${esc(m.email)}</div>` : ''}
         </div>
       </div>
@@ -2014,7 +2014,7 @@ function printDistrictRoster() {
       <td>${esc(m.full_name||'—')}${m.captain_name&&m.full_name&&m.captain_name.trim().toLowerCase()===m.full_name.trim().toLowerCase()?' <span class="cap-badge">★ Captain</span>':''}</td>
       <td>${esc(m.business_name||'—')}</td>
       <td>${esc([m.business_address,m.business_city,m.business_state,m.business_zip].filter(Boolean).join(', ')||'—')}</td>
-      <td>${m.phone?`<a href="tel:${esc(m.phone)}" style="color:inherit;text-decoration:none">${esc(m.phone)}</a>`:'—'}</td>
+      <td>${m.phone?`<a href="tel:${m.phone}" style="color:inherit;text-decoration:none">${fmtPhone(m.phone)}</a>`:'—'}</td>
       <td>${esc(m.email||'—')}</td>
     </tr>`).join('');
 
