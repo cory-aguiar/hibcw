@@ -2934,11 +2934,25 @@
 
                         <!-- Alert composer -->
                         <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px">
-                            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:10px">📢 Send District Alert</div>
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                                <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal)" id="alertComposerLabel">📢 Send District Alert</div>
+                                <button id="alertCancelEditBtn" onclick="cancelAlertEdit()" style="display:none;background:none;border:1px solid var(--b2);border-radius:4px;padding:3px 8px;font-size:.65rem;color:var(--slate);cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Cancel Edit</button>
+                            </div>
+                            <input type="hidden" id="alertEditId">
                             <textarea id="captainAlertMsg" placeholder="Type a message to alert all members in your district…" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:5px;padding:10px 12px;color:var(--white);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:80px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--b2)'"></textarea>
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px">
-                                <div style="font-size:.68rem;color:var(--slate2)">Sends to all verified members in your district via the alert log.</div>
-                                <button class="btn btn-teal" onclick="sendDistrictAlert()" style="white-space:nowrap;flex-shrink:0">📤 Send Alert</button>
+                            <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                                <label style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;padding:5px 10px;cursor:pointer;font-size:.7rem;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">
+
+                                                    📎 Attach Photo/Video
+                                                    
+                                    <input type="file" id="captainAlertMedia" accept="image/*,video/*" style="display:none" onchange="previewAlertMedia(this,'captainAlertPreview')">
+                                </label>
+                                <button id="captainAlertClearMedia" onclick="clearAlertMedia('captainAlertMedia','captainAlertPreview')" style="display:none;background:none;border:1px solid rgba(232,65,90,.3);border-radius:4px;padding:5px 10px;font-size:.7rem;color:var(--red);cursor:pointer">✕ Remove</button>
+                            </div>
+                            <div id="captainAlertPreview" style="display:none;margin-top:8px;border-radius:6px;overflow:hidden;border:1px solid var(--b2);max-width:320px"></div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:10px">
+                                <div style="font-size:.68rem;color:var(--slate2)">Appears on the public map and mobile app.</div>
+                                <button class="btn btn-teal" onclick="sendDistrictAlert()" id="alertSendBtn" style="white-space:nowrap;flex-shrink:0">📤 Send Alert</button>
                             </div>
                         </div>
 
@@ -3167,7 +3181,21 @@
                     <div class="mf-label">Message</div>
                     <textarea id="adminAlertMsg" placeholder="Type your alert message for this district…" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b2);border-radius:5px;padding:10px 12px;color:var(--white);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:100px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--b2)'"></textarea>
                 </div>
-                <div id="adminAlertLog" style="margin-top:8px">
+                <div class="mf-row">
+                    <div class="mf-label" style="margin-bottom:6px">Photo / Video (optional)</div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                        <label style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;padding:5px 10px;cursor:pointer;font-size:.75rem;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">
+
+                                        📎 Attach File
+                                        
+                            <input type="file" id="adminAlertMedia" accept="image/*,video/*" style="display:none" onchange="previewAlertMedia(this,'adminAlertPreview')">
+                        </label>
+                        <button id="adminAlertClearMedia" onclick="clearAlertMedia('adminAlertMedia','adminAlertPreview')" style="display:none;background:none;border:1px solid rgba(232,65,90,.3);border-radius:4px;padding:5px 10px;font-size:.72rem;color:var(--red);cursor:pointer">✕ Remove</button>
+                    </div>
+                    <div id="adminAlertPreview" style="display:none;margin-top:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2);max-width:280px"></div>
+                </div>
+                <input type="hidden" id="adminAlertEditId">
+                <div class="mf-row">
                     <div class="mf-label" style="margin-bottom:8px">Recent Alerts (All Districts)</div>
                     <div id="adminAlertLogBody" style="max-height:200px;overflow-y:auto"></div>
                 </div>
@@ -6952,9 +6980,64 @@
         }
     }
 
+    async function loadDistrictAlerts() {
+        if (!sb || !captainDistrict)
+            return;
+        const el = document.getElementById('captainAlertLog');
+        if (!el)
+            return;
+        try {
+            const {data, error} = await sb
+            .from('district_alerts')
+            .select('*')
+            .eq('district', captainDistrict)
+            .order('created_at', {
+                ascending: false
+            })
+            .limit(10);
+            if (error)
+                throw error;
+            if (!data.length) {
+                el.innerHTML = `<div style="font-size:.75rem;color:var(--slate2);font-style:italic">No alerts sent yet.</div>`;
+                return;
+            }
+            el.innerHTML = data.map(a => `
+      <div style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.18);border-radius:6px;padding:10px 12px;margin-bottom:8px">
+        <div style="font-size:.82rem;line-height:1.5;color:var(--white);margin-bottom:6px">${
+            esc(a.message)}</div>
+        ${a.media_url ? `
+          <div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2);max-width:280px">
+            ${
+            a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:180px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:180px;object-fit:cover">`}
+          </div>` : ''}
+        <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
+          <span>👤 ${
+            esc(a.sent_by_name || 'Captain')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
+          <div style="display:flex;gap:6px">
+            <button onclick="startAlertEdit('${
+            a.id}',${JSON.stringify(esc(a.message))},${JSON.stringify(a.media_url || '')})" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 8px;color:var(--teal);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✏️ Edit</button>
+            <button onclick="deleteDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(232,65,90,.3);border-radius:3px;padding:2px 8px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Cancel</button>
+          </div>
+        </div>
+      </div>`
+
+
+            ).join('');
+        } catch (e) {
+            el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load alerts — make sure the district_alerts table exists in your database.</div>`;
+        }
+    }
+
     async function deleteDistrictAlert(id) {
         if (!confirm('Cancel and remove this alert? It will no longer appear on the public site.'))
             return;
+        // Also remove media from storage if exists
+        const alert = await sb.from('district_alerts').select('media_url').eq('id', id).single();
+        if (alert.data?.media_url) {
+            const path = alert.data.media_url.split('/object/public/incident-media/')[1];
+            if (path)
+                await sb.storage.from('incident-media').remove([path]);
+        }
         const {error} = await sb.from('district_alerts').delete().eq('id', id);
         if (!error) {
             showToast('🗑', 'Alert cancelled.');
@@ -6964,28 +7047,155 @@
             showToast('⚠️', error.message, 'err');
     }
 
+    /* ── Alert media helpers ──────────────────────────────── */
+    function previewAlertMedia(input, previewId) {
+        const file = input.files?.[0];
+        const prev = document.getElementById(previewId);
+        const clearBtn = input.parentElement?.parentElement?.querySelector('[id$="ClearMedia"]') ||
+        document.getElementById(input.id.replace('Media', 'ClearMedia'));
+        if (!file || !prev)
+            return;
+        const url = URL.createObjectURL(file);
+        prev.style.display = 'block';
+        prev.innerHTML = file.type.startsWith('video/')
+        ? `<video src="${url}" controls style="width:100%;display:block;max-height:200px"></video>`
+        : `<img src="${url}" style="width:100%;display:block;max-height:200px;object-fit:cover">`;
+        if (clearBtn)
+            clearBtn.style.display = 'inline-flex';
+    }
+
+    function clearAlertMedia(inputId, previewId) {
+        const input = document.getElementById(inputId);
+        const prev = document.getElementById(previewId);
+        const clearBtn = document.getElementById(inputId.replace('Media', 'ClearMedia')) ||
+        document.getElementById('captainAlertClearMedia');
+        if (input)
+            input.value = '';
+        if (prev) {
+            prev.innerHTML = '';
+            prev.style.display = 'none';
+        }
+        if (clearBtn)
+            clearBtn.style.display = 'none';
+    }
+
+    async function uploadAlertMedia(file, district) {
+        const ext = file.name.split('.').pop();
+        const path = `district-alerts/${district}-${Date.now()}.${ext}`;
+        const {error} = await sb.storage.from('incident-media').upload(path, file, {
+            contentType: file.type,
+            upsert: false
+        });
+        if (error)
+            throw error;
+        const {data: urlData} = sb.storage.from('incident-media').getPublicUrl(path);
+        return {
+            url: urlData.publicUrl,
+            type: file.type.startsWith('video/') ? 'video' : 'image'
+        };
+    }
+
+    /* ── Edit an existing alert ──────────────────────────── */
+    function startAlertEdit(id, message, mediaUrl) {
+        document.getElementById('alertEditId').value = id;
+        document.getElementById('captainAlertMsg').value = message;
+        document.getElementById('alertComposerLabel').textContent = '✏️ Edit Alert';
+        document.getElementById('alertSendBtn').textContent = '💾 Save Changes';
+        document.getElementById('alertCancelEditBtn').style.display = 'inline-flex';
+        // Show existing media if any
+        const prev = document.getElementById('captainAlertPreview');
+        if (mediaUrl && prev) {
+            const isVideo = /\.(mp4|mov|webm|ogg)$/i.test(mediaUrl);
+            prev.style.display = 'block';
+            prev.innerHTML = isVideo
+            ? `<video src="${esc(mediaUrl)}" controls style="width:100%;display:block;max-height:200px"></video>`
+            : `<img src="${esc(mediaUrl)}" style="width:100%;display:block;max-height:200px;object-fit:cover">`;
+            document.getElementById('captainAlertClearMedia').style.display = 'inline-flex';
+        }
+        document.getElementById('captainAlertMsg').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+        document.getElementById('captainAlertMsg').focus();
+    }
+
+    function cancelAlertEdit() {
+        document.getElementById('alertEditId').value = '';
+        document.getElementById('captainAlertMsg').value = '';
+        document.getElementById('alertComposerLabel').textContent = '📢 Send District Alert';
+        document.getElementById('alertSendBtn').textContent = '📤 Send Alert';
+        document.getElementById('alertCancelEditBtn').style.display = 'none';
+        clearAlertMedia('captainAlertMedia', 'captainAlertPreview');
+    }
+
     async function sendDistrictAlert() {
         const msg = document.getElementById('captainAlertMsg')?.value.trim();
+        const editId = document.getElementById('alertEditId')?.value;
+        const file = document.getElementById('captainAlertMedia')?.files?.[0];
         if (!msg) {
             showToast('⚠️', 'Please enter a message.', 'err');
             return;
         }
         if (!captainDistrict)
             return;
+
+        const btn = document.getElementById('alertSendBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Saving…';
+
         try {
-            const {error} = await sb.from('district_alerts').insert({
-                district: captainDistrict,
-                message: msg,
-                sent_by_email: currentUserEmail,
-                sent_by_name: currentUserName,
-            });
-            if (error)
-                throw error;
-            document.getElementById('captainAlertMsg').value = '';
-            showToast('📢', 'Alert sent to your district.');
+            let mediaUrl = null,
+                mediaType = null;
+
+            // If editing, keep existing media unless a new file was selected
+            if (editId && !file) {
+                const {data: existing} = await sb.from('district_alerts').select('media_url,media_type').eq('id', editId).single();
+                // If user cleared preview, treat as remove; otherwise keep
+                const prevVisible = document.getElementById('captainAlertPreview')?.style.display !== 'none';
+                if (prevVisible && existing?.data?.media_url) {
+                    mediaUrl = existing.data.media_url;
+                    mediaType = existing.data.media_type;
+                }
+            }
+
+            if (file) {
+                const uploaded = await uploadAlertMedia(file, captainDistrict);
+                mediaUrl = uploaded.url;
+                mediaType = uploaded.type;
+            }
+
+            if (editId) {
+                const {error} = await sb.from('district_alerts').update({
+                    message: msg,
+                    media_url: mediaUrl,
+                    media_type: mediaType,
+                    updated_at: new Date().toISOString(),
+                    is_edited: true
+                }).eq('id', editId);
+                if (error)
+                    throw error;
+                showToast('✅', 'Alert updated.');
+            } else {
+                const {error} = await sb.from('district_alerts').insert({
+                    district: captainDistrict,
+                    message: msg,
+                    media_url: mediaUrl,
+                    media_type: mediaType,
+                    sent_by_email: currentUserEmail,
+                    sent_by_name: currentUserName,
+                });
+                if (error)
+                    throw error;
+                showToast('📢', 'Alert sent to your district.');
+            }
+
+            cancelAlertEdit();
             loadDistrictAlerts();
         } catch (e) {
-            showToast('⚠️', e.message || 'Failed to send alert.', 'err');
+            showToast('⚠️', e.message || 'Failed to save alert.', 'err');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = document.getElementById('alertEditId')?.value ? '💾 Save Changes' : '📤 Send Alert';
         }
     }
 
@@ -7001,6 +7211,8 @@
             });
         }
         document.getElementById('adminAlertMsg').value = '';
+        document.getElementById('adminAlertEditId').value = '';
+        clearAlertMedia('adminAlertMedia', 'adminAlertPreview');
         document.getElementById('adminAlertOverlay').classList.add('open');
         loadAdminAlertLog();
     }
@@ -7031,15 +7243,23 @@
                 const distColor = KIAA_DISTRICTS.find(d => d.id === a.district)?.color || 'var(--teal)';
                 return `
         <div style="padding:8px 0;border-bottom:1px solid var(--b2)">
-          <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:3px">
+          <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:4px">
             <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${
 
                 distColor}18;color:${distColor};border:1px solid ${distColor}44;border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0">${esc(districtLabel(a.district))}</span>
             <span style="font-size:.8rem;line-height:1.4">${esc(a.message)}</span>
           </div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">👤 ${
-                esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}</div>
+          ${
+                a.media_url ? `<div style="margin-bottom:5px;border-radius:4px;overflow:hidden;border:1px solid var(--b2);max-width:200px">
+            ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:120px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:120px;object-fit:cover">`}
+          </div>` : ''}
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);display:flex;justify-content:space-between;align-items:center">
+            <span>👤 ${
+                esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
+            <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url || '')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:1px 7px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕</button>
+          </div>
         </div>`
+
                 ;
             }).join('');
         } catch (e) {
@@ -7047,9 +7267,28 @@
         }
     }
 
+    async function deleteAdminAlert(id, mediaUrl) {
+        if (!confirm('Delete this alert? It will be removed from the public site.'))
+            return;
+        if (mediaUrl) {
+            const path = mediaUrl.split('/object/public/incident-media/')[1];
+            if (path)
+                await sb.storage.from('incident-media').remove([path]);
+        }
+        const {error} = await sb.from('district_alerts').delete().eq('id', id);
+        if (!error) {
+            showToast('🗑', 'Alert deleted.');
+            loadAdminAlertLog();
+        }
+        else
+            showToast('⚠️', error.message, 'err');
+    }
+
     async function sendAdminDistrictAlert() {
         const district = document.getElementById('adminAlertDistrict')?.value;
         const msg = document.getElementById('adminAlertMsg')?.value.trim();
+        const editId = document.getElementById('adminAlertEditId')?.value;
+        const file = document.getElementById('adminAlertMedia')?.files?.[0];
         if (!district) {
             showToast('⚠️', 'Select a district first.', 'err');
             return;
@@ -7058,20 +7297,54 @@
             showToast('⚠️', 'Please enter a message.', 'err');
             return;
         }
+        const btn = document.querySelector('#adminAlertOverlay .btn-teal');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⏳ Saving…';
+        }
         try {
-            const {error} = await sb.from('district_alerts').insert({
-                district,
-                message: msg,
-                sent_by_email: currentUserEmail,
-                sent_by_name: currentUserName,
-            });
-            if (error)
-                throw error;
+            let mediaUrl = null,
+                mediaType = null;
+            if (file) {
+                const uploaded = await uploadAlertMedia(file, district);
+                mediaUrl = uploaded.url;
+                mediaType = uploaded.type;
+            }
+            if (editId) {
+                const {error} = await sb.from('district_alerts').update({
+                    message: msg,
+                    media_url: mediaUrl,
+                    media_type: mediaType,
+                    updated_at: new Date().toISOString(),
+                    is_edited: true
+                }).eq('id', editId);
+                if (error)
+                    throw error;
+                showToast('✅', 'Alert updated.');
+            } else {
+                const {error} = await sb.from('district_alerts').insert({
+                    district,
+                    message: msg,
+                    media_url: mediaUrl,
+                    media_type: mediaType,
+                    sent_by_email: currentUserEmail,
+                    sent_by_name: currentUserName,
+                });
+                if (error)
+                    throw error;
+                showToast('📢', `Alert sent to ${districtLabel(district)}.`);
+            }
             document.getElementById('adminAlertMsg').value = '';
-            showToast('📢', `Alert sent to ${districtLabel(district)}.`);
+            document.getElementById('adminAlertEditId').value = '';
+            clearAlertMedia('adminAlertMedia', 'adminAlertPreview');
             loadAdminAlertLog();
         } catch (e) {
-            showToast('⚠️', e.message || 'Failed to send alert.', 'err');
+            showToast('⚠️', e.message || 'Failed to save alert.', 'err');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '📤 Send';
+            }
         }
     }
 
