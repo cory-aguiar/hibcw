@@ -1133,9 +1133,18 @@ function renderMembers() {
   if(df) rows=rows.filter(m=>m.district===df);
   if(q) rows=rows.filter(m=>[m.email,m.full_name,m.business_name,m.phone,m.business_city].filter(Boolean).join(' ').toLowerCase().includes(q));
   if(!rows.length){el.innerHTML=`<div class="empty"><div class="empty-ico">👥</div>No members found.</div>`;return;}
-  el.innerHTML=rows.map(m=>`
+  // Sort: captain first within each district, then alphabetical by name
+  rows = [...rows].sort((a, b) => {
+    const aCap = a.full_name && a.captain_name && a.full_name.trim().toLowerCase() === a.captain_name.trim().toLowerCase() ? 0 : 1;
+    const bCap = b.full_name && b.captain_name && b.full_name.trim().toLowerCase() === b.captain_name.trim().toLowerCase() ? 0 : 1;
+    if (aCap !== bCap) return aCap - bCap;
+    return (a.full_name || a.email || '').localeCompare(b.full_name || b.email || '');
+  });
+  el.innerHTML=rows.map(m=>{
+    const isCaptain = m.full_name && m.captain_name && m.full_name.trim().toLowerCase() === m.captain_name.trim().toLowerCase();
+    return `
     <div class="mem-card">
-      <div class="mem-name">${m.full_name?esc(m.full_name):'<span style="color:var(--slate2);font-style:italic">No name</span>'}</div>
+      <div class="mem-name">${m.full_name?esc(m.full_name):'<span style="color:var(--slate2);font-style:italic">No name</span>'}${isCaptain?' <span style="font-family:\'IBM Plex Mono\',monospace;font-size:.52rem;background:rgba(0,201,167,.15);color:var(--teal);border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:1px 5px;vertical-align:middle">👮 Captain</span>':''}</div>
       <div class="mem-email-row">${esc(m.email)}</div>
       <div class="mem-detail">
         ${m.business_name?`🏢 ${esc(m.business_name)}<br>`:''}
@@ -1146,7 +1155,8 @@ function renderMembers() {
       <div class="mem-actions captain-hidden">
         <button class="btn btn-red" style="font-size:.68rem" onclick="removeMember('${m.id}')">Remove</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 async function removeMember(id) {
   const m=memberList.find(x=>x.id===id);
@@ -1281,12 +1291,16 @@ function buildCaptainMap() {
   memberList.forEach(m => {
     if (m.district && distMap[m.district]) {
       distMap[m.district].members.push(m);
-      if (m.captain_name && !distMap[m.district].captain) {
+      if (m.captain_name && m.full_name &&
+          m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()) {
+        // This member IS the captain — always prefer them
         distMap[m.district].captain = m.captain_name;
-        if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()) {
-          distMap[m.district].photo_url     = m.photo_url || null;
-          distMap[m.district].captainMember = m;
-        }
+        distMap[m.district].photo_url     = m.photo_url || null;
+        distMap[m.district].captainMember = m;
+      } else if (m.captain_name && !distMap[m.district].captain) {
+        // Fallback: first member with captain_name set
+        distMap[m.district].captain = m.captain_name;
+      }
       }
     }
   });
