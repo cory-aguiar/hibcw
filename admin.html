@@ -3158,6 +3158,7 @@
                       <div class="page-sub">Monthly performance metrics, milestones, and quarterly summaries — Superadmin only</div>
                     </div>
                     <div style="display:flex;gap:8px;flex-shrink:0;margin-top:4px">
+                      <button onclick="refreshTrackerLive()" style="background:transparent;border:1px solid var(--border);border-radius:5px;padding:7px 14px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.64rem;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,201,167,.08)'" onmouseout="this.style.background='transparent'">🔄 Refresh</button>
                       <button onclick="exportTrackerCSV()" style="background:transparent;border:1px solid var(--b2);border-radius:5px;padding:7px 14px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.64rem;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">⬇ Export CSV</button>
                     </div>
                   </div>
@@ -6837,7 +6838,8 @@
         {label:'Q4',months:[9,10,11],color:'#f97316'},
     ];
 
-    let trackerData = {};   // {year: {month_idx: {col:val,...}}}
+    let trackerData = {};   // {year: {month_idx: {notes only}}} — from tracker_monthly
+    let trackerLive = {};   // {month_idx: {col:val,...}} — computed from live Supabase data
     let milestones  = [];
     let quarterlyNotes = {}; // {year_q: {summary,worked,attention}}
     let trackerYear = new Date().getFullYear();
@@ -6858,7 +6860,7 @@
     async function loadTrackerData() {
         try {
             const [{data:md},{data:ms},{data:qn}] = await Promise.all([
-                sb.from('tracker_monthly').select('*').order('month'),
+                sb.from('tracker_monthly').select('year,month,notes').order('month'),
                 sb.from('tracker_milestones').select('*').order('created_at',{ascending:false}),
                 sb.from('tracker_quarterly').select('*'),
             ]);
@@ -6871,25 +6873,109 @@
             milestones = ms || [];
             (qn||[]).forEach(r => { quarterlyNotes[`${r.year}_${r.quarter}`] = r; });
         } catch(e) {
-            // Tables may not exist yet — work in memory
             console.log('Tracker tables not yet created — running in memory mode');
+        }
+        await computeLiveMonthData();
+    }
+
+    async function computeLiveMonthData() {
+        trackerLive = {};
+        try {
+            const yearStart = `${trackerYear}-01-01`;
+            const yearEnd   = `${trackerYear}-12-31`;
+
+            const [
+                {data:incidents},
+                {data:approvedMembers},
+                {data:alerts},
+                {data:apps},
+                {data:adminUsers},
+            ] = await Promise.all([
+                sb.from('incidents').select('id,occurred_at,status,police_report').gte('occurred_at', yearStart).lte('occurred_at', yearEnd + 'T23:59:59'),
+                sb.from('member_applications').select('id,created_at,status').eq('status','approved'),
+                sb.from('district_alerts').select('id,created_at').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
+                sb.from('member_applications').select('id,created_at,status').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
+                sb.from('admin_users').select('id,district,role').not('role','is',null),
+            ]);
+
+            const getMonth = d => new Date(d).getMonth();
+
+            for (let m = 0; m < 12; m++) {
+                trackerLive[m] = {
+                    incidents:0, incidents_archived:0, police_reports:0,
+                    alerts_sent:0, apps_received:0, apps_approved:0, apps_rejected:0,
+                    members_total:0, members_new:0, captain_logins:0, active_districts:0,
+                };
+            }
+
+            (incidents||[]).forEach(inc => {
+                const m = getMonth(inc.occurred_at);
+                if (m < 0 || m > 11) return;
+                trackerLive[m].incidents++;
+                if (inc.status === 'archived') trackerLive[m].incidents_archived++;
+                if (inc.police_report) trackerLive[m].police_reports++;
+            });
+
+            (alerts||[]).forEach(a => {
+                const m = getMonth(a.created_at);
+                if (m >= 0 && m <= 11) trackerLive[m].alerts_sent++;
+            });
+
+            (apps||[]).forEach(a => {
+                const m = getMonth(a.created_at);
+                if (m < 0 || m > 11) return;
+                trackerLive[m].apps_received++;
+                if (a.status === 'approved') trackerLive[m].apps_approved++;
+                if (a.status === 'rejected')  trackerLive[m].apps_rejected++;
+            });
+
+            // Cumulative member totals
+            const allApproved = (approvedMembers||[]).filter(m=>m.created_at).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+            const baseMembers = allApproved.filter(m=>new Date(m.created_at) < new Date(yearStart)).length;
+            const newByMonth  = Array(12).fill(0);
+            allApproved.forEach(m => {
+                const d = new Date(m.created_at);
+                if (d >= new Date(yearStart) && d <= new Date(yearEnd+'T23:59:59'))
+                    newByMonth[d.getMonth()]++;
+            });
+            let running = baseMembers;
+            for (let m = 0; m < 12; m++) {
+                running += newByMonth[m];
+                trackerLive[m].members_new   = newByMonth[m];
+                trackerLive[m].members_total = running;
+            }
+
+            // Active districts = unique districts with a captain assigned
+            const activeDist = new Set((adminUsers||[]).filter(u=>u.role==='captain'&&u.district).map(u=>u.district));
+            for (let m = 0; m < 12; m++) trackerLive[m].active_districts = activeDist.size;
+
+        } catch(e) {
+            console.log('Live tracker compute error:', e.message);
         }
     }
 
     function getMonthData(month) {
-        return (trackerData[trackerYear]||{})[month] || {};
+        const live  = trackerLive[month] || {};
+        const saved = (trackerData[trackerYear]||{})[month] || {};
+        return { ...live, notes: saved.notes || '' };
     }
 
     async function saveMonthData(month, key, val) {
+        if (key !== 'notes') return; // numeric fields are live — not manually editable
         if (!trackerData[trackerYear]) trackerData[trackerYear] = {};
         if (!trackerData[trackerYear][month]) trackerData[trackerYear][month] = {year:trackerYear,month};
-        trackerData[trackerYear][month][key] = val;
-        trackerInited = false; // refresh KPIs next render
-        renderTrackerKPIs();
+        trackerData[trackerYear][month].notes = val;
         try {
-            const row = {year:trackerYear, month, [key]:val||null};
-            await sb.from('tracker_monthly').upsert(row, {onConflict:'year,month'});
-        } catch(e) { console.log('tracker_monthly table not yet created'); }
+            await sb.from('tracker_monthly').upsert({year:trackerYear, month, notes:val||null},{onConflict:'year,month'});
+        } catch(e) { console.log('tracker_monthly save error:', e.message); }
+    }
+
+    async function refreshTrackerLive() {
+        await computeLiveMonthData();
+        renderTrackerKPIs();
+        renderMonthlyTable();
+        renderSponsorReport();
+        showToast('🔄', 'Tracker refreshed from live data.');
     }
 
     async function saveQuarterlyNote(year, quarter, field, val) {
@@ -6933,30 +7019,33 @@
           ${numCols.map(c=>`<div class="tracker-hdr" style="white-space:pre-line">${c.label}</div>`).join('')}
           <div class="tracker-hdr" style="text-align:left">Notes</div>
         </div>`;
+        const now = new Date();
         const rows = TRACKER_MONTHS.map((m,i)=>{
             const d = getMonthData(i);
-            const numInputs = numCols.map(c=>`
-              <div class="tracker-cell">
-                <input type="number" min="0" value="${d[c.key]||''}" placeholder="—"
-                  onchange="saveMonthData(${i},'${c.key}',this.value?parseInt(this.value):null)"
-                  style="color:${c.color}">
-              </div>`).join('');
+            const isFuture = i > now.getMonth() && trackerYear === now.getFullYear();
+            const numCells = numCols.map(c=>{
+                const val = d[c.key];
+                const display = (val !== undefined && val !== null && val !== '') ? val : (isFuture ? '' : '—');
+                return `<div class="tracker-cell" style="text-align:center;font-weight:500;color:${val ? c.color : 'var(--slate2)'}">
+                  ${display}
+                </div>`;
+            }).join('');
             return `<div class="tracker-month-row" style="${i%2===0?'background:rgba(255,255,255,.015)':''}">
               <div class="tracker-cell" style="font-weight:600;color:var(--white);padding-left:4px">${m}</div>
-              ${numInputs}
+              ${numCells}
               <div class="tracker-cell">
-                <input type="text" value="${esc(d.notes||'')}" placeholder="Notes…"
+                <input type="text" value="${esc(d.notes||'')}" placeholder="Add note…"
                   style="text-align:left;color:var(--slate)"
                   onchange="saveMonthData(${i},'notes',this.value||null)">
               </div>
             </div>`;
         }).join('');
 
-        // Totals
-        const yd = trackerData[trackerYear]||{};
-        const allM = Object.values(yd);
+        // Totals row
+        const allM = Object.values(trackerLive);
         const totals = numCols.map(c=>{
-            if (c.key==='members_total') return Math.max(...Object.values(yd).map(m=>parseInt(m[c.key])||0).concat([0]));
+            if (c.key==='members_total'||c.key==='active_districts')
+                return Math.max(...allM.map(m=>parseInt(m[c.key])||0).concat([0]));
             return allM.reduce((s,m)=>s+(parseInt(m[c.key])||0),0);
         });
         const totRow = `<div class="tracker-month-row" style="background:var(--navy3);border-top:2px solid var(--border)">
@@ -6965,7 +7054,12 @@
           <div class="tracker-cell"></div>
         </div>`;
 
-        el.innerHTML = `<div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;overflow:hidden;overflow-x:auto">${hdrRow}${rows}${totRow}</div>`;
+        const liveNote = `<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal)">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--teal);display:inline-block"></span>
+          Live data — updates automatically from Supabase &nbsp;·&nbsp; Only the Notes column is editable
+        </div>`;
+
+        el.innerHTML = liveNote + `<div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;overflow:hidden;overflow-x:auto">${hdrRow}${rows}${totRow}</div>`;
     }
 
     function renderMilestones() {
