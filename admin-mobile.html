@@ -1205,13 +1205,15 @@ function renderApps() {
       </div>
       ${a.notes?`<div style="font-size:.72rem;color:var(--slate2);font-style:italic;margin-top:6px;padding-top:6px;border-top:1px solid var(--b2)">"${esc(a.notes)}"</div>`:''}
       <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);margin-top:6px">${fmt(a.created_at)}</div>
-      <div class="app-actions-row captain-hidden">
-        ${a.status==='pending'?`
-          <button class="btn btn-teal" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">✅ Approve</button>
-          <button class="btn btn-red" onclick="rejectApp('${a.id}')">❌ Reject</button>`:''}
-        ${a.status==='approved'?`<button class="btn btn-ghost" onclick="rejectApp('${a.id}')">Revoke</button>`:''}
-        ${a.status==='rejected'?`<button class="btn btn-teal" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">Re-approve</button>`:''}
-        <button class="btn btn-ghost" onclick="deleteApp('${a.id}')">Delete</button>
+      <div class="app-actions-row">
+        ${(currentRole!=='captain'||a.district===captainDistrict)?`
+          ${a.status==='pending'?`
+            <button class="btn btn-teal" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">✅ Approve</button>
+            <button class="btn btn-red" onclick="rejectApp('${a.id}')">❌ Reject</button>`:''}
+          ${a.status==='approved'?`<button class="btn btn-ghost" onclick="rejectApp('${a.id}')">Revoke</button>`:''}
+          ${a.status==='rejected'?`<button class="btn btn-teal" onclick="approveApp('${a.id}','${esc(a.email)}','${esc(a.full_name)}')">Re-approve</button>`:''}
+        `:''}
+        <button class="btn btn-ghost captain-hidden" onclick="deleteApp('${a.id}')">Delete</button>
       </div>
     </div>`).join('');
 }
