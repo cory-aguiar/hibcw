@@ -7305,7 +7305,8 @@
         // ── Forms & Templates ─────────────────────────────
         { category:'Forms & Templates', icon:'📝', title:'Incident Report Form (Paper)',  desc:'Printable paper form for capturing incident details when internet is unavailable.', file:'files/form-incident-paper.pdf', roles:['admin','superadmin','captain'] },
         { category:'Forms & Templates', icon:'📝', title:'Member Sign-Up Sheet',          desc:'Paper sign-up sheet for collecting member information at community events.',       file:'files/form-member-signup.pdf',  roles:['admin','superadmin','captain'] },
-        { category:'Forms & Templates', icon:'📝', title:'Captain Introductory Letter',   desc:'Template letter introducing HIBCW to a new business in your district.',            file:'files/template-intro-letter.pdf', roles:['admin','superadmin','captain'] },
+        { category:'Forms & Templates', icon:'✍️', title:'Captain Introductory Letter — Fill & Print', desc:'Interactive letter template — click any field to type your info, then print or save as PDF. Opens in browser.', file:'files/template-intro-letter.html', roles:['admin','superadmin','captain'], openInBrowser:true },
+        { category:'Forms & Templates', icon:'📝', title:'Captain Introductory Letter — Blank PDF', desc:'Printable blank letter template for handwriting your information.',            file:'files/template-intro-letter.pdf', roles:['admin','superadmin','captain'] },
         // ── Admin Resources ───────────────────────────────
         { category:'Admin Resources', icon:'🔧', title:'HIBCW Data Export Guide',         desc:'Instructions for interpreting and working with exported CSV data files.',           file:'files/guide-csv-export.pdf',    roles:['admin','superadmin'] },
         { category:'Admin Resources', icon:'🔧', title:'Supabase Database Reference',     desc:'Quick reference for database table structure and RLS policy overview.',             file:'files/guide-database.pdf',      roles:['admin','superadmin'] },
@@ -7408,7 +7409,7 @@
                         <div style="font-size:.84rem;font-weight:500;color:var(--white);margin-bottom:2px">${esc(f.title)}</div>
                         <div style="font-size:.72rem;color:var(--slate);line-height:1.4">${esc(f.desc)}</div>
                       </div>
-                      <a href="${f.file}" download style="display:inline-flex;align-items:center;gap:5px;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--teal);text-decoration:none;white-space:nowrap;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--teal)';this.style.background='rgba(0,201,167,.08)'" onmouseout="this.style.borderColor='var(--b2)';this.style.background='var(--navy3)'">⬇ Download PDF</a>
+                      <a href="${f.file}" ${f.openInBrowser ? 'target="_blank" rel="noopener"' : 'download'} style="display:inline-flex;align-items:center;gap:5px;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--teal);text-decoration:none;white-space:nowrap;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--teal)';this.style.background='rgba(0,201,167,.08)'" onmouseout="this.style.borderColor='var(--b2)';this.style.background='var(--navy3)'">${f.openInBrowser ? '✍️ Open & Fill In' : '⬇ Download PDF'}</a>
                     </div>`).join('')}
                   </div>
                 </div>`;
