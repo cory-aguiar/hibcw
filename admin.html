@@ -4682,7 +4682,9 @@
         document.getElementById('meOrigEmail').value = m.email;
         document.getElementById('meFullName').value = m.full_name || '';
         document.getElementById('meEmail').value = m.email || '';
-        document.getElementById('mePhone').value = m.phone || '';
+        const mePhoneEl = document.getElementById('mePhone');
+        mePhoneEl.value = m.phone || '';
+        phoneMask(mePhoneEl);
         document.getElementById('meBizName').value = m.business_name || '';
         document.getElementById('meBizAddr').value = m.business_address || '';
         document.getElementById('meBizCity').value = m.business_city || '';
@@ -4812,7 +4814,7 @@
         const origEmail = document.getElementById('meOrigEmail').value.toLowerCase();
         const newEmail = document.getElementById('meEmail').value.trim().toLowerCase();
         const fullName = document.getElementById('meFullName').value.trim();
-        const phone = document.getElementById('mePhone').value.trim();
+        const phone = document.getElementById('mePhone').value.trim().replace(/\D/g, '');
         const bizName = document.getElementById('meBizName').value.trim();
         const bizAddr = document.getElementById('meBizAddr').value.trim();
         const bizCity = document.getElementById('meBizCity').value.trim();
@@ -6759,6 +6761,15 @@
     /* ════════════════════════════════════════════════════
        HELPERS
     ════════════════════════════════════════════════════ */
+    // ── Phone mask ────────────────────────────────────────
+    function phoneMask(input) {
+      let v = input.value.replace(/\D/g, '').slice(0, 10);
+      if (v.length >= 7)      v = '(' + v.slice(0,3) + ') ' + v.slice(3,6) + '-' + v.slice(6);
+      else if (v.length >= 4) v = '(' + v.slice(0,3) + ') ' + v.slice(3);
+      else if (v.length > 0)  v = '(' + v;
+      input.value = v;
+    }
+
     function fmt(iso) {
         return new Date(iso).toLocaleString('en-US', {
             month: 'short',
@@ -7944,7 +7955,7 @@
                 </div>
                 <div class="mf-group">
                     <div class="mf-label">Phone Number</div>
-                    <input class="tb-search" id="mePhone" type="tel" placeholder="(808) 000-0000" style="width:100%">
+                    <input class="tb-search" id="mePhone" type="tel" placeholder="(808) 000-0000" oninput="phoneMask(this)" maxlength="14" style="width:100%">
                 </div>
                 <div class="mf-group">
                     <div class="mf-label">Business Name</div>
