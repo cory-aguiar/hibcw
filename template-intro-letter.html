@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HIBCW Captain Introductory Letter</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+@page{size:letter;margin:0}
+body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:11px;color:#1a2a3a;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+
+/* ── Toolbar ── */
+.toolbar{background:#0b1524;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.toolbar-brand{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#00c9a7}
+.toolbar-actions{display:flex;gap:8px;align-items:center}
+.t-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:all .15s;text-decoration:none;border:none;white-space:nowrap}
+.t-btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6)}
+.t-btn-ghost:hover{border-color:#00c9a7;color:#00c9a7}
+.t-btn-teal{background:#00c9a7;color:#0b1524}
+.t-btn-teal:hover{opacity:.85}
+.toolbar-hint{font-size:10px;color:rgba(255,255,255,.35);font-style:italic}
+@media print{.toolbar{display:none}}
+
+/* ── Page shell ── */
+.page{width:816px;min-height:1056px;background:#fff;margin:0 auto;display:flex;flex-direction:column;position:relative;overflow:hidden}
+
+/* ── Accent bar top ── */
+.accent-top{height:6px;background:#0b1524}
+.accent-stripe{height:3px;background:#00c9a7}
+
+/* ── Letterhead ── */
+.letterhead{padding:28px 52px 20px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #e0e8f0}
+.lh-left{}
+.lh-org{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#00c9a7;margin-bottom:4px}
+.lh-title{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#0b1524;line-height:1;margin-bottom:2px}
+.lh-sub{font-size:9.5px;color:#7a8fa6}
+.lh-right{text-align:right;flex-shrink:0}
+.lh-district{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6;margin-bottom:4px}
+
+/* Fill-in fields */
+.fill{display:inline-block;border-bottom:1px solid #b0c0cc;min-width:160px;height:16px;vertical-align:bottom;font-family:'IBM Plex Sans',sans-serif;font-size:11px;color:#0b1524}
+.fill-sm{min-width:80px}
+.fill-lg{min-width:220px}
+.fill-xl{min-width:280px}
+.fill-block{display:block;border-bottom:1px solid #b0c0cc;width:100%;height:18px;margin-top:2px}
+.fill-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;min-width:220px;height:22px;color:#0b1524;border-bottom:1.5px solid #0b1524}
+
+/* ── Body ── */
+.letter-body{padding:24px 52px 0;flex:1}
+
+/* Date + address block */
+.date-block{margin-bottom:20px}
+.date-line{font-size:10.5px;color:#4a6070;margin-bottom:16px}
+.addr-block{margin-bottom:20px;line-height:1.8;font-size:10.5px;color:#1a2a3a}
+.addr-label{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#b0c0cc;margin-bottom:4px}
+
+/* Salutation + body */
+.salutation{font-size:12px;font-weight:500;color:#0b1524;margin-bottom:14px}
+.para{font-size:11px;line-height:1.85;color:#2a3a4a;margin-bottom:14px}
+.para strong{color:#0b1524;font-weight:600}
+
+/* Benefits inset */
+.benefits-inset{background:#f5f9f8;border:1px solid rgba(0,201,167,.25);border-left:3px solid #00c9a7;border-radius:0 6px 6px 0;padding:12px 16px;margin:14px 0}
+.benefit-row{display:flex;align-items:flex-start;gap:8px;padding:3px 0;font-size:10.5px;color:#2a3a4a;line-height:1.5}
+.benefit-dot{width:6px;height:6px;border-radius:50%;background:#00c9a7;flex-shrink:0;margin-top:5px}
+.benefit-text strong{color:#0b1524;font-weight:600}
+
+/* CTA block */
+.cta-block{background:#0b1524;border-radius:7px;padding:14px 18px;margin:16px 0;display:flex;align-items:center;gap:18px}
+.cta-left{flex:1}
+.cta-label{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,201,167,.75);margin-bottom:3px}
+.cta-url{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:#fff}
+.cta-sub{font-size:9.5px;color:rgba(255,255,255,.45);margin-top:2px}
+.cta-qr{background:#fff;border-radius:5px;padding:5px;width:72px;height:72px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.cta-qr svg{width:62px;height:62px}
+
+/* Closing + signature */
+.closing-block{margin-top:18px;margin-bottom:0}
+.closing-line{font-size:11px;color:#2a3a4a;margin-bottom:16px}
+.sig-area{margin-bottom:12px}
+.sig-line{height:36px;border-bottom:1px solid #b0c0cc;width:220px;margin-bottom:3px}
+.sig-name-line{height:22px;border-bottom:1.5px solid #0b1524;width:220px;margin-bottom:3px}
+.sig-label{font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:#b0c0cc}
+
+/* Captain contact card */
+.contact-card{display:inline-flex;flex-direction:column;gap:3px;background:#f5f9f8;border:1px solid rgba(0,201,167,.2);border-radius:5px;padding:10px 14px;margin-top:8px;min-width:280px}
+.cc-name-row{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.cc-badge{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;background:rgba(0,201,167,.15);color:#007a65;border-radius:3px;padding:2px 6px}
+.cc-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#0b1524}
+.cc-row{display:flex;align-items:center;gap:6px;font-size:9.5px;color:#4a6070}
+.cc-row .fill{border-bottom:1px dashed #b0c0cc;min-width:160px;height:14px;font-size:9.5px}
+.cc-icon{font-size:10px;width:14px;text-align:center;flex-shrink:0}
+
+/* ── Footer ── */
+.letter-footer{padding:14px 52px;border-top:1px solid #e0e8f0;display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.lf-left{font-size:8.5px;color:#b0c0cc;line-height:1.7}
+.lf-right{text-align:right;font-family:'IBM Plex Mono',monospace;font-size:8px;color:#b0c0cc}
+.accent-bottom{height:3px;background:#00c9a7}
+.accent-bot2{height:5px;background:#0b1524}
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="toolbar-brand">HIBCW · Captain Introductory Letter</div>
+  <div class="toolbar-hint">Fill in the fields, then print or save as PDF</div>
+  <div class="toolbar-actions">
+    <a class="t-btn t-btn-ghost" href="javascript:window.print()">🖨 Print / Save PDF</a>
+    <a class="t-btn t-btn-teal" href="template-intro-letter.pdf" download>⬇ Download PDF</a>
+  </div>
+</div>
+
+<div class="page">
+  <div class="accent-top"></div>
+  <div class="accent-stripe"></div>
+
+  <!-- LETTERHEAD -->
+  <div class="letterhead">
+    <div class="lh-left">
+      <div class="lh-org">A Program of KIAA</div>
+      <div class="lh-title">Hawaii Island Business<br>Crime Watch</div>
+      <div class="lh-sub">hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422</div>
+    </div>
+    <div class="lh-right">
+      <div class="lh-district">Your District Captain for</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#0b1524;line-height:1.2;margin-bottom:4px">District <span class="fill fill-sm"></span><br><span class="fill fill-lg"></span></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#b0c0cc;margin-top:4px">HIBCW · Hawaii Island</div>
+    </div>
+  </div>
+
+  <div class="letter-body">
+
+    <!-- DATE + RECIPIENT -->
+    <div class="date-block" style="margin-top:18px">
+      <div class="date-line"><span class="fill fill-sm"></span></div>
+      <div class="addr-label">Recipient</div>
+      <div class="addr-block">
+        <span class="fill fill-xl"></span><br>
+        <span class="fill fill-lg"></span><br>
+        <span class="fill fill-xl"></span>
+      </div>
+    </div>
+
+    <!-- SALUTATION -->
+    <div class="salutation">Dear <span class="fill fill-lg"></span>,</div>
+
+    <!-- BODY -->
+    <div class="para">
+      My name is <strong><span class="fill fill-lg"></span></strong>, and I am the District Captain for 
+      <strong>HIBCW District <span class="fill fill-sm"></span> — <span class="fill fill-lg"></span></strong>. 
+      I'm reaching out because I believe your business would be a valuable part of our community safety network — and I'd love to personally invite you to join.
+    </div>
+
+    <div class="para">
+      The <strong>Hawaii Island Business Crime Watch (HIBCW)</strong> is a free program operated by KIAA that connects local businesses, district captains, and law enforcement across Hawaii Island. Our goal is simple: keep businesses like yours informed and protected through real-time communication, shared awareness, and community support.
+    </div>
+
+    <!-- BENEFITS INSET -->
+    <div class="benefits-inset">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#007a65;margin-bottom:8px">As a member, your business receives:</div>
+      <div class="benefit-row"><div class="benefit-dot"></div><div class="benefit-text"><strong>Real-time district alerts</strong> — I'll notify you directly when something happens in our area so you can take action quickly.</div></div>
+      <div class="benefit-row"><div class="benefit-dot"></div><div class="benefit-text"><strong>Verified member badge</strong> — Your incident reports on the HIBCW public map display a verified badge, increasing your credibility with the community.</div></div>
+      <div class="benefit-row"><div class="benefit-dot"></div><div class="benefit-text"><strong>Community network</strong> — Connect with neighboring businesses and stay informed about patterns of activity in our district.</div></div>
+      <div class="benefit-row"><div class="benefit-dot"></div><div class="benefit-text"><strong>Direct line to your captain</strong> — You'll have my personal contact information for any safety concerns in our district.</div></div>
+      <div class="benefit-row"><div class="benefit-dot"></div><div class="benefit-text"><strong>It's completely free</strong> — There is no cost to join, and the application takes less than two minutes.</div></div>
+    </div>
+
+    <div class="para">
+      Joining is easy. Simply scan the QR code below or visit <strong>hibcw.vercel.app</strong> and click "Join HIBCW." Your application comes directly to me and I'll have you approved and connected right away.
+    </div>
+
+    <!-- CTA BLOCK -->
+    <div class="cta-block">
+      <div class="cta-left">
+        <div class="cta-label">Apply online at</div>
+        <div class="cta-url">hibcw.vercel.app</div>
+        <div class="cta-sub">Click "Join HIBCW" · Free membership · Approved by your District Captain</div>
+      </div>
+      <div>
+        <div class="cta-qr">
+          <!-- QR code SVG inline — points to hibcw.vercel.app/apply.html -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 140 140"><rect width="140" height="140" fill="white"/><rect x="12" y="12" width="4" height="4" fill="#0b1524"/><rect x="16" y="12" width="4" height="4" fill="#0b1524"/><rect x="20" y="12" width="4" height="4" fill="#0b1524"/><rect x="24" y="12" width="4" height="4" fill="#0b1524"/><rect x="28" y="12" width="4" height="4" fill="#0b1524"/><rect x="32" y="12" width="4" height="4" fill="#0b1524"/><rect x="36" y="12" width="4" height="4" fill="#0b1524"/><rect x="64" y="12" width="4" height="4" fill="#0b1524"/><rect x="68" y="12" width="4" height="4" fill="#0b1524"/><rect x="72" y="12" width="4" height="4" fill="#0b1524"/><rect x="76" y="12" width="4" height="4" fill="#0b1524"/><rect x="80" y="12" width="4" height="4" fill="#0b1524"/><rect x="92" y="12" width="4" height="4" fill="#0b1524"/><rect x="100" y="12" width="4" height="4" fill="#0b1524"/><rect x="104" y="12" width="4" height="4" fill="#0b1524"/><rect x="108" y="12" width="4" height="4" fill="#0b1524"/><rect x="112" y="12" width="4" height="4" fill="#0b1524"/><rect x="116" y="12" width="4" height="4" fill="#0b1524"/><rect x="120" y="12" width="4" height="4" fill="#0b1524"/><rect x="124" y="12" width="4" height="4" fill="#0b1524"/><rect x="12" y="16" width="4" height="4" fill="#0b1524"/><rect x="36" y="16" width="4" height="4" fill="#0b1524"/><rect x="68" y="16" width="4" height="4" fill="#0b1524"/><rect x="84" y="16" width="4" height="4" fill="#0b1524"/><rect x="88" y="16" width="4" height="4" fill="#0b1524"/><rect x="92" y="16" width="4" height="4" fill="#0b1524"/><rect x="100" y="16" width="4" height="4" fill="#0b1524"/><rect x="124" y="16" width="4" height="4" fill="#0b1524"/><rect x="12" y="20" width="4" height="4" fill="#0b1524"/><rect x="20" y="20" width="4" height="4" fill="#0b1524"/><rect x="24" y="20" width="4" height="4" fill="#0b1524"/><rect x="28" y="20" width="4" height="4" fill="#0b1524"/><rect x="36" y="20" width="4" height="4" fill="#0b1524"/><rect x="44" y="20" width="4" height="4" fill="#0b1524"/><rect x="64" y="20" width="4" height="4" fill="#0b1524"/><rect x="76" y="20" width="4" height="4" fill="#0b1524"/><rect x="80" y="20" width="4" height="4" fill="#0b1524"/><rect x="84" y="20" width="4" height="4" fill="#0b1524"/><rect x="92" y="20" width="4" height="4" fill="#0b1524"/><rect x="100" y="20" width="4" height="4" fill="#0b1524"/><rect x="108" y="20" width="4" height="4" fill="#0b1524"/><rect x="112" y="20" width="4" height="4" fill="#0b1524"/><rect x="116" y="20" width="4" height="4" fill="#0b1524"/><rect x="124" y="20" width="4" height="4" fill="#0b1524"/><rect x="12" y="24" width="4" height="4" fill="#0b1524"/><rect x="20" y="24" width="4" height="4" fill="#0b1524"/><rect x="24" y="24" width="4" height="4" fill="#0b1524"/><rect x="28" y="24" width="4" height="4" fill="#0b1524"/><rect x="36" y="24" width="4" height="4" fill="#0b1524"/><rect x="64" y="24" width="4" height="4" fill="#0b1524"/><rect x="68" y="24" width="4" height="4" fill="#0b1524"/><rect x="76" y="24" width="4" height="4" fill="#0b1524"/><rect x="80" y="24" width="4" height="4" fill="#0b1524"/><rect x="84" y="24" width="4" height="4" fill="#0b1524"/><rect x="88" y="24" width="4" height="4" fill="#0b1524"/><rect x="100" y="24" width="4" height="4" fill="#0b1524"/><rect x="108" y="24" width="4" height="4" fill="#0b1524"/><rect x="112" y="24" width="4" height="4" fill="#0b1524"/><rect x="116" y="24" width="4" height="4" fill="#0b1524"/><rect x="124" y="24" width="4" height="4" fill="#0b1524"/><rect x="12" y="28" width="4" height="4" fill="#0b1524"/><rect x="20" y="28" width="4" height="4" fill="#0b1524"/><rect x="24" y="28" width="4" height="4" fill="#0b1524"/><rect x="28" y="28" width="4" height="4" fill="#0b1524"/><rect x="36" y="28" width="4" height="4" fill="#0b1524"/><rect x="64" y="28" width="4" height="4" fill="#0b1524"/><rect x="76" y="28" width="4" height="4" fill="#0b1524"/><rect x="84" y="28" width="4" height="4" fill="#0b1524"/><rect x="100" y="28" width="4" height="4" fill="#0b1524"/><rect x="108" y="28" width="4" height="4" fill="#0b1524"/><rect x="112" y="28" width="4" height="4" fill="#0b1524"/><rect x="116" y="28" width="4" height="4" fill="#0b1524"/><rect x="124" y="28" width="4" height="4" fill="#0b1524"/><rect x="12" y="32" width="4" height="4" fill="#0b1524"/><rect x="36" y="32" width="4" height="4" fill="#0b1524"/><rect x="68" y="32" width="4" height="4" fill="#0b1524"/><rect x="76" y="32" width="4" height="4" fill="#0b1524"/><rect x="80" y="32" width="4" height="4" fill="#0b1524"/><rect x="100" y="32" width="4" height="4" fill="#0b1524"/><rect x="124" y="32" width="4" height="4" fill="#0b1524"/><rect x="12" y="36" width="4" height="4" fill="#0b1524"/><rect x="16" y="36" width="4" height="4" fill="#0b1524"/><rect x="20" y="36" width="4" height="4" fill="#0b1524"/><rect x="24" y="36" width="4" height="4" fill="#0b1524"/><rect x="28" y="36" width="4" height="4" fill="#0b1524"/><rect x="32" y="36" width="4" height="4" fill="#0b1524"/><rect x="36" y="36" width="4" height="4" fill="#0b1524"/><rect x="44" y="36" width="4" height="4" fill="#0b1524"/><rect x="52" y="36" width="4" height="4" fill="#0b1524"/><rect x="60" y="36" width="4" height="4" fill="#0b1524"/><rect x="68" y="36" width="4" height="4" fill="#0b1524"/><rect x="76" y="36" width="4" height="4" fill="#0b1524"/><rect x="84" y="36" width="4" height="4" fill="#0b1524"/><rect x="92" y="36" width="4" height="4" fill="#0b1524"/><rect x="100" y="36" width="4" height="4" fill="#0b1524"/><rect x="104" y="36" width="4" height="4" fill="#0b1524"/><rect x="108" y="36" width="4" height="4" fill="#0b1524"/><rect x="112" y="36" width="4" height="4" fill="#0b1524"/><rect x="116" y="36" width="4" height="4" fill="#0b1524"/><rect x="120" y="36" width="4" height="4" fill="#0b1524"/><rect x="124" y="36" width="4" height="4" fill="#0b1524"/><rect x="44" y="40" width="4" height="4" fill="#0b1524"/><rect x="72" y="40" width="4" height="4" fill="#0b1524"/><rect x="76" y="40" width="4" height="4" fill="#0b1524"/><rect x="80" y="40" width="4" height="4" fill="#0b1524"/><rect x="84" y="40" width="4" height="4" fill="#0b1524"/><rect x="92" y="40" width="4" height="4" fill="#0b1524"/><rect x="12" y="44" width="4" height="4" fill="#0b1524"/><rect x="16" y="44" width="4" height="4" fill="#0b1524"/><rect x="20" y="44" width="4" height="4" fill="#0b1524"/><rect x="28" y="44" width="4" height="4" fill="#0b1524"/><rect x="32" y="44" width="4" height="4" fill="#0b1524"/><rect x="36" y="44" width="4" height="4" fill="#0b1524"/><rect x="40" y="44" width="4" height="4" fill="#0b1524"/><rect x="44" y="44" width="4" height="4" fill="#0b1524"/><rect x="84" y="44" width="4" height="4" fill="#0b1524"/><rect x="88" y="44" width="4" height="4" fill="#0b1524"/><rect x="96" y="44" width="4" height="4" fill="#0b1524"/><rect x="112" y="44" width="4" height="4" fill="#0b1524"/><rect x="68" y="48" width="4" height="4" fill="#0b1524"/><rect x="72" y="48" width="4" height="4" fill="#0b1524"/><rect x="84" y="48" width="4" height="4" fill="#0b1524"/><rect x="88" y="48" width="4" height="4" fill="#0b1524"/><rect x="104" y="48" width="4" height="4" fill="#0b1524"/><rect x="108" y="48" width="4" height="4" fill="#0b1524"/><rect x="112" y="48" width="4" height="4" fill="#0b1524"/><rect x="124" y="48" width="4" height="4" fill="#0b1524"/><rect x="36" y="52" width="4" height="4" fill="#0b1524"/><rect x="80" y="52" width="4" height="4" fill="#0b1524"/><rect x="104" y="52" width="4" height="4" fill="#0b1524"/><rect x="108" y="52" width="4" height="4" fill="#0b1524"/><rect x="120" y="52" width="4" height="4" fill="#0b1524"/><rect x="124" y="52" width="4" height="4" fill="#0b1524"/><rect x="68" y="56" width="4" height="4" fill="#0b1524"/><rect x="72" y="56" width="4" height="4" fill="#0b1524"/><rect x="88" y="56" width="4" height="4" fill="#0b1524"/><rect x="96" y="56" width="4" height="4" fill="#0b1524"/><rect x="104" y="56" width="4" height="4" fill="#0b1524"/><rect x="108" y="56" width="4" height="4" fill="#0b1524"/><rect x="112" y="56" width="4" height="4" fill="#0b1524"/><rect x="116" y="56" width="4" height="4" fill="#0b1524"/><rect x="124" y="56" width="4" height="4" fill="#0b1524"/><rect x="36" y="60" width="4" height="4" fill="#0b1524"/><rect x="64" y="60" width="4" height="4" fill="#0b1524"/><rect x="76" y="60" width="4" height="4" fill="#0b1524"/><rect x="92" y="60" width="4" height="4" fill="#0b1524"/><rect x="96" y="60" width="4" height="4" fill="#0b1524"/><rect x="104" y="60" width="4" height="4" fill="#0b1524"/><rect x="120" y="60" width="4" height="4" fill="#0b1524"/><rect x="124" y="60" width="4" height="4" fill="#0b1524"/><rect x="72" y="64" width="4" height="4" fill="#0b1524"/><rect x="76" y="64" width="4" height="4" fill="#0b1524"/><rect x="80" y="64" width="4" height="4" fill="#0b1524"/><rect x="88" y="64" width="4" height="4" fill="#0b1524"/><rect x="100" y="64" width="4" height="4" fill="#0b1524"/><rect x="116" y="64" width="4" height="4" fill="#0b1524"/><rect x="124" y="64" width="4" height="4" fill="#0b1524"/><rect x="36" y="68" width="4" height="4" fill="#0b1524"/><rect x="72" y="68" width="4" height="4" fill="#0b1524"/><rect x="76" y="68" width="4" height="4" fill="#0b1524"/><rect x="84" y="68" width="4" height="4" fill="#0b1524"/><rect x="92" y="68" width="4" height="4" fill="#0b1524"/><rect x="96" y="68" width="4" height="4" fill="#0b1524"/><rect x="104" y="68" width="4" height="4" fill="#0b1524"/><rect x="116" y="68" width="4" height="4" fill="#0b1524"/><rect x="120" y="68" width="4" height="4" fill="#0b1524"/><rect x="68" y="72" width="4" height="4" fill="#0b1524"/><rect x="76" y="72" width="4" height="4" fill="#0b1524"/><rect x="80" y="72" width="4" height="4" fill="#0b1524"/><rect x="84" y="72" width="4" height="4" fill="#0b1524"/><rect x="88" y="72" width="4" height="4" fill="#0b1524"/><rect x="92" y="72" width="4" height="4" fill="#0b1524"/><rect x="96" y="72" width="4" height="4" fill="#0b1524"/><rect x="108" y="72" width="4" height="4" fill="#0b1524"/><rect x="112" y="72" width="4" height="4" fill="#0b1524"/><rect x="124" y="72" width="4" height="4" fill="#0b1524"/><rect x="36" y="76" width="4" height="4" fill="#0b1524"/><rect x="64" y="76" width="4" height="4" fill="#0b1524"/><rect x="72" y="76" width="4" height="4" fill="#0b1524"/><rect x="84" y="76" width="4" height="4" fill="#0b1524"/><rect x="96" y="76" width="4" height="4" fill="#0b1524"/><rect x="104" y="76" width="4" height="4" fill="#0b1524"/><rect x="116" y="76" width="4" height="4" fill="#0b1524"/><rect x="124" y="76" width="4" height="4" fill="#0b1524"/><rect x="68" y="80" width="4" height="4" fill="#0b1524"/><rect x="72" y="80" width="4" height="4" fill="#0b1524"/><rect x="84" y="80" width="4" height="4" fill="#0b1524"/><rect x="88" y="80" width="4" height="4" fill="#0b1524"/><rect x="92" y="80" width="4" height="4" fill="#0b1524"/><rect x="100" y="80" width="4" height="4" fill="#0b1524"/><rect x="104" y="80" width="4" height="4" fill="#0b1524"/><rect x="116" y="80" width="4" height="4" fill="#0b1524"/><rect x="124" y="80" width="4" height="4" fill="#0b1524"/><rect x="36" y="84" width="4" height="4" fill="#0b1524"/><rect x="64" y="84" width="4" height="4" fill="#0b1524"/><rect x="80" y="84" width="4" height="4" fill="#0b1524"/><rect x="96" y="84" width="4" height="4" fill="#0b1524"/><rect x="100" y="84" width="4" height="4" fill="#0b1524"/><rect x="116" y="84" width="4" height="4" fill="#0b1524"/><rect x="120" y="84" width="4" height="4" fill="#0b1524"/><rect x="64" y="88" width="4" height="4" fill="#0b1524"/><rect x="68" y="88" width="4" height="4" fill="#0b1524"/><rect x="72" y="88" width="4" height="4" fill="#0b1524"/><rect x="92" y="88" width="4" height="4" fill="#0b1524"/><rect x="96" y="88" width="4" height="4" fill="#0b1524"/><rect x="104" y="88" width="4" height="4" fill="#0b1524"/><rect x="116" y="88" width="4" height="4" fill="#0b1524"/><rect x="120" y="88" width="4" height="4" fill="#0b1524"/><rect x="36" y="92" width="4" height="4" fill="#0b1524"/><rect x="76" y="92" width="4" height="4" fill="#0b1524"/><rect x="88" y="92" width="4" height="4" fill="#0b1524"/><rect x="92" y="92" width="4" height="4" fill="#0b1524"/><rect x="96" y="92" width="4" height="4" fill="#0b1524"/><rect x="100" y="92" width="4" height="4" fill="#0b1524"/><rect x="104" y="92" width="4" height="4" fill="#0b1524"/><rect x="108" y="92" width="4" height="4" fill="#0b1524"/><rect x="116" y="92" width="4" height="4" fill="#0b1524"/><rect x="124" y="92" width="4" height="4" fill="#0b1524"/><rect x="44" y="96" width="4" height="4" fill="#0b1524"/><rect x="72" y="96" width="4" height="4" fill="#0b1524"/><rect x="76" y="96" width="4" height="4" fill="#0b1524"/><rect x="80" y="96" width="4" height="4" fill="#0b1524"/><rect x="88" y="96" width="4" height="4" fill="#0b1524"/><rect x="92" y="96" width="4" height="4" fill="#0b1524"/><rect x="108" y="96" width="4" height="4" fill="#0b1524"/><rect x="112" y="96" width="4" height="4" fill="#0b1524"/><rect x="116" y="96" width="4" height="4" fill="#0b1524"/><rect x="124" y="96" width="4" height="4" fill="#0b1524"/><rect x="12" y="100" width="4" height="4" fill="#0b1524"/><rect x="16" y="100" width="4" height="4" fill="#0b1524"/><rect x="20" y="100" width="4" height="4" fill="#0b1524"/><rect x="24" y="100" width="4" height="4" fill="#0b1524"/><rect x="28" y="100" width="4" height="4" fill="#0b1524"/><rect x="32" y="100" width="4" height="4" fill="#0b1524"/><rect x="36" y="100" width="4" height="4" fill="#0b1524"/><rect x="44" y="100" width="4" height="4" fill="#0b1524"/><rect x="64" y="100" width="4" height="4" fill="#0b1524"/><rect x="68" y="100" width="4" height="4" fill="#0b1524"/><rect x="72" y="100" width="4" height="4" fill="#0b1524"/><rect x="76" y="100" width="4" height="4" fill="#0b1524"/><rect x="84" y="100" width="4" height="4" fill="#0b1524"/><rect x="88" y="100" width="4" height="4" fill="#0b1524"/><rect x="92" y="100" width="4" height="4" fill="#0b1524"/><rect x="100" y="100" width="4" height="4" fill="#0b1524"/><rect x="108" y="100" width="4" height="4" fill="#0b1524"/><rect x="112" y="100" width="4" height="4" fill="#0b1524"/><rect x="12" y="104" width="4" height="4" fill="#0b1524"/><rect x="36" y="104" width="4" height="4" fill="#0b1524"/><rect x="44" y="104" width="4" height="4" fill="#0b1524"/><rect x="64" y="104" width="4" height="4" fill="#0b1524"/><rect x="76" y="104" width="4" height="4" fill="#0b1524"/><rect x="80" y="104" width="4" height="4" fill="#0b1524"/><rect x="84" y="104" width="4" height="4" fill="#0b1524"/><rect x="88" y="104" width="4" height="4" fill="#0b1524"/><rect x="92" y="104" width="4" height="4" fill="#0b1524"/><rect x="108" y="104" width="4" height="4" fill="#0b1524"/><rect x="12" y="108" width="4" height="4" fill="#0b1524"/><rect x="20" y="108" width="4" height="4" fill="#0b1524"/><rect x="24" y="108" width="4" height="4" fill="#0b1524"/><rect x="28" y="108" width="4" height="4" fill="#0b1524"/><rect x="36" y="108" width="4" height="4" fill="#0b1524"/><rect x="44" y="108" width="4" height="4" fill="#0b1524"/><rect x="72" y="108" width="4" height="4" fill="#0b1524"/><rect x="84" y="108" width="4" height="4" fill="#0b1524"/><rect x="92" y="108" width="4" height="4" fill="#0b1524"/><rect x="96" y="108" width="4" height="4" fill="#0b1524"/><rect x="100" y="108" width="4" height="4" fill="#0b1524"/><rect x="104" y="108" width="4" height="4" fill="#0b1524"/><rect x="108" y="108" width="4" height="4" fill="#0b1524"/><rect x="112" y="108" width="4" height="4" fill="#0b1524"/><rect x="116" y="108" width="4" height="4" fill="#0b1524"/><rect x="120" y="108" width="4" height="4" fill="#0b1524"/><rect x="12" y="112" width="4" height="4" fill="#0b1524"/><rect x="20" y="112" width="4" height="4" fill="#0b1524"/><rect x="24" y="112" width="4" height="4" fill="#0b1524"/><rect x="28" y="112" width="4" height="4" fill="#0b1524"/><rect x="36" y="112" width="4" height="4" fill="#0b1524"/><rect x="68" y="112" width="4" height="4" fill="#0b1524"/><rect x="72" y="112" width="4" height="4" fill="#0b1524"/><rect x="84" y="112" width="4" height="4" fill="#0b1524"/><rect x="100" y="112" width="4" height="4" fill="#0b1524"/><rect x="108" y="112" width="4" height="4" fill="#0b1524"/><rect x="112" y="112" width="4" height="4" fill="#0b1524"/><rect x="120" y="112" width="4" height="4" fill="#0b1524"/><rect x="12" y="116" width="4" height="4" fill="#0b1524"/><rect x="20" y="116" width="4" height="4" fill="#0b1524"/><rect x="24" y="116" width="4" height="4" fill="#0b1524"/><rect x="28" y="116" width="4" height="4" fill="#0b1524"/><rect x="36" y="116" width="4" height="4" fill="#0b1524"/><rect x="44" y="116" width="4" height="4" fill="#0b1524"/><rect x="80" y="116" width="4" height="4" fill="#0b1524"/><rect x="88" y="116" width="4" height="4" fill="#0b1524"/><rect x="96" y="116" width="4" height="4" fill="#0b1524"/><rect x="112" y="116" width="4" height="4" fill="#0b1524"/><rect x="116" y="116" width="4" height="4" fill="#0b1524"/><rect x="124" y="116" width="4" height="4" fill="#0b1524"/><rect x="12" y="120" width="4" height="4" fill="#0b1524"/><rect x="36" y="120" width="4" height="4" fill="#0b1524"/><rect x="44" y="120" width="4" height="4" fill="#0b1524"/><rect x="72" y="120" width="4" height="4" fill="#0b1524"/><rect x="96" y="120" width="4" height="4" fill="#0b1524"/><rect x="100" y="120" width="4" height="4" fill="#0b1524"/><rect x="120" y="120" width="4" height="4" fill="#0b1524"/><rect x="124" y="120" width="4" height="4" fill="#0b1524"/><rect x="12" y="124" width="4" height="4" fill="#0b1524"/><rect x="16" y="124" width="4" height="4" fill="#0b1524"/><rect x="20" y="124" width="4" height="4" fill="#0b1524"/><rect x="24" y="124" width="4" height="4" fill="#0b1524"/><rect x="28" y="124" width="4" height="4" fill="#0b1524"/><rect x="32" y="124" width="4" height="4" fill="#0b1524"/><rect x="36" y="124" width="4" height="4" fill="#0b1524"/><rect x="44" y="124" width="4" height="4" fill="#0b1524"/><rect x="76" y="124" width="4" height="4" fill="#0b1524"/><rect x="96" y="124" width="4" height="4" fill="#0b1524"/><rect x="104" y="124" width="4" height="4" fill="#0b1524"/><rect x="112" y="124" width="4" height="4" fill="#0b1524"/><rect x="124" y="124" width="4" height="4" fill="#0b1524"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="para">
+      I look forward to welcoming you to our network. If you have any questions before applying, please don't hesitate to reach out to me directly using the contact information below. I'm here to help.
+    </div>
+
+    <div class="para">Warm regards,</div>
+
+    <!-- CLOSING + SIGNATURE + CONTACT CARD -->
+    <div class="closing-block">
+      <div class="sig-area">
+        <div class="sig-line"></div>
+        <div style="margin-top:6px">
+          <div class="fill fill-name"></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#7a8fa6;margin-top:3px">District Captain, HIBCW District <span class="fill fill-sm" style="height:12px;min-width:50px;font-size:9px"></span> — <span class="fill fill-lg" style="height:12px;font-size:9px"></span></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#b0c0cc">A Program of KIAA</div>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <div class="cc-name-row">
+          <span class="cc-badge">👮 District Captain</span>
+          <span class="cc-name"><span class="fill fill-xl" style="border-bottom:none;height:20px"></span></span>
+        </div>
+        <div class="cc-row"><span class="cc-icon">📞</span><span class="fill fill-lg"></span></div>
+        <div class="cc-row"><span class="cc-icon">✉️</span><span class="fill fill-xl"></span></div>
+        <div class="cc-row"><span class="cc-icon">📍</span>HIBCW District <span class="fill fill-sm" style="min-width:40px"></span> — <span class="fill fill-lg"></span>, Hawaii Island</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="letter-footer">
+    <div class="lf-left">
+      Hawaii Island Business Crime Watch · A Program of KIAA<br>
+      hibcw.vercel.app · hibcw@kiaahilo.org · (808) 961-5422
+    </div>
+    <div class="lf-right">
+      HIBCW LTR-01 · REV 2026<br>
+      Template — fill in before distributing
+    </div>
+  </div>
+  <div class="accent-bottom"></div>
+  <div class="accent-bot2"></div>
+</div>
+
+</body>
+</html>
