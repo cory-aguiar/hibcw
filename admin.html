@@ -338,7 +338,9 @@
     .view {
         display: none;
         flex-direction: column;
-        flex: 1
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto
     }
 
     .view.on {
@@ -7347,6 +7349,7 @@
                 roles: ['admin', 'superadmin', 'captain'],
                 sections: ['Emergency Contacts', 'Quick Tasks', 'Permissions', 'Useful Links', 'Alert Guide', 'Districts', 'Status Key'],
                 url: 'captain-quickref.html',
+                btnLabel: '📖 Open Reference Card',
             },
         ];
 
@@ -7364,7 +7367,7 @@
               ${r.sections.map(s => `<span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;background:${r.color}10;border:1px solid ${r.color}25;border-radius:3px;padding:2px 7px;color:${r.color}">${s}</span>`).join('')}
             </div>
             <div style="display:flex;gap:8px;margin-top:2px">
-              <button onclick="openHandbook('${r.url}')" style="flex:1;background:${r.color};border:none;border-radius:5px;padding:8px 12px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">📖 Open Handbook</button>
+              <button onclick="openHandbook('${r.url}')" style="flex:1;background:${r.color};border:none;border-radius:5px;padding:8px 12px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">${r.btnLabel||'📖 Open Handbook'}</button>
               <button onclick="printHandbook('${r.url}')" style="background:transparent;border:1px solid ${r.color}44;border-radius:5px;padding:8px 12px;color:${r.color};font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='${r.color}';this.style.background='${r.color}10'" onmouseout="this.style.borderColor='${r.color}44';this.style.background='transparent'" title="Print / Save as PDF">🖨 Print PDF</button>
             </div>
           </div>`).join('');
