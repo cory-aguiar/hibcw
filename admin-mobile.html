@@ -594,6 +594,10 @@ body.light .strip-cell{background:#fff}
         <div id="mobileResourceCards"></div>
         <div id="mobileResourceFiles"></div>
 
+        <!-- GROWTH TRACKER — superadmin only -->
+        <div class="more-section-title superadmin-only">📊 Growth Tracker</div>
+        <div id="mobileTrackerWrap" class="superadmin-only"></div>
+
         <div style="padding:8px 16px 4px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.54rem;color:var(--slate2);line-height:1.8">
           HIBCW Admin · Public Beta<br>
           Hawaii Island Business Crime Watch · A Program of KIAA
@@ -847,6 +851,7 @@ function applyRoleUI() {
   document.getElementById('moreUserName').textContent=currentUserName;
   document.getElementById('moreUserRole').textContent=currentRole==='superadmin'?'⭐ Superadmin':currentRole==='captain'?'👮 Captain':'👤 Admin';
   renderMobileResources();
+  if (currentRole==='superadmin') initMobileTracker();
 }
 
 /* ════════════════════════════════════════════════
@@ -2060,6 +2065,307 @@ function renderMobileResources() {
           </div>
         </div>`;
     }).join('')}`;
+}
+
+/* ════════════════════════════════════════════════
+   MOBILE GROWTH TRACKER  (Superadmin only)
+════════════════════════════════════════════════ */
+const MOB_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MOB_MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MOB_TRACKER_COLS = [
+  {key:'active_districts',  label:'Active Districts',  color:'#f97316'},
+  {key:'members_total',     label:'Members (Total)',   color:'#00c9a7'},
+  {key:'members_new',       label:'New Members',       color:'#3b82f6'},
+  {key:'incidents',         label:'Incidents',         color:'#e8415a'},
+  {key:'incidents_archived',label:'Archived',          color:'#7a8fa6'},
+  {key:'police_reports',    label:'Police Reports',    color:'#f5a623'},
+  {key:'alerts_sent',       label:'Alerts Sent',       color:'#a855f7'},
+  {key:'captain_logins',    label:'Captain Logins',    color:'#10b981'},
+  {key:'apps_received',     label:'Apps Received',     color:'#f59e0b'},
+  {key:'apps_approved',     label:'Apps Approved',     color:'#22c55e'},
+  {key:'apps_rejected',     label:'Apps Rejected',     color:'#ef4444'},
+];
+const MOB_MS_COLORS = {
+  Launch:'#00c9a7',Membership:'#3b82f6',Incident:'#e8415a',Alert:'#f5a623',
+  Captain:'#a855f7',Media:'#10b981',Emergency:'#f97316',Feedback:'#7a8fa6',Milestone:'#0b1524'
+};
+
+let mobTrackerData  = {};
+let mobMilestones   = [];
+let mobQuarterlyNotes = {};
+let mobTrackerYear  = new Date().getFullYear();
+let mobTrackerInited = false;
+let mobTrackerTab   = 'monthly';
+let mobEditingMonth = null;
+
+async function initMobileTracker() {
+  if (!mobTrackerInited) {
+    await loadMobTrackerData();
+    mobTrackerInited = true;
+  }
+  renderMobTracker();
+}
+
+async function loadMobTrackerData() {
+  try {
+    const [{data:md},{data:ms},{data:qn}] = await Promise.all([
+      sb.from('tracker_monthly').select('*').order('month'),
+      sb.from('tracker_milestones').select('*').order('created_at',{ascending:false}),
+      sb.from('tracker_quarterly').select('*'),
+    ]);
+    mobTrackerData = {};
+    (md||[]).forEach(r=>{
+      const y=r.year||mobTrackerYear;
+      if(!mobTrackerData[y]) mobTrackerData[y]={};
+      mobTrackerData[y][r.month]=r;
+    });
+    mobMilestones = ms||[];
+    (qn||[]).forEach(r=>{ mobQuarterlyNotes[`${r.year}_${r.quarter}`]=r; });
+  } catch(e){ console.log('Tracker tables not yet created — memory mode'); }
+}
+
+function getMobMonthData(m){ return (mobTrackerData[mobTrackerYear]||{})[m]||{}; }
+
+async function saveMobMonthData(month, key, val) {
+  if(!mobTrackerData[mobTrackerYear]) mobTrackerData[mobTrackerYear]={};
+  if(!mobTrackerData[mobTrackerYear][month]) mobTrackerData[mobTrackerYear][month]={year:mobTrackerYear,month};
+  mobTrackerData[mobTrackerYear][month][key]=val;
+  renderMobKPIs();
+  try {
+    await sb.from('tracker_monthly').upsert({year:mobTrackerYear,month,[key]:val||null},{onConflict:'year,month'});
+  } catch(e){}
+}
+
+function renderMobTracker() {
+  const el = document.getElementById('mobileTrackerWrap');
+  if (!el) return;
+
+  const yd = mobTrackerData[mobTrackerYear]||{};
+  const allM = Object.values(yd);
+  const totalMembers   = Math.max(...allM.map(m=>parseInt(m.members_total)||0).concat([0]));
+  const totalIncidents = allM.reduce((s,m)=>s+(parseInt(m.incidents)||0),0);
+  const totalAlerts    = allM.reduce((s,m)=>s+(parseInt(m.alerts_sent)||0),0);
+  const totalNew       = allM.reduce((s,m)=>s+(parseInt(m.members_new)||0),0);
+
+  el.innerHTML = `
+    <!-- KPI strip -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 12px">
+      <div style="background:var(--navy2);border:1px solid rgba(0,201,167,.25);border-top:2px solid #00c9a7;border-radius:7px;padding:10px 12px">
+        <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">Total Members</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#00c9a7;line-height:1">${totalMembers}</div>
+      </div>
+      <div style="background:var(--navy2);border:1px solid rgba(232,65,90,.25);border-top:2px solid #e8415a;border-radius:7px;padding:10px 12px">
+        <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">Incidents YTD</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#e8415a;line-height:1">${totalIncidents}</div>
+      </div>
+      <div style="background:var(--navy2);border:1px solid rgba(168,85,247,.25);border-top:2px solid #a855f7;border-radius:7px;padding:10px 12px">
+        <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">Alerts Sent</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#a855f7;line-height:1">${totalAlerts}</div>
+      </div>
+      <div style="background:var(--navy2);border:1px solid rgba(59,130,246,.25);border-top:2px solid #3b82f6;border-radius:7px;padding:10px 12px">
+        <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">New Members</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#3b82f6;line-height:1">${totalNew}</div>
+      </div>
+    </div>
+
+    <!-- Tab pills -->
+    <div style="display:flex;gap:6px;padding:0 12px 10px;overflow-x:auto">
+      ${['monthly','milestones','quarterly'].map(t=>`
+        <button onclick="switchMobTrackerTab('${t}')" id="mobtab-${t}"
+          style="background:${mobTrackerTab===t?'var(--teal)':'var(--navy2)'};
+                 color:${mobTrackerTab===t?'#0b1524':'var(--slate)'};
+                 border:1px solid ${mobTrackerTab===t?'transparent':'var(--b2)'};
+                 border-radius:20px;padding:5px 14px;font-family:'IBM Plex Mono',monospace;
+                 font-size:.6rem;cursor:pointer;white-space:nowrap;transition:all .15s">
+          ${{monthly:'📅 Monthly',milestones:'⭐ Milestones',quarterly:'📝 Quarterly'}[t]}
+        </button>`).join('')}
+    </div>
+
+    <!-- Tab content -->
+    <div id="mobTrackerTabContent" style="padding:0 12px 12px">
+      ${renderMobTrackerTabContent()}
+    </div>`;
+}
+
+function renderMobKPIs() {
+  // Just re-render the whole thing for simplicity on mobile
+  renderMobTracker();
+}
+
+function switchMobTrackerTab(tab) {
+  mobTrackerTab = tab;
+  renderMobTracker();
+}
+
+function renderMobTrackerTabContent() {
+  if (mobTrackerTab === 'monthly') return renderMobMonthlyTab();
+  if (mobTrackerTab === 'milestones') return renderMobMilestonesTab();
+  if (mobTrackerTab === 'quarterly') return renderMobQuarterlyTab();
+  return '';
+}
+
+function renderMobMonthlyTab() {
+  // Month cards — tap to expand and edit
+  const months = MOB_MONTHS_FULL.map((m,i)=>{
+    const d = getMobMonthData(i);
+    const hasData = MOB_TRACKER_COLS.some(c=>d[c.key]);
+    const isOpen = mobEditingMonth === i;
+    return `
+      <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:7px;margin-bottom:6px;overflow:hidden">
+        <div onclick="toggleMobMonth(${i})" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer">
+          <div>
+            <div style="font-size:.84rem;font-weight:600;color:var(--white)">${m}</div>
+            ${hasData ? `<div style="font-size:.65rem;color:var(--teal);font-family:'IBM Plex Mono',monospace;margin-top:1px">
+              ${d.members_new?`+${d.members_new} members ·`:''}
+              ${d.incidents?`${d.incidents} incidents ·`:''}
+              ${d.alerts_sent?`${d.alerts_sent} alerts`:''}</div>` :
+              `<div style="font-size:.65rem;color:var(--slate2);font-family:'IBM Plex Mono',monospace;margin-top:1px">No data entered</div>`}
+          </div>
+          <div style="color:var(--slate);font-size:.8rem;transition:transform .2s;transform:rotate(${isOpen?'90':'0'}deg)">›</div>
+        </div>
+        ${isOpen ? `<div style="padding:0 14px 14px;border-top:1px solid var(--b2)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+            ${MOB_TRACKER_COLS.map(c=>`
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:${c.color};margin-bottom:3px">${c.label}</div>
+                <input type="number" min="0" value="${d[c.key]||''}" placeholder="—"
+                  style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:6px 8px;color:var(--white);font-size:.82rem;text-align:center"
+                  onchange="saveMobMonthData(${i},'${c.key}',this.value?parseInt(this.value):null)">
+              </div>`).join('')}
+          </div>
+          <div style="margin-top:8px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Notes</div>
+            <input type="text" value="${esc(d.notes||'')}" placeholder="Monthly notes…"
+              style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:6px 8px;color:var(--white);font-size:.82rem"
+              onchange="saveMobMonthData(${i},'notes',this.value||null)">
+          </div>
+        </div>` : ''}
+      </div>`;
+  }).join('');
+  return months;
+}
+
+function toggleMobMonth(i) {
+  mobEditingMonth = mobEditingMonth === i ? null : i;
+  renderMobTracker();
+}
+
+function renderMobMilestonesTab() {
+  const addBtn = `
+    <button onclick="openMobMilestoneSheet()" style="width:100%;background:var(--teal);border:none;border-radius:7px;padding:10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:700;cursor:pointer;margin-bottom:10px">+ Add Milestone</button>`;
+
+  if (!mobMilestones.length) return addBtn + `<div style="color:var(--slate2);font-size:.78rem;text-align:center;padding:16px 0">No milestones yet</div>`;
+
+  const list = mobMilestones.map(ms=>{
+    const color = MOB_MS_COLORS[ms.category]||'var(--teal)';
+    return `<div style="background:var(--navy2);border:1px solid var(--b2);border-left:3px solid ${color};border-radius:0 7px 7px 0;padding:11px 12px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;background:${color}15;color:${color};border:1px solid ${color}33;border-radius:3px;padding:1px 6px">${ms.category}</span>
+        <button onclick="deleteMobMilestone('${ms.id}')" style="background:none;border:none;color:var(--slate2);font-size:.72rem;cursor:pointer">✕</button>
+      </div>
+      <div style="font-size:.8rem;font-weight:600;color:var(--white);margin-bottom:2px">${esc(ms.story||'')}</div>
+      <div style="font-size:.7rem;color:var(--slate)">${esc(ms.impact||'')}${ms.date?' · '+ms.date:''}</div>
+    </div>`;
+  }).join('');
+  return addBtn + list;
+}
+
+function renderMobQuarterlyTab() {
+  const quarters = [{label:'Q1',months:[0,1,2],color:'#00c9a7'},{label:'Q2',months:[3,4,5],color:'#f5a623'},{label:'Q3',months:[6,7,8],color:'#a855f7'},{label:'Q4',months:[9,10,11],color:'#f97316'}];
+  const yd = mobTrackerData[mobTrackerYear]||{};
+  return quarters.map(q=>{
+    const qData = mobQuarterlyNotes[`${mobTrackerYear}_${q.label}`]||{};
+    const allM = q.months.map(i=>yd[i]||{});
+    const totNewMem = allM.reduce((s,m)=>s+(parseInt(m.members_new)||0),0);
+    const totInc = allM.reduce((s,m)=>s+(parseInt(m.incidents)||0),0);
+    const totAlerts = allM.reduce((s,m)=>s+(parseInt(m.alerts_sent)||0),0);
+    return `<div style="background:var(--navy2);border:1px solid var(--b2);border-top:2px solid ${q.color};border-radius:7px;padding:14px;margin-bottom:10px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:${q.color};margin-bottom:8px">${q.label} · ${MOB_MONTHS_FULL[q.months[0]]}–${MOB_MONTHS_FULL[q.months[2]]}</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#3b82f6">${totNewMem}</div>
+          <div style="font-size:.58rem;color:var(--slate)">New Members</div>
+        </div>
+        <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#e8415a">${totInc}</div>
+          <div style="font-size:.58rem;color:var(--slate)">Incidents</div>
+        </div>
+        <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#a855f7">${totAlerts}</div>
+          <div style="font-size:.58rem;color:var(--slate)">Alerts</div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:${q.color};margin-bottom:4px">Summary</div>
+      <textarea style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:56px;line-height:1.55"
+        placeholder="Write 2–3 sentences about this quarter…"
+        onchange="saveMobQuarterlyNote(${mobTrackerYear},'${q.label}','summary',this.value)">${esc(qData.summary||'')}</textarea>
+    </div>`;
+  }).join('');
+}
+
+async function saveMobQuarterlyNote(year, quarter, field, val) {
+  const k=`${year}_${quarter}`;
+  if(!mobQuarterlyNotes[k]) mobQuarterlyNotes[k]={year,quarter};
+  mobQuarterlyNotes[k][field]=val;
+  try { await sb.from('tracker_quarterly').upsert({year,quarter,[field]:val||null},{onConflict:'year,quarter'}); } catch(e){}
+}
+
+function openMobMilestoneSheet() {
+  const sheet = document.createElement('div');
+  sheet.id = 'mobMsSheet';
+  sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;flex-direction:column;justify-content:flex-end';
+  sheet.innerHTML = `
+    <div style="background:var(--navy2);border-radius:14px 14px 0 0;padding:20px;max-height:85vh;overflow-y:auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white)">Add Milestone</div>
+        <button onclick="document.getElementById('mobMsSheet').remove()" style="background:none;border:none;color:var(--slate);font-size:1.2rem;cursor:pointer">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Date</div>
+          <input type="date" id="mobMsDate" value="${new Date().toISOString().split('T')[0]}" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.8rem"></div>
+        <div><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Category</div>
+          <select id="mobMsCat" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.8rem">
+            ${['Launch','Membership','Incident','Alert','Captain','Media','Emergency','Feedback','Milestone'].map(c=>`<option>${c}</option>`).join('')}
+          </select></div>
+      </div>
+      <div style="margin-bottom:10px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Milestone / Story</div>
+        <textarea id="mobMsStory" rows="3" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.8rem;resize:vertical"></textarea></div>
+      <div style="margin-bottom:10px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Impact / Why it matters</div>
+        <input type="text" id="mobMsImpact" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.8rem"></div>
+      <div style="margin-bottom:16px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:6px">Use in pitch?</div>
+        <div style="display:flex;gap:8px">
+          ${['Yes','No','Maybe'].map(v=>`<label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer"><input type="radio" name="mobMsPitch" value="${v}" ${v==='Yes'?'checked':''}> ${v}</label>`).join('')}
+        </div></div>
+      <button onclick="saveMobMilestone()" style="width:100%;background:var(--teal);border:none;border-radius:7px;padding:12px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:700;cursor:pointer">Save Milestone</button>
+    </div>`;
+  document.body.appendChild(sheet);
+}
+
+async function saveMobMilestone() {
+  const ms = {
+    date:     document.getElementById('mobMsDate').value,
+    category: document.getElementById('mobMsCat').value,
+    story:    document.getElementById('mobMsStory').value.trim(),
+    impact:   document.getElementById('mobMsImpact').value.trim()||null,
+    use_in_pitch: document.querySelector('input[name="mobMsPitch"]:checked')?.value||'Yes',
+    created_at: new Date().toISOString(),
+  };
+  if (!ms.story) { showToast('⚠️','Enter a milestone story first.','err'); return; }
+  try {
+    const {data,error} = await sb.from('tracker_milestones').insert(ms).select().single();
+    if (error) throw error;
+    mobMilestones.unshift(data||{...ms,id:Date.now().toString()});
+  } catch(e){ mobMilestones.unshift({...ms,id:Date.now().toString()}); }
+  document.getElementById('mobMsSheet')?.remove();
+  renderMobTracker();
+  showToast('⭐','Milestone saved!');
+}
+
+async function deleteMobMilestone(id) {
+  if (!confirm('Delete this milestone?')) return;
+  mobMilestones = mobMilestones.filter(m=>m.id!=id);
+  try { await sb.from('tracker_milestones').delete().eq('id',id); } catch(e){}
+  renderMobTracker();
 }
 
 function showToast(ico,body,type='') {
