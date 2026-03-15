@@ -283,6 +283,33 @@
         font-weight: 500
     }
 
+
+    .tracker-tab {
+        background: transparent; border: none; border-bottom: 2px solid transparent;
+        padding: 10px 16px; color: var(--slate); font-family: 'IBM Plex Mono', monospace;
+        font-size: .68rem; cursor: pointer; transition: all .15s; letter-spacing: .04em;
+    }
+    .tracker-tab:hover { color: var(--white); }
+    .tracker-tab.on { color: var(--teal); border-bottom-color: var(--teal); }
+    .tracker-month-row { display:grid; grid-template-columns: 110px repeat(11,1fr) 2fr; gap:0; border-bottom:1px solid var(--b2); }
+    .tracker-month-row:hover { background: rgba(255,255,255,.02); }
+    .tracker-cell { padding: 7px 8px; font-size:.78rem; color:var(--white); }
+    .tracker-cell input { background:transparent; border:none; width:100%; color:var(--white); font-size:.78rem; font-family:'IBM Plex Sans',sans-serif; text-align:center; outline:none; }
+    .tracker-cell input:focus { background: rgba(0,201,167,.06); border-radius:3px; }
+    .tracker-hdr { background:var(--navy3); padding:7px 8px; font-family:'IBM Plex Mono',monospace; font-size:.58rem; letter-spacing:.08em; text-transform:uppercase; color:var(--slate); text-align:center; border-bottom:2px solid var(--border); }
+    .tracker-hdr.first { text-align:left; }
+    .ms-row { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--b2); }
+    .ms-cat-badge { font-family:'IBM Plex Mono',monospace; font-size:.58rem; padding:2px 7px; border-radius:3px; border:1px solid; white-space:nowrap; flex-shrink:0; margin-top:2px; }
+    .q-card { background:var(--navy2); border:1px solid var(--b2); border-radius:8px; padding:18px; margin-bottom:12px; }
+    .q-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:10px 0; }
+    .q-stat { background:var(--navy3); border-radius:5px; padding:10px; text-align:center; }
+    .q-stat-val { font-family:'Rajdhani',sans-serif; font-size:1.4rem; font-weight:700; line-height:1; }
+    .q-stat-lbl { font-family:'IBM Plex Mono',monospace; font-size:.58rem; color:var(--slate); margin-top:3px; }
+    .q-textarea { width:100%; background:var(--navy3); border:1px solid var(--b2); border-radius:5px; padding:10px; color:var(--white); font-size:.82rem; font-family:'IBM Plex Sans',sans-serif; resize:vertical; line-height:1.6; min-height:64px; }
+    .q-textarea:focus { border-color:var(--teal); outline:none; }
+    .sponsor-stat { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--b2); }
+    .sponsor-stat:last-child { border-bottom:none; }
+
     .nav-count {
         margin-left: auto;
         font-family: 'IBM Plex Mono', monospace;
@@ -2580,6 +2607,7 @@
                     <span class="nav-count" id="nc-apps">—</span>
                 </button>
                 <button class="nav-btn superadmin-only" id="nav-admins" onclick="showView('admins')">🔐 Manage Admins</button>
+                <button class="nav-btn superadmin-only" id="nav-tracker" onclick="showView('tracker')">📊 Growth Tracker</button>
                 <button class="nav-btn" id="nav-resources" onclick="showView('resources')">📚 Resources</button>
                 <button class="nav-btn" id="nav-captains" onclick="showView('captains')" style="border-top:1px solid var(--b2);margin-top:6px;padding-top:10px">>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="13" height="15" style="display:inline-block;vertical-align:middle;margin-right:5px;flex-shrink:0;margin-bottom:1px" aria-hidden="true">
@@ -3122,6 +3150,87 @@
                 </div>
 
                 <!-- ── MAP VIEW ── -->
+                <!-- GROWTH TRACKER VIEW -->
+                <div class="view" id="view-tracker">
+                  <div style="padding:24px 24px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+                    <div>
+                      <div class="page-title">📊 Growth Tracker</div>
+                      <div class="page-sub">Monthly performance metrics, milestones, and quarterly summaries — Superadmin only</div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-shrink:0;margin-top:4px">
+                      <button onclick="exportTrackerCSV()" style="background:transparent;border:1px solid var(--b2);border-radius:5px;padding:7px 14px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.64rem;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">⬇ Export CSV</button>
+                    </div>
+                  </div>
+
+                  <!-- KPI tiles -->
+                  <div id="trackerKPIs" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:0 24px 20px"></div>
+
+                  <!-- Tabs -->
+                  <div style="padding:0 24px;display:flex;gap:2px;border-bottom:1px solid var(--b2);margin-bottom:0">
+                    <button class="tracker-tab on" id="ttab-monthly" onclick="switchTrackerTab('monthly')">📅 Monthly Data</button>
+                    <button class="tracker-tab" id="ttab-milestones" onclick="switchTrackerTab('milestones')">⭐ Milestones</button>
+                    <button class="tracker-tab" id="ttab-quarterly" onclick="switchTrackerTab('quarterly')">📝 Quarterly</button>
+                    <button class="tracker-tab" id="ttab-sponsor" onclick="switchTrackerTab('sponsor')">💼 Sponsor Report</button>
+                  </div>
+
+                  <!-- Monthly Data tab -->
+                  <div id="trackerTab-monthly" class="tracker-tab-content" style="padding:20px 24px">
+                    <div style="font-size:.76rem;color:var(--slate);margin-bottom:14px">Enter your numbers at the end of each month. All data is saved to Supabase and syncs across sessions.</div>
+                    <div id="monthlyTable"></div>
+                  </div>
+
+                  <!-- Milestones tab -->
+                  <div id="trackerTab-milestones" class="tracker-tab-content" style="padding:20px 24px;display:none">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                      <div style="font-size:.76rem;color:var(--slate)">Record every significant first, story, and win. These become your pitch to sponsors and new islands.</div>
+                      <button onclick="openMilestoneModal()" style="background:var(--teal);border:none;border-radius:5px;padding:7px 14px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.64rem;font-weight:700;cursor:pointer">+ Add Milestone</button>
+                    </div>
+                    <div id="milestoneList"></div>
+                  </div>
+
+                  <!-- Quarterly tab -->
+                  <div id="trackerTab-quarterly" class="tracker-tab-content" style="padding:20px 24px;display:none">
+                    <div style="font-size:.76rem;color:var(--slate);margin-bottom:14px">Write 2–3 sentences at the end of each quarter. This becomes your story when talking to BOH and Kauai.</div>
+                    <div id="quarterlyForms"></div>
+                  </div>
+
+                  <!-- Sponsor Report tab -->
+                  <div id="trackerTab-sponsor" class="tracker-tab-content" style="padding:20px 24px;display:none">
+                    <div id="sponsorReport"></div>
+                  </div>
+                </div>
+
+                <!-- Milestone Modal -->
+                <div id="milestoneModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center">
+                  <div style="background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:24px;width:520px;max-width:90vw">
+                    <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);margin-bottom:16px">Add Milestone</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                      <div><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Date</div><input type="date" id="msDate" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:7px 10px;color:var(--white);font-size:.82rem"></div>
+                      <div><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Category</div>
+                        <select id="msCategory" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:7px 10px;color:var(--white);font-size:.82rem">
+                          <option>Launch</option><option>Membership</option><option>Incident</option>
+                          <option>Alert</option><option>Captain</option><option>Media</option>
+                          <option>Emergency</option><option>Feedback</option><option>Milestone</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div style="margin-bottom:10px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">District (optional)</div><input type="text" id="msDistrict" placeholder="e.g. South Hilo or All" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:7px 10px;color:var(--white);font-size:.82rem"></div>
+                    <div style="margin-bottom:10px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Milestone / Story</div><textarea id="msStory" rows="3" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:7px 10px;color:var(--white);font-size:.82rem;resize:vertical"></textarea></div>
+                    <div style="margin-bottom:16px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Impact / Why it matters</div><input type="text" id="msImpact" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:7px 10px;color:var(--white);font-size:.82rem"></div>
+                    <div style="margin-bottom:16px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Use in sponsor pitch?</div>
+                      <div style="display:flex;gap:12px;margin-top:4px">
+                        <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;cursor:pointer"><input type="radio" name="msPitch" value="Yes" checked> Yes</label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;cursor:pointer"><input type="radio" name="msPitch" value="No"> No</label>
+                        <label style="display:flex;align-items:center;gap=6px;font-size:.82rem;cursor:pointer"><input type="radio" name="msPitch" value="Maybe"> Maybe</label>
+                      </div>
+                    </div>
+                    <div style="display:flex;gap:8px;justify-content:flex-end">
+                      <button onclick="closeMilestoneModal()" style="background:transparent;border:1px solid var(--b2);border-radius:5px;padding:8px 16px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.64rem;cursor:pointer">Cancel</button>
+                      <button onclick="saveMilestone()" style="background:var(--teal);border:none;border-radius:5px;padding:8px 16px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.64rem;font-weight:700;cursor:pointer">Save Milestone</button>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- RESOURCES VIEW -->
                 <div class="view" id="view-resources">
                   <div style="padding:24px 24px 16px">
@@ -3713,6 +3822,8 @@
                 renderCaptainDashboard();
         } else if (v === 'admins') {
             loadAdmins();
+        } else if (v === 'tracker') {
+            initTracker();
         } else if (v === 'resources') {
             renderResources();
         } else {
@@ -6696,6 +6807,359 @@
     }
 
     // Returns the current captain name for a district, or null if none assigned
+    /* ════════════════════════════════════════════════════
+       GROWTH TRACKER  (Superadmin only)
+    ════════════════════════════════════════════════════ */
+    const TRACKER_MONTHS = ['January','February','March','April','May','June',
+                             'July','August','September','October','November','December'];
+    const TRACKER_COLS = [
+        {key:'active_districts',  label:'Active\nDistricts', color:'#f97316'},
+        {key:'members_total',     label:'Members\n(Cumul.)',  color:'#00c9a7'},
+        {key:'members_new',       label:'New\nMembers',      color:'#3b82f6'},
+        {key:'incidents',         label:'Incidents\nReported',color:'#e8415a'},
+        {key:'incidents_archived',label:'Archived',           color:'#7a8fa6'},
+        {key:'police_reports',    label:'Police\nReports',   color:'#f5a623'},
+        {key:'alerts_sent',       label:'Alerts\nSent',      color:'#a855f7'},
+        {key:'captain_logins',    label:'Captain\nLogins',   color:'#10b981'},
+        {key:'apps_received',     label:'Apps\nReceived',    color:'#f59e0b'},
+        {key:'apps_approved',     label:'Approved',           color:'#22c55e'},
+        {key:'apps_rejected',     label:'Rejected',           color:'#ef4444'},
+        {key:'notes',             label:'Notes',              color:'#7a8fa6'},
+    ];
+    const MS_COLORS = {
+        Launch:'#00c9a7',Membership:'#3b82f6',Incident:'#e8415a',Alert:'#f5a623',
+        Captain:'#a855f7',Media:'#10b981',Emergency:'#f97316',Feedback:'#7a8fa6',Milestone:'#0b1524'
+    };
+    const QUARTERS = [
+        {label:'Q1',months:[0,1,2],color:'#00c9a7'},
+        {label:'Q2',months:[3,4,5],color:'#f5a623'},
+        {label:'Q3',months:[6,7,8],color:'#a855f7'},
+        {label:'Q4',months:[9,10,11],color:'#f97316'},
+    ];
+
+    let trackerData = {};   // {year: {month_idx: {col:val,...}}}
+    let milestones  = [];
+    let quarterlyNotes = {}; // {year_q: {summary,worked,attention}}
+    let trackerYear = new Date().getFullYear();
+    let trackerInited = false;
+
+    async function initTracker() {
+        if (!trackerInited) {
+            await loadTrackerData();
+            trackerInited = true;
+        }
+        renderTrackerKPIs();
+        renderMonthlyTable();
+        renderMilestones();
+        renderQuarterly();
+        renderSponsorReport();
+    }
+
+    async function loadTrackerData() {
+        try {
+            const [{data:md},{data:ms},{data:qn}] = await Promise.all([
+                sb.from('tracker_monthly').select('*').order('month'),
+                sb.from('tracker_milestones').select('*').order('created_at',{ascending:false}),
+                sb.from('tracker_quarterly').select('*'),
+            ]);
+            trackerData = {};
+            (md||[]).forEach(r => {
+                const y = r.year || trackerYear;
+                if (!trackerData[y]) trackerData[y] = {};
+                trackerData[y][r.month] = r;
+            });
+            milestones = ms || [];
+            (qn||[]).forEach(r => { quarterlyNotes[`${r.year}_${r.quarter}`] = r; });
+        } catch(e) {
+            // Tables may not exist yet — work in memory
+            console.log('Tracker tables not yet created — running in memory mode');
+        }
+    }
+
+    function getMonthData(month) {
+        return (trackerData[trackerYear]||{})[month] || {};
+    }
+
+    async function saveMonthData(month, key, val) {
+        if (!trackerData[trackerYear]) trackerData[trackerYear] = {};
+        if (!trackerData[trackerYear][month]) trackerData[trackerYear][month] = {year:trackerYear,month};
+        trackerData[trackerYear][month][key] = val;
+        trackerInited = false; // refresh KPIs next render
+        renderTrackerKPIs();
+        try {
+            const row = {year:trackerYear, month, [key]:val||null};
+            await sb.from('tracker_monthly').upsert(row, {onConflict:'year,month'});
+        } catch(e) { console.log('tracker_monthly table not yet created'); }
+    }
+
+    async function saveQuarterlyNote(year, quarter, field, val) {
+        const k = `${year}_${quarter}`;
+        if (!quarterlyNotes[k]) quarterlyNotes[k] = {year,quarter};
+        quarterlyNotes[k][field] = val;
+        try {
+            await sb.from('tracker_quarterly').upsert({year,quarter,[field]:val||null},{onConflict:'year,quarter'});
+        } catch(e) { console.log('tracker_quarterly table not yet created'); }
+    }
+
+    function renderTrackerKPIs() {
+        const el = document.getElementById('trackerKPIs');
+        if (!el) return;
+        const yd = trackerData[trackerYear] || {};
+        const allMonths = Object.values(yd);
+        const totalMembers  = Math.max(...allMonths.map(m=>parseInt(m.members_total)||0).concat([0]));
+        const totalIncidents= allMonths.reduce((s,m)=>s+(parseInt(m.incidents)||0),0);
+        const totalAlerts   = allMonths.reduce((s,m)=>s+(parseInt(m.alerts_sent)||0),0);
+        const totalMemNew   = allMonths.reduce((s,m)=>s+(parseInt(m.members_new)||0),0);
+        const kpis = [
+            {label:'Total Members',    val:totalMembers,   color:'#00c9a7', icon:'👥'},
+            {label:'Incidents Reported',val:totalIncidents,color:'#e8415a', icon:'🚨'},
+            {label:'Alerts Sent',      val:totalAlerts,    color:'#a855f7', icon:'📢'},
+            {label:'New Members (YTD)',  val:totalMemNew,   color:'#3b82f6', icon:'✅'},
+        ];
+        el.innerHTML = kpis.map(k=>`
+          <div style="background:var(--navy2);border:1px solid ${k.color}22;border-top:3px solid ${k.color};border-radius:8px;padding:14px 16px">
+            <div style="font-size:.72rem;color:var(--slate);margin-bottom:4px">${k.icon} ${k.label}</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:${k.color};line-height:1">${k.val.toLocaleString()}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);margin-top:3px">${trackerYear} year to date</div>
+          </div>`).join('');
+    }
+
+    function renderMonthlyTable() {
+        const el = document.getElementById('monthlyTable');
+        if (!el) return;
+        const numCols = TRACKER_COLS.filter(c=>c.key!=='notes');
+        const hdrRow = `<div class="tracker-month-row">
+          <div class="tracker-hdr first" style="text-align:left">Month</div>
+          ${numCols.map(c=>`<div class="tracker-hdr" style="white-space:pre-line">${c.label}</div>`).join('')}
+          <div class="tracker-hdr" style="text-align:left">Notes</div>
+        </div>`;
+        const rows = TRACKER_MONTHS.map((m,i)=>{
+            const d = getMonthData(i);
+            const numInputs = numCols.map(c=>`
+              <div class="tracker-cell">
+                <input type="number" min="0" value="${d[c.key]||''}" placeholder="—"
+                  onchange="saveMonthData(${i},'${c.key}',this.value?parseInt(this.value):null)"
+                  style="color:${c.color}">
+              </div>`).join('');
+            return `<div class="tracker-month-row" style="${i%2===0?'background:rgba(255,255,255,.015)':''}">
+              <div class="tracker-cell" style="font-weight:600;color:var(--white);padding-left:4px">${m}</div>
+              ${numInputs}
+              <div class="tracker-cell">
+                <input type="text" value="${esc(d.notes||'')}" placeholder="Notes…"
+                  style="text-align:left;color:var(--slate)"
+                  onchange="saveMonthData(${i},'notes',this.value||null)">
+              </div>
+            </div>`;
+        }).join('');
+
+        // Totals
+        const yd = trackerData[trackerYear]||{};
+        const allM = Object.values(yd);
+        const totals = numCols.map(c=>{
+            if (c.key==='members_total') return Math.max(...Object.values(yd).map(m=>parseInt(m[c.key])||0).concat([0]));
+            return allM.reduce((s,m)=>s+(parseInt(m[c.key])||0),0);
+        });
+        const totRow = `<div class="tracker-month-row" style="background:var(--navy3);border-top:2px solid var(--border)">
+          <div class="tracker-cell" style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);letter-spacing:.08em">TOTAL / MAX</div>
+          ${totals.map((t,i)=>`<div class="tracker-cell" style="font-weight:700;color:${numCols[i].color};text-align:center">${t||'—'}</div>`).join('')}
+          <div class="tracker-cell"></div>
+        </div>`;
+
+        el.innerHTML = `<div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;overflow:hidden;overflow-x:auto">${hdrRow}${rows}${totRow}</div>`;
+    }
+
+    function renderMilestones() {
+        const el = document.getElementById('milestoneList');
+        if (!el) return;
+        if (!milestones.length) {
+            el.innerHTML = `<div style="color:var(--slate2);font-style:italic;font-size:.82rem;padding:20px 0">No milestones yet — click "+ Add Milestone" to record your first win.</div>`;
+            return;
+        }
+        el.innerHTML = milestones.map(ms=>{
+            const color = MS_COLORS[ms.category]||'var(--teal)';
+            const pitchColor = ms.use_in_pitch==='Yes'?'var(--teal)':ms.use_in_pitch==='Maybe'?'var(--gold)':'var(--slate2)';
+            return `<div class="ms-row">
+              <div>
+                <span class="ms-cat-badge" style="color:${color};border-color:${color}44;background:${color}12">${ms.category||'—'}</span>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:.84rem;font-weight:600;color:var(--white);margin-bottom:3px">${esc(ms.story||'')}</div>
+                <div style="font-size:.74rem;color:var(--slate);line-height:1.5">${esc(ms.impact||'')}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);margin-top:4px">
+                  ${ms.date||''} ${ms.district?'· '+esc(ms.district):''} · Pitch: <span style="color:${pitchColor}">${ms.use_in_pitch||'—'}</span>
+                </div>
+              </div>
+              <button onclick="deleteMilestone('${ms.id}')" style="background:none;border:none;color:var(--slate2);cursor:pointer;font-size:.8rem;flex-shrink:0" title="Delete">✕</button>
+            </div>`;
+        }).join('');
+    }
+
+    function renderQuarterly() {
+        const el = document.getElementById('quarterlyForms');
+        if (!el) return;
+        const yd = trackerData[trackerYear]||{};
+        el.innerHTML = QUARTERS.map(q=>{
+            const qData = quarterlyNotes[`${trackerYear}_${q.label}`]||{};
+            const stats = q.months.map(mi=>{
+                const md = yd[mi]||{};
+                return {month:TRACKER_MONTHS[mi], new_members:md.members_new||0, incidents:md.incidents||0, alerts:md.alerts_sent||0, apps:md.apps_approved||0};
+            });
+            const totNewMem = stats.reduce((s,m)=>s+m.new_members,0);
+            const totInc    = stats.reduce((s,m)=>s+m.incidents,0);
+            const totAlerts = stats.reduce((s,m)=>s+m.alerts,0);
+            const totApps   = stats.reduce((s,m)=>s+m.apps,0);
+            return `<div class="q-card">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:${q.color}">${q.label} · ${trackerYear}</div>
+                <div style="font-size:.74rem;color:var(--slate)">${TRACKER_MONTHS[q.months[0]]} — ${TRACKER_MONTHS[q.months[2]]}</div>
+              </div>
+              <div class="q-stats">
+                <div class="q-stat"><div class="q-stat-val" style="color:#3b82f6">${totNewMem}</div><div class="q-stat-lbl">New Members</div></div>
+                <div class="q-stat"><div class="q-stat-val" style="color:#e8415a">${totInc}</div><div class="q-stat-lbl">Incidents</div></div>
+                <div class="q-stat"><div class="q-stat-val" style="color:#a855f7">${totAlerts}</div><div class="q-stat-lbl">Alerts Sent</div></div>
+                <div class="q-stat"><div class="q-stat-val" style="color:#22c55e">${totApps}</div><div class="q-stat-lbl">Apps Approved</div></div>
+              </div>
+              <div style="margin-bottom:8px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:${q.color};margin-bottom:5px">Quarter Summary</div>
+                <textarea class="q-textarea" placeholder="Write 2–3 sentences summarizing this quarter…" onchange="saveQuarterlyNote(${trackerYear},'${q.label}','summary',this.value)">${esc(qData.summary||'')}</textarea>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:5px">What worked well</div>
+                  <textarea class="q-textarea" style="min-height:48px" placeholder="What went well this quarter?" onchange="saveQuarterlyNote(${trackerYear},'${q.label}','worked',this.value)">${esc(qData.worked||'')}</textarea>
+                </div>
+                <div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:5px">What needs attention</div>
+                  <textarea class="q-textarea" style="min-height:48px" placeholder="What needs improvement?" onchange="saveQuarterlyNote(${trackerYear},'${q.label}','attention',this.value)">${esc(qData.attention||'')}</textarea>
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderSponsorReport() {
+        const el = document.getElementById('sponsorReport');
+        if (!el) return;
+        const yd = trackerData[trackerYear]||{};
+        const allM = Object.values(yd);
+        const totalMembers   = Math.max(...allM.map(m=>parseInt(m.members_total)||0).concat([0]));
+        const totalIncidents = allM.reduce((s,m)=>s+(parseInt(m.incidents)||0),0);
+        const totalAlerts    = allM.reduce((s,m)=>s+(parseInt(m.alerts_sent)||0),0);
+        const monthsActive   = allM.filter(m=>parseInt(m.members_new)||parseInt(m.incidents)).length;
+        const pitchMilestones= milestones.filter(m=>m.use_in_pitch==='Yes').slice(0,5);
+
+        el.innerHTML = `
+          <div style="background:var(--navy2);border:1px solid var(--border);border-top:3px solid var(--teal);border-radius:8px;padding:20px;margin-bottom:16px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:12px">Platform Performance — Hawaii Island Proof of Concept</div>
+            <div>
+              ${[
+                ['Total verified members',  totalMembers,   '#00c9a7'],
+                ['Total incidents reported', totalIncidents, '#e8415a'],
+                ['District alerts sent',     totalAlerts,    '#a855f7'],
+                ['Districts covered',        '9 of 9',       '#f97316'],
+                ['Months in operation',      monthsActive,   '#3b82f6'],
+              ].map(([label,val,color])=>`
+                <div class="sponsor-stat">
+                  <div style="font-size:.84rem;font-weight:600;color:var(--white)">${label}</div>
+                  <div style="font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:${color}">${val}</div>
+                </div>`).join('')}
+            </div>
+          </div>
+          ${pitchMilestones.length ? `
+          <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:20px;margin-bottom:16px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px">⭐ Key Stories for Your Pitch</div>
+            ${pitchMilestones.map(ms=>`
+              <div style="padding:8px 0;border-bottom:1px solid var(--b2)">
+                <div style="font-size:.82rem;font-weight:600;color:var(--white);margin-bottom:2px">${esc(ms.story||'')}</div>
+                <div style="font-size:.72rem;color:var(--slate)">${esc(ms.impact||'')} ${ms.date?'· '+ms.date:''}</div>
+              </div>`).join('')}
+          </div>` : ''}
+          <div style="background:var(--navy2);border:1px solid rgba(245,166,35,.25);border-radius:8px;padding:20px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px">💼 Kauai Expansion — Sponsorship Summary</div>
+            ${[
+                ['Program name',          'Kauai Business Crime Watch'],
+                ['Sponsoring org target', 'Kauai Chamber of Commerce (or equivalent)'],
+                ['Founding sponsor ask',  'One-time: $3,000–$5,000'],
+                ['Annual retainer',       '$2,400–$3,000/year ($200–$250/month)'],
+                ['Sponsor visibility',    'Logo on all materials · Alerts · Press release · Business network access'],
+                ['BOH relationship',      'Existing warm contact — ideal first approach'],
+                ['Timeline',              'Launch 60–90 days after sponsor confirmation'],
+            ].map(([label,val])=>`
+              <div class="sponsor-stat">
+                <div style="font-size:.8rem;color:var(--slate)">${label}</div>
+                <div style="font-size:.82rem;color:var(--white);text-align:right;max-width:60%">${val}</div>
+              </div>`).join('')}
+          </div>`;
+    }
+
+    function switchTrackerTab(tab) {
+        document.querySelectorAll('.tracker-tab').forEach(t=>t.classList.remove('on'));
+        document.querySelectorAll('.tracker-tab-content').forEach(t=>t.style.display='none');
+        document.getElementById(`ttab-${tab}`)?.classList.add('on');
+        document.getElementById(`trackerTab-${tab}`).style.display='';
+    }
+
+    function openMilestoneModal() {
+        document.getElementById('msDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('milestoneModal').style.display='flex';
+    }
+    function closeMilestoneModal() {
+        document.getElementById('milestoneModal').style.display='none';
+        ['msDate','msCategory','msDistrict','msStory','msImpact'].forEach(id=>{
+            const el=document.getElementById(id);
+            if(el) el.value = id==='msDate' ? '' : (id==='msCategory' ? 'Launch' : '');
+        });
+    }
+
+    async function saveMilestone() {
+        const ms = {
+            date:     document.getElementById('msDate').value,
+            category: document.getElementById('msCategory').value,
+            district: document.getElementById('msDistrict').value||null,
+            story:    document.getElementById('msStory').value.trim(),
+            impact:   document.getElementById('msImpact').value.trim()||null,
+            use_in_pitch: document.querySelector('input[name="msPitch"]:checked')?.value||'Yes',
+            created_at: new Date().toISOString(),
+        };
+        if (!ms.story) { showToast('⚠️','Please enter a milestone story.','err'); return; }
+        try {
+            const {data,error} = await sb.from('tracker_milestones').insert(ms).select().single();
+            if (error) throw error;
+            milestones.unshift(data||{...ms,id:Date.now().toString()});
+        } catch(e) {
+            milestones.unshift({...ms,id:Date.now().toString()});
+        }
+        closeMilestoneModal();
+        renderMilestones();
+        showToast('⭐','Milestone saved!');
+    }
+
+    async function deleteMilestone(id) {
+        if (!confirm('Delete this milestone?')) return;
+        milestones = milestones.filter(m=>m.id!=id);
+        try { await sb.from('tracker_milestones').delete().eq('id',id); } catch(e){}
+        renderMilestones();
+    }
+
+    function exportTrackerCSV() {
+        const yd = trackerData[trackerYear]||{};
+        const cols = ['Month','Active Districts','Members Total','New Members','Incidents',
+                      'Archived','Police Reports','Alerts Sent','Captain Logins',
+                      'Apps Received','Apps Approved','Apps Rejected','Notes'];
+        const keys = ['active_districts','members_total','members_new','incidents',
+                      'incidents_archived','police_reports','alerts_sent','captain_logins',
+                      'apps_received','apps_approved','apps_rejected','notes'];
+        const rows = TRACKER_MONTHS.map((m,i)=>{
+            const d = yd[i]||{};
+            return [m,...keys.map(k=>d[k]||'')].join(',');
+        });
+        const csv = [cols.join(','),...rows].join('\n');
+        const a = document.createElement('a');
+        a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+        a.download = `HIBCW_Tracker_${trackerYear}.csv`;
+        a.click();
+    }
+
     /* ════════════════════════════════════════════════════
        RESOURCES
     ════════════════════════════════════════════════════ */
