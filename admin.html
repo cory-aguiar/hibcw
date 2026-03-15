@@ -4517,6 +4517,9 @@
             const nc = document.getElementById('nc-members');
             if (nc)
                 nc.textContent = memberList.length;
+
+            // Silently backfill any members missing their captain name
+            backfillCaptainNames();
         } catch (e) {
             console.warn('loadMembers error:', e);
             memberList = [];
@@ -6684,6 +6687,66 @@
         m.district === districtId && m.captain_name && m.captain_name.trim()
         );
         return captain ? captain.captain_name.trim() : null;
+    }
+
+    // Build a district -> captainName map using exact full_name match (same logic as renderCaptains)
+    function buildCaptainNameMap() {
+        const map = {};
+        // First pass: exact matches (real captains)
+        memberList.forEach(m => {
+            if (m.district && m.captain_name && m.full_name &&
+                m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()) {
+                map[m.district] = m.captain_name.trim();
+            }
+        });
+        // Second pass: fallback for districts with no exact match
+        memberList.forEach(m => {
+            if (m.district && m.captain_name && !map[m.district]) {
+                map[m.district] = m.captain_name.trim();
+            }
+        });
+        return map;
+    }
+
+    async function backfillCaptainNames() {
+        if (!sb) return;
+        const captainMap = buildCaptainNameMap();
+        if (!Object.keys(captainMap).length) return;
+
+        // Find members whose captain_name is missing or doesn't match the current captain
+        const needsUpdate = memberList.filter(m => {
+            if (!m.district || !m.app_id) return false; // needs an app record to update
+            const correctCaptain = captainMap[m.district];
+            if (!correctCaptain) return false;
+            return !m.captain_name || m.captain_name.trim() !== correctCaptain;
+        });
+
+        if (!needsUpdate.length) return;
+
+        // Group by captain name for efficient batch updates
+        const byCapt = {};
+        needsUpdate.forEach(m => {
+            const cap = captainMap[m.district];
+            if (!byCapt[cap]) byCapt[cap] = [];
+            byCapt[cap].push(m.app_id);
+        });
+
+        // Fire updates — one per unique captain name
+        const updates = Object.entries(byCapt).map(([captainName, appIds]) =>
+            sb.from('member_applications')
+              .update({ captain_name: captainName })
+              .in('id', appIds)
+        );
+        await Promise.all(updates);
+
+        // Update in-memory memberList so UI reflects immediately
+        needsUpdate.forEach(m => {
+            m.captain_name = captainMap[m.district];
+        });
+
+        // Re-render silently
+        renderMembers();
+        renderCaptains();
     }
 
     async function approveApp(id, email, name) {
