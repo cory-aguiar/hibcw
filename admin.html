@@ -6723,6 +6723,16 @@
                 sections: ['Your Role', 'Signing In', 'Your Dashboard', 'Incidents', 'Alerts', 'Members', 'Applications', 'Permissions'],
                 url: 'handbook-captain.html',
             },
+            {
+                id: 'quickref',
+                title: 'Captain Quick Reference Card',
+                desc: 'Single-page at-a-glance reference — emergency contacts, most common tasks, permissions, useful links, and alert writing guide. Print and keep on desk.',
+                icon: '⚡',
+                color: '#a855f7',
+                roles: ['admin', 'superadmin', 'captain'],
+                sections: ['Emergency Contacts', 'Quick Tasks', 'Permissions', 'Useful Links', 'Alert Guide', 'Districts', 'Status Key'],
+                url: 'captain-quickref.html',
+            },
         ];
 
         const visible = resources.filter(r => r.roles.includes(currentRole));
