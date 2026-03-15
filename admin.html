@@ -3124,12 +3124,16 @@
                 <!-- ── MAP VIEW ── -->
                 <!-- RESOURCES VIEW -->
                 <div class="view" id="view-resources">
-                  <div style="padding:24px">
+                  <div style="padding:24px 24px 16px">
                     <div class="page-title">📚 Resources</div>
-                    <div class="page-sub">Handbooks and reference guides for the HIBCW admin panel</div>
+                    <div class="page-sub">Handbooks, reference guides, and downloadable materials for HIBCW captains and admins</div>
                   </div>
-                  <div style="padding:0 24px 32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px" id="resourceCards">
-                    <!-- Cards injected by renderResources() -->
+                  <div style="padding:0 24px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px" id="resourceCards">
+                    <!-- Handbook cards injected by renderResources() -->
+                  </div>
+                  <!-- File Library -->
+                  <div style="padding:0 24px 32px" id="resourceFiles">
+                    <!-- File list injected by renderResources() -->
                   </div>
                 </div>
 
@@ -6695,9 +6699,45 @@
     /* ════════════════════════════════════════════════════
        RESOURCES
     ════════════════════════════════════════════════════ */
+
+    // ── File library ─────────────────────────────────────
+    // To add a file: push a new object into RESOURCE_FILES.
+    // Fields:
+    //   title       — display name
+    //   desc        — one-line description
+    //   category    — group heading (e.g. 'District Flyers', 'Forms & Templates')
+    //   icon        — emoji icon
+    //   file        — filename relative to this directory (e.g. 'files/flyer-south-hilo.pdf')
+    //   roles       — ['admin','superadmin','captain'] or any subset
+    //   district    — optional: restrict to a specific district id (e.g. 'south-hilo')
+    //                 if set, the file only shows for captains of that district (admins always see all)
+    const RESOURCE_FILES = [
+        // ── District Flyers ───────────────────────────────
+        { category:'District Flyers', icon:'🗺', title:'District 1 — Hāmākua Flyer',     desc:'Printable promotional flyer for District 1 Hāmākua businesses.',        file:'files/flyer-d1-hamakua.pdf',     roles:['admin','superadmin','captain'], district:'hamakua'    },
+        { category:'District Flyers', icon:'🗺', title:'District 2 — North Hilo Flyer',   desc:'Printable promotional flyer for District 2 North Hilo businesses.',      file:'files/flyer-d2-north-hilo.pdf',  roles:['admin','superadmin','captain'], district:'north-hilo'  },
+        { category:'District Flyers', icon:'🗺', title:'District 3 — South Hilo Flyer',   desc:'Printable promotional flyer for District 3 South Hilo businesses.',      file:'files/flyer-d3-south-hilo.pdf',  roles:['admin','superadmin','captain'], district:'south-hilo'  },
+        { category:'District Flyers', icon:'🗺', title:'District 4 — Lower Puna Flyer',   desc:'Printable promotional flyer for District 4 Lower Puna businesses.',      file:'files/flyer-d4-lower-puna.pdf',  roles:['admin','superadmin','captain'], district:'lower-puna'  },
+        { category:'District Flyers', icon:'🗺', title:'District 5 — Upper Puna Flyer',   desc:'Printable promotional flyer for District 5 Upper Puna businesses.',      file:'files/flyer-d5-upper-puna.pdf',  roles:['admin','superadmin','captain'], district:'upper-puna'  },
+        { category:'District Flyers', icon:'🗺', title:'District 6 — Kaʻū Flyer',         desc:"Printable promotional flyer for District 6 Kaʻū businesses.",            file:'files/flyer-d6-kau.pdf',         roles:['admin','superadmin','captain'], district:'kau'         },
+        { category:'District Flyers', icon:'🗺', title:'District 7 — South Kona Flyer',   desc:'Printable promotional flyer for District 7 South Kona businesses.',      file:'files/flyer-d7-south-kona.pdf',  roles:['admin','superadmin','captain'], district:'south-kona'  },
+        { category:'District Flyers', icon:'🗺', title:'District 8 — North Kona Flyer',   desc:'Printable promotional flyer for District 8 North Kona businesses.',      file:'files/flyer-d8-north-kona.pdf',  roles:['admin','superadmin','captain'], district:'north-kona'  },
+        { category:'District Flyers', icon:'🗺', title:'District 9 — Kohala Flyer',       desc:'Printable promotional flyer for District 9 Kohala businesses.',          file:'files/flyer-d9-kohala.pdf',      roles:['admin','superadmin','captain'], district:'north-kohala'},
+        // ── General Flyers ────────────────────────────────
+        { category:'General Flyers',  icon:'📄', title:'HIBCW General Awareness Flyer',   desc:'General HIBCW flyer suitable for any district. Share with local businesses.', file:'files/flyer-general.pdf',       roles:['admin','superadmin','captain'] },
+        { category:'General Flyers',  icon:'📄', title:'Join HIBCW — Recruitment Flyer',  desc:'Encourages businesses to apply for HIBCW membership. Include your contact info before distributing.', file:'files/flyer-recruitment.pdf',   roles:['admin','superadmin','captain'] },
+        // ── Forms & Templates ─────────────────────────────
+        { category:'Forms & Templates', icon:'📝', title:'Incident Report Form (Paper)',  desc:'Printable paper form for capturing incident details when internet is unavailable.', file:'files/form-incident-paper.pdf', roles:['admin','superadmin','captain'] },
+        { category:'Forms & Templates', icon:'📝', title:'Member Sign-Up Sheet',          desc:'Paper sign-up sheet for collecting member information at community events.',       file:'files/form-member-signup.pdf',  roles:['admin','superadmin','captain'] },
+        { category:'Forms & Templates', icon:'📝', title:'Captain Introductory Letter',   desc:'Template letter introducing HIBCW to a new business in your district.',            file:'files/template-intro-letter.pdf', roles:['admin','superadmin','captain'] },
+        // ── Admin Resources ───────────────────────────────
+        { category:'Admin Resources', icon:'🔧', title:'HIBCW Data Export Guide',         desc:'Instructions for interpreting and working with exported CSV data files.',           file:'files/guide-csv-export.pdf',    roles:['admin','superadmin'] },
+        { category:'Admin Resources', icon:'🔧', title:'Supabase Database Reference',     desc:'Quick reference for database table structure and RLS policy overview.',             file:'files/guide-database.pdf',      roles:['admin','superadmin'] },
+    ];
+
     function renderResources() {
-        const el = document.getElementById('resourceCards');
-        if (!el) return;
+        const elCards = document.getElementById('resourceCards');
+        const elFiles = document.getElementById('resourceFiles');
+        if (!elCards) return;
 
         const isAdmin   = currentRole === 'admin' || currentRole === 'superadmin';
         const isCaptain = currentRole === 'captain';
@@ -6735,14 +6775,8 @@
             },
         ];
 
-        const visible = resources.filter(r => r.roles.includes(currentRole));
-
-        if (!visible.length) {
-            el.innerHTML = `<div style="color:var(--slate2);font-style:italic;font-size:.85rem;padding:8px 0">No resources available for your role.</div>`;
-            return;
-        }
-
-        el.innerHTML = visible.map(r => `
+        const visibleCards = resources.filter(r => r.roles.includes(currentRole));
+        elCards.innerHTML = visibleCards.map(r => `
           <div style="background:var(--navy2);border:1px solid ${r.color}33;border-top:3px solid ${r.color};border-radius:10px;padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 0 0 1px ${r.color}44'" onmouseout="this.style.boxShadow='none'">
             <div style="display:flex;align-items:flex-start;gap:14px">
               <div style="width:44px;height:44px;border-radius:10px;background:${r.color}18;border:1px solid ${r.color}33;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">${r.icon}</div>
@@ -6759,6 +6793,49 @@
               <button onclick="printHandbook('${r.url}')" style="background:transparent;border:1px solid ${r.color}44;border-radius:5px;padding:8px 12px;color:${r.color};font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='${r.color}';this.style.background='${r.color}10'" onmouseout="this.style.borderColor='${r.color}44';this.style.background='transparent'" title="Print / Save as PDF">🖨 Print PDF</button>
             </div>
           </div>`).join('');
+
+        // ── File library ──────────────────────────────────
+        if (!elFiles) return;
+
+        // Filter files by role; captains also see their district-specific file + all non-district files
+        const visibleFiles = RESOURCE_FILES.filter(f => {
+            if (!f.roles.includes(currentRole)) return false;
+            if (f.district && isCaptain) return f.district === captainDistrict;
+            return true;
+        });
+
+        if (!visibleFiles.length) { elFiles.innerHTML = ''; return; }
+
+        // Group by category
+        const categories = [...new Set(visibleFiles.map(f => f.category))];
+
+        elFiles.innerHTML = `
+          <div style="border-top:1px solid var(--b2);padding-top:24px;margin-top:8px">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.04em;color:var(--white);margin-bottom:4px">📁 Downloadable Files</div>
+            <div style="font-size:.76rem;color:var(--slate);margin-bottom:20px">PDF files you can download, print, and distribute.</div>
+            ${categories.map(cat => {
+                const files = visibleFiles.filter(f => f.category === cat);
+                const catColor = cat === 'District Flyers' ? '#3b82f6' : cat === 'General Flyers' ? '#00c9a7' : cat === 'Forms & Templates' ? '#f59e0b' : '#7a8fa6';
+                return `
+                <div style="margin-bottom:20px">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:${catColor};margin-bottom:8px;display:flex;align-items:center;gap:8px">
+                    ${cat}
+                    <div style="flex:1;height:1px;background:${catColor}22"></div>
+                  </div>
+                  <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;overflow:hidden">
+                    ${files.map((f, i) => `
+                    <div style="display:flex;align-items:center;gap:14px;padding:11px 16px;${i < files.length-1 ? 'border-bottom:1px solid var(--b2)' : ''};transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.03)'" onmouseout="this.style.background='transparent'">
+                      <div style="font-size:1rem;flex-shrink:0">${f.icon}</div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:.84rem;font-weight:500;color:var(--white);margin-bottom:2px">${esc(f.title)}</div>
+                        <div style="font-size:.72rem;color:var(--slate);line-height:1.4">${esc(f.desc)}</div>
+                      </div>
+                      <a href="${f.file}" download style="display:inline-flex;align-items:center;gap:5px;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--teal);text-decoration:none;white-space:nowrap;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--teal)';this.style.background='rgba(0,201,167,.08)'" onmouseout="this.style.borderColor='var(--b2)';this.style.background='var(--navy3)'">⬇ Download PDF</a>
+                    </div>`).join('')}
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>`;
     }
 
     function openHandbook(url) {
