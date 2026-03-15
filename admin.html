@@ -7074,9 +7074,15 @@
                 <div style="font-size:.72rem;color:var(--slate)">${esc(ms.impact||'')} ${ms.date?'· '+ms.date:''}</div>
               </div>`).join('')}
           </div>` : ''}
-          <div style="background:var(--navy2);border:1px solid rgba(245,166,35,.25);border-radius:8px;padding:20px">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px">💼 Expansion — Sponsorship Summary</div>
-            ${[
+          <div style="background:var(--navy2);border:1px solid rgba(245,166,35,.25);border-radius:8px;overflow:hidden">
+            <button onclick="toggleExpansionSection(this)" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:transparent;border:none;cursor:pointer;text-align:left">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)">💼 Expansion — Sponsorship Summary</span>
+              </div>
+              <span id="expansionChevron" style="color:var(--slate);font-size:.8rem;transition:transform .2s">›</span>
+            </button>
+            <div id="expansionBody" style="display:none;padding:0 18px 18px">
+              ${[
                 ['Program model',         'Island-specific deployment with local sponsoring organization'],
                 ['Founding sponsor ask',  'One-time: $3,000–$5,000'],
                 ['Annual retainer',       '$2,400–$3,000/year ($200–$250/month)'],
@@ -7086,12 +7092,21 @@
                 ['Sponsoring org target', ''],
                 ['Sponsor contact',       ''],
                 ['Date of conversation',  ''],
-            ].map(([label,val])=>`
-              <div class="sponsor-stat">
-                <div style="font-size:.8rem;color:var(--slate)">${label}</div>
-                <div style="font-size:.82rem;color:var(--white);text-align:right;max-width:60%">${val}</div>
-              </div>`).join('')}
+              ].map(([label,val])=>`
+                <div class="sponsor-stat">
+                  <div style="font-size:.8rem;color:var(--slate)">${label}</div>
+                  <div style="font-size:.82rem;color:var(--white);text-align:right;max-width:60%">${val}</div>
+                </div>`).join('')}
+            </div>
           </div>`;
+    }
+
+    function toggleExpansionSection(btn) {
+        const body = document.getElementById('expansionBody');
+        const chevron = document.getElementById('expansionChevron');
+        const isOpen = body.style.display !== 'none';
+        body.style.display = isOpen ? 'none' : 'block';
+        chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
     }
 
     function switchTrackerTab(tab) {
