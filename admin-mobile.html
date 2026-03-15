@@ -2109,7 +2109,7 @@ async function initMobileTracker() {
 async function loadMobTrackerData() {
   try {
     const [{data:md},{data:ms},{data:qn}] = await Promise.all([
-      sb.from('tracker_monthly').select('*').order('month'),
+      sb.from('tracker_monthly').select('year,month,notes').order('month'),
       sb.from('tracker_milestones').select('*').order('created_at',{ascending:false}),
       sb.from('tracker_quarterly').select('*'),
     ]);
@@ -2122,17 +2122,54 @@ async function loadMobTrackerData() {
     mobMilestones = ms||[];
     (qn||[]).forEach(r=>{ mobQuarterlyNotes[`${r.year}_${r.quarter}`]=r; });
   } catch(e){ console.log('Tracker tables not yet created — memory mode'); }
+  await computeMobLiveData();
 }
 
-function getMobMonthData(m){ return (mobTrackerData[mobTrackerYear]||{})[m]||{}; }
+let mobTrackerLive = {};
+
+async function computeMobLiveData() {
+  mobTrackerLive = {};
+  try {
+    const yearStart = `${mobTrackerYear}-01-01`;
+    const yearEnd   = `${mobTrackerYear}-12-31`;
+    const [
+      {data:incidents},{data:approvedMembers},{data:alerts},{data:apps},{data:adminUsers},
+    ] = await Promise.all([
+      sb.from('incidents').select('id,occurred_at,status,police_report').gte('occurred_at',yearStart).lte('occurred_at',yearEnd+'T23:59:59'),
+      sb.from('member_applications').select('id,created_at,status').eq('status','approved'),
+      sb.from('district_alerts').select('id,created_at').gte('created_at',yearStart).lte('created_at',yearEnd+'T23:59:59'),
+      sb.from('member_applications').select('id,created_at,status').gte('created_at',yearStart).lte('created_at',yearEnd+'T23:59:59'),
+      sb.from('admin_users').select('id,district,role').not('role','is',null),
+    ]);
+    const gm = d => new Date(d).getMonth();
+    for (let m=0;m<12;m++) mobTrackerLive[m]={incidents:0,incidents_archived:0,police_reports:0,alerts_sent:0,apps_received:0,apps_approved:0,apps_rejected:0,members_total:0,members_new:0,captain_logins:0,active_districts:0};
+    (incidents||[]).forEach(inc=>{const m=gm(inc.occurred_at);if(m<0||m>11)return;mobTrackerLive[m].incidents++;if(inc.status==='archived')mobTrackerLive[m].incidents_archived++;if(inc.police_report)mobTrackerLive[m].police_reports++;});
+    (alerts||[]).forEach(a=>{const m=gm(a.created_at);if(m>=0&&m<=11)mobTrackerLive[m].alerts_sent++;});
+    (apps||[]).forEach(a=>{const m=gm(a.created_at);if(m<0||m>11)return;mobTrackerLive[m].apps_received++;if(a.status==='approved')mobTrackerLive[m].apps_approved++;if(a.status==='rejected')mobTrackerLive[m].apps_rejected++;});
+    const allApproved=(approvedMembers||[]).filter(m=>m.created_at).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+    const base=allApproved.filter(m=>new Date(m.created_at)<new Date(yearStart)).length;
+    const nbm=Array(12).fill(0);
+    allApproved.forEach(m=>{const d=new Date(m.created_at);if(d>=new Date(yearStart)&&d<=new Date(yearEnd+'T23:59:59'))nbm[d.getMonth()]++;});
+    let run=base;
+    for(let m=0;m<12;m++){run+=nbm[m];mobTrackerLive[m].members_new=nbm[m];mobTrackerLive[m].members_total=run;}
+    const ad=new Set((adminUsers||[]).filter(u=>u.role==='captain'&&u.district).map(u=>u.district));
+    for(let m=0;m<12;m++) mobTrackerLive[m].active_districts=ad.size;
+  } catch(e){ console.log('Mob live tracker error:',e.message); }
+}
+
+function getMobMonthData(m){
+  const live=(mobTrackerLive[m]||{});
+  const saved=(mobTrackerData[mobTrackerYear]||{})[m]||{};
+  return {...live, notes:saved.notes||''};
+}
 
 async function saveMobMonthData(month, key, val) {
+  if(key!=='notes') return;
   if(!mobTrackerData[mobTrackerYear]) mobTrackerData[mobTrackerYear]={};
   if(!mobTrackerData[mobTrackerYear][month]) mobTrackerData[mobTrackerYear][month]={year:mobTrackerYear,month};
-  mobTrackerData[mobTrackerYear][month][key]=val;
-  renderMobKPIs();
+  mobTrackerData[mobTrackerYear][month].notes=val;
   try {
-    await sb.from('tracker_monthly').upsert({year:mobTrackerYear,month,[key]:val||null},{onConflict:'year,month'});
+    await sb.from('tracker_monthly').upsert({year:mobTrackerYear,month,notes:val||null},{onConflict:'year,month'});
   } catch(e){}
 }
 
@@ -2205,21 +2242,24 @@ function renderMobTrackerTabContent() {
 }
 
 function renderMobMonthlyTab() {
-  // Month cards — tap to expand and edit
+  const now = new Date();
+  const refreshBtn = `<button onclick="refreshMobTrackerLive()" style="width:100%;background:rgba(0,201,167,.08);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px">🔄 Refresh Live Data</button>`;
+  const liveNote = `<div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);margin-bottom:8px;display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block"></span> Live data — tap a month to add notes</div>`;
   const months = MOB_MONTHS_FULL.map((m,i)=>{
     const d = getMobMonthData(i);
-    const hasData = MOB_TRACKER_COLS.some(c=>d[c.key]);
+    const hasData = MOB_TRACKER_COLS.some(c=>d[c.key]&&parseInt(d[c.key])>0);
     const isOpen = mobEditingMonth === i;
+    const isFuture = i > now.getMonth() && mobTrackerYear === now.getFullYear();
     return `
       <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:7px;margin-bottom:6px;overflow:hidden">
         <div onclick="toggleMobMonth(${i})" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer">
           <div>
             <div style="font-size:.84rem;font-weight:600;color:var(--white)">${m}</div>
             ${hasData ? `<div style="font-size:.65rem;color:var(--teal);font-family:'IBM Plex Mono',monospace;margin-top:1px">
-              ${d.members_new?`+${d.members_new} members ·`:''}
-              ${d.incidents?`${d.incidents} incidents ·`:''}
+              ${d.members_new?`+${d.members_new} mbrs ·`:''}
+              ${d.incidents?`${d.incidents} inc ·`:''}
               ${d.alerts_sent?`${d.alerts_sent} alerts`:''}</div>` :
-              `<div style="font-size:.65rem;color:var(--slate2);font-family:'IBM Plex Mono',monospace;margin-top:1px">No data entered</div>`}
+              `<div style="font-size:.65rem;color:var(--slate2);font-family:'IBM Plex Mono',monospace;margin-top:1px">${isFuture?'Future month':'No activity yet'}</div>`}
           </div>
           <div style="color:var(--slate);font-size:.8rem;transition:transform .2s;transform:rotate(${isOpen?'90':'0'}deg)">›</div>
         </div>
@@ -2228,21 +2268,27 @@ function renderMobMonthlyTab() {
             ${MOB_TRACKER_COLS.map(c=>`
               <div>
                 <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:${c.color};margin-bottom:3px">${c.label}</div>
-                <input type="number" min="0" value="${d[c.key]||''}" placeholder="—"
-                  style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:6px 8px;color:var(--white);font-size:.82rem;text-align:center"
-                  onchange="saveMobMonthData(${i},'${c.key}',this.value?parseInt(this.value):null)">
+                <div style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:6px 8px;color:${d[c.key]?c.color:'var(--slate2)'};font-size:.82rem;text-align:center;font-weight:600">
+                  ${d[c.key]||'—'}
+                </div>
               </div>`).join('')}
           </div>
           <div style="margin-top:8px">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Notes</div>
-            <input type="text" value="${esc(d.notes||'')}" placeholder="Monthly notes…"
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Notes (editable)</div>
+            <input type="text" value="${esc(d.notes||'')}" placeholder="Add a note for this month…"
               style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:6px 8px;color:var(--white);font-size:.82rem"
               onchange="saveMobMonthData(${i},'notes',this.value||null)">
           </div>
         </div>` : ''}
       </div>`;
   }).join('');
-  return months;
+  return refreshBtn + liveNote + months;
+}
+
+async function refreshMobTrackerLive() {
+  await computeMobLiveData();
+  renderMobTracker();
+  showToast('🔄','Tracker refreshed from live data.');
 }
 
 function toggleMobMonth(i) {
