@@ -2370,10 +2370,17 @@ function renderAlertFeed(alerts) {
     const color = DISTRICT_COLORS_PUBLIC[a.district] || 'var(--teal)';
     const label = DISTRICT_LABELS_PUBLIC[a.district] || a.district;
     const date  = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+    const mediaHtml = a.media_url
+      ? `<div style="margin:6px 0;border-radius:5px;overflow:hidden;border:1px solid var(--border2)">
+          ${a.media_type==='video'
+            ? `<video src="${escHtml(a.media_url)}" controls style="width:100%;display:block;max-height:200px"></video>`
+            : `<img src="${escHtml(a.media_url)}" style="width:100%;display:block;max-height:200px;object-fit:cover" loading="lazy">`}
+        </div>` : '';
     return `<div style="padding:14px 16px;border-bottom:1px solid var(--border2)">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;padding:1px 6px;display:inline-block;margin-bottom:6px;background:${color}18;color:${color};border:1px solid ${color}44">${escHtml(label)}</span>
       <div style="font-size:.8rem;line-height:1.55;color:var(--white);margin-bottom:5px">${escHtml(a.message)}</div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">👤 ${escHtml(a.sent_by_name||'HIBCW')} · ${date}</div>
+      ${mediaHtml}
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">👤 ${escHtml(a.sent_by_name||'HIBCW')} · ${date}${a.is_edited?' · <em>edited</em>':''}</div>
     </div>`;
   }).join('');
 
@@ -2387,7 +2394,6 @@ function renderAlertFeed(alerts) {
 
 function showLatestAlertBanner(alerts) {
   if (!alerts.length) return;
-  // Only show alerts from the last 48 hours
   const cutoff = Date.now() - 48 * 60 * 60 * 1000;
   const recent = alerts.find(a => new Date(a.created_at).getTime() > cutoff);
   if (!recent) return;
@@ -2402,6 +2408,24 @@ function showLatestAlertBanner(alerts) {
   document.getElementById('alertBannerDistrict').style.color = color;
   document.getElementById('alertBannerMsg').textContent = recent.message;
   document.getElementById('alertBannerMeta').textContent = '👤 ' + (recent.sent_by_name||'HIBCW') + ' · ' + date;
+
+  // Show media if present
+  let mediaEl = document.getElementById('alertBannerMedia');
+  if (!mediaEl) {
+    mediaEl = document.createElement('div');
+    mediaEl.id = 'alertBannerMedia';
+    mediaEl.style.cssText = 'margin-top:8px;border-radius:5px;overflow:hidden;border:1px solid rgba(255,255,255,.1)';
+    document.getElementById('alertBannerMeta').after(mediaEl);
+  }
+  if (recent.media_url) {
+    mediaEl.style.display = 'block';
+    mediaEl.innerHTML = recent.media_type === 'video'
+      ? `<video src="${escHtml(recent.media_url)}" controls style="width:100%;display:block;max-height:160px"></video>`
+      : `<img src="${escHtml(recent.media_url)}" style="width:100%;display:block;max-height:160px;object-fit:cover">`;
+  } else {
+    mediaEl.style.display = 'none'; mediaEl.innerHTML = '';
+  }
+
   banner.dataset.alertId = recent.id;
   banner.style.display = 'flex';
 }
