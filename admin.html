@@ -4561,7 +4561,15 @@
 
         const na = `<span style="color:var(--slate2);font-style:italic">—</span>`;
 
-        tbody.innerHTML = filtered.map((m, i) => {
+        // Sort: captain first within each district, then alphabetical by name
+        const sorted = [...filtered].sort((a, b) => {
+            const aCap = a.full_name && a.captain_name && a.full_name.trim().toLowerCase() === a.captain_name.trim().toLowerCase() ? 0 : 1;
+            const bCap = b.full_name && b.captain_name && b.full_name.trim().toLowerCase() === b.captain_name.trim().toLowerCase() ? 0 : 1;
+            if (aCap !== bCap) return aCap - bCap;
+            return (a.full_name || a.email || '').localeCompare(b.full_name || b.email || '');
+        });
+
+        tbody.innerHTML = sorted.map((m, i) => {
             const added = new Date(m.created_at);
             const dateStr = added.toLocaleDateString('en-US', {
                 month: 'short',
@@ -4570,10 +4578,11 @@
             });
             const days = Math.floor((Date.now() - added) / 86400000);
             const daysStr = days === 0 ? 'Today' : days === 1 ? '1 day' : `${days} days`;
+            const isCaptain = m.full_name && m.captain_name && m.full_name.trim().toLowerCase() === m.captain_name.trim().toLowerCase();
             return `
     <tr id="mc-${m.id}">
       <td class="mem-num">${i + 1}</td>
-      <td style="white-space:nowrap;font-weight:500">${m.full_name ? esc(m.full_name) : na}</td>
+      <td style="white-space:nowrap;font-weight:500">${m.full_name ? esc(m.full_name) : na}${isCaptain ? ' <span style="font-family:\'IBM Plex Mono\',monospace;font-size:.55rem;background:rgba(0,201,167,.15);color:var(--teal);border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:1px 5px;vertical-align:middle">👮 Captain</span>' : ''}</td>
       <td><div class="mem-email"><span class="mem-dot"></span>${esc(m.email)}</div></td>
       <td class="mem-date" style="white-space:nowrap">${m.phone ? fmtPhone(m.phone) : na}</td>
       <td style="white-space:nowrap">${m.business_name ? esc(m.business_name) : na}</td>
@@ -5042,13 +5051,16 @@
         memberList.forEach(m => {
             if (m.district && distMap[m.district]) {
                 distMap[m.district].members.push(m);
-                if (m.captain_name && !distMap[m.district].captain) {
+                // Identify the captain: member whose full_name === captain_name (exact match)
+                if (m.captain_name && m.full_name &&
+                    m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()) {
+                    // This member IS the captain — always prefer them for photo/contact
                     distMap[m.district].captain = m.captain_name;
-                    // Store full captain record if this member IS the captain
-                    if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()) {
-                        distMap[m.district].photo_url = m.photo_url || null;
-                        distMap[m.district].captainMember = m;
-                    }
+                    distMap[m.district].photo_url = m.photo_url || null;
+                    distMap[m.district].captainMember = m;
+                } else if (m.captain_name && !distMap[m.district].captain) {
+                    // Fallback: first member with captain_name set (no exact match yet)
+                    distMap[m.district].captain = m.captain_name;
                 }
             }
         });
