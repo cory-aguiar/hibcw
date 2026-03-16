@@ -1,661 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIBCW Member Packet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box
-    }
-
-    body {
-        font-family: 'IBM Plex Sans', sans-serif;
-        background: #f0f4f8;
-        color: #1a2a3a;
-        min-height: 100vh
-    }
-
-    header {
-        background: linear-gradient(90deg, #0b1524, #111e30);
-        padding: 14px 28px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 2px solid rgba(0, 201, 167, .25)
-    }
-
-    .logo-wrap {
-        display: flex;
-        align-items: center;
-        gap: 10px
-    }
-
-    .logo-shield {
-        width: 36px;
-        height: 36px;
-        flex-shrink: 0;
-        background: linear-gradient(160deg, #002266, #001133);
-        border: 2px solid #f5a623;
-        clip-path: polygon(50% 0%, 100% 15%, 100% 60%, 50% 100%, 0% 60%, 0% 15%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Rajdhani', sans-serif;
-        font-size: .75rem;
-        font-weight: 700;
-        color: #f5a623
-    }
-
-    .logo-text {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1.1rem;
-        font-weight: 700;
-        letter-spacing: .08em;
-        color: #eef3f8
-    }
-
-    .logo-sub {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .55rem;
-        color: #00c9a7;
-        letter-spacing: .12em;
-        text-transform: uppercase
-    }
-
-    .hdr-actions {
-        display: flex;
-        gap: 10px;
-        align-items: center
-    }
-
-    .btn {
-        padding: 7px 16px;
-        border-radius: 5px;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .68rem;
-        cursor: pointer;
-        transition: all .15s;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #00c9a7, #00a589);
-        border: none;
-        color: #0b1524;
-        font-weight: 700
-    }
-
-    .btn-ghost {
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, .15);
-        color: #7a8fa6
-    }
-
-    .btn-ghost:hover {
-        border-color: #00c9a7;
-        color: #00c9a7
-    }
-
-    .page {
-        max-width: 860px;
-        margin: 0 auto;
-        padding: 32px 24px 60px
-    }
-
-    .biz-header {
-        background: white;
-        border: 1px solid #d0dce8;
-        border-left: 4px solid #00c9a7;
-        border-radius: 0 8px 8px 0;
-        padding: 20px 24px;
-        margin-bottom: 28px;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 16px;
-        align-items: start
-    }
-
-    .biz-name {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #0b1524;
-        margin-bottom: 4px
-    }
-
-    .biz-meta {
-        font-size: .82rem;
-        color: #4a6070;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px
-    }
-
-    .biz-district {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .7rem;
-        padding: 3px 10px;
-        border-radius: 3px;
-        border: 1px solid;
-        margin-top: 6px;
-        display: inline-block
-    }
-
-    .checklist {
-        background: white;
-        border: 1px solid #d0dce8;
-        border-radius: 8px;
-        padding: 24px;
-        margin-bottom: 28px
-    }
-
-    .checklist-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #0b1524;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px
-    }
-
-    .item {
-        display: flex;
-        align-items: flex-start;
-        gap: 14px;
-        padding: 12px 0;
-        border-bottom: 1px solid #e8f0f8;
-        cursor: pointer;
-        transition: background .1s;
-        border-radius: 4px;
-        padding-left: 4px
-    }
-
-    .item:last-child {
-        border-bottom: none
-    }
-
-    .item:hover {
-        background: #f8fbff
-    }
-
-    .item-check {
-        width: 22px;
-        height: 22px;
-        border: 2px solid #c8d8e4;
-        border-radius: 4px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 1px;
-        transition: all .15s
-    }
-
-    .item.done .item-check {
-        background: #00c9a7;
-        border-color: #00c9a7;
-        color: white
-    }
-
-    .item-icon {
-        font-size: 1.1rem;
-        flex-shrink: 0;
-        margin-top: 1px
-    }
-
-    .item-body {
-        flex: 1
-    }
-
-    .item-title {
-        font-weight: 600;
-        font-size: .9rem;
-        color: #1a2a3a;
-        margin-bottom: 2px
-    }
-
-    .item-desc {
-        font-size: .76rem;
-        color: #7a8fa6;
-        line-height: 1.5
-    }
-
-    .item-actions {
-        display: flex;
-        gap: 7px;
-        margin-top: 7px;
-        flex-wrap: wrap
-    }
-
-    .item-btn {
-        padding: 5px 12px;
-        border-radius: 4px;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .62rem;
-        cursor: pointer;
-        transition: all .15s;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        border: 1px solid
-    }
-
-    .item-btn-primary {
-        background: rgba(0, 201, 167, .1);
-        border-color: rgba(0, 201, 167, .3);
-        color: #007a65
-    }
-
-    .item-btn-primary:hover {
-        background: rgba(0, 201, 167, .2)
-    }
-
-    .item-btn-ghost {
-        background: transparent;
-        border-color: #d0dce8;
-        color: #7a8fa6
-    }
-
-    .item-btn-ghost:hover {
-        border-color: #00c9a7;
-        color: #007a65
-    }
-
-    .progress-wrap {
-        margin-bottom: 24px
-    }
-
-    .progress-bar {
-        height: 6px;
-        background: #e0e8f0;
-        border-radius: 3px;
-        overflow: hidden
-    }
-
-    .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #00c9a7, #00a589);
-        border-radius: 3px;
-        transition: width .3s
-    }
-
-    .progress-label {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .65rem;
-        color: #7a8fa6;
-        margin-top: 5px;
-        text-align: right
-    }
-
-    .notes-card {
-        background: white;
-        border: 1px solid #d0dce8;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 28px
-    }
-
-    .notes-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1rem;
-        font-weight: 700;
-        color: #0b1524;
-        margin-bottom: 10px
-    }
-
-    textarea {
-        width: 100%;
-        border: 1px solid #d0dce8;
-        border-radius: 5px;
-        padding: 10px;
-        font-family: 'IBM Plex Sans', sans-serif;
-        font-size: .84rem;
-        color: #1a2a3a;
-        resize: vertical;
-        min-height: 80px;
-        outline: none;
-        transition: border-color .2s
-    }
-
-    textarea:focus {
-        border-color: #00c9a7
-    }
-
-    @media print {
-        header .hdr-actions, .checklist-title button, .item-actions, textarea {
-            display:none !important
-        }
-
-        body {
-            background:white
-        }
-
-        * {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact
-        }
-    }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HIBCW Member Packet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'IBM Plex Sans',sans-serif;background:#f0f4f8;color:#1a2a3a;min-height:100vh}
+  header{background:linear-gradient(90deg,#0b1524,#111e30);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid rgba(0,201,167,.25)}
+  .logo-wrap{display:flex;align-items:center;gap:10px}
+  
+  .logo-text{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.08em;color:#eef3f8}
+  .logo-sub{font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:#00c9a7;letter-spacing:.12em;text-transform:uppercase}
+  .hdr-actions{display:flex;gap:10px;align-items:center}
+  .btn{padding:7px 16px;border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer;transition:all .15s;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+  .btn-primary{background:linear-gradient(135deg,#00c9a7,#00a589);border:none;color:#0b1524;font-weight:700}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.15);color:#7a8fa6}
+  .btn-ghost:hover{border-color:#00c9a7;color:#00c9a7}
+  .page{max-width:860px;margin:0 auto;padding:32px 24px 60px}
+  .biz-header{background:white;border:1px solid #d0dce8;border-left:4px solid #00c9a7;border-radius:0 8px 8px 0;padding:20px 24px;margin-bottom:28px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+  .biz-name{font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:#0b1524;margin-bottom:4px}
+  .biz-meta{font-size:.82rem;color:#4a6070;display:flex;flex-wrap:wrap;gap:12px}
+  .biz-district{font-family:'IBM Plex Mono',monospace;font-size:.7rem;padding:3px 10px;border-radius:3px;border:1px solid;margin-top:6px;display:inline-block}
+  .checklist{background:white;border:1px solid #d0dce8;border-radius:8px;padding:24px;margin-bottom:28px}
+  .checklist-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#0b1524;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid #e8f0f8;cursor:pointer;transition:background .1s;border-radius:4px;padding-left:4px}
+  .item:last-child{border-bottom:none}
+  .item:hover{background:#f8fbff}
+  .item-check{width:22px;height:22px;border:2px solid #c8d8e4;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s}
+  .item.done .item-check{background:#00c9a7;border-color:#00c9a7;color:white}
+  .item-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+  .item-body{flex:1}
+  .item-title{font-weight:600;font-size:.9rem;color:#1a2a3a;margin-bottom:2px}
+  .item-desc{font-size:.76rem;color:#7a8fa6;line-height:1.5}
+  .item-actions{display:flex;gap:7px;margin-top:7px;flex-wrap:wrap}
+  .item-btn{padding:5px 12px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;border:1px solid}
+  .item-btn-primary{background:rgba(0,201,167,.1);border-color:rgba(0,201,167,.3);color:#007a65}
+  .item-btn-primary:hover{background:rgba(0,201,167,.2)}
+  .item-btn-ghost{background:transparent;border-color:#d0dce8;color:#7a8fa6}
+  .item-btn-ghost:hover{border-color:#00c9a7;color:#007a65}
+  .progress-wrap{margin-bottom:24px}
+  .progress-bar{height:6px;background:#e0e8f0;border-radius:3px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#00c9a7,#00a589);border-radius:3px;transition:width .3s}
+  .progress-label{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:#7a8fa6;margin-top:5px;text-align:right}
+  .notes-card{background:white;border:1px solid #d0dce8;border-radius:8px;padding:20px;margin-bottom:28px}
+  .notes-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:#0b1524;margin-bottom:10px}
+  textarea{width:100%;border:1px solid #d0dce8;border-radius:5px;padding:10px;font-family:'IBM Plex Sans',sans-serif;font-size:.84rem;color:#1a2a3a;resize:vertical;min-height:80px;outline:none;transition:border-color .2s}
+  textarea:focus{border-color:#00c9a7}
+  @media print{header .hdr-actions,.checklist-title button,.item-actions,textarea{display:none!important}body{background:white}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-wrap">
-            <div class="logo-shield">HIBCW</div>
-            <div>
-                <div class="logo-text">HIBCW Member Packet</div>
-                <div class="logo-sub">Hawaii Island Business Crime Watch</div>
-            </div>
-        </div>
-        <div class="hdr-actions">
-            <button class="btn btn-ghost" onclick="window.close()">← Close</button>
-            <button class="btn btn-primary" onclick="window.print()">🖨 Print Checklist</button>
-        </div>
-    </header>
-
-    <div class="page">
-
-        <!-- Business header -->
-        <div class="biz-header" id="bizHeader">
-            <div>
-                <div class="biz-name" id="bizName">Loading…</div>
-                <div class="biz-meta">
-                    <span id="bizContact"></span>
-                    <span id="bizPhone"></span>
-                    <span id="bizEmail"></span>
-                </div>
-                <div class="biz-meta" style="margin-top:4px">
-                    <span id="bizAddress"></span>
-                </div>
-                <div id="bizDistrictBadge" class="biz-district"></div>
-            </div>
-            <div style="text-align:right">
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6;margin-bottom:4px">Packet Generated</div>
-                <div id="packetDate" style="font-size:.84rem;color:#1a2a3a;font-weight:600"></div>
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#7a8fa6;margin-top:2px">
-                    Captain: 
-                    <span id="bizCaptain">—</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Progress -->
-        <div class="progress-wrap">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width:0%"></div>
-            </div>
-            <div class="progress-label">
-                <span id="progressLabel">0 of 8 items checked</span>
-            </div>
-        </div>
-
-        <!-- Assembly Checklist -->
-        <div class="checklist">
-            <div class="checklist-title">
-
-                      📋 Packet Assembly Checklist
-                      
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:400;color:#7a8fa6;margin-left:8px">Check each item as you print and assemble</span>
-            </div>
-            <div id="checklistItems"></div>
-        </div>
-
-        <!-- Assembly notes -->
-        <div class="notes-card">
-            <div class="notes-title">📝 Assembly Notes</div>
-            <textarea id="packetNotes" placeholder="Add notes about this packet (e.g. hand-delivered by Captain on 3/15, mailed to PO Box, business closed — will retry)…"></textarea>
-        </div>
-
-        <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:#b0c0cc;margin-top:8px">
-            HIBCW · Hawaii Island Business Crime Watch · A Program of KIAA · kiaahilo.org
-          </div>
-
+<header>
+  <div class="logo-wrap">
+    <img src="logo-shield.svg" alt="HIBCW Shield" style="width:32px;height:32px;flex-shrink:0;object-fit:contain">
+    <div>
+      <div class="logo-text">HIBCW Member Packet</div>
+      <div class="logo-sub">Hawaii Island Business Crime Watch</div>
     </div>
+  </div>
+  <div class="hdr-actions">
+    <button class="btn btn-ghost" onclick="window.close()">← Close</button>
+    <button class="btn btn-primary" onclick="window.print()">🖨 Print Checklist</button>
+  </div>
+</header>
 
-    <script>
-    // Parse URL params
-    const p = new URLSearchParams(window.location.search);
-    const bizId = p.get('id') || '';
-    const bizName = p.get('name') || 'Business Name';
-    const bizContact = p.get('contact') || '';
-    const bizAddr = p.get('address') || '';
-    const bizDist = p.get('district') || '';
-    const bizDistId = p.get('distId') || '';
-    const bizCaptain = p.get('captain') || '';
-    const bizPhone = p.get('phone') || '';
-    const bizEmail = p.get('email') || '';
-    const bizType = p.get('type') || '';
+<div class="page">
 
-    const DIST_COLORS = {
-        'hamakua': '#84cc16',
-        'north-hilo': '#3b82f6',
-        'south-hilo': '#00c9a7',
-        'lower-puna': '#c084fc',
-        'upper-puna': '#a855f7',
-        'kau': '#ef4444',
-        'south-kona': '#f59e0b',
-        'north-kona': '#f97316',
-        'north-kohala': '#10b981'
-    };
-    const distColor = DIST_COLORS[bizDistId] || '#00c9a7';
+  <!-- Business header -->
+  <div class="biz-header" id="bizHeader">
+    <div>
+      <div class="biz-name" id="bizName">Loading…</div>
+      <div class="biz-meta">
+        <span id="bizContact"></span>
+        <span id="bizPhone"></span>
+        <span id="bizEmail"></span>
+      </div>
+      <div class="biz-meta" style="margin-top:4px"><span id="bizAddress"></span></div>
+      <div id="bizDistrictBadge" class="biz-district"></div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6;margin-bottom:4px">Packet Generated</div>
+      <div id="packetDate" style="font-size:.84rem;color:#1a2a3a;font-weight:600"></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#7a8fa6;margin-top:2px">Captain: <span id="bizCaptain">—</span></div>
+    </div>
+  </div>
 
-    // Populate header
-    document.getElementById('bizName').textContent = bizName;
-    document.getElementById('bizContact').textContent = bizContact ? '👤 ' + bizContact : '';
-    document.getElementById('bizPhone').textContent = bizPhone ? '📞 ' + bizPhone : '';
-    document.getElementById('bizEmail').textContent = bizEmail ? '✉️ ' + bizEmail : '';
-    document.getElementById('bizAddress').textContent = bizAddr ? '📍 ' + bizAddr : '';
-    document.getElementById('bizCaptain').textContent = bizCaptain || '—';
-    document.getElementById('packetDate').textContent = new Date().toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric'
-    });
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-label"><span id="progressLabel">0 of 8 items checked</span></div>
+  </div>
 
-    const badge = document.getElementById('bizDistrictBadge');
-    badge.textContent = bizDist || '—';
-    badge.style.color = distColor;
-    badge.style.borderColor = distColor + '55';
-    badge.style.background = distColor + '11';
+  <!-- Assembly Checklist -->
+  <div class="checklist">
+    <div class="checklist-title">
+      📋 Packet Assembly Checklist
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:400;color:#7a8fa6;margin-left:8px">Check each item as you print and assemble</span>
+    </div>
+    <div id="checklistItems"></div>
+  </div>
 
-    document.getElementById('bizHeader').style.borderLeftColor = distColor;
+  <!-- Assembly notes -->
+  <div class="notes-card">
+    <div class="notes-title">📝 Assembly Notes</div>
+    <textarea id="packetNotes" placeholder="Add notes about this packet (e.g. hand-delivered by Captain on 3/15, mailed to PO Box, business closed — will retry)…"></textarea>
+  </div>
 
-    // Flyer filename from district
-    const flyerMap = {
-        'hamakua': 'files/flyer-d1-hamakua.pdf',
-        'north-hilo': 'files/flyer-d2-north-hilo.pdf',
-        'south-hilo': 'files/flyer-d3-south-hilo.pdf',
-        'lower-puna': 'files/flyer-d4-lower-puna.pdf',
-        'upper-puna': 'files/flyer-d5-upper-puna.pdf',
-        'kau': 'files/flyer-d6-kau.pdf',
-        'south-kona': 'files/flyer-d7-south-kona.pdf',
-        'north-kona': 'files/flyer-d8-north-kona.pdf',
-        'north-kohala': 'files/flyer-d9-north-kohala.pdf'
-    };
-    const distFlyer = flyerMap[bizDistId] || null;
+  <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:#b0c0cc;margin-top:8px">
+    HIBCW · Hawaii Island Business Crime Watch · A Program of KIAA · kiaahilo.org
+  </div>
 
-    // Build letter URL with pre-filled params
-    const letterParams = new URLSearchParams({
-        prefill: '1',
-        distNum: bizDistId ? bizDistId.replace(/[^0-9]/g, '') : '',
-        distName: bizDist,
-        captain: bizCaptain,
-        recipient: bizContact || bizName,
-        business: bizName,
-        address: bizAddr,
-    });
+</div>
 
-    const packetItems = [
-    {
-        id: 'welcome',
-        icon: '✉️',
-        title: 'Welcome Letter from District Captain',
-        desc: 'Open the interactive letter, fill in any remaining details, then print on HIBCW or KIAA letterhead.',
-        actions: [
-        {
-            label: '✍️ Open & Fill Letter',
-            url: `files/template-intro-letter.html?${letterParams.toString()}`,
-            primary: true
-        },
-        {
-            label: '📄 Blank PDF',
-            url: 'files/template-intro-letter.pdf'
-        },
-        ]
-    },
-    {
-        id: 'certificate',
-        icon: '🏅',
-        title: 'HIBCW Membership Certificate',
-        desc: `Personalized certificate for ${bizName}. Print on heavy stock if available.`,
-        actions: [
-        {
-            label: '🖨 Print Certificate',
-            url: `packet-certificate.html?name=${encodeURIComponent(bizName)}&district=${encodeURIComponent(bizDist)}&captain=${encodeURIComponent(bizCaptain)}&date=${encodeURIComponent(new Date().toLocaleDateString('en-US', {month: 'long',day: 'numeric',year: 'numeric'}))}`,
-            primary: true
-        },
-        ]
-    },
-    {
-        id: 'flyer',
-        icon: '📍',
-        title: `District Flyer — ${bizDist || 'Your District'}`,
-        desc: 'Color-coded flyer for the business\'s specific district with QR code linking to apply.hibcw.vercel.app.',
-        actions: distFlyer ? [
-        {
-            label: '🖨 Print Flyer',
-            url: distFlyer,
-            primary: true
-        },
-        ] : [{
-            label: '📁 Upload district flyer to files/',
-            url: null
-        }]
-    },
-    {
-        id: 'overview',
-        icon: '📋',
-        title: 'HIBCW Program Overview',
-        desc: 'One-page overview of the HIBCW program, how it works, and benefits for businesses.',
-        actions: [
-        {
-            label: '🖨 Print Overview',
-            url: 'files/packet-overview.pdf',
-            primary: true
-        },
-        ]
-    },
-    {
-        id: 'howto',
-        icon: '🚨',
-        title: 'How to Report an Incident',
-        desc: 'Step-by-step guide with illustrations showing how to report a crime or suspicious activity.',
-        actions: [
-        {
-            label: '🖨 Print Guide',
-            url: 'files/packet-how-to-report.pdf',
-            primary: true
-        },
-        ]
-    },
-    {
-        id: 'quickref',
-        icon: '⚡',
-        title: 'Quick Reference Guide',
-        desc: 'Half-page reference card: what to report, when to call 911, HIBCW vs. Crime Stoppers.',
-        actions: [
-        {
-            label: '🖨 Print Quick Ref',
-            url: 'files/packet-quick-reference.pdf',
-            primary: true
-        },
-        ]
-    },
-    {
-        id: 'contactcard',
-        icon: '📇',
-        title: 'Emergency Contact Card (Wallet Size)',
-        desc: 'Prints 4 wallet-size cards per page. Trim and include one in the packet.',
-        actions: [
-        {
-            label: '🖨 Print Contact Cards',
-            url: `files/packet-contact-card.html?district=${encodeURIComponent(bizDist)}&captain=${encodeURIComponent(bizCaptain)}&phone=${encodeURIComponent(bizPhone)}`,
-            primary: true
-        },
-        ]
-    },
-    {
-        id: 'badge',
-        icon: '🏷',
-        title: 'HIBCW Member Window Badge',
-        desc: 'Printable 4"×4" window badge/decal. Business displays it to show HIBCW participation.',
-        actions: [
-        {
-            label: '🖨 Print Window Badge',
-            url: `files/packet-window-badge.html?name=${encodeURIComponent(bizName)}&district=${encodeURIComponent(bizDist)}`,
-            primary: true
-        },
-        ]
-    },
-    ];
+<script>
+// Parse URL params
+const p = new URLSearchParams(window.location.search);
+const bizId      = p.get('id')    || '';
+const bizName    = p.get('name')  || 'Business Name';
+const bizContact = p.get('contact') || '';
+const bizAddr    = p.get('address') || '';
+const bizDist    = p.get('district') || '';
+const bizDistId  = p.get('distId') || '';
+const bizCaptain = p.get('captain') || '';
+const bizPhone   = p.get('phone')   || '';
+const bizEmail   = p.get('email')   || '';
+const bizType    = p.get('type')    || '';
 
-    // Render checklist
-    const checked = new Set(JSON.parse(localStorage.getItem(`hibcw-packet-${bizId}`) || '[]'));
+const DIST_COLORS = {
+  'hamakua':'#84cc16','north-hilo':'#3b82f6','south-hilo':'#00c9a7',
+  'lower-puna':'#c084fc','upper-puna':'#a855f7','kau':'#ef4444',
+  'south-kona':'#f59e0b','north-kona':'#f97316','north-kohala':'#10b981'
+};
+const distColor = DIST_COLORS[bizDistId] || '#00c9a7';
 
-    function renderChecklist() {
-        const el = document.getElementById('checklistItems');
-        el.innerHTML = packetItems.map((item, i) => `
-    <div class="item ${checked.has(item.id) ? 'done' : ''}" id="item-${item.id}" onclick="toggleItem('${item.id}',event)">
-      <div class="item-check">${checked.has(item.id) ? '✓' : ''}</div>
+// Populate header
+document.getElementById('bizName').textContent    = bizName;
+document.getElementById('bizContact').textContent  = bizContact ? '👤 '+bizContact : '';
+document.getElementById('bizPhone').textContent    = bizPhone   ? '📞 '+bizPhone   : '';
+document.getElementById('bizEmail').textContent    = bizEmail   ? '✉️ '+bizEmail   : '';
+document.getElementById('bizAddress').textContent  = bizAddr    ? '📍 '+bizAddr    : '';
+document.getElementById('bizCaptain').textContent  = bizCaptain || '—';
+document.getElementById('packetDate').textContent  = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+const badge = document.getElementById('bizDistrictBadge');
+badge.textContent = bizDist || '—';
+badge.style.color = distColor;
+badge.style.borderColor = distColor+'55';
+badge.style.background  = distColor+'11';
+
+document.getElementById('bizHeader').style.borderLeftColor = distColor;
+
+// Flyer filename from district
+const flyerMap = {
+  'hamakua':'files/flyer-d1-hamakua.pdf','north-hilo':'files/flyer-d2-north-hilo.pdf',
+  'south-hilo':'files/flyer-d3-south-hilo.pdf','lower-puna':'files/flyer-d4-lower-puna.pdf',
+  'upper-puna':'files/flyer-d5-upper-puna.pdf','kau':'files/flyer-d6-kau.pdf',
+  'south-kona':'files/flyer-d7-south-kona.pdf','north-kona':'files/flyer-d8-north-kona.pdf',
+  'north-kohala':'files/flyer-d9-north-kohala.pdf'
+};
+const distFlyer = flyerMap[bizDistId] || null;
+
+// Build letter URL with pre-filled params
+const letterParams = new URLSearchParams({
+  prefill: '1',
+  distNum: bizDistId ? bizDistId.replace(/[^0-9]/g,'') : '',
+  distName: bizDist,
+  captain:  bizCaptain,
+  recipient: bizContact || bizName,
+  business:  bizName,
+  address:   bizAddr,
+});
+
+const packetItems = [
+  {
+    id: 'welcome',
+    icon: '✉️',
+    title: 'Welcome Letter from District Captain',
+    desc: 'Open the interactive letter, fill in any remaining details, then print on HIBCW or KIAA letterhead.',
+    actions: [
+      {label:'✍️ Open & Fill Letter', url:`files/template-intro-letter.html?${letterParams.toString()}`, primary:true},
+      {label:'📄 Blank PDF', url:'files/template-intro-letter.pdf'},
+    ]
+  },
+  {
+    id: 'certificate',
+    icon: '🏅',
+    title: 'HIBCW Membership Certificate',
+    desc: `Personalized certificate for ${bizName}. Print on heavy stock if available.`,
+    actions: [
+      {label:'🖨 Print Certificate', url:`packet-certificate.html?name=${encodeURIComponent(bizName)}&district=${encodeURIComponent(bizDist)}&captain=${encodeURIComponent(bizCaptain)}&date=${encodeURIComponent(new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}))}`, primary:true},
+    ]
+  },
+  {
+    id: 'flyer',
+    icon: '📍',
+    title: `District Flyer — ${bizDist || 'Your District'}`,
+    desc: 'Color-coded flyer for the business\'s specific district with QR code linking to apply.hibcw.vercel.app.',
+    actions: distFlyer ? [
+      {label:'🖨 Print Flyer', url:distFlyer, primary:true},
+    ] : [{label:'📁 Upload district flyer to files/', url:null}]
+  },
+  {
+    id: 'overview',
+    icon: '📋',
+    title: 'HIBCW Program Overview',
+    desc: 'One-page overview of the HIBCW program, how it works, and benefits for businesses.',
+    actions: [
+      {label:'🖨 Print Overview', url:'files/packet-overview.pdf', primary:true},
+    ]
+  },
+  {
+    id: 'howto',
+    icon: '🚨',
+    title: 'How to Report an Incident',
+    desc: 'Step-by-step guide with illustrations showing how to report a crime or suspicious activity.',
+    actions: [
+      {label:'🖨 Print Guide', url:'files/packet-how-to-report.pdf', primary:true},
+    ]
+  },
+  {
+    id: 'quickref',
+    icon: '⚡',
+    title: 'Quick Reference Guide',
+    desc: 'Half-page reference card: what to report, when to call 911, HIBCW vs. Crime Stoppers.',
+    actions: [
+      {label:'🖨 Print Quick Ref', url:'files/packet-quick-reference.pdf', primary:true},
+    ]
+  },
+  {
+    id: 'contactcard',
+    icon: '📇',
+    title: 'Emergency Contact Card (Wallet Size)',
+    desc: 'Prints 4 wallet-size cards per page. Trim and include one in the packet.',
+    actions: [
+      {label:'🖨 Print Contact Cards', url:`files/packet-contact-card.html?district=${encodeURIComponent(bizDist)}&captain=${encodeURIComponent(bizCaptain)}&phone=${encodeURIComponent(bizPhone)}`, primary:true},
+    ]
+  },
+  {
+    id: 'badge',
+    icon: '🏷',
+    title: 'HIBCW Member Window Badge',
+    desc: 'Printable 4"×4" window badge/decal. Business displays it to show HIBCW participation.',
+    actions: [
+      {label:'🖨 Print Window Badge', url:`files/packet-window-badge.html?name=${encodeURIComponent(bizName)}&district=${encodeURIComponent(bizDist)}`, primary:true},
+    ]
+  },
+];
+
+// Render checklist
+const checked = new Set(JSON.parse(localStorage.getItem(`hibcw-packet-${bizId}`) || '[]'));
+
+function renderChecklist() {
+  const el = document.getElementById('checklistItems');
+  el.innerHTML = packetItems.map((item,i) => `
+    <div class="item ${checked.has(item.id)?'done':''}" id="item-${item.id}" onclick="toggleItem('${item.id}',event)">
+      <div class="item-check">${checked.has(item.id)?'✓':''}</div>
       <div class="item-icon">${item.icon}</div>
       <div class="item-body">
-        <div class="item-title">${
-        item.title}</div>
+        <div class="item-title">${item.title}</div>
         <div class="item-desc">${item.desc}</div>
         <div class="item-actions" onclick="event.stopPropagation()">
-          ${
-        item.actions.map(a => a.url ? `<a href="${a.url}" target="_blank" rel="noopener" class="item-btn ${a.primary ? 'item-btn-primary' : 'item-btn-ghost'}">${a.label}</a>` : `<span class="item-btn item-btn-ghost" style="opacity:.5;cursor:default">${a.label}</span>`).join('')}
+          ${item.actions.map(a => a.url
+            ? `<a href="${a.url}" target="_blank" rel="noopener" class="item-btn ${a.primary?'item-btn-primary':'item-btn-ghost'}">${a.label}</a>`
+            : `<span class="item-btn item-btn-ghost" style="opacity:.5;cursor:default">${a.label}</span>`
+          ).join('')}
         </div>
       </div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#b0c0cc;flex-shrink:0;margin-top:2px">${
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#b0c0cc;flex-shrink:0;margin-top:2px">${i+1}/8</div>
+    </div>`).join('');
+  updateProgress();
+}
 
-        i + 1}/8</div>
-    </div>`
-        ).join('');
-        updateProgress();
-    }
+function toggleItem(id, e) {
+  if (e.target.closest('a')) return;
+  if (checked.has(id)) checked.delete(id); else checked.add(id);
+  if (bizId) localStorage.setItem(`hibcw-packet-${bizId}`, JSON.stringify([...checked]));
+  renderChecklist();
+}
 
-    function toggleItem(id, e) {
-        if (e.target.closest('a'))
-            return;
-        if (checked.has(id))
-            checked.delete(id);
-        else
-            checked.add(id);
-        if (bizId)
-            localStorage.setItem(`hibcw-packet-${bizId}`, JSON.stringify([...checked]));
-        renderChecklist();
-    }
+function updateProgress() {
+  const pct = Math.round((checked.size / packetItems.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent =
+    `${checked.size} of ${packetItems.length} items checked${pct===100?' — Packet Complete! 🎉':''}`;
+}
 
-    function updateProgress() {
-        const pct = Math.round((checked.size / packetItems.length) * 100);
-        document.getElementById('progressFill').style.width = pct + '%';
-        document.getElementById('progressLabel').textContent =
-        `${checked.size} of ${packetItems.length} items checked${pct === 100 ? ' — Packet Complete! 🎉' : ''}`;
-    }
-
-    renderChecklist();
-    </script>
+renderChecklist();
+</script>
 </body>
 </html>
