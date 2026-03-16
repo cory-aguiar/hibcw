@@ -7340,25 +7340,34 @@
     let registryList = [];
 
     async function loadRegistry() {
-        // Populate district filter
+        // Populate district filter — admins/superadmins only
         const df = document.getElementById('registryDistrictFilter');
-        if (df && df.options.length === 1) {
+        if (df && df.options.length === 1 && currentRole !== 'captain') {
             KIAA_DISTRICTS.forEach(d => {
                 const o = document.createElement('option');
                 o.value = d.id; o.textContent = d.label;
                 df.appendChild(o);
             });
         }
+        // Hide district filter for captains — they only see their own
+        if (currentRole === 'captain') {
+            const filterWrap = document.getElementById('registryDistrictFilter');
+            if (filterWrap) filterWrap.style.display = 'none';
+        }
         try {
-            const {data, error} = await sb.from('business_registry')
-                .select('*').order('submitted_at', {ascending:false});
+            let query = sb.from('business_registry').select('*').order('submitted_at', {ascending:false});
+            // Server-side district filter for captains — never expose other districts
+            if (currentRole === 'captain' && captainDistrict) {
+                query = query.eq('district', captainDistrict);
+            }
+            const {data, error} = await query;
             if (error) throw error;
             registryList = data || [];
             updateRegistryCount();
-            renderRegistry();
+            if (currentView === 'registry') renderRegistry();
         } catch(e) {
-            document.getElementById('registryBody').innerHTML =
-                `<div style="color:var(--slate2);font-size:.85rem;padding:20px 0">Could not load business registry: ${esc(e.message)}</div>`;
+            const el = document.getElementById('registryBody');
+            if (el) el.innerHTML = `<div style="color:var(--slate2);font-size:.85rem;padding:20px 0">Could not load business registry: ${esc(e.message)}</div>`;
         }
     }
 
