@@ -2527,6 +2527,8 @@ async function loadMobRegistry() {
       subtitle.textContent = `${mobRegistryList.length} businesses · ${pending} pending`;
     }
     renderMobRegistry();
+    // Re-render districts so business counts appear on cards
+    if (currentScreen === 'districts') renderDistOverview();
   } catch(e) {
     document.getElementById('mobRegistryList').innerHTML = `<div style="color:var(--red);font-size:.78rem">${e.message}</div>`;
   }
