@@ -780,6 +780,8 @@
         // Try ZIP-only detection immediately (no API call needed)
         if (zip.length === 5) {
             const zipDistrictMap = {
+                // Unambiguous ZIPs only — ZIPs that span multiple districts are excluded
+                // so GPS geocoding handles them precisely
                 '96710': 'hamakua',
                 '96728': 'hamakua',
                 '96773': 'hamakua',
@@ -788,8 +790,7 @@
                 '96727': 'north-hilo',
                 '96760': 'north-hilo',
                 '96771': 'north-hilo',
-                '96720': 'south-hilo',
-                '96721': 'south-hilo',
+                // 96720 and 96721 span North & South Hilo — GPS resolves these
                 '96749': 'lower-puna',
                 '96778': 'lower-puna',
                 '96764': 'lower-puna',
@@ -800,6 +801,7 @@
                 '96704': 'south-kona',
                 '96750': 'south-kona',
                 '96756': 'south-kona',
+                // 96740 spans South Hilo & North Kona — GPS resolves this
                 '96745': 'north-kona',
                 '96753': 'north-kona',
                 '96743': 'north-kohala',
@@ -842,10 +844,14 @@
             const lng = parseFloat(data[0].lon);
             const district = await detectDistrictFromCoords(lat, lng);
             if (district) {
-                detectedDistrict = district;
-                await lookupCaptain(district);
+                // GPS result is authoritative — always overrides ZIP map
+                if (district !== detectedDistrict) {
+                    detectedDistrict = district;
+                    await lookupCaptain(district);
+                }
                 showDistrictPreview(district);
-            } else {
+            } else if (!detectedDistrict) {
+                // Only show fallback if ZIP map also failed
                 showDistrictFallback();
             }
         } catch (e) {
@@ -888,9 +894,6 @@
             '96773': 'hamakua',
             '96776': 'hamakua',
             '96781': 'hamakua',
-            '96720': 'south-hilo',
-            '96721': 'south-hilo',
-            '96740': 'south-hilo',
             '96727': 'north-hilo',
             '96760': 'north-hilo',
             '96771': 'north-hilo',
@@ -904,7 +907,6 @@
             '96704': 'south-kona',
             '96750': 'south-kona',
             '96756': 'south-kona',
-            '96740': 'north-kona',
             '96745': 'north-kona',
             '96753': 'north-kona',
             '96743': 'north-kohala',
