@@ -1556,13 +1556,19 @@ function renderDistOverview() {
         </div>
 
         <!-- Action buttons -->
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" style="flex:1;font-size:.72rem;border-color:${color}33;color:${color}" onclick="openDistMembers('${v}')">
-            👥 Members (${memCount})
-          </button>
-          <button class="btn btn-ghost" style="flex:1;font-size:.72rem;border-color:rgba(0,201,167,.3);color:var(--teal)" onclick="openDistBusinesses('${v}')">
-            🏢 Businesses (${mobRegistryList.filter(b=>b.district===v).length})
-          </button>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost" style="flex:1;font-size:.72rem;border-color:${color}33;color:${color}" onclick="openDistMembers('${v}')">
+              👥 Members (${memCount})
+            </button>
+            <button class="btn btn-ghost" style="flex:1;font-size:.72rem;border-color:rgba(0,201,167,.3);color:var(--teal)" onclick="openDistBusinesses('${v}')">
+              🏢 Businesses (${mobRegistryList.filter(b=>b.district===v).length})
+            </button>
+          </div>
+          ${(currentRole === 'admin' || currentRole === 'superadmin') ? `
+          <button class="btn btn-ghost" style="width:100%;font-size:.72rem;border-color:rgba(245,158,11,.3);color:var(--gold)" onclick="openSetCaptainModal('${v}')">
+            👮 Set Captain
+          </button>` : ''}
         </div>
 
       </div>
