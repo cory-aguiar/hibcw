@@ -1268,8 +1268,9 @@ body.light .alert-feed-msg{color:var(--white)}
         </div>
 
         <!-- Glossary link -->
-        <button class="glossary-link" onclick="document.getElementById('glossaryOverlay').classList.add('open')">
-          📖 Not sure which type to pick? View incident glossary
+        <button class="glossary-link" onclick="document.getElementById('glossaryOverlay').classList.add('open')" style="width:100%;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.25);border-radius:5px;padding:9px 14px;cursor:pointer;color:#00c9a7;font-size:.8rem;font-family:'IBM Plex Mono',monospace;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:7px">
+          <span style="font-size:.9rem">📖</span>
+          View Incident Glossary
         </button>
 
         <!-- Glossary modal -->
