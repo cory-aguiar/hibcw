@@ -644,6 +644,7 @@ body.light .disc-emergency .disc-text strong{color:#c0273d}
       <div class="count-badge" id="countBadge">0 incidents</div>
       <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 12px;cursor:pointer;font-size:.65rem;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--slate)'">🌙 Dark</button>
       <a href="https://form.jotform.com/260695751808064" target="_blank" rel="noopener" class="donate-link">💛 Donate</a>
+      <a href="register-business.html" class="member-link" style="background:rgba(0,201,167,.1);border-color:rgba(0,201,167,.25);color:var(--teal)" onmouseover="this.style.background='rgba(0,201,167,.2)'" onmouseout="this.style.background='rgba(0,201,167,.1)'">🏢 Register</a>
       <a href="apply.html" class="member-link">✅ Join</a>
     </div>
   </header>
@@ -2506,6 +2507,15 @@ function toggleTheme() {
       " onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
         Done
       </button>
+
+      <!-- Report another link -->
+      <div style="margin-top:14px">
+        <a href="javascript:void(0)" onclick="closeThankYou();resetForm();showTab('report')"
+          style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--slate);text-decoration:none;transition:color .15s;display:inline-flex;align-items:center;gap:5px"
+          onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--slate)'">
+          🚨 Report another incident
+        </a>
+      </div>
     </div>
   </div>
 </div>
