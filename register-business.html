@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIBCW — Register Your Business</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box
+    }
+
+    :root {
+        --navy: #0b1524;
+        --navy2: #111e30;
+        --navy3: #18293f;
+        --teal: #00c9a7;
+        --gold: #f5a623;
+        --red: #e8415a;
+        --slate: #7a8fa6;
+        --slate2: #4a6070;
+        --white: #eef3f8;
+        --border: rgba(0, 201, 167, .15);
+        --b2: rgba(255, 255, 255, .07)
+    }
+
+    body.light {
+        --navy: #f0f4f8;
+        --navy2: #ffffff;
+        --navy3: #e8eef5;
+        --teal: #007a65;
+        --gold: #b87c0a;
+        --red: #c0273d;
+        --slate: #4a5f72;
+        --slate2: #7a95a8;
+        --white: #0f1e2e;
+        --border: rgba(0, 122, 101, .2);
+        --b2: rgba(0, 0, 0, .1);
+        background: #f0f4f8;
+        color: #0f1e2e
+    }
+
+    body.light header {
+        background: linear-gradient(90deg, #dce8f5, #eaf1f8) !important;
+        border-bottom-color: rgba(0, 122, 101, .2) !important
+    }
+
+    body.light .back-btn {
+        border-color: rgba(0, 0, 0, .15);
+        color: #4a5f72
+    }
+
+    body.light .back-btn:hover {
+        border-color: #007a65;
+        color: #007a65
+    }
+
+    body.light .benefit {
+        background: #fff;
+        border-color: rgba(0, 0, 0, .1)
+    }
+
+    body.light .benefit-title {
+        color: #0f1e2e
+    }
+
+    body.light .form-card {
+        background: #fff;
+        border-color: rgba(0, 0, 0, .1)
+    }
+
+    body.light .form-title {
+        border-bottom-color: rgba(0, 0, 0, .1);
+        color: #0f1e2e
+    }
+
+    body.light .fld input, body.light .fld textarea {
+        background: rgba(0, 0, 0, .04) !important;
+        border-color: rgba(0, 0, 0, .15) !important;
+        color: #0f1e2e !important
+    }
+
+    body.light .fld input:focus, body.light .fld textarea:focus {
+        border-color: #007a65 !important
+    }
+
+    body.light .fld input::placeholder, body.light .fld textarea::placeholder {
+        color: #7a95a8 !important
+    }
+
+    body.light .disc {
+        background: rgba(0, 122, 101, .06);
+        border-color: rgba(0, 122, 101, .2)
+    }
+
+    body.light .page-footer {
+        border-top-color: rgba(0, 0, 0, .1)
+    }
+
+    body.light select {
+        background: #fff !important;
+        color: #0f1e2e !important;
+        border-color: rgba(0, 0, 0, .15) !important
+    }
+
+    body.light .captain-preview {
+        background: rgba(0, 122, 101, .06);
+        border-color: rgba(0, 122, 101, .25)
+    }
+
+    html, body {
+        min-height: 100%;
+        font-family: 'IBM Plex Sans', sans-serif;
+        background: var(--navy);
+        color: var(--white)
+    }
+
+    header {
+        background: linear-gradient(90deg, #0b1524, #111e30);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between
+    }
+
+    .hd-left {
+        display: flex;
+        align-items: center;
+        gap: 10px
+    }
+
+    .logo-shield {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        background: linear-gradient(160deg, #002266, #001133);
+        border: 1.5px solid var(--gold);
+        clip-path: polygon(50% 0%, 100% 15%, 100% 60%, 50% 100%, 0% 60%, 0% 15%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .7rem;
+        font-weight: 700;
+        color: var(--gold)
+    }
+
+    .logo-name {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: .08em
+    }
+
+    .logo-sub {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .55rem;
+        color: var(--teal);
+        letter-spacing: .12em;
+        text-transform: uppercase
+    }
+
+    .back-btn {
+        background: none;
+        border: 1px solid var(--b2);
+        border-radius: 4px;
+        padding: 5px 13px;
+        color: var(--slate);
+        font-size: .75rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all .2s;
+        display: flex;
+        align-items: center;
+        gap: 5px
+    }
+
+    .back-btn:hover {
+        border-color: var(--teal);
+        color: var(--teal)
+    }
+
+    .page {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 40px 24px 60px
+    }
+
+    .page-hero {
+        text-align: center;
+        margin-bottom: 40px
+    }
+
+    .page-shield {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px;
+        background: linear-gradient(160deg, #002266, #001133);
+        border: 2px solid var(--gold);
+        clip-path: polygon(50% 0%, 100% 15%, 100% 60%, 50% 100%, 0% 60%, 0% 15%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--gold)
+    }
+
+    .page-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: .05em;
+        margin-bottom: 10px
+    }
+
+    .page-sub {
+        font-size: .88rem;
+        color: var(--slate);
+        line-height: 1.7;
+        max-width: 480px;
+        margin: 0 auto
+    }
+
+    .benefits {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 36px
+    }
+
+    .benefit {
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 8px;
+        padding: 16px 14px;
+        text-align: center
+    }
+
+    .benefit-icon {
+        font-size: 1.4rem;
+        margin-bottom: 8px
+    }
+
+    .benefit-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: .82rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        color: var(--white);
+        margin-bottom: 4px
+    }
+
+    .benefit-desc {
+        font-size: .72rem;
+        color: var(--slate);
+        line-height: 1.5
+    }
+
+    .form-card {
+        background: var(--navy2);
+        border: 1px solid var(--b2);
+        border-radius: 12px;
+        padding: 32px
+    }
+
+    .form-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        margin-bottom: 24px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--b2);
+        display: flex;
+        align-items: center;
+        gap: 8px
+    }
+
+    .sec-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .62rem;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin: 24px 0 16px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(0, 201, 167, .15)
+    }
+
+    .fld {
+        margin-bottom: 18px
+    }
+
+    .fld label {
+        display: block;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .58rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--slate);
+        margin-bottom: 6px
+    }
+
+    .fld input, .fld textarea {
+        width: 100%;
+        background: rgba(255, 255, 255, .04);
+        border: 1px solid var(--b2);
+        border-radius: 5px;
+        padding: 10px 13px;
+        color: var(--white);
+        font-size: .88rem;
+        outline: none;
+        transition: border-color .2s;
+        font-family: 'IBM Plex Sans', sans-serif
+    }
+
+    .fld input:focus, .fld textarea:focus {
+        border-color: var(--teal)
+    }
+
+    .fld input.err, .fld textarea.err {
+        border-color: var(--red)
+    }
+
+    .fld input::placeholder, .fld textarea::placeholder {
+        color: var(--slate2)
+    }
+
+    .fld textarea {
+        resize: vertical;
+        min-height: 80px
+    }
+
+    .fld-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px
+    }
+
+    .req {
+        color: var(--red);
+        margin-left: 2px
+    }
+
+    select {
+        width: 100%;
+        background: rgba(255, 255, 255, .04);
+        border: 1px solid var(--b2);
+        border-radius: 5px;
+        padding: 10px 13px;
+        color: var(--white);
+        font-size: .88rem;
+        outline: none;
+        transition: border-color .2s;
+        font-family: 'IBM Plex Sans', sans-serif;
+        -webkit-appearance: none
+    }
+
+    select:focus {
+        border-color: var(--teal)
+    }
+
+    select option {
+        background: #1a2b45;
+        color: #c8d8e8
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 13px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--teal), #00a589);
+        color: #0b1524;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        transition: filter .2s;
+        margin-top: 8px
+    }
+
+    .submit-btn:hover {
+        filter: brightness(1.1)
+    }
+
+    .submit-btn:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+        filter: none
+    }
+
+    .disc {
+        background: rgba(0, 201, 167, .05);
+        border: 1px solid rgba(0, 201, 167, .15);
+        border-radius: 6px;
+        padding: 12px 14px;
+        margin-bottom: 20px;
+        font-size: .75rem;
+        color: var(--slate);
+        line-height: 1.6
+    }
+
+    .captain-preview {
+        display: none;
+        background: rgba(0, 201, 167, .07);
+        border: 1px solid rgba(0, 201, 167, .2);
+        border-radius: 6px;
+        padding: 10px 14px;
+        margin-top: 8px;
+        font-size: .8rem;
+        color: var(--teal)
+    }
+
+    .success-box {
+        text-align: center;
+        padding: 40px 24px;
+        display: none
+    }
+
+    .success-icon {
+        font-size: 3rem;
+        margin-bottom: 16px
+    }
+
+    .success-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--teal);
+        margin-bottom: 10px
+    }
+
+    .success-msg {
+        font-size: .88rem;
+        color: var(--slate);
+        line-height: 1.7;
+        max-width: 400px;
+        margin: 0 auto 24px
+    }
+
+    .page-footer {
+        text-align: center;
+        padding: 20px 24px;
+        font-size: .72rem;
+        color: var(--slate2);
+        border-top: 1px solid var(--b2);
+        margin-top: 40px
+    }
+
+    .page-footer a {
+        color: var(--slate);
+        text-decoration: none
+    }
+
+    .page-footer a:hover {
+        color: var(--teal)
+    }
+
+    @media (max-width: 600px) {
+        .benefits {
+            grid-template-columns:1fr
+        }
+
+        .fld-row {
+            grid-template-columns:1fr
+        }
+
+        .form-card {
+            padding:20px
+        }
+
+        .page {
+            padding: 24px 16px 40px
+        }
+    }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="hd-left">
+            <div class="logo-shield">HIBCW</div>
+            <div>
+                <div class="logo-name">HIBCW</div>
+                <div class="logo-sub">Hawaii Island Business Crime Watch</div>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+            <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
+            <a href="index.html" class="back-btn">← Back to Map</a>
+        </div>
+    </header>
+
+    <div class="page">
+
+        <div class="page-hero">
+            <div class="page-shield">HIBCW</div>
+            <div class="page-title">Register Your Business</div>
+            <div class="page-sub">Register your business with the Hawaii Island Business Crime Watch network. Your business will be listed in your district and your District Captain will be notified.</div>
+        </div>
+
+        <div class="benefits">
+            <div class="benefit">
+                <div class="benefit-icon">📍</div>
+                <div class="benefit-title">District Network</div>
+                <div class="benefit-desc">Your business is assigned to a local district captain who serves as your community contact</div>
+            </div>
+            <div class="benefit">
+                <div class="benefit-icon">📢</div>
+                <div class="benefit-title">Stay Informed</div>
+                <div class="benefit-desc">Receive your HIBCW Member Packet with safety resources for your business</div>
+            </div>
+            <div class="benefit">
+                <div class="benefit-icon">🤝</div>
+                <div class="benefit-title">Community Safety</div>
+                <div class="benefit-desc">Be part of Hawaii Island's coordinated business crime awareness network</div>
+            </div>
+        </div>
+
+        <div class="form-card" id="formCard">
+            <div class="form-title">🏢 Business Registration</div>
+
+            <div class="disc">
+                        Your registration will be reviewed by your District Captain. This registration is free and separate from HIBCW individual membership. A welcome packet will be prepared and delivered to your business upon approval.
+                    </div>
+
+            <!-- Business Information -->
+            <div class="sec-label">Business Information</div>
+
+            <div class="fld">
+                <label>
+                    Business Name 
+                    <span class="req">*</span>
+                </label>
+                <input type="text" id="bName" placeholder="e.g. Hilo Hardware Store">
+            </div>
+
+            <div class="fld">
+                <label>
+                    Type of Business 
+                    <span class="req">*</span>
+                </label>
+                <select id="bType">
+                    <option value="">Select business type…</option>
+                    <option>Retail — General</option>
+                    <option>Retail — Grocery / Food</option>
+                    <option>Retail — Clothing / Apparel</option>
+                    <option>Retail — Electronics</option>
+                    <option>Retail — Pharmacy / Health</option>
+                    <option>Retail — Hardware / Building</option>
+                    <option>Restaurant / Food Service</option>
+                    <option>Bar / Nightlife</option>
+                    <option>Hotel / Lodging</option>
+                    <option>Professional Services</option>
+                    <option>Medical / Dental / Healthcare</option>
+                    <option>Financial Services / Bank</option>
+                    <option>Automotive</option>
+                    <option>Agriculture / Farm</option>
+                    <option>Tourism / Activities</option>
+                    <option>Salon / Beauty</option>
+                    <option>Gym / Fitness</option>
+                    <option>Education / Childcare</option>
+                    <option>Religious Organization</option>
+                    <option>Nonprofit</option>
+                    <option>Government / Public Agency</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div class="fld">
+                <label>Number of Employees</label>
+                <select id="bEmployees">
+                    <option value="">Prefer not to say</option>
+                    <option>1 (sole proprietor)</option>
+                    <option>2–5</option>
+                    <option>6–10</option>
+                    <option>11–25</option>
+                    <option>26–50</option>
+                    <option>51–100</option>
+                    <option>100+</option>
+                </select>
+            </div>
+
+            <div class="fld">
+                <label>
+                    Website 
+                    <span style="font-weight:300;text-transform:none;letter-spacing:0">(optional)</span>
+                </label>
+                <input type="url" id="bWebsite" placeholder="https://yourbusiness.com">
+            </div>
+
+            <!-- Business Address -->
+            <div class="sec-label">Business Address</div>
+
+            <div class="fld">
+                <label>
+                    Street Address 
+                    <span class="req">*</span>
+                </label>
+                <input type="text" id="bStreet" placeholder="123 Kamehameha Ave">
+            </div>
+
+            <div class="fld-row">
+                <div class="fld" style="margin-bottom:0">
+                    <label>
+                        City 
+                        <span class="req">*</span>
+                    </label>
+                    <input type="text" id="bCity" placeholder="Hilo">
+                </div>
+                <div class="fld" style="margin-bottom:0">
+                    <label>
+                        ZIP Code 
+                        <span class="req">*</span>
+                    </label>
+                    <input type="text" id="bZip" placeholder="96720" maxlength="10">
+                </div>
+            </div>
+
+            <div id="captainPreview" class="captain-preview"></div>
+
+            <!-- Owner / Contact Information -->
+            <div class="sec-label">Owner / Contact Information</div>
+
+            <div class="fld-row">
+                <div class="fld" style="margin-bottom:0">
+                    <label>
+                        Contact Name 
+                        <span class="req">*</span>
+                    </label>
+                    <input type="text" id="bContact" placeholder="First & last name">
+                </div>
+                <div class="fld" style="margin-bottom:0">
+                    <label>
+                        Phone 
+                        <span class="req">*</span>
+                    </label>
+                    <input type="tel" id="bPhone" placeholder="(808) 000-0000" oninput="phoneMask(this)" maxlength="14">
+                </div>
+            </div>
+            <div style="margin-top:14px"></div>
+            <div class="fld">
+                <label>
+                    Email Address 
+                    <span class="req">*</span>
+                </label>
+                <input type="email" id="bEmail" placeholder="you@yourbusiness.com">
+            </div>
+
+            <!-- Notes -->
+            <div class="sec-label">Additional Information</div>
+            <div class="fld">
+                <label>
+                    Notes 
+                    <span style="font-weight:300;text-transform:none;letter-spacing:0">(optional)</span>
+                </label>
+                <textarea id="bNotes" placeholder="Anything else you'd like your District Captain to know…"></textarea>
+            </div>
+
+            <div id="errMsg" style="display:none;background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.3);border-radius:5px;padding:10px 14px;font-size:.8rem;color:var(--red);margin-bottom:14px"></div>
+
+            <button class="submit-btn" id="submitBtn" onclick="submitRegistration()">🏢 Register My Business</button>
+        </div>
+
+        <!-- Success state -->
+        <div class="success-box" id="successBox">
+            <div class="success-icon">🤙🏼</div>
+            <div class="success-title">Mahalo! Registration Received</div>
+            <div class="success-msg">Your business registration has been submitted to your District Captain for review. You will be contacted when your registration is processed and your Member Packet is ready.</div>
+            <a href="index.html" class="back-btn" style="display:inline-flex;margin:0 auto">← Return to Map</a>
+        </div>
+
+        <div class="page-footer">
+            <a href="index.html">Public Map</a>
+             &nbsp;·&nbsp;
+                    
+            <a href="apply.html">Join as Member</a>
+             &nbsp;·&nbsp;
+                    
+            <a href="privacy.html">Privacy Policy</a>
+             &nbsp;·&nbsp;
+                    
+            <a href="terms.html">Terms of Use</a>
+            <br>
+
+                    HIBCW · Hawaii Island Business Crime Watch · A Program of KIAA · kiaahilo.org
+                
+        </div>
+
+    </div>
+
+    <script>
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const DISTRICTS = [
+    ['hamakua', 'District 1 — Hāmākua'],
+    ['north-hilo', 'District 2 — North Hilo'],
+    ['south-hilo', 'District 3 — South Hilo'],
+    ['lower-puna', 'District 4 — Lower Puna'],
+    ['upper-puna', 'District 5 — Upper Puna'],
+    ['kau', 'District 6 — Kaʻū'],
+    ['south-kona', 'District 7 — South Kona'],
+    ['north-kona', 'District 8 — North Kona'],
+    ['north-kohala', 'District 9 — Kohala'],
+    ];
+
+    // ── Theme ──────────────────────────────────────────────
+    const saved = localStorage.getItem('hibcw-theme');
+    if (saved === 'light') {
+        document.body.classList.add('light');
+        document.getElementById('themeToggle').textContent = '☀️';
+    }
+    function toggleTheme() {
+        const light = document.body.classList.toggle('light');
+        localStorage.setItem('hibcw-theme', light ? 'light' : 'dark');
+        document.getElementById('themeToggle').textContent = light ? '☀️' : '🌙';
+    }
+
+    // ── Phone mask ─────────────────────────────────────────
+    function phoneMask(input) {
+        let v = input.value.replace(/\D/g, '').substring(0, 10);
+        if (v.length >= 6)
+            v = '(' + v.substring(0, 3) + ') ' + v.substring(3, 6) + '-' + v.substring(6);
+        else if (v.length >= 3)
+            v = '(' + v.substring(0, 3) + ') ' + v.substring(3);
+        input.value = v;
+    }
+
+    // ── Auto-detect district from address via geocoding ────
+    let geocodeTimer;
+    let detectedDistrict = null;
+    let captainName = null;
+
+    function onAddressChange() {
+        clearTimeout(geocodeTimer);
+        geocodeTimer = setTimeout(geocodeAddress, 800);
+    }
+
+    document.getElementById('bStreet').addEventListener('input', onAddressChange);
+    document.getElementById('bCity').addEventListener('input', onAddressChange);
+    document.getElementById('bZip').addEventListener('input', onAddressChange);
+
+    async function geocodeAddress() {
+        const street = document.getElementById('bStreet').value.trim();
+        const city = document.getElementById('bCity').value.trim();
+        const zip = document.getElementById('bZip').value.trim();
+        if (!street || !city)
+            return;
+
+        const query = encodeURIComponent(`${street}, ${city}, HI ${zip}`);
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=us`);
+            const data = await res.json();
+            if (!data.length)
+                return;
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            const district = await detectDistrictFromCoords(lat, lng);
+            if (district) {
+                detectedDistrict = district;
+                await lookupCaptain(district);
+                showDistrictPreview(district);
+            }
+        } catch (e) {
+            console.log('Geocode error:', e);
+        }
+    }
+
+    async function detectDistrictFromCoords(lat, lng) {
+        // Try GIS boundary lookup first
+        try {
+            const res = await fetch(`https://services.arcgis.com/bDAqqMkYMMKSHMcd/arcgis/rest/services/Council_Districts/FeatureServer/0/query?geometry=${lng},${lat}&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=COUNCILMEM&f=json&inSR=4326`);
+            const data = await res.json();
+            if (data.features?.length) {
+                const council = data.features[0].attributes.COUNCILMEM;
+                const map = {
+                    'Hāmākua': 'hamakua',
+                    'Hamakua': 'hamakua',
+                    'North Hilo': 'north-hilo',
+                    'South Hilo': 'south-hilo',
+                    'Lower Puna': 'lower-puna',
+                    'Upper Puna': 'upper-puna',
+                    "Ka'u": 'kau',
+                    "Kaʻū": 'kau',
+                    'South Kona': 'south-kona',
+                    'North Kona': 'north-kona',
+                    'Kohala': 'north-kohala',
+                };
+                for (const [k, v] of Object.entries(map)) {
+                    if (council && council.includes(k))
+                        return v;
+                }
+            }
+        } catch (e) {}
+
+        // Fallback: simple bounding box by ZIP
+        const zipDistrictMap = {
+            '96710': 'hamakua',
+            '96728': 'hamakua',
+            '96773': 'hamakua',
+            '96776': 'hamakua',
+            '96781': 'hamakua',
+            '96720': 'south-hilo',
+            '96721': 'south-hilo',
+            '96740': 'south-hilo',
+            '96727': 'north-hilo',
+            '96760': 'north-hilo',
+            '96771': 'north-hilo',
+            '96749': 'lower-puna',
+            '96778': 'lower-puna',
+            '96764': 'lower-puna',
+            '96770': 'lower-puna',
+            '96785': 'upper-puna',
+            '96772': 'kau',
+            '96777': 'kau',
+            '96704': 'south-kona',
+            '96750': 'south-kona',
+            '96756': 'south-kona',
+            '96740': 'north-kona',
+            '96745': 'north-kona',
+            '96753': 'north-kona',
+            '96743': 'north-kohala',
+            '96755': 'north-kohala',
+        };
+        const zip = document.getElementById('bZip').value.replace(/\D/g, '').substring(0, 5);
+        return zipDistrictMap[zip] || null;
+    }
+
+    function showDistrictPreview(districtId) {
+        const label = DISTRICTS.find(d => d[0] === districtId)?.[1] || districtId;
+        const el = document.getElementById('captainPreview');
+        el.style.display = 'block';
+        el.innerHTML = `📍 Auto-assigned to <strong>${label}</strong>${captainName ? ` · 👮 Captain: <strong>${captainName}</strong>` : ''}`;
+    }
+
+    async function lookupCaptain(districtId) {
+        try {
+            const {data} = await sb.from('member_applications')
+            .select('captain_name')
+            .eq('district', districtId)
+            .eq('status', 'approved')
+            .not('captain_name', 'is', null)
+            .limit(1)
+            .single();
+            captainName = data?.captain_name || null;
+        } catch (e) {
+            captainName = null;
+        }
+    }
+
+    // ── Submit ─────────────────────────────────────────────
+    async function submitRegistration() {
+        const btn = document.getElementById('submitBtn');
+        const errEl = document.getElementById('errMsg');
+        errEl.style.display = 'none';
+
+        const bName = document.getElementById('bName').value.trim();
+        const bType = document.getElementById('bType').value;
+        const bStreet = document.getElementById('bStreet').value.trim();
+        const bCity = document.getElementById('bCity').value.trim();
+        const bZip = document.getElementById('bZip').value.trim();
+        const bContact = document.getElementById('bContact').value.trim();
+        const bPhone = document.getElementById('bPhone').value.trim();
+        const bEmail = document.getElementById('bEmail').value.trim().toLowerCase();
+        const bEmployees = document.getElementById('bEmployees').value;
+        const bWebsite = document.getElementById('bWebsite').value.trim();
+        const bNotes = document.getElementById('bNotes').value.trim();
+
+        // Validation
+        const missing = [];
+        if (!bName)
+            missing.push('Business name');
+        if (!bType)
+            missing.push('Business type');
+        if (!bStreet)
+            missing.push('Street address');
+        if (!bCity)
+            missing.push('City');
+        if (!bZip)
+            missing.push('ZIP code');
+        if (!bContact)
+            missing.push('Contact name');
+        if (!bPhone)
+            missing.push('Phone number');
+        if (!bEmail)
+            missing.push('Email address');
+        if (missing.length) {
+            errEl.textContent = 'Please fill in: ' + missing.join(', ');
+            errEl.style.display = 'block';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Submitting…';
+
+        // Geocode if not already done
+        if (!detectedDistrict)
+            await geocodeAddress();
+
+        const row = {
+            business_name: bName,
+            business_type: bType,
+            street_address: bStreet,
+            city: bCity,
+            zip: bZip,
+            full_address: `${bStreet}, ${bCity}, HI ${bZip}`,
+            contact_name: bContact,
+            phone: bPhone.replace(/\D/g, ''),
+            email: bEmail,
+            employees: bEmployees || null,
+            website: bWebsite || null,
+            notes: bNotes || null,
+            district: detectedDistrict || null,
+            captain_name: captainName || null,
+            status: 'pending',
+            submitted_at: new Date().toISOString(),
+        };
+
+        try {
+            const {error} = await sb.from('business_registry').insert(row);
+            if (error)
+                throw error;
+            document.getElementById('formCard').style.display = 'none';
+            document.getElementById('successBox').style.display = 'block';
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        } catch (e) {
+            errEl.textContent = 'Submission failed: ' + (e.message || 'Please try again.');
+            errEl.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = '🏢 Register My Business';
+        }
+    }
+    </script>
+</body>
+</html>
