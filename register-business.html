@@ -628,7 +628,36 @@
                 </div>
             </div>
 
-            <div id="captainPreview" class="captain-preview"></div>
+            <!-- District display -->
+            <div class="fld" id="districtDisplayWrap" style="display:none">
+                <label>District (Auto-Detected)</label>
+                <div id="districtDisplay" style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.25);border-radius:5px;padding:10px 13px;font-size:.88rem;color:var(--teal);display:flex;align-items:center;gap:8px">
+                    <span>📍</span>
+                    <span id="districtDisplayText">Detecting…</span>
+                </div>
+                <div id="captainPreview" style="font-size:.76rem;color:var(--slate);margin-top:5px"></div>
+            </div>
+
+            <!-- Fallback: manual district select (shown if geocoding fails) -->
+            <div class="fld" id="districtFallbackWrap" style="display:none">
+                <label>
+                    District 
+                    <span class="req">*</span>
+                    <span style="font-weight:300;text-transform:none;letter-spacing:0;font-family:'IBM Plex Sans',sans-serif">(could not auto-detect — please select)</span>
+                </label>
+                <select id="bDistrictFallback" onchange="onManualDistrictSelect(this.value)">
+                    <option value="">Select your district…</option>
+                    <option value="hamakua">District 1 — Hāmākua</option>
+                    <option value="north-hilo">District 2 — North Hilo</option>
+                    <option value="south-hilo">District 3 — South Hilo</option>
+                    <option value="lower-puna">District 4 — Lower Puna</option>
+                    <option value="upper-puna">District 5 — Upper Puna</option>
+                    <option value="kau">District 6 — Kaʻū</option>
+                    <option value="south-kona">District 7 — South Kona</option>
+                    <option value="north-kona">District 8 — North Kona</option>
+                    <option value="north-kohala">District 9 — Kohala</option>
+                </select>
+            </div>
 
             <!-- Owner / Contact Information -->
             <div class="sec-label">Owner / Contact Information</div>
@@ -744,6 +773,15 @@
 
     function onAddressChange() {
         clearTimeout(geocodeTimer);
+        const street = document.getElementById('bStreet').value.trim();
+        const city = document.getElementById('bCity').value.trim();
+        if (street && city) {
+            // Show detecting state immediately
+            document.getElementById('districtDisplayWrap').style.display = 'block';
+            document.getElementById('districtFallbackWrap').style.display = 'none';
+            document.getElementById('districtDisplayText').textContent = 'Detecting district…';
+            document.getElementById('captainPreview').textContent = '';
+        }
         geocodeTimer = setTimeout(geocodeAddress, 800);
     }
 
@@ -771,9 +809,12 @@
                 detectedDistrict = district;
                 await lookupCaptain(district);
                 showDistrictPreview(district);
+            } else {
+                showDistrictFallback();
             }
         } catch (e) {
             console.log('Geocode error:', e);
+            showDistrictFallback();
         }
     }
 
@@ -839,9 +880,24 @@
 
     function showDistrictPreview(districtId) {
         const label = DISTRICTS.find(d => d[0] === districtId)?.[1] || districtId;
-        const el = document.getElementById('captainPreview');
-        el.style.display = 'block';
-        el.innerHTML = `📍 Auto-assigned to <strong>${label}</strong>${captainName ? ` · 👮 Captain: <strong>${captainName}</strong>` : ''}`;
+        // Show the detected district display
+        document.getElementById('districtDisplayWrap').style.display = 'block';
+        document.getElementById('districtFallbackWrap').style.display = 'none';
+        document.getElementById('districtDisplayText').textContent = label;
+        if (captainName) {
+            document.getElementById('captainPreview').textContent = '👮 District Captain: ' + captainName;
+        }
+    }
+
+    function showDistrictFallback() {
+        document.getElementById('districtDisplayWrap').style.display = 'none';
+        document.getElementById('districtFallbackWrap').style.display = 'block';
+    }
+
+    function onManualDistrictSelect(val) {
+        detectedDistrict = val;
+        if (val)
+            lookupCaptain(val);
     }
 
     async function lookupCaptain(districtId) {
@@ -921,7 +977,7 @@
             employees: bEmployees || null,
             website: bWebsite || null,
             notes: bNotes || null,
-            district: detectedDistrict || null,
+            district: detectedDistrict || document.getElementById('bDistrictFallback')?.value || null,
             captain_name: captainName || null,
             status: 'pending',
             submitted_at: new Date().toISOString(),
