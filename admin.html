@@ -7473,6 +7473,9 @@
             registryList = data || [];
             updateRegistryCount();
             if (currentView === 'registry') renderRegistry();
+            // Re-render districts so business counts appear on cards
+            if (currentView === 'captains') renderCaptains();
+            if (currentRole === 'captain') renderCaptainDashboard();
         } catch(e) {
             const el = document.getElementById('registryBody');
             if (el) el.innerHTML = `<div style="color:var(--slate2);font-size:.85rem;padding:20px 0">Could not load business registry: ${esc(e.message)}</div>`;
