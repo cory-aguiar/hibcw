@@ -765,6 +765,33 @@ body.light .strip-cell{background:#fff}
   </div>
 </div>
 
+<!-- DISTRICT BUSINESSES SHEET -->
+<div class="modal-overlay" id="distBizOverlay" onclick="if(event.target===this)closeDistBiz()">
+  <div class="modal-sheet" id="distBizSheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="distBizTitle">District Businesses</div>
+        <div style="font-size:.65rem;color:var(--slate);margin-top:2px" id="distBizCount"></div>
+      </div>
+      <button class="modal-close" onclick="closeDistBiz()">✕</button>
+    </div>
+    <div style="padding:8px 12px;border-bottom:1px solid var(--b2);flex-shrink:0;display:flex;gap:6px">
+      <input class="srch" id="distBizSearchInput" placeholder="🔍 Search businesses…" oninput="filterDistBizSheet()" style="flex:1">
+      <select id="distBizStatusFilter" onchange="filterDistBizSheet()" style="background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:6px 8px;color:var(--white);font-size:.72rem;outline:none">
+        <option value="">All</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+    <div id="distBizBody" style="overflow-y:auto;flex:1;padding:8px 12px"></div>
+    <div style="padding:10px 12px;border-top:1px solid var(--b2);display:flex;gap:8px;flex-wrap:wrap" >
+      <button class="btn btn-ghost captain-hidden" style="flex:1;font-size:.72rem" onclick="closeDistBiz();showMobRegistry()">📋 Open Full Registry</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast">
   <div class="toast-ico" id="toastIco"></div>
@@ -1528,10 +1555,15 @@ function renderDistOverview() {
           ${typeBars}
         </div>
 
-        <!-- Action button -->
-        <button class="btn btn-ghost btn-full" style="font-size:.72rem;border-color:${color}33;color:${color}" onclick="openDistMembers('${v}')">
-          👥 View Members (${memCount})
-        </button>
+        <!-- Action buttons -->
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" style="flex:1;font-size:.72rem;border-color:${color}33;color:${color}" onclick="openDistMembers('${v}')">
+            👥 Members (${memCount})
+          </button>
+          <button class="btn btn-ghost" style="flex:1;font-size:.72rem;border-color:rgba(0,201,167,.3);color:var(--teal)" onclick="openDistBusinesses('${v}')">
+            🏢 Businesses (${registryList.filter(b=>b.district===v).length})
+          </button>
+        </div>
 
       </div>
     </div>`;
@@ -2755,6 +2787,82 @@ function filterDistMembers() {
 function closeDistMembers() {
   document.getElementById('distMembersOverlay').classList.remove('open');
   _distMembersId = null;
+}
+
+/* ── District Businesses Sheet ─────────────────────── */
+let _distBizId = null;
+
+function openDistBusinesses(districtId) {
+  _distBizId = districtId;
+  const DIST_LABELS = {
+    'hamakua':'District 1 — Hāmākua','north-hilo':'District 2 — North Hilo','south-hilo':'District 3 — South Hilo',
+    'lower-puna':'District 4 — Lower Puna','upper-puna':'District 5 — Upper Puna','kau':'District 6 — Kaʻū',
+    'south-kona':'District 7 — South Kona','north-kona':'District 8 — North Kona','north-kohala':'District 9 — Kohala'
+  };
+  const DIST_COLORS = {
+    'hamakua':'#84cc16','north-hilo':'#3b82f6','south-hilo':'#00c9a7',
+    'lower-puna':'#c084fc','upper-puna':'#a855f7','kau':'#ef4444',
+    'south-kona':'#f59e0b','north-kona':'#f97316','north-kohala':'#10b981'
+  };
+  const label = DIST_LABELS[districtId] || districtId;
+  const color = DIST_COLORS[districtId] || 'var(--teal)';
+  const businesses = mobRegistryList.filter(b => b.district === districtId);
+
+  document.getElementById('distBizTitle').textContent = label;
+  document.getElementById('distBizTitle').style.color = color;
+  document.getElementById('distBizCount').textContent = `${businesses.length} registered business${businesses.length!==1?'es':''}`;
+  document.getElementById('distBizSearchInput').value = '';
+  document.getElementById('distBizStatusFilter').value = '';
+  renderDistBizSheetRows(businesses);
+  document.getElementById('distBizOverlay').classList.add('open');
+}
+
+function renderDistBizSheetRows(businesses) {
+  const el = document.getElementById('distBizBody');
+  if (!businesses.length) {
+    el.innerHTML = '<div style="color:var(--slate2);font-style:italic;font-size:.82rem;padding:12px 0;text-align:center">No businesses registered in this district yet.</div>';
+    return;
+  }
+  const DIST_COLORS = {
+    'hamakua':'#84cc16','north-hilo':'#3b82f6','south-hilo':'#00c9a7',
+    'lower-puna':'#c084fc','upper-puna':'#a855f7','kau':'#ef4444',
+    'south-kona':'#f59e0b','north-kona':'#f97316','north-kohala':'#10b981'
+  };
+  el.innerHTML = businesses.map(b => {
+    const sc = b.status==='approved'?'var(--teal)':b.status==='pending'?'var(--gold)':'var(--red)';
+    const dc = DIST_COLORS[b.district]||'var(--teal)';
+    return `<div class="dist-biz-row" data-name="${esc((b.business_name||'').toLowerCase())}" data-contact="${esc((b.contact_name||'').toLowerCase())}" data-status="${b.status||''}"
+      style="background:var(--navy2);border:1px solid var(--b2);border-left:3px solid ${dc};border-radius:0 7px 7px 0;padding:10px 12px;margin-bottom:6px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.84rem;font-weight:600;color:var(--white)">${esc(b.business_name||'—')}</div>
+          <div style="font-size:.7rem;color:var(--slate);margin-top:1px">${esc(b.business_type||'')}${b.city?' · '+esc(b.city):''}</div>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;padding:2px 7px;border-radius:3px;border:1px solid;color:${sc};background:${sc}18;border-color:${sc}44;white-space:nowrap;text-transform:capitalize;flex-shrink:0">${b.status}</span>
+      </div>
+      <div style="font-size:.72rem;color:var(--slate);margin-bottom:6px">${esc(b.contact_name||'')}${b.phone?' · '+fmtPhone(b.phone):''}</div>
+      ${b.packet_sent_at?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal);margin-bottom:6px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</div>`:''}
+      <div style="display:flex;gap:6px" class="captain-hidden">
+        <button onclick="closeDistBiz();openMobBizSheet('${b.id}')" style="flex:1;background:transparent;border:1px solid var(--b2);border-radius:5px;padding:5px 8px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">View</button>
+        ${b.status==='approved'&&!b.packet_sent_at?`<button onclick="closeDistBiz();mobGeneratePacket('${b.id}')" style="flex:1;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:5px 8px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">📦 Packet</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterDistBizSheet() {
+  const q    = (document.getElementById('distBizSearchInput')?.value||'').toLowerCase().trim();
+  const stat = document.getElementById('distBizStatusFilter')?.value||'';
+  document.querySelectorAll('.dist-biz-row').forEach(row => {
+    const matchQ = !q || row.dataset.name?.includes(q) || row.dataset.contact?.includes(q);
+    const matchS = !stat || row.dataset.status === stat;
+    row.style.display = matchQ && matchS ? '' : 'none';
+  });
+}
+
+function closeDistBiz() {
+  document.getElementById('distBizOverlay').classList.remove('open');
+  _distBizId = null;
 }
 
 function printDistrictRoster() {
