@@ -3376,7 +3376,7 @@
     </div>
 
     <!-- BUSINESS REGISTRY DETAIL MODAL -->
-    <div class="overlay" id="registryDetailModal" onclick="if(event.target===this)closeModal('registryDetailModal')" style="display:none;z-index:9999">
+    <div class="overlay" id="registryDetailModal" onclick="if(event.target===this)closeBizModal('registryDetailModal')" style="display:none;position:fixed;inset:0;background:rgba(6,14,26,.85);z-index:9999;align-items:center;justify-content:center;padding:20px">
       <div class="modal" style="max-width:540px;padding:24px">
         <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:var(--white);margin-bottom:16px">🏢 Business Details</div>
         <div id="registryDetailBody"></div>
@@ -3384,7 +3384,7 @@
     </div>
 
     <!-- EDIT BUSINESS MODAL (admin/superadmin only) -->
-    <div class="overlay" id="editBusinessModal" onclick="if(event.target===this)closeModal('editBusinessModal')" style="display:none;z-index:9999">
+    <div class="overlay" id="editBusinessModal" onclick="if(event.target===this)closeBizModal('editBusinessModal')" style="display:none;position:fixed;inset:0;background:rgba(6,14,26,.85);z-index:9999;align-items:center;justify-content:center;padding:20px">
       <div class="modal" style="max-width:580px;padding:24px;max-height:90vh;overflow-y:auto">
         <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:var(--white);margin-bottom:20px">✏️ Edit Business</div>
         <input type="hidden" id="ebId">
@@ -3458,7 +3458,7 @@
           </div>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button onclick="closeModal('editBusinessModal')" style="background:transparent;border:1px solid var(--b2);border-radius:5px;padding:8px 18px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">Cancel</button>
+          <button onclick="closeBizModal('editBusinessModal')" style="background:transparent;border:1px solid var(--b2);border-radius:5px;padding:8px 18px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">Cancel</button>
           <button id="ebSaveBtn" onclick="saveEditBusiness()" style="background:var(--teal);border:none;border-radius:5px;padding:8px 18px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:700;cursor:pointer">Save Changes</button>
         </div>
       </div>
@@ -7623,13 +7623,43 @@
           </div>`;
     }
 
+    function openBizModal(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = 'flex';
+    }
+
+    function closeBizModal(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = 'none';
+    }
+
+    async function deleteRegistry(id) {
+        const b = registryList.find(b=>b.id===id);
+        if (!b) return;
+        if (!confirm(`Permanently delete "${b.business_name}"? This cannot be undone.`)) return;
+        const {error} = await sb.from('business_registry').delete().eq('id', id);
+        if (!error) {
+            registryList = registryList.filter(b=>b.id!==id);
+            closeBizModal('registryDetailModal');
+            closeBizModal('editBusinessModal');
+            renderRegistry();
+            updateRegistryCount();
+            if (currentView === 'captains') renderCaptains();
+            showToast('🗑', 'Business deleted.');
+        } else {
+            showToast('⚠️', error.message, 'err');
+        }
+    }
+
     function openRegistryDetail(id) {
         const b = registryList.find(b=>b.id===id);
         if (!b) return;
         const distColor = KIAA_DISTRICTS.find(d=>d.id===b.district)?.color || 'var(--teal)';
         const distLabel = KIAA_DISTRICTS.find(d=>d.id===b.district)?.label || b.district || '—';
         const canEdit   = currentRole === 'admin' || currentRole === 'superadmin';
-        openModal('registryDetailModal');
+        openBizModal('registryDetailModal');
         document.getElementById('registryDetailBody').innerHTML = `
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
             <div>
@@ -7661,14 +7691,19 @@
             </div>
           </div>
           ${b.notes?`<div style="background:var(--navy3);border-radius:6px;padding:10px 12px;margin-bottom:14px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Notes</div><div style="font-size:.8rem;color:var(--white);line-height:1.6">${esc(b.notes)}</div></div>`:''}
-          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap">
-            ${canEdit ? `<button onclick="closeModal('registryDetailModal');openEditBusiness('${b.id}')" style="background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:8px 16px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">✏️ Edit</button>` : ''}
-            ${b.status==='pending'?`
-              <button onclick="approveRegistry('${b.id}');closeModal('registryDetailModal')" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:8px 16px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">✅ Approve</button>
-              <button onclick="rejectRegistry('${b.id}');closeModal('registryDetailModal')" style="background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:8px 16px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">❌ Reject</button>`:''}
-            ${b.status==='approved'&&!b.packet_sent_at?`<button onclick="generatePacket('${b.id}');closeModal('registryDetailModal')" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:8px 16px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">📦 Generate Packet</button>`:''}
-            ${b.packet_sent_at?`<span style="font-size:.75rem;color:var(--teal);display:flex;align-items:center;gap:4px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</span>`:''}
-            <button onclick="closeModal('registryDetailModal')" style="background:transparent;border:1px solid var(--b2);border-radius:5px;padding:8px 16px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">Close</button>
+          <div style="display:flex;gap:8px;justify-content:space-between;margin-top:8px;flex-wrap:wrap">
+            <div>
+              ${canEdit ? `<button onclick="deleteRegistry('${b.id}')" style="background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:8px 16px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">🗑 Delete</button>` : ''}
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              ${canEdit ? `<button onclick="closeBizModal('registryDetailModal');openEditBusiness('${b.id}')" style="background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:8px 16px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">✏️ Edit</button>` : ''}
+              ${b.status==='pending'?`
+                <button onclick="approveRegistry('${b.id}');closeBizModal('registryDetailModal')" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:8px 16px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">✅ Approve</button>
+                <button onclick="rejectRegistry('${b.id}');closeBizModal('registryDetailModal')" style="background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:8px 16px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">❌ Reject</button>`:''}
+              ${b.status==='approved'&&!b.packet_sent_at?`<button onclick="generatePacket('${b.id}');closeBizModal('registryDetailModal')" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:8px 16px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">📦 Generate Packet</button>`:''}
+              ${b.packet_sent_at?`<span style="font-size:.75rem;color:var(--teal);display:flex;align-items:center;gap:4px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</span>`:''}
+              <button onclick="closeBizModal('registryDetailModal')" style="background:transparent;border:1px solid var(--b2);border-radius:5px;padding:8px 16px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">Close</button>
+            </div>
           </div>`;
     }
 
@@ -7692,7 +7727,7 @@
         document.getElementById('ebNotes').value        = b.notes||'';
         document.getElementById('ebDistrict').value     = b.district||'';
         document.getElementById('ebStatus').value       = b.status||'pending';
-        openModal('editBusinessModal');
+        openBizModal('editBusinessModal');
     }
 
     async function saveEditBusiness() {
@@ -7725,7 +7760,7 @@
             if (error) throw error;
             // Update local list
             Object.assign(b, updates);
-            closeModal('editBusinessModal');
+            closeBizModal('editBusinessModal');
             renderRegistry();
             if (currentView === 'captains') renderCaptains();
             showToast('✅', 'Business updated successfully.');
