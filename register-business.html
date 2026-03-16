@@ -630,12 +630,12 @@
 
             <!-- District display -->
             <div class="fld" id="districtDisplayWrap" style="display:none">
-                <label>District (Auto-Detected)</label>
-                <div id="districtDisplay" style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.25);border-radius:5px;padding:10px 13px;font-size:.88rem;color:var(--teal);display:flex;align-items:center;gap:8px">
-                    <span>📍</span>
+                <label>District (Auto-Detected) ✓</label>
+                <div id="districtDisplay" style="background:rgba(0,201,167,.08);border:1.5px solid rgba(0,201,167,.4);border-radius:5px;padding:11px 13px;font-size:.9rem;font-weight:600;color:var(--teal);display:flex;align-items:center;gap:8px">
+                    <span style="font-size:1.1rem">📍</span>
                     <span id="districtDisplayText">Detecting…</span>
                 </div>
-                <div id="captainPreview" style="font-size:.76rem;color:var(--slate);margin-top:5px"></div>
+                <div id="captainPreview" style="font-size:.76rem;color:var(--slate);margin-top:6px;padding-left:2px"></div>
             </div>
 
             <!-- Fallback: manual district select (shown if geocoding fails) -->
@@ -643,7 +643,7 @@
                 <label>
                     District 
                     <span class="req">*</span>
-                    <span style="font-weight:300;text-transform:none;letter-spacing:0;font-family:'IBM Plex Sans',sans-serif">(could not auto-detect — please select)</span>
+                    <span style="font-weight:300;text-transform:none;letter-spacing:0;font-family:'IBM Plex Sans',sans-serif;color:var(--slate)">(please select your district)</span>
                 </label>
                 <select id="bDistrictFallback" onchange="onManualDistrictSelect(this.value)">
                     <option value="">Select your district…</option>
@@ -775,14 +775,53 @@
         clearTimeout(geocodeTimer);
         const street = document.getElementById('bStreet').value.trim();
         const city = document.getElementById('bCity').value.trim();
+        const zip = document.getElementById('bZip').value.replace(/\D/g, '').substring(0, 5);
+
+        // Try ZIP-only detection immediately (no API call)
+        if (zip.length === 5) {
+            const zipDistrictMap = {
+                '96710': 'hamakua',
+                '96728': 'hamakua',
+                '96773': 'hamakua',
+                '96776': 'hamakua',
+                '96781': 'hamakua',
+                '96727': 'north-hilo',
+                '96760': 'north-hilo',
+                '96771': 'north-hilo',
+                '96720': 'south-hilo',
+                '96721': 'south-hilo',
+                '96749': 'lower-puna',
+                '96778': 'lower-puna',
+                '96764': 'lower-puna',
+                '96770': 'lower-puna',
+                '96785': 'upper-puna',
+                '96772': 'kau',
+                '96777': 'kau',
+                '96704': 'south-kona',
+                '96750': 'south-kona',
+                '96756': 'south-kona',
+                '96745': 'north-kona',
+                '96753': 'north-kona',
+                '96743': 'north-kohala',
+                '96755': 'north-kohala',
+            };
+            const zipDistrict = zipDistrictMap[zip];
+            if (zipDistrict) {
+                detectedDistrict = zipDistrict;
+                showDistrictPreview(zipDistrict);
+                lookupCaptain(zipDistrict);
+            }
+        }
+
+        // Still queue full geocode for precise GPS-based detection
         if (street && city) {
-            // Show detecting state immediately
             document.getElementById('districtDisplayWrap').style.display = 'block';
             document.getElementById('districtFallbackWrap').style.display = 'none';
-            document.getElementById('districtDisplayText').textContent = 'Detecting district…';
-            document.getElementById('captainPreview').textContent = '';
+            if (!detectedDistrict) {
+                document.getElementById('districtDisplayText').textContent = 'Detecting district…';
+            }
+            geocodeTimer = setTimeout(geocodeAddress, 900);
         }
-        geocodeTimer = setTimeout(geocodeAddress, 800);
     }
 
     document.getElementById('bStreet').addEventListener('input', onAddressChange);
