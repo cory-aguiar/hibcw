@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>HIBCW Window Badge</title><link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+@page{size:letter;margin:14mm}
+body{background:#f0f0f0;font-family:'IBM Plex Sans',Arial,sans-serif;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.page{width:780px;min-height:1020px;background:#fff;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+.toolbar{width:100%;background:#0b1524;padding:9px 18px;display:flex;align-items:center;justify-content:space-between}
+.toolbar-brand{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#00c9a7}
+.t-btn{padding:5px 11px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6)}
+.instructions{width:100%;padding:14px 20px;font-size:10px;color:#4a6070;line-height:1.7;border-bottom:1px dashed #c8d8e4;text-align:center}
+.badge-area{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+.badge{width:340px;height:340px;background:#0b1524;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;position:relative;overflow:hidden}
+.badge::before{content:'';position:absolute;inset:0;border:4px solid var(--dc,#00c9a7);border-radius:12px;pointer-events:none}
+
+.badge-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+.badge-member{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:#fff;letter-spacing:.06em;margin-bottom:4px}
+.badge-org{font-family:'IBM Plex Mono',monospace;font-size:8px;color:rgba(255,255,255,.5);letter-spacing:.1em;text-align:center;margin-bottom:16px}
+.badge-district{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dc,#00c9a7);letter-spacing:.08em;text-align:center}
+.badge-url{font-family:'IBM Plex Mono',monospace;font-size:8px;color:rgba(255,255,255,.35);margin-top:12px}
+.badge-accent{position:absolute;bottom:0;left:0;right:0;height:4px;background:var(--dc,#00c9a7)}
+.cut-instructions{width:100%;padding:12px 20px;font-size:9px;color:#b0c0cc;text-align:center;font-family:'IBM Plex Mono',monospace;border-top:1px dashed #c8d8e4;margin-top:auto}
+@media print{.toolbar{display:none}.instructions{display:none}.cut-instructions{display:none}}
+</style></head><body>
+<div class="page">
+<div class="toolbar"><div class="toolbar-brand">HIBCW · Window Badge</div><div style="display:flex;gap:6px"><a href="javascript:window.print()" class="t-btn">🖨 Print</a><button class="t-btn" onclick="window.close()">✕ Close</button></div></div>
+<div class="instructions">Print this page and cut out the badge. Display it in your business window or on your front door to show your HIBCW registration to the community.</div>
+<div class="badge-area">
+  <div class="badge">
+    <img src="logo-shield.svg" alt="HIBCW Shield" style="width:70px;height:70px;margin-bottom:14px;display:block;object-fit:contain">
+    <div class="badge-title">Registered Business</div>
+    <div class="badge-member">HIBCW MEMBER</div>
+    <div class="badge-org">Hawaii Island Business Crime Watch<br>A Program of KIAA</div>
+    <div class="badge-district" id="badgeDistrict"></div>
+    <div class="badge-url">hibcw.vercel.app</div>
+    <div class="badge-accent"></div>
+  </div>
+</div>
+<div class="cut-instructions">Print · Cut · Display in window or on door</div>
+</div>
+
+<script>
+const p = new URLSearchParams(window.location.search);
+const get = k => p.get(k)||'';
+const DIST_COLORS = {'hamakua':'#84cc16','north-hilo':'#3b82f6','south-hilo':'#00c9a7','lower-puna':'#c084fc','upper-puna':'#a855f7','kau':'#ef4444','south-kona':'#f59e0b','north-kona':'#f97316','north-kohala':'#10b981'};
+const dc = DIST_COLORS[get('distId')] || '#00c9a7';
+document.documentElement.style.setProperty('--dc', dc);
+
+document.getElementById('badgeDistrict').textContent = get('district')||'';
+</script></body></html>

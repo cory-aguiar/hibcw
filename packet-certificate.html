@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HIBCW Membership Certificate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+  <style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#f0f4f8;display:flex;flex-direction:column;align-items:center;min-height:100vh;font-family:'IBM Plex Sans',sans-serif}
+  .toolbar{background:#0b1524;border-bottom:1px solid rgba(0,201,167,.2);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;width:100%;gap:12px}
+  .t-logo{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;color:#eef3f8;letter-spacing:.06em}
+  .t-sub{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:#00c9a7;letter-spacing:.12em;text-transform:uppercase}
+  .t-btn{padding:6px 14px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer;transition:all .15s;border:none}
+  .t-print{background:linear-gradient(135deg,#00c9a7,#00a589);color:#0b1524;font-weight:700}
+  .t-close{background:transparent;border:1px solid rgba(255,255,255,.15)!important;color:#7a8fa6}
+  .cert-wrap{padding:32px 24px;width:100%;max-width:760px}
+  .cert{width:100%;aspect-ratio:1.414/1;background:white;border:3px solid #0b2040;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+  /* Corner ornaments */
+  .cert::before,.cert::after{content:'';position:absolute;width:80px;height:80px;border-color:#00c9a7;border-style:solid;border-width:0}
+  .cert::before{top:12px;left:12px;border-top-width:3px;border-left-width:3px}
+  .cert::after{bottom:12px;right:12px;border-bottom-width:3px;border-right-width:3px}
+  .cert-inner{position:absolute;inset:24px;border:1px solid rgba(11,32,64,.15);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:24px 40px}
+  /* Top band */
+  .cert-top{text-align:center;width:100%}
+  .cert-org{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:#7a8fa6;margin-bottom:6px}
+  .cert-program{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#0b1524;line-height:1}
+  .cert-sub{font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:#00c9a7;margin-top:4px}
+  /* Shield */
+  
+  /* Middle */
+  .cert-mid{text-align:center;width:100%}
+  .cert-presents{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:#7a8fa6;margin-bottom:10px}
+  .cert-award{font-family:'Playfair Display',serif;font-size:1rem;font-style:italic;color:#4a6070;margin-bottom:6px}
+  .cert-bizname{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:#0b1524;line-height:1.1;border-bottom:2px solid #00c9a7;padding-bottom:8px;margin-bottom:8px;max-width:100%;word-break:break-word}
+  .cert-body{font-size:.76rem;color:#4a6070;line-height:1.7;max-width:480px;text-align:center}
+  /* Bottom */
+  .cert-bot{width:100%;display:flex;justify-content:space-between;align-items:flex-end}
+  .cert-sig{text-align:center;flex:1}
+  .cert-sig-line{border-top:1px solid #b0c0cc;padding-top:5px;font-size:.72rem;color:#4a6070}
+  .cert-sig-name{font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:700;color:#0b1524}
+  .cert-center-bot{text-align:center;flex:1}
+  .cert-dist{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:#7a8fa6;margin-bottom:3px}
+  .cert-num{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:#b0c0cc;margin-top:6px}
+  /* Watermark */
+  .cert-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.04;font-family:'Rajdhani',sans-serif;font-size:8rem;font-weight:700;letter-spacing:.2em;color:#0b1524;transform:rotate(-30deg)}
+  @media print{.toolbar{display:none!important}.cert-wrap{padding:0}.cert{box-shadow:none;border:2px solid #0b2040;width:100%;max-width:none}body{background:white}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  </style>
+</head>
+<body>
+<div class="toolbar">
+  <div><div class="t-logo">HIBCW Member Certificate</div><div class="t-sub">Hawaii Island Business Crime Watch</div></div>
+  <div style="display:flex;gap:8px">
+    <button class="t-btn t-close" style="border:1px solid rgba(255,255,255,.15)" onclick="window.close()">← Back</button>
+    <button class="t-btn t-print" onclick="window.print()">🖨 Print Certificate</button>
+  </div>
+</div>
+
+<div class="cert-wrap">
+  <div class="cert">
+    <div class="cert-wm">HIBCW</div>
+    <div class="cert-inner">
+
+      <!-- Top -->
+      <div class="cert-top">
+        <div class="cert-org">A Program of the Korea Indonesia America Association (KIAA) · Hawaii Island</div>
+        <div class="cert-program">Hawaii Island Business Crime Watch</div>
+        <div class="cert-sub">HIBCW · Official Membership Certificate</div>
+      </div>
+
+      <!-- Shield -->
+      <img src="logo-shield.svg" alt="HIBCW Shield" style="width:64px;height:64px;flex-shrink:0;object-fit:contain">
+
+      <!-- Middle -->
+      <div class="cert-mid">
+        <div class="cert-presents">This certificate is proudly presented to</div>
+        <div class="cert-bizname" id="certBizName">Business Name</div>
+        <div class="cert-award">in recognition of joining the</div>
+        <div class="cert-body">
+          Hawaii Island Business Crime Watch Network — a community-led program dedicated to protecting Hawaii Island businesses through awareness, coordination, and cooperative safety.
+          <br><br>
+          This business is a registered member in good standing and is recognized as a participating partner in community safety.
+        </div>
+      </div>
+
+      <!-- Bottom -->
+      <div class="cert-bot">
+        <div class="cert-sig">
+          <div class="cert-sig-name" id="certCaptain">District Captain</div>
+          <div class="cert-sig-line">District Captain, HIBCW</div>
+        </div>
+        <div class="cert-center-bot">
+          <div class="cert-dist" id="certDistrict">District</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;color:#0b1524" id="certDate">Date</div>
+          <div class="cert-num" id="certNum">—</div>
+        </div>
+        <div class="cert-sig">
+          <div class="cert-sig-name">KIAA Program Office</div>
+          <div class="cert-sig-line">Hawaii Island · kiaahilo.org</div>
+        </div>
+      </div>
+
+    </div>
+    <!-- Corner ornaments bottom-left / top-right -->
+    <div style="position:absolute;bottom:12px;left:12px;width:80px;height:80px;border-bottom:3px solid #00c9a7;border-left:3px solid #00c9a7"></div>
+    <div style="position:absolute;top:12px;right:12px;width:80px;height:80px;border-top:3px solid #00c9a7;border-right:3px solid #00c9a7"></div>
+  </div>
+</div>
+
+<script>
+const p = new URLSearchParams(window.location.search);
+const name     = p.get('name')     || 'Business Name';
+const district = p.get('district') || '';
+const captain  = p.get('captain')  || 'District Captain';
+const date     = p.get('date')     || new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+document.getElementById('certBizName').textContent  = name;
+document.getElementById('certCaptain').textContent  = captain;
+document.getElementById('certDistrict').textContent = district;
+document.getElementById('certDate').textContent     = date;
+// Generate cert number: HIBCW-YYYY-XXXX
+const yr  = new Date().getFullYear();
+const num = Math.floor(10000 + Math.random() * 89999);
+document.getElementById('certNum').textContent = `Certificate No. HIBCW-${yr}-${num}`;
+</script>
+</body>
+</html>
