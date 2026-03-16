@@ -2611,6 +2611,9 @@
                 <button class="nav-btn superadmin-only" id="nav-admins" onclick="showView('admins')">🔐 Manage Admins</button>
                 <button class="nav-btn superadmin-only" id="nav-tracker" onclick="showView('tracker')">📊 Growth Tracker</button>
                 <button class="nav-btn" id="nav-resources" onclick="showView('resources')">📚 Resources</button>
+                <button class="nav-btn" id="nav-registry" onclick="showView('registry')">🏢 Business Registry
+                    <span class="nav-count" id="nc-registry">—</span>
+                </button>
                 <button class="nav-btn" id="nav-captains" onclick="showView('captains')" style="border-top:1px solid var(--b2);margin-top:6px;padding-top:10px">>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="13" height="15" style="display:inline-block;vertical-align:middle;margin-right:5px;flex-shrink:0;margin-bottom:1px" aria-hidden="true">
                         <path fill="currentColor" d="M24.21,70c0-.48-2.23-2.58-2.74-2.58-.2,0-.9-.4-1.56-.9-.86-.64-1.66-1-2.78-1.26-.87-.2-1.68-.3-1.8-.22-.12.07-.2.05-.16-.05.1-.35-.77-1.44-1.04-1.29-.14.08-.19.07-.1-.03.09-.1-.14-.6-.51-1.12-.94-1.31-1.13-2.14-.89-3.83.11-.78.31-2.29.45-3.36.13-1.06.45-2.68.7-3.6.54-1.96.46-2.79-.52-5.26-.5-1.26-.68-2.09-.69-3.22-.01-1.48-.03-1.52-.65-1.65-.98-.2-1.89-2.24-2.05-4.59-.14-2.05-.49-2.72-1.8-3.43-.44-.23-.83-.62-.88-.86-.05-.24-.38-.84-.74-1.33-.87-1.2-1.01-2.09-.55-3.59.6-1.98.95-2.52,2.65-4.06,1.16-1.05,1.85-1.5,2.44-1.6.76-.12.85-.22,1.08-1.18.4-1.61.67-2,2.72-3.96,1.39-1.33,1.91-1.98,1.91-2.39,0-.75-.84-2.11-1.17-1.9-.16.1-.2.06-.1-.09.09-.14-.29-.84-.84-1.57-1.71-2.26-1.97-2.96-1.97-5.32s.53-3.73,1.58-4.02c.98-.27,2.84-.13,3.63.28.41.21.9.33,1.08.26.18-.07.28-.04.21.06-.06.1.16.33.5.51.34.18.92.65,1.3,1.05.38.4,1.35,1.05,2.16,1.44.81.39,1.84,1.04,2.27,1.45,1.26,1.18,2.57,1.8,3.47,1.66,1.86-.3,5.2.87,11.57,4.06,5.03,2.52,6.46,3.46,8.82,5.86.93.94,1.78,1.66,1.88,1.59.11-.07.17-.03.14.07-.1.35.77,1.44,1.04,1.29.14-.08.19-.07.11.02-.08.09,0,.52.17.94.27.64.28,1.06.06,2.36-.23,1.39-.21,1.66.12,2.17.45.68,1.21,1.02,2.3,1.02,1.63,0,2.61.97,2.61,2.59,0,1.11.34,1.9,1.32,3,.46.52,1.16,1.35,1.55,1.83.5.62,1.07,1.01,1.93,1.31.68.23,1.67.67,2.22.96.55.3,1.11.47,1.25.39.14-.08.2-.08.12.01-.08.09-.01.53.14.98.66,1.91-.45,3.43-3.33,4.61-1.51.62-2.09,1.01-3.17,2.14-.72.76-1.26,1.46-1.2,1.57.06.1.03.16-.07.14s-.95.32-1.89.77c-.94.45-2.06.97-2.5,1.15-.44.18-1.44.9-2.22,1.61-.78.7-1.69,1.34-2,1.42-.67.17-2.18.02-3.97-.38-1.76-.4-2.41-.17-3.86,1.39-.79.85-1.71,1.55-2.5,1.91-.69.31-1.95,1.19-2.8,1.94s-1.75,1.37-2,1.37c-.65,0-1.84.66-1.67.92.08.12.04.2-.08.16-.41-.12-1.68,1.23-2.13,2.25-.25.56-.4,1.07-.34,1.13.06.06-.12.35-.4.66-.28.3-.63.98-.79,1.5-.18.6-.74,1.43-1.51,2.23-.67.7-1.46,1.63-1.75,2.07-.6.91-1.77,1.26-1.77.54h0Z"/>
@@ -2961,7 +2964,7 @@
                         </div>
 
                         <!-- Quick stats strip -->
-                        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px" id="captainDashStats"></div>
+                        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px" id="captainDashStats"></div>
 
                         <!-- Alert composer -->
                         <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px">
@@ -3002,6 +3005,11 @@
                         <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:14px;margin-bottom:20px">
                             <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:10px">🚨 Recent Incidents</div>
                             <div id="captainRecentInc"></div>
+                        </div>
+                        <!-- New business notifications -->
+                        <div id="captainBusinessNotifications" style="display:none;background:var(--navy2);border:1px solid rgba(245,166,35,.25);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:14px;margin-bottom:20px">
+                            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">🏢 New Business Registrations in Your District</div>
+                            <div id="captainBusinessList"></div>
                         </div>
                     </div>
                     <!-- Overview grid -->
@@ -3234,6 +3242,31 @@
                   </div>
                 </div>
 
+                <!-- BUSINESS REGISTRY VIEW -->
+                <div class="view" id="view-registry">
+                  <div class="page-hd">
+                    <div>
+                      <div class="page-title">🏢 Business Registry</div>
+                      <div class="page-sub" id="registrySubtitle">Registered businesses across all districts</div>
+                    </div>
+                    <div class="page-actions">
+                      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                        <input class="tb-search" id="registrySearch" placeholder="Search businesses…" oninput="renderRegistry()">
+                        <select class="tb-select" id="registryDistrictFilter" onchange="renderRegistry()" style="min-width:160px">
+                          <option value="">All Districts</option>
+                        </select>
+                        <select class="tb-select" id="registryStatusFilter" onchange="renderRegistry()" style="min-width:130px">
+                          <option value="">All Statuses</option>
+                          <option value="pending">Pending</option>
+                          <option value="approved">Approved</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="registryBody" style="padding:16px 24px 32px"></div>
+                </div>
+
                 <!-- RESOURCES VIEW -->
                 <div class="view" id="view-resources">
                   <div style="padding:24px 24px 16px">
@@ -3340,6 +3373,14 @@
         <button class="lb-close" onclick="closeLightbox()">✕</button>
         <img id="lbImg" src="" alt="" style="display:none">
         <video id="lbVid" src="" controls style="display:none"></video>
+    </div>
+
+    <!-- BUSINESS REGISTRY DETAIL MODAL -->
+    <div class="overlay" id="registryDetailModal" onclick="if(event.target===this)closeModal('registryDetailModal')" style="display:none;z-index:9999">
+      <div class="modal" style="max-width:540px;padding:24px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:var(--white);margin-bottom:16px">🏢 Business Details</div>
+        <div id="registryDetailBody"></div>
+      </div>
     </div>
 
     <!-- TOAST -->
@@ -3696,6 +3737,14 @@
         await loadAll();
         await loadMembers();
         await loadApplications();
+        // Load registry count for nav badge
+        sb.from('business_registry').select('id,status',{count:'exact'})
+          .eq('status','pending').then(({count}) => {
+            const el = document.getElementById('nc-registry');
+            if (el) el.textContent = count || '—';
+          });
+        loadRegistry(); // non-blocking — loads in background
+        await loadRegistryBadge();
         // Populate district filter selects
         ['active', 'archived', 'all'].forEach(v => {
             const el = document.getElementById('district-' + v);
@@ -3827,6 +3876,8 @@
             loadAdmins();
         } else if (v === 'tracker') {
             initTracker();
+        } else if (v === 'registry') {
+            loadRegistry();
         } else if (v === 'resources') {
             renderResources();
         } else {
@@ -7273,6 +7324,227 @@
         a.click();
     }
 
+    async function loadRegistryBadge() {
+        try {
+            let q = sb.from('business_registry').select('id',{count:'exact',head:true}).eq('status','pending');
+            if (currentRole === 'captain') q = q.eq('district', captainDistrict);
+            const {count} = await q;
+            const el = document.getElementById('nc-registry');
+            if (el) el.textContent = count || '—';
+        } catch(e) {}
+    }
+
+    /* ════════════════════════════════════════════════════
+       BUSINESS REGISTRY
+    ════════════════════════════════════════════════════ */
+    let registryList = [];
+
+    async function loadRegistry() {
+        // Populate district filter
+        const df = document.getElementById('registryDistrictFilter');
+        if (df && df.options.length === 1) {
+            KIAA_DISTRICTS.forEach(d => {
+                const o = document.createElement('option');
+                o.value = d.id; o.textContent = d.label;
+                df.appendChild(o);
+            });
+        }
+        try {
+            const {data, error} = await sb.from('business_registry')
+                .select('*').order('submitted_at', {ascending:false});
+            if (error) throw error;
+            registryList = data || [];
+            updateRegistryCount();
+            renderRegistry();
+        } catch(e) {
+            document.getElementById('registryBody').innerHTML =
+                `<div style="color:var(--slate2);font-size:.85rem;padding:20px 0">Could not load business registry: ${esc(e.message)}</div>`;
+        }
+    }
+
+    function updateRegistryCount() {
+        const el = document.getElementById('nc-registry');
+        if (el) el.textContent = registryList.filter(b=>b.status==='pending').length || '—';
+    }
+
+    function renderRegistry() {
+        const el = document.getElementById('registryBody');
+        if (!el) return;
+        const q    = (document.getElementById('registrySearch')?.value||'').toLowerCase().trim();
+        const dist = document.getElementById('registryDistrictFilter')?.value||'';
+        const stat = document.getElementById('registryStatusFilter')?.value||'';
+
+        let filtered = registryList.filter(b => {
+            if (dist && b.district !== dist) return false;
+            if (stat && b.status !== stat) return false;
+            if (q && ![b.business_name,b.contact_name,b.email,b.city,b.business_type,b.full_address]
+                .filter(Boolean).join(' ').toLowerCase().includes(q)) return false;
+            // Captains only see their district
+            if (currentRole === 'captain' && b.district !== captainDistrict) return false;
+            return true;
+        });
+
+        const subtitle = document.getElementById('registrySubtitle');
+        if (subtitle) subtitle.textContent = `${filtered.length} business${filtered.length!==1?'es':''} · ${registryList.filter(b=>b.status==='pending').length} pending`;
+
+        if (!filtered.length) {
+            el.innerHTML = `<div style="color:var(--slate2);font-style:italic;font-size:.85rem;padding:20px 0">No businesses match the current filters.</div>`;
+            return;
+        }
+
+        el.innerHTML = `
+          <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 120px 140px;background:var(--navy3);padding:9px 16px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);border-bottom:2px solid var(--border)">
+              <div>Business</div><div>Type</div><div>District</div><div>Contact</div><div>Status</div><div>Actions</div>
+            </div>
+            ${filtered.map((b,i) => {
+              const distColor = KIAA_DISTRICTS.find(d=>d.id===b.district)?.color || 'var(--teal)';
+              const statusColor = b.status==='approved'?'var(--teal)':b.status==='rejected'?'var(--red)':'var(--gold)';
+              const packetBadge = b.packet_sent_at
+                ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;background:rgba(0,201,167,.1);color:var(--teal);border-radius:3px;padding:1px 5px;margin-left:4px">📦 ${new Date(b.packet_sent_at).toLocaleDateString()}</span>`
+                : '';
+              return `
+              <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 120px 140px;padding:11px 16px;border-bottom:${i<filtered.length-1?'1px solid var(--b2)':'none'};align-items:center;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
+                <div>
+                  <div style="font-weight:500;color:var(--white);font-size:.84rem">${esc(b.business_name)}${packetBadge}</div>
+                  <div style="font-size:.72rem;color:var(--slate);margin-top:2px">${esc(b.city||'')}${b.zip?' '+b.zip:''}</div>
+                </div>
+                <div style="font-size:.78rem;color:var(--white)">${esc(b.business_type||'—')}</div>
+                <div><span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;background:${distColor}15;color:${distColor};border:1px solid ${distColor}33;border-radius:3px;padding:2px 6px">${esc(KIAA_DISTRICTS.find(d=>d.id===b.district)?.label||b.district||'—')}</span></div>
+                <div>
+                  <div style="font-size:.78rem;color:var(--white)">${esc(b.contact_name||'—')}</div>
+                  <div style="font-size:.7rem;color:var(--slate)">${b.phone?fmtPhone(b.phone):''}</div>
+                </div>
+                <div><span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;background:${statusColor}15;color:${statusColor};border:1px solid ${statusColor}33;border-radius:3px;padding:2px 7px;text-transform:capitalize">${b.status}</span></div>
+                <div style="display:flex;gap:5px;flex-wrap:wrap">
+                  <button onclick="openRegistryDetail('${b.id}')" style="background:transparent;border:1px solid var(--b2);border-radius:4px;padding:4px 9px;color:var(--slate);font-size:.68rem;cursor:pointer;transition:all .15s;font-family:'IBM Plex Mono',monospace" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">View</button>
+                  ${b.status==='pending' ? `<button onclick="approveRegistry('${b.id}')" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);border-radius:4px;padding:4px 8px;color:var(--teal);font-size:.68rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✓</button>
+                  <button onclick="rejectRegistry('${b.id}')" style="background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:4px;padding:4px 8px;color:var(--red);font-size:.68rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕</button>` : ''}
+                  ${b.status==='approved' && !b.packet_sent_at ? `<button onclick="generatePacket('${b.id}')" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:4px;padding:4px 8px;color:var(--gold);font-size:.68rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">📦 Packet</button>` : ''}
+                </div>
+              </div>`;
+            }).join('')}
+          </div>`;
+    }
+
+    function openRegistryDetail(id) {
+        const b = registryList.find(b=>b.id===id);
+        if (!b) return;
+        const distColor = KIAA_DISTRICTS.find(d=>d.id===b.district)?.color || 'var(--teal)';
+        const distLabel = KIAA_DISTRICTS.find(d=>d.id===b.district)?.label || b.district || '—';
+        openModal('registryDetailModal');
+        document.getElementById('registryDetailBody').innerHTML = `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Business</div>
+              <div style="font-size:1rem;font-weight:600;color:var(--white)">${esc(b.business_name)}</div>
+              <div style="font-size:.78rem;color:var(--slate);margin-top:2px">${esc(b.business_type||'—')}</div>
+            </div>
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">District</div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:.72rem;background:${distColor}15;color:${distColor};border:1px solid ${distColor}33;border-radius:3px;padding:3px 8px">${esc(distLabel)}</span>
+              ${b.captain_name ? `<div style="font-size:.75rem;color:var(--slate);margin-top:4px">👮 ${esc(b.captain_name)}</div>` : ''}
+            </div>
+          </div>
+          <div style="background:var(--navy3);border-radius:6px;padding:12px 14px;margin-bottom:14px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:8px">Address</div>
+            <div style="font-size:.84rem;color:var(--white)">${esc(b.full_address||[b.street_address,b.city,'HI',b.zip].filter(Boolean).join(', '))}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div style="background:var(--navy3);border-radius:6px;padding:10px 12px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:6px">Contact</div>
+              <div style="font-size:.84rem;font-weight:500;color:var(--white)">${esc(b.contact_name||'—')}</div>
+              <div style="font-size:.76rem;color:var(--slate);margin-top:2px">${b.phone?fmtPhone(b.phone):'—'}</div>
+              <div style="font-size:.76rem;color:var(--teal);margin-top:2px">${esc(b.email||'')}</div>
+            </div>
+            <div style="background:var(--navy3);border-radius:6px;padding:10px 12px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:6px">Details</div>
+              <div style="font-size:.78rem;color:var(--white)">${b.employees?'👥 '+esc(b.employees):'—'}</div>
+              ${b.website?`<a href="${esc(b.website)}" target="_blank" style="font-size:.72rem;color:var(--teal);text-decoration:none;display:block;margin-top:3px">🌐 ${esc(b.website)}</a>`:''}
+            </div>
+          </div>
+          ${b.notes?`<div style="background:var(--navy3);border-radius:6px;padding:10px 12px;margin-bottom:14px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Notes</div><div style="font-size:.8rem;color:var(--white);line-height:1.6">${esc(b.notes)}</div></div>`:''}
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap">
+            ${b.status==='pending'?`
+              <button onclick="approveRegistry('${b.id}');closeModal('registryDetailModal')" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:8px 16px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">✅ Approve</button>
+              <button onclick="rejectRegistry('${b.id}');closeModal('registryDetailModal')" style="background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:8px 16px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">❌ Reject</button>`:''}
+            ${b.status==='approved'&&!b.packet_sent_at?`<button onclick="generatePacket('${b.id}');closeModal('registryDetailModal')" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:8px 16px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">📦 Generate Packet</button>`:''}
+            ${b.packet_sent_at?`<span style="font-size:.75rem;color:var(--teal);display:flex;align-items:center;gap:4px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</span>`:''}
+            <button onclick="closeModal('registryDetailModal')" style="background:transparent;border:1px solid var(--b2);border-radius:5px;padding:8px 16px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">Close</button>
+          </div>`;
+    }
+
+    async function approveRegistry(id) {
+        if (!confirm('Approve this business registration?')) return;
+        const {error} = await sb.from('business_registry').update({
+            status:'approved', approved_at:new Date().toISOString(), approved_by:currentUserName
+        }).eq('id',id);
+        if (!error) {
+            const b = registryList.find(b=>b.id===id);
+            if (b) { b.status='approved'; b.approved_at=new Date().toISOString(); }
+            renderRegistry(); updateRegistryCount();
+            showToast('✅','Business approved!');
+            // Notify captain dashboard
+            notifyCaptainNewBusiness(id);
+        } else showToast('⚠️',error.message,'err');
+    }
+
+    async function rejectRegistry(id) {
+        if (!confirm('Reject this business registration?')) return;
+        const {error} = await sb.from('business_registry').update({status:'rejected'}).eq('id',id);
+        if (!error) {
+            const b = registryList.find(b=>b.id===id);
+            if (b) b.status = 'rejected';
+            renderRegistry(); updateRegistryCount();
+            showToast('❌','Business registration rejected.');
+        } else showToast('⚠️',error.message,'err');
+    }
+
+    async function notifyCaptainNewBusiness(id) {
+        const b = registryList.find(b=>b.id===id);
+        if (!b || !b.district) return;
+        try {
+            await sb.from('captain_notifications').insert({
+                district:    b.district,
+                type:        'new_business',
+                title:       'New Business Registered',
+                message:     `${b.business_name} in ${b.city||''} has been approved and added to your district registry.`,
+                business_id: b.id,
+                created_at:  new Date().toISOString(),
+                read:        false,
+            });
+        } catch(e) { console.log('Captain notification:', e.message); }
+    }
+
+    async function generatePacket(id) {
+        const b = registryList.find(b=>b.id===id);
+        if (!b) return;
+        // Open the packet print page in a new tab with business data encoded
+        const params = new URLSearchParams({
+            id:      b.id,
+            name:    b.business_name||'',
+            contact: b.contact_name||'',
+            address: b.full_address||[b.street_address,b.city,'HI',b.zip].filter(Boolean).join(', '),
+            district:KIAA_DISTRICTS.find(d=>d.id===b.district)?.label||b.district||'',
+            captain: b.captain_name||'',
+            phone:   b.phone?fmtPhone(b.phone):'',
+            email:   b.email||'',
+            type:    b.business_type||'',
+            distId:  b.district||'',
+        });
+        window.open(`packet-print.html?${params.toString()}`, '_blank', 'noopener');
+        // Mark packet as sent
+        const {error} = await sb.from('business_registry').update({
+            packet_sent_at: new Date().toISOString()
+        }).eq('id',id);
+        if (!error) {
+            const reg = registryList.find(r=>r.id===id);
+            if (reg) reg.packet_sent_at = new Date().toISOString();
+            renderRegistry();
+            showToast('📦','Packet generated! Mark as sent after printing.');
+        }
+    }
+
     /* ════════════════════════════════════════════════════
        RESOURCES
     ════════════════════════════════════════════════════ */
@@ -7727,6 +7999,8 @@
         const thisWeek = distInc.filter(i => new Date(i.occurred_at) >= weekStart).length;
         const today = distInc.filter(i => new Date(i.occurred_at) >= todayStart).length;
         const memCount = memberList.filter(m => m.district === captainDistrict).length;
+        const regCount = registryList.filter(b => b.district === captainDistrict && b.status === 'approved').length;
+        const pendingReg = registryList.filter(b => b.district === captainDistrict && b.status === 'pending').length;
 
         const statsEl = document.getElementById('captainDashStats');
         if (statsEl) {
@@ -7740,7 +8014,8 @@
             tile(active, 'Active', true) +
             tile(thisMonth, 'Month', false) +
             tile(thisWeek, 'Week', false) +
-            tile(memCount, 'Members', false);
+            tile(memCount, 'Members', false) +
+            tile(regCount + (pendingReg ? ` <span style="font-size:.9rem;color:var(--gold)">(${pendingReg})</span>` : ''), 'Businesses', false);
         }
 
         // Recent incidents (last 8 in district)
@@ -7778,11 +8053,44 @@
 
         // Load alerts
         loadDistrictAlerts();
+
+        // Load new business notifications for this captain's district
+        loadCaptainBusinessNotifications();
+    }
+
+    async function loadCaptainBusinessNotifications() {
+        const wrap = document.getElementById('captainBusinessNotifications');
+        const list = document.getElementById('captainBusinessList');
+        if (!wrap || !list || !captainDistrict) return;
+        try {
+            const {data} = await sb.from('business_registry')
+                .select('id,business_name,city,business_type,submitted_at,status,packet_sent_at')
+                .eq('district', captainDistrict)
+                .order('submitted_at', {ascending:false})
+                .limit(5);
+            const recent = (data||[]).filter(b => {
+                const days = (Date.now() - new Date(b.submitted_at)) / 864e5;
+                return b.status === 'pending' || days <= 30;
+            });
+            if (!recent.length) { wrap.style.display = 'none'; return; }
+            wrap.style.display = 'block';
+            list.innerHTML = recent.map(b => `
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--b2);gap:10px">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:.82rem;font-weight:500;color:var(--white)">${esc(b.business_name)}</div>
+                  <div style="font-size:.7rem;color:var(--slate)">${esc(b.business_type||'')}${b.city?' · '+esc(b.city):''}</div>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;padding:2px 7px;border-radius:3px;border:1px solid;white-space:nowrap;
+                  color:${b.status==='approved'?'var(--teal)':b.status==='pending'?'var(--gold)':'var(--red)'};
+                  background:${b.status==='approved'?'rgba(0,201,167,.1)':b.status==='pending'?'rgba(245,166,35,.1)':'rgba(232,65,90,.1)'};
+                  border-color:${b.status==='approved'?'rgba(0,201,167,.3)':b.status==='pending'?'rgba(245,166,35,.3)':'rgba(232,65,90,.3)'}">${b.status}${b.packet_sent_at?' · 📦':''}
+                </span>
+              </div>`).join('');
+        } catch(e) { wrap.style.display = 'none'; }
     }
 
     /* ════════════════════════════════════════════════════
        DISTRICT ALERTS
-    ════════════════════════════════════════════════════ */
     async function loadDistrictAlerts() {
         if (!sb || !captainDistrict)
             return;
