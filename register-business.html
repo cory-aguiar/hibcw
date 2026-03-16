@@ -608,7 +608,7 @@
                     Street Address 
                     <span class="req">*</span>
                 </label>
-                <input type="text" id="bStreet" placeholder="123 Kamehameha Ave">
+                <input type="text" id="bStreet" placeholder="123 Kamehameha Ave" oninput="onAddressChange()">
             </div>
 
             <div class="fld-row">
@@ -617,14 +617,14 @@
                         City 
                         <span class="req">*</span>
                     </label>
-                    <input type="text" id="bCity" placeholder="Hilo">
+                    <input type="text" id="bCity" placeholder="Hilo" oninput="onAddressChange()">
                 </div>
                 <div class="fld" style="margin-bottom:0">
                     <label>
                         ZIP Code 
                         <span class="req">*</span>
                     </label>
-                    <input type="text" id="bZip" placeholder="96720" maxlength="10">
+                    <input type="text" id="bZip" placeholder="96720" maxlength="10" oninput="onAddressChange()">
                 </div>
             </div>
 
@@ -766,7 +766,7 @@
         input.value = v;
     }
 
-    // ── Auto-detect district from address via geocoding ────
+    // ── Auto-detect district from address ─────────────────
     let geocodeTimer;
     let detectedDistrict = null;
     let captainName = null;
@@ -777,7 +777,7 @@
         const city = document.getElementById('bCity').value.trim();
         const zip = document.getElementById('bZip').value.replace(/\D/g, '').substring(0, 5);
 
-        // Try ZIP-only detection immediately (no API call)
+        // Try ZIP-only detection immediately (no API call needed)
         if (zip.length === 5) {
             const zipDistrictMap = {
                 '96710': 'hamakua',
@@ -806,27 +806,24 @@
                 '96755': 'north-kohala',
             };
             const zipDistrict = zipDistrictMap[zip];
-            if (zipDistrict) {
+            if (zipDistrict && zipDistrict !== detectedDistrict) {
                 detectedDistrict = zipDistrict;
                 showDistrictPreview(zipDistrict);
                 lookupCaptain(zipDistrict);
             }
         }
 
-        // Still queue full geocode for precise GPS-based detection
+        // Queue full GPS geocode for precise confirmation (runs after user stops typing)
         if (street && city) {
-            document.getElementById('districtDisplayWrap').style.display = 'block';
-            document.getElementById('districtFallbackWrap').style.display = 'none';
             if (!detectedDistrict) {
+                document.getElementById('districtDisplayWrap').style.display = 'block';
+                document.getElementById('districtFallbackWrap').style.display = 'none';
                 document.getElementById('districtDisplayText').textContent = 'Detecting district…';
             }
             geocodeTimer = setTimeout(geocodeAddress, 900);
         }
     }
 
-    document.getElementById('bStreet').addEventListener('input', onAddressChange);
-    document.getElementById('bCity').addEventListener('input', onAddressChange);
-    document.getElementById('bZip').addEventListener('input', onAddressChange);
 
     async function geocodeAddress() {
         const street = document.getElementById('bStreet').value.trim();
