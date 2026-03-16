@@ -2466,9 +2466,9 @@ async function deleteMobMilestone(id) {
 let mobRegistryList = [];
 
 async function loadMobRegistry() {
-  // Populate district filter
+  // Populate district filter — admins/superadmins only
   const df = document.getElementById('mobRegDistrict');
-  if (df && df.options.length === 1) {
+  if (df && df.options.length === 1 && currentRole !== 'captain') {
     const dists = [
       ['hamakua','D1 — Hāmākua'],['north-hilo','D2 — North Hilo'],['south-hilo','D3 — South Hilo'],
       ['lower-puna','D4 — Lower Puna'],['upper-puna','D5 — Upper Puna'],['kau','D6 — Kaʻū'],
@@ -2476,9 +2476,17 @@ async function loadMobRegistry() {
     ];
     dists.forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;df.appendChild(o);});
   }
+  // Hide district filter for captains
+  if (currentRole === 'captain' && df) df.style.display = 'none';
+
   document.getElementById('mobRegistryList').innerHTML = '<div style="color:var(--slate2);font-size:.78rem;padding:8px 0">Loading…</div>';
   try {
-    const {data,error} = await sb.from('business_registry').select('*').order('submitted_at',{ascending:false});
+    let query = sb.from('business_registry').select('*').order('submitted_at',{ascending:false});
+    // Server-side district filter for captains
+    if (currentRole === 'captain' && captainDistrict) {
+      query = query.eq('district', captainDistrict);
+    }
+    const {data,error} = await query;
     if (error) throw error;
     mobRegistryList = data || [];
     const subtitle = document.getElementById('mobRegistrySubtitle');
