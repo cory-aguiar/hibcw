@@ -3173,6 +3173,8 @@
                           <option value="approved">Approved</option>
                           <option value="rejected">Rejected</option>
                         </select>
+                        <button class="btn btn-ghost btn-lg" onclick="exportRegistryCSV()" title="Export visible rows to CSV">⬇ Export CSV</button>
+                        <button class="btn btn-ghost btn-lg" onclick="printRegistry()" title="Print business registry">🖨 Print</button>
                       </div>
                     </div>
                   </div>
@@ -6188,6 +6190,7 @@
             </div>
             <div style="padding:12px 22px;border-top:1px solid var(--b2);display:flex;gap:8px;align-items:center;flex-shrink:0" class="captain-hidden">
               <button onclick="showView('registry');closeDistBizModal()" style="background:transparent;border:1px solid var(--teal);border-radius:5px;padding:6px 14px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.64rem;cursor:pointer">📋 Open Full Registry</button>
+              <button onclick="printDistrictBusinesses()" style="background:transparent;border:1px solid var(--b2);border-radius:5px;padding:6px 14px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.64rem;cursor:pointer" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">🖨 Print</button>
             </div>
           </div>`;
         modal.style.display = 'flex';
@@ -6200,7 +6203,7 @@
         if (!businesses.length) return '';
         return businesses.map(b => {
             const sc = b.status==='approved'?'var(--teal)':b.status==='pending'?'var(--gold)':'var(--red)';
-            return `<tr data-name="${esc((b.business_name||'').toLowerCase())}" data-type="${esc((b.business_type||'').toLowerCase())}" data-contact="${esc((b.contact_name||'').toLowerCase())}" data-status="${b.status||''}" style="border-bottom:1px solid var(--b2);transition:background .12s" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
+            return `<tr data-id="${b.id}" data-name="${esc((b.business_name||'').toLowerCase())}" data-type="${esc((b.business_type||'').toLowerCase())}" data-contact="${esc((b.contact_name||'').toLowerCase())}" data-status="${b.status||''}" style="border-bottom:1px solid var(--b2);transition:background .12s" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
               <td style="padding:10px 14px">
                 <div style="font-size:.84rem;font-weight:500;color:var(--white)">${esc(b.business_name||'—')}</div>
                 <div style="font-size:.7rem;color:var(--slate);margin-top:1px">${esc(b.city||'')}${b.zip?' '+b.zip:''}</div>
@@ -6234,9 +6237,189 @@
         });
     }
 
-    function closeDistBizModal() {
+    function exportRegistryCSV() {
+        const search = (document.getElementById('registrySearch')?.value||'').toLowerCase().trim();
+        const distF  = document.getElementById('registryDistrictFilter')?.value||'';
+        const statF  = document.getElementById('registryStatusFilter')?.value||'';
+
+        const rows = registryList.filter(b => {
+            const matchQ = !search || (b.business_name||'').toLowerCase().includes(search) || (b.contact_name||'').toLowerCase().includes(search) || (b.city||'').toLowerCase().includes(search);
+            const matchD = !distF  || b.district === distF;
+            const matchS = !statF  || b.status   === statF;
+            return matchQ && matchD && matchS;
+        });
+
+        const distLabel = id => KIAA_DISTRICTS.find(d=>d.id===id)?.label || id || '';
+        const headers   = ['Business Name','Type','Status','District','Street Address','City','ZIP','Contact Name','Phone','Email','Employees','Website','Captain','Submitted','Approved','Packet Sent','Notes'];
+        const csvRows   = [headers, ...rows.map(b => [
+            b.business_name||'', b.business_type||'', b.status||'', distLabel(b.district),
+            b.street_address||'', b.city||'', b.zip||'',
+            b.contact_name||'', b.phone?fmtPhone(b.phone):'', b.email||'',
+            b.employees||'', b.website||'', b.captain_name||'',
+            b.submitted_at?new Date(b.submitted_at).toLocaleDateString():'',
+            b.approved_at?new Date(b.approved_at).toLocaleDateString():'',
+            b.packet_sent_at?new Date(b.packet_sent_at).toLocaleDateString():'',
+            (b.notes||'').replace(/\n/g,' ')
+        ].map(v => `"${String(v).replace(/"/g,'""')}"`))];
+
+        const csv  = csvRows.map(r=>r.join(',')).join('\n');
+        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `HIBCW_BusinessRegistry_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function printRegistry() {
+        const search = (document.getElementById('registrySearch')?.value||'').toLowerCase().trim();
+        const distF  = document.getElementById('registryDistrictFilter')?.value||'';
+        const statF  = document.getElementById('registryStatusFilter')?.value||'';
+
+        const rows = registryList.filter(b => {
+            const matchQ = !search || (b.business_name||'').toLowerCase().includes(search) || (b.contact_name||'').toLowerCase().includes(search) || (b.city||'').toLowerCase().includes(search);
+            const matchD = !distF  || b.district === distF;
+            const matchS = !statF  || b.status   === statF;
+            return matchQ && matchD && matchS;
+        });
+
+        const distLabel = id => KIAA_DISTRICTS.find(d=>d.id===id)?.label || id || '';
+        const sc = s => s==='approved'?'#00c9a7':s==='pending'?'#f5a623':'#e8415a';
+        const title = [distF?distLabel(distF):'All Districts', statF||'All Statuses'].filter(Boolean).join(' · ');
+
+        const html = `<!DOCTYPE html><html><head><title>HIBCW Business Registry</title>
+        <style>
+          body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#0f1e2e;font-size:11px}
+          .header{display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid #00c9a7;padding-bottom:10px;margin-bottom:16px}
+          .org{font-size:9px;color:#7a8fa6;letter-spacing:.1em;text-transform:uppercase}
+          .title{font-size:16px;font-weight:700;color:#0b1524}
+          .sub{font-size:10px;color:#4a6070;margin-top:2px}
+          table{width:100%;border-collapse:collapse}
+          th{background:#0b1524;color:#eef3f8;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:6px 8px;text-align:left;font-weight:600}
+          td{padding:6px 8px;border-bottom:1px solid #dde6ee;vertical-align:top}
+          tr:nth-child(even) td{background:#f7f9fc}
+          .badge{display:inline-block;border-radius:3px;padding:1px 6px;font-size:9px;font-weight:600;text-transform:capitalize}
+          .footer{margin-top:16px;font-size:9px;color:#7a8fa6;display:flex;justify-content:space-between;border-top:1px solid #dde6ee;padding-top:8px}
+          @media print{body{padding:12px}}
+        </style></head><body>
+        <div class="header">
+          <div>
+            <div class="org">Hawaii Island Business Crime Watch · HIBCW</div>
+            <div class="title">Business Registry</div>
+            <div class="sub">${esc(title)} · ${rows.length} business${rows.length!==1?'es':''}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="org">Printed ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+            <div class="org">CONFIDENTIAL — For authorized use only</div>
+          </div>
+        </div>
+        <table>
+          <thead><tr>
+            <th>#</th><th>Business</th><th>Type</th><th>District</th>
+            <th>Contact</th><th>Phone</th><th>Status</th><th>Packet</th>
+          </tr></thead>
+          <tbody>
+            ${rows.map((b,i)=>`<tr>
+              <td style="color:#7a8fa6;width:28px">${i+1}</td>
+              <td><strong>${esc(b.business_name||'—')}</strong><br><span style="color:#7a8fa6">${esc(b.city||'')}${b.zip?' '+b.zip:''}</span></td>
+              <td>${esc(b.business_type||'—')}</td>
+              <td>${esc(distLabel(b.district))}</td>
+              <td>${esc(b.contact_name||'—')}</td>
+              <td style="white-space:nowrap">${b.phone?fmtPhone(b.phone):'—'}</td>
+              <td><span class="badge" style="background:${sc(b.status)}22;color:${sc(b.status)};border:1px solid ${sc(b.status)}55">${b.status||'—'}</span></td>
+              <td style="color:${b.packet_sent_at?'#00c9a7':'#7a8fa6'}">${b.packet_sent_at?new Date(b.packet_sent_at).toLocaleDateString():'—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        <div class="footer">
+          <span>HIBCW · Hawaii Island Business Crime Watch · A Program of KIAA · kiaahilo.org</span>
+          <span>Crime Stoppers (808) 961-8300 · HPD Non-Emergency (808) 935-3311</span>
+        </div>
+        <script>window.onload=()=>window.print();<\/script>
+        </body></html>`;
+
+        const win = window.open('','_blank','width=1000,height=700');
+        if (!win) { showToast('⚠️','Pop-ups blocked — please allow pop-ups and try again.','err'); return; }
+        win.document.write(html);
+        win.document.close();
+    }
+
+    function printDistrictBusinesses() {
         const modal = document.getElementById('districtBusinessesModal');
-        if (modal) modal.style.display = 'none';
+        if (!modal) return;
+        const distId    = modal._distId;
+        const distLabel = KIAA_DISTRICTS.find(d=>d.id===distId)?.label || distId || 'District';
+        const distColor = KIAA_DISTRICTS.find(d=>d.id===distId)?.color || '#00c9a7';
+
+        // Use currently visible (filtered) rows
+        const rows = [];
+        document.querySelectorAll('#distBizTbody tr').forEach(tr => {
+            if (tr.style.display === 'none') return;
+            const id = tr.dataset.id;
+            const b  = registryList.find(b=>b.id===id);
+            if (b) rows.push(b);
+        });
+
+        // Fallback: use full district list if no data-id on rows
+        const businesses = rows.length ? rows : (modal._businesses || registryList.filter(b=>b.district===distId));
+        const sc = s => s==='approved'?'#00c9a7':s==='pending'?'#f5a623':'#e8415a';
+
+        const html = `<!DOCTYPE html><html><head><title>HIBCW ${esc(distLabel)} Businesses</title>
+        <style>
+          body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#0f1e2e;font-size:11px}
+          .header{display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid ${distColor};padding-bottom:10px;margin-bottom:16px}
+          .org{font-size:9px;color:#7a8fa6;letter-spacing:.1em;text-transform:uppercase}
+          .title{font-size:16px;font-weight:700;color:#0b1524}
+          .sub{font-size:10px;color:#4a6070;margin-top:2px}
+          table{width:100%;border-collapse:collapse}
+          th{background:#0b1524;color:#eef3f8;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:6px 8px;text-align:left;font-weight:600}
+          td{padding:6px 8px;border-bottom:1px solid #dde6ee;vertical-align:top}
+          tr:nth-child(even) td{background:#f7f9fc}
+          .badge{display:inline-block;border-radius:3px;padding:1px 6px;font-size:9px;font-weight:600;text-transform:capitalize}
+          .footer{margin-top:16px;font-size:9px;color:#7a8fa6;display:flex;justify-content:space-between;border-top:1px solid #dde6ee;padding-top:8px}
+          @media print{body{padding:12px}}
+        </style></head><body>
+        <div class="header">
+          <div>
+            <div class="org">Hawaii Island Business Crime Watch · HIBCW</div>
+            <div class="title">${esc(distLabel)} — Business Roster</div>
+            <div class="sub">${businesses.length} registered business${businesses.length!==1?'es':''}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="org">Printed ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+            <div class="org">CONFIDENTIAL — For authorized use only</div>
+          </div>
+        </div>
+        <table>
+          <thead><tr>
+            <th>#</th><th>Business</th><th>Type</th>
+            <th>Contact</th><th>Phone</th><th>Email</th><th>Status</th><th>Packet</th>
+          </tr></thead>
+          <tbody>
+            ${businesses.map((b,i)=>`<tr>
+              <td style="color:#7a8fa6;width:28px">${i+1}</td>
+              <td><strong>${esc(b.business_name||'—')}</strong><br><span style="color:#7a8fa6">${esc(b.city||'')}${b.zip?' '+b.zip:''}</span></td>
+              <td>${esc(b.business_type||'—')}</td>
+              <td>${esc(b.contact_name||'—')}</td>
+              <td style="white-space:nowrap">${b.phone?fmtPhone(b.phone):'—'}</td>
+              <td style="color:#0b4a3f">${esc(b.email||'—')}</td>
+              <td><span class="badge" style="background:${sc(b.status)}22;color:${sc(b.status)};border:1px solid ${sc(b.status)}55">${b.status||'—'}</span></td>
+              <td style="color:${b.packet_sent_at?'#00c9a7':'#7a8fa6'}">${b.packet_sent_at?new Date(b.packet_sent_at).toLocaleDateString():'—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        <div class="footer">
+          <span>HIBCW · Hawaii Island Business Crime Watch · A Program of KIAA · kiaahilo.org</span>
+          <span>Crime Stoppers (808) 961-8300 · HPD Non-Emergency (808) 935-3311</span>
+        </div>
+        <script>window.onload=()=>window.print();<\/script>
+        </body></html>`;
+
+        const win = window.open('','_blank','width=1000,height=700');
+        if (!win) { showToast('⚠️','Pop-ups blocked — please allow pop-ups and try again.','err'); return; }
+        win.document.write(html);
+        win.document.close();
     }
 
     function printDistrictRoster() {
@@ -6384,6 +6567,11 @@
         const win = window.open('', '_blank', 'width=1000,height=700');
         win.document.write(html);
         win.document.close();
+    }
+
+    function closeDistBizModal() {
+        const modal = document.getElementById('districtBusinessesModal');
+        if (modal) modal.style.display = 'none';
     }
 
     /* ─── Set Captain Modal ──────────────────────────────────── */
