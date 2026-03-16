@@ -590,6 +590,50 @@ body.light .strip-cell{background:#fff}
           </a>
         </div>
 
+        <div class="more-section-title admin-only">🏢 Business Registry</div>
+        <div class="more-card admin-only">
+          <div class="more-row" onclick="showMobRegistry()">
+            <div class="more-ico">🏢</div>
+            <div><div class="more-label">View Registry</div><div class="more-sub" id="mobRegistrySubtitle">Loading…</div></div>
+            <div class="more-arrow">›</div>
+          </div>
+        </div>
+
+        <!-- Registry screen (slides in) -->
+        <div id="mobRegistryScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:500;overflow-y:auto;padding-bottom:80px">
+          <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+            <button onclick="closeMobRegistry()" style="background:none;border:none;color:var(--teal);font-size:.9rem;cursor:pointer;padding:2px 6px">‹ Back</button>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">Business Registry</div>
+            <button onclick="loadMobRegistry()" style="background:none;border:none;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer">🔄 Refresh</button>
+          </div>
+          <div style="padding:10px 12px">
+            <input class="srch" id="mobRegSearch" placeholder="🔍 Search businesses…" oninput="renderMobRegistry()" style="width:100%;margin-bottom:8px">
+            <div style="display:flex;gap:6px;margin-bottom:10px">
+              <select id="mobRegStatus" onchange="renderMobRegistry()" style="flex:1;background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 10px;color:var(--white);font-size:.78rem">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <select id="mobRegDistrict" onchange="renderMobRegistry()" style="flex:1;background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 10px;color:var(--white);font-size:.78rem">
+                <option value="">All Districts</option>
+              </select>
+            </div>
+          </div>
+          <div id="mobRegistryList" style="padding:0 12px 12px"></div>
+        </div>
+
+        <!-- Business detail sheet -->
+        <div id="mobBizSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;display:none;flex-direction:column;justify-content:flex-end">
+          <div style="background:var(--navy2);border-radius:14px 14px 0 0;padding:20px;max-height:85vh;overflow-y:auto">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white)">Business Details</div>
+              <button onclick="closeMobBizSheet()" style="background:none;border:none;color:var(--slate);font-size:1.2rem;cursor:pointer">✕</button>
+            </div>
+            <div id="mobBizSheetBody"></div>
+          </div>
+        </div>
+
         <div class="more-section-title">📚 Resources</div>
         <div id="mobileResourceCards"></div>
         <div id="mobileResourceFiles"></div>
@@ -852,6 +896,7 @@ function applyRoleUI() {
   document.getElementById('moreUserRole').textContent=currentRole==='superadmin'?'⭐ Superadmin':currentRole==='captain'?'👮 Captain':'👤 Admin';
   renderMobileResources();
   if (currentRole==='superadmin') initMobileTracker();
+  loadMobRegistry();
 }
 
 /* ════════════════════════════════════════════════
@@ -2413,6 +2458,187 @@ async function deleteMobMilestone(id) {
   mobMilestones = mobMilestones.filter(m=>m.id!=id);
   try { await sb.from('tracker_milestones').delete().eq('id',id); } catch(e){}
   renderMobTracker();
+}
+
+/* ════════════════════════════════════════════════
+   MOBILE BUSINESS REGISTRY
+════════════════════════════════════════════════ */
+let mobRegistryList = [];
+
+async function loadMobRegistry() {
+  // Populate district filter
+  const df = document.getElementById('mobRegDistrict');
+  if (df && df.options.length === 1) {
+    const dists = [
+      ['hamakua','D1 — Hāmākua'],['north-hilo','D2 — North Hilo'],['south-hilo','D3 — South Hilo'],
+      ['lower-puna','D4 — Lower Puna'],['upper-puna','D5 — Upper Puna'],['kau','D6 — Kaʻū'],
+      ['south-kona','D7 — South Kona'],['north-kona','D8 — North Kona'],['north-kohala','D9 — Kohala'],
+    ];
+    dists.forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;df.appendChild(o);});
+  }
+  document.getElementById('mobRegistryList').innerHTML = '<div style="color:var(--slate2);font-size:.78rem;padding:8px 0">Loading…</div>';
+  try {
+    const {data,error} = await sb.from('business_registry').select('*').order('submitted_at',{ascending:false});
+    if (error) throw error;
+    mobRegistryList = data || [];
+    const subtitle = document.getElementById('mobRegistrySubtitle');
+    if (subtitle) {
+      const pending = mobRegistryList.filter(b=>b.status==='pending').length;
+      subtitle.textContent = `${mobRegistryList.length} businesses · ${pending} pending`;
+    }
+    renderMobRegistry();
+  } catch(e) {
+    document.getElementById('mobRegistryList').innerHTML = `<div style="color:var(--red);font-size:.78rem">${e.message}</div>`;
+  }
+}
+
+function showMobRegistry() {
+  document.getElementById('mobRegistryScreen').style.display = 'block';
+  if (!mobRegistryList.length) loadMobRegistry();
+  else renderMobRegistry();
+}
+
+function closeMobRegistry() {
+  document.getElementById('mobRegistryScreen').style.display = 'none';
+}
+
+function renderMobRegistry() {
+  const el = document.getElementById('mobRegistryList');
+  if (!el) return;
+  const q    = (document.getElementById('mobRegSearch')?.value||'').toLowerCase().trim();
+  const stat = document.getElementById('mobRegStatus')?.value||'';
+  const dist = document.getElementById('mobRegDistrict')?.value||'';
+  const DIST_COLORS = {
+    'hamakua':'#84cc16','north-hilo':'#3b82f6','south-hilo':'#00c9a7',
+    'lower-puna':'#c084fc','upper-puna':'#a855f7','kau':'#ef4444',
+    'south-kona':'#f59e0b','north-kona':'#f97316','north-kohala':'#10b981'
+  };
+  let list = mobRegistryList.filter(b => {
+    if (stat && b.status !== stat) return false;
+    if (dist && b.district !== dist) return false;
+    if (currentRole === 'captain' && b.district !== captainDistrict) return false;
+    if (q && ![b.business_name,b.contact_name,b.city,b.business_type].filter(Boolean).join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (!list.length) { el.innerHTML = '<div style="color:var(--slate2);font-size:.78rem;padding:8px 0;font-style:italic">No businesses match.</div>'; return; }
+  el.innerHTML = list.map(b => {
+    const dc = DIST_COLORS[b.district]||'var(--teal)';
+    const sc = b.status==='approved'?'var(--teal)':b.status==='pending'?'var(--gold)':'var(--red)';
+    return `<div onclick="openMobBizSheet('${b.id}')" style="background:var(--navy2);border:1px solid var(--b2);border-left:3px solid ${dc};border-radius:0 7px 7px 0;padding:12px 14px;margin-bottom:7px;cursor:pointer">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.84rem;font-weight:600;color:var(--white);margin-bottom:2px">${esc(b.business_name)}</div>
+          <div style="font-size:.7rem;color:var(--slate)">${esc(b.business_type||'')}${b.city?' · '+esc(b.city):''}</div>
+          ${b.packet_sent_at?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);margin-top:3px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</div>`:''}
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;padding:2px 7px;border-radius:3px;border:1px solid;color:${sc};background:${sc}18;border-color:${sc}44;white-space:nowrap;flex-shrink:0;text-transform:capitalize">${b.status}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openMobBizSheet(id) {
+  const b = mobRegistryList.find(b=>b.id===id);
+  if (!b) return;
+  const DIST_COLORS = {
+    'hamakua':'#84cc16','north-hilo':'#3b82f6','south-hilo':'#00c9a7',
+    'lower-puna':'#c084fc','upper-puna':'#a855f7','kau':'#ef4444',
+    'south-kona':'#f59e0b','north-kona':'#f97316','north-kohala':'#10b981'
+  };
+  const DIST_LABELS = {
+    'hamakua':'D1 — Hāmākua','north-hilo':'D2 — North Hilo','south-hilo':'D3 — South Hilo',
+    'lower-puna':'D4 — Lower Puna','upper-puna':'D5 — Upper Puna','kau':'D6 — Kaʻū',
+    'south-kona':'D7 — South Kona','north-kona':'D8 — North Kona','north-kohala':'D9 — Kohala'
+  };
+  const dc = DIST_COLORS[b.district]||'var(--teal)';
+  const sc = b.status==='approved'?'var(--teal)':b.status==='pending'?'var(--gold)':'var(--red)';
+  document.getElementById('mobBizSheetBody').innerHTML = `
+    <div style="margin-bottom:12px">
+      <div style="font-size:1rem;font-weight:600;color:var(--white);margin-bottom:3px">${esc(b.business_name)}</div>
+      <div style="font-size:.78rem;color:var(--slate)">${esc(b.business_type||'—')}</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;padding:3px 8px;border-radius:3px;border:1px solid;color:${dc};background:${dc}18;border-color:${dc}44">${DIST_LABELS[b.district]||b.district||'—'}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;padding:3px 8px;border-radius:3px;border:1px solid;color:${sc};background:${sc}18;border-color:${sc}44;text-transform:capitalize">${b.status}</span>
+    </div>
+    ${[
+      ['📍 Address', b.full_address||[b.street_address,b.city,'HI',b.zip].filter(Boolean).join(', ')],
+      ['👤 Contact', b.contact_name],
+      ['📞 Phone', b.phone?`(${b.phone.slice(0,3)}) ${b.phone.slice(3,6)}-${b.phone.slice(6)}`:null],
+      ['✉️ Email', b.email],
+      ['👥 Employees', b.employees],
+      ['🌐 Website', b.website],
+      ['👮 Captain', b.captain_name],
+      ['📦 Packet', b.packet_sent_at?'Sent '+new Date(b.packet_sent_at).toLocaleDateString():null],
+      ['📝 Notes', b.notes],
+    ].filter(([,v])=>v).map(([l,v])=>`
+      <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--b2);font-size:.8rem">
+        <span style="color:var(--slate);flex-shrink:0;width:80px">${l}</span>
+        <span style="color:var(--white)">${esc(v)}</span>
+      </div>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      ${b.status==='pending'?`
+        <button onclick="mobApproveReg('${b.id}')" style="flex:1;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);border-radius:6px;padding:9px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">✅ Approve</button>
+        <button onclick="mobRejectReg('${b.id}')" style="flex:1;background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:6px;padding:9px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">❌ Reject</button>`:''}
+      ${b.status==='approved'&&!b.packet_sent_at?`
+        <button onclick="mobGeneratePacket('${b.id}')" style="width:100%;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:6px;padding:9px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">📦 Generate Packet</button>`:''}
+    </div>`;
+  const sheet = document.getElementById('mobBizSheet');
+  sheet.style.display = 'flex';
+}
+
+function closeMobBizSheet() {
+  document.getElementById('mobBizSheet').style.display = 'none';
+}
+
+async function mobApproveReg(id) {
+  if (!confirm('Approve this business?')) return;
+  const {error} = await sb.from('business_registry').update({status:'approved',approved_at:new Date().toISOString(),approved_by:currentUserName}).eq('id',id);
+  if (!error) {
+    const b = mobRegistryList.find(b=>b.id===id);
+    if (b) b.status = 'approved';
+    closeMobBizSheet();
+    renderMobRegistry();
+    showToast('✅','Business approved!');
+  } else showToast('⚠️',error.message,'err');
+}
+
+async function mobRejectReg(id) {
+  if (!confirm('Reject this registration?')) return;
+  const {error} = await sb.from('business_registry').update({status:'rejected'}).eq('id',id);
+  if (!error) {
+    const b = mobRegistryList.find(b=>b.id===id);
+    if (b) b.status = 'rejected';
+    closeMobBizSheet();
+    renderMobRegistry();
+    showToast('❌','Registration rejected.');
+  } else showToast('⚠️',error.message,'err');
+}
+
+async function mobGeneratePacket(id) {
+  const b = mobRegistryList.find(b=>b.id===id);
+  if (!b) return;
+  const DIST_LABELS = {
+    'hamakua':'District 1 — Hāmākua','north-hilo':'District 2 — North Hilo','south-hilo':'District 3 — South Hilo',
+    'lower-puna':'District 4 — Lower Puna','upper-puna':'District 5 — Upper Puna','kau':'District 6 — Kaʻū',
+    'south-kona':'District 7 — South Kona','north-kona':'District 8 — North Kona','north-kohala':'District 9 — Kohala'
+  };
+  const params = new URLSearchParams({
+    id:b.id, name:b.business_name||'', contact:b.contact_name||'',
+    address:b.full_address||[b.street_address,b.city,'HI',b.zip].filter(Boolean).join(', '),
+    district:DIST_LABELS[b.district]||b.district||'', captain:b.captain_name||'',
+    phone:b.phone?`(${b.phone.slice(0,3)}) ${b.phone.slice(3,6)}-${b.phone.slice(6)}`:'',
+    email:b.email||'', type:b.business_type||'', distId:b.district||'',
+  });
+  window.open(`packet-print.html?${params.toString()}`, '_blank', 'noopener');
+  const {error} = await sb.from('business_registry').update({packet_sent_at:new Date().toISOString()}).eq('id',id);
+  if (!error) {
+    const reg = mobRegistryList.find(r=>r.id===id);
+    if (reg) reg.packet_sent_at = new Date().toISOString();
+    closeMobBizSheet();
+    renderMobRegistry();
+    showToast('📦','Packet generated!');
+  }
 }
 
 function showToast(ico,body,type='') {
