@@ -178,22 +178,22 @@
             <input type="url" id="bWebsite" placeholder="https://yourbusiness.com">
         </div>
 
-        <!-- Business Address -->
-        <div class="sec-label">Business Address</div>
+        <!-- Physical Address -->
+        <div class="sec-label">Physical Address</div>
 
         <div class="fld">
             <label>Street Address <span class="req">*</span></label>
-            <input type="text" id="bStreet" placeholder="123 Kamehameha Ave" oninput="onAddressChange()">
+            <input type="text" id="bStreet" placeholder="123 Kamehameha Ave" oninput="onAddressChange();syncMailing()">
         </div>
 
         <div class="fld-row">
             <div class="fld" style="margin-bottom:0">
                 <label>City <span class="req">*</span></label>
-                <input type="text" id="bCity" placeholder="Hilo" oninput="onAddressChange()">
+                <input type="text" id="bCity" placeholder="Hilo" oninput="onAddressChange();syncMailing()">
             </div>
             <div class="fld" style="margin-bottom:0">
                 <label>ZIP Code <span class="req">*</span></label>
-                <input type="text" id="bZip" placeholder="96720" maxlength="10" oninput="onAddressChange()">
+                <input type="text" id="bZip" placeholder="96720" maxlength="10" oninput="onAddressChange();syncMailing()">
             </div>
         </div>
 
@@ -221,6 +221,34 @@
                 <option value="north-kona">District 8 — North Kona</option>
                 <option value="north-kohala">District 9 — Kohala</option>
             </select>
+        </div>
+
+        <!-- Mailing Address -->
+        <div class="sec-label" style="margin-top:28px">Mailing Address</div>
+
+        <div class="fld" style="margin-bottom:14px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;color:var(--slate)">
+                <input type="checkbox" id="sameAsPhysical" checked onchange="toggleSameAsPhysical()" style="width:15px;height:15px;accent-color:var(--teal);cursor:pointer;flex-shrink:0">
+                Same as physical address
+            </label>
+        </div>
+
+        <div id="mailingFields" style="display:none">
+            <div class="fld">
+                <label>Mailing Street Address</label>
+                <input type="text" id="bMailStreet" placeholder="P.O. Box or street address">
+            </div>
+            <div class="fld-row">
+                <div class="fld" style="margin-bottom:0">
+                    <label>City</label>
+                    <input type="text" id="bMailCity" placeholder="Hilo">
+                </div>
+                <div class="fld" style="margin-bottom:0">
+                    <label>ZIP Code</label>
+                    <input type="text" id="bMailZip" placeholder="96720" maxlength="10">
+                </div>
+            </div>
+            <div style="margin-bottom:18px"></div>
         </div>
 
         <!-- Owner / Contact Information -->
@@ -454,6 +482,21 @@ async function lookupCaptain(districtId) {
     } catch(e) { captainName = null; }
 }
 
+// ── Mailing address sync ───────────────────────────────
+function syncMailing() {
+    if (!document.getElementById('sameAsPhysical').checked) return;
+    document.getElementById('bMailStreet').value = document.getElementById('bStreet').value;
+    document.getElementById('bMailCity').value   = document.getElementById('bCity').value;
+    document.getElementById('bMailZip').value    = document.getElementById('bZip').value;
+}
+
+function toggleSameAsPhysical() {
+    const same   = document.getElementById('sameAsPhysical').checked;
+    const fields = document.getElementById('mailingFields');
+    fields.style.display = same ? 'none' : 'block';
+    if (same) syncMailing();
+}
+
 // ── Submit ─────────────────────────────────────────────
 async function submitRegistration() {
     const btn = document.getElementById('submitBtn');
@@ -471,6 +514,12 @@ async function submitRegistration() {
     const bEmployees = document.getElementById('bEmployees').value;
     const bWebsite = document.getElementById('bWebsite').value.trim();
     const bNotes   = document.getElementById('bNotes').value.trim();
+
+    // Mailing address — use physical if same-as checked
+    const sameAs      = document.getElementById('sameAsPhysical').checked;
+    const bMailStreet = sameAs ? bStreet : document.getElementById('bMailStreet').value.trim();
+    const bMailCity   = sameAs ? bCity   : document.getElementById('bMailCity').value.trim();
+    const bMailZip    = sameAs ? bZip    : document.getElementById('bMailZip').value.trim();
 
     // Validation
     const missing = [];
@@ -501,6 +550,11 @@ async function submitRegistration() {
         city:             bCity,
         zip:              bZip,
         full_address:     `${bStreet}, ${bCity}, HI ${bZip}`,
+        mailing_street:   bMailStreet || null,
+        mailing_city:     bMailCity   || null,
+        mailing_zip:      bMailZip    || null,
+        mailing_address:  bMailStreet ? `${bMailStreet}, ${bMailCity}, HI ${bMailZip}` : null,
+        mailing_same_as_physical: sameAs,
         contact_name:     bContact,
         phone:            bPhone.replace(/\D/g,''),
         email:            bEmail,
