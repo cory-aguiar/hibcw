@@ -6,6 +6,12 @@
 <title>HIBCW Admin — Mobile</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="config.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -139,6 +145,36 @@ header{
 .screen::-webkit-scrollbar{display:none}
 
 /* ── Bottom nav ── */
+/* ── Map screen ── */
+#sc-map{padding-bottom:0;overflow:hidden;flex-direction:column}
+#mobMap{width:100%;flex:1;min-height:0}
+.mob-map-controls{position:absolute;top:10px;left:10px;z-index:500;display:flex;gap:5px;flex-wrap:wrap;pointer-events:auto}
+.mob-map-btn{background:rgba(11,21,36,.88);border:1px solid var(--b2);border-radius:4px;padding:5px 10px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate);letter-spacing:.08em;transition:all .2s;-webkit-tap-highlight-color:transparent;backdrop-filter:blur(4px)}
+.mob-map-btn.on{border-color:var(--teal);color:var(--teal);background:rgba(0,201,167,.12)}
+.mob-map-panel{flex:1;position:relative;min-height:0;display:flex;flex-direction:column}
+.mob-map-sheet{flex-shrink:0;background:var(--navy2);border-top:1px solid var(--b2);max-height:38vh;display:flex;flex-direction:column;overflow:hidden}
+.mob-map-sheet-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--b2);flex-shrink:0}
+.mob-map-sheet-title{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.06em}
+.mob-map-sheet-count{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal)}
+.mob-map-list{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:6px}
+.mob-map-inc{background:rgba(255,255,255,.03);border:1px solid var(--b2);border-left:3px solid transparent;border-radius:5px;padding:9px 11px;margin-bottom:5px;cursor:pointer;transition:all .15s}
+.mob-map-inc.hl{border-left-color:var(--teal);background:rgba(0,201,167,.06)}
+.mob-map-inc-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.mob-map-inc-addr{font-size:.68rem;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.mob-map-inc-time{font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--slate2);white-space:nowrap;flex-shrink:0;margin-left:6px}
+.mob-map-empty{padding:24px 16px;text-align:center;color:var(--slate);font-size:.76rem;line-height:1.7}
+.mob-pu-type{font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.mob-pu-addr{font-size:.72rem;color:var(--slate);margin-bottom:3px}
+.mob-pu-time{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);margin-bottom:8px}
+.mob-pu-btn{background:var(--teal);border:none;border-radius:3px;padding:5px 12px;cursor:pointer;color:#0b1524;font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;width:100%}
+.mob-adm-marker{width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.mob-adm-marker-inner{transform:rotate(45deg);font-size:.9rem;line-height:1}
+.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(0,201,167,.2)!important}
+.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{background:rgba(0,201,167,.6)!important;color:#0b1524!important;font-weight:700;font-family:'Rajdhani',sans-serif;font-size:.8rem}
+.leaflet-popup-content-wrapper{background:var(--navy2);border:1px solid rgba(0,201,167,.2);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.leaflet-popup-content{margin:12px 14px;font-family:'IBM Plex Sans',sans-serif}
+.leaflet-popup-tip{background:var(--navy2)}
+
 .bot-nav{
   height:var(--nav-h);flex-shrink:0;
   padding-bottom:var(--safe-bot);
@@ -222,7 +258,7 @@ header{
 .inc-card:active{background:rgba(255,255,255,.04)}
 .inc-card-body{flex:1;min-width:0}
 .inc-title{font-size:.85rem;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.inc-addr{font-size:.72rem;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.inc-addr{font-size:.72rem;color:var(--slate);overflow:hidden;margin-bottom:4px}.inc-addr .addr-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .inc-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .inc-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
 .inc-time{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);white-space:nowrap}
@@ -635,6 +671,27 @@ body.light .strip-cell{background:#fff}
 
   </div><!-- /screens -->
 
+    <!-- MAP SCREEN -->
+    <div class="screen" id="sc-map">
+      <div class="mob-map-panel">
+        <div id="mobMap"></div>
+        <div class="mob-map-controls">
+          <button class="mob-map-btn on"  id="mmb-street"   onclick="mobSetLayer('street')">STREET</button>
+          <button class="mob-map-btn"     id="mmb-sat"      onclick="mobSetLayer('sat')">SAT</button>
+          <button class="mob-map-btn on"  id="mmb-cluster"  onclick="mobToggleCluster()">CLUSTER</button>
+          <button class="mob-map-btn"     id="mmb-heat"     onclick="mobToggleHeat()">HEAT</button>
+          <button class="mob-map-btn"     id="mmb-districts" onclick="mobToggleDistricts(this)">DISTRICTS</button>
+        </div>
+      </div>
+      <div class="mob-map-sheet">
+        <div class="mob-map-sheet-hd">
+          <span class="mob-map-sheet-title">Active Incidents</span>
+          <span class="mob-map-sheet-count" id="mobMapCount">—</span>
+        </div>
+        <div class="mob-map-list" id="mobMapList"></div>
+      </div>
+    </div>
+
   <!-- Bottom nav -->
   <nav class="bot-nav">
     <button class="nav-btn on" id="nav-incidents" onclick="showScreen('incidents')">
@@ -657,6 +714,10 @@ body.light .strip-cell{background:#fff}
     <button class="nav-btn" id="nav-districts" onclick="showScreen('districts')">
       <span class="nav-ico">📍</span>
       <span class="nav-lbl">Districts</span>
+    </button>
+    <button class="nav-btn" id="nav-map" onclick="showScreen('map')">
+      <span class="nav-ico">🗺</span>
+      <span class="nav-lbl">Map</span>
     </button>
     <button class="nav-btn" id="nav-more" onclick="showScreen('more')">
       <span class="nav-ico">☰</span>
@@ -948,13 +1009,13 @@ async function loadAll() {
 function startRealtime() {
   sb.channel('adm-mob').on('postgres_changes',{event:'INSERT',schema:'public',table:'incidents'},async p=>{
     const {data}=await sb.from('incidents').select('*,incident_media(*)').eq('id',p.new.id).single();
-    if(data){allIncidents.unshift(data);filterIncidents();renderStats();updateMoreStrip();showToast('🔔',`New: ${data.type} — ${data.address}`);}
+    if(data){allIncidents.unshift(data);filterIncidents();renderStats();updateMoreStrip();if(currentScreen==='map')mobRefreshMarkers();showToast('🔔',`New: ${data.type} — ${data.address}`);}
     const dot=document.getElementById('realtimeDot'); if(dot) dot.style.background='var(--teal)';
   }).on('postgres_changes',{event:'UPDATE',schema:'public',table:'incidents'},async p=>{
     const {data}=await sb.from('incidents').select('*,incident_media(*)').eq('id',p.new.id).single();
-    if(data){const idx=allIncidents.findIndex(i=>i.id===data.id);if(idx!==-1)allIncidents[idx]=data;else allIncidents.unshift(data);filterIncidents();renderStats();updateMoreStrip();}
+    if(data){const idx=allIncidents.findIndex(i=>i.id===data.id);if(idx!==-1)allIncidents[idx]=data;else allIncidents.unshift(data);filterIncidents();renderStats();updateMoreStrip();if(currentScreen==='map')mobRefreshMarkers();}
   }).on('postgres_changes',{event:'DELETE',schema:'public',table:'incidents'},p=>{
-    allIncidents=allIncidents.filter(i=>i.id!==p.old.id);filterIncidents();renderStats();updateMoreStrip();
+    allIncidents=allIncidents.filter(i=>i.id!==p.old.id);filterIncidents();renderStats();updateMoreStrip();if(currentScreen==='map')mobRefreshMarkers();
   }).subscribe(s=>{
     const dot=document.getElementById('realtimeDot');
     if(dot) dot.style.background=s==='SUBSCRIBED'?'var(--teal)':'var(--gold)';
@@ -976,6 +1037,7 @@ function showScreen(name) {
   if(name==='apps') loadApplications();
   if(name==='districts') { renderDistricts(); if(currentRole==='captain') renderCaptainDashboard(); }
   if(name==='stats') renderStats();
+  if(name==='map') { initMobMap(); mobRefreshMarkers(); }
 }
 
 /* ════════════════════════════════════════════════
@@ -1001,7 +1063,7 @@ function renderIncidentList(rows) {
     <div class="inc-card" style="border-left-color:${color[inc.type_color]||'var(--teal)'};${inc.status==='archived'?'opacity:.6':''}" onclick="openDetail('${inc.id}')">
       <div class="inc-card-body">
         <div class="inc-title">${esc(inc.type)}</div>
-        <div class="inc-addr">${esc(inc.address)}</div>
+        <div class="inc-addr"><span class="addr-line">${esc(inc.address)}</span>${inc.district ? `<span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:${DISTRICT_COLORS[inc.district]||'var(--teal)'};letter-spacing:.03em;margin-top:1px">${districtLabel(inc.district)}</span>` : ''}</div>
         <div class="inc-meta">
           <span class="badge ${bc[inc.type_color]||'b-teal'}">${esc(inc.type)}</span>
           ${inc.is_recurring?'<span class="recurring-flag">🔁 Recurring</span>':''}
@@ -1292,7 +1354,7 @@ function renderApps() {
         ${a.business_address?`📍 <span>${esc(a.business_address)}</span><br>`:''}
         ✉️ <span>${esc(a.email)}</span><br>
         📞 <span>${fmtPhone(a.phone)}</span>
-        ${a.district?`<br>📍 <span style="color:var(--teal)">${esc(districtLabel(a.district))}</span>`:''}
+        ${a.district?`<br>📍 <span style="color:${DISTRICT_COLORS[a.district]||'var(--teal)'}">${esc(districtLabel(a.district))}</span>`:''}
       </div>
       ${a.notes?`<div style="font-size:.72rem;color:var(--slate2);font-style:italic;margin-top:6px;padding-top:6px;border-top:1px solid var(--b2)">"${esc(a.notes)}"</div>`:''}
       <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);margin-top:6px">${fmt(a.created_at)}</div>
@@ -2072,7 +2134,7 @@ const RESOURCE_FILES = [
   { category:'District Flyers', icon:'🗺', title:"District 6 — Kaʻū Flyer",        desc:"Promotional flyer for Kaʻū businesses.",         file:'files/flyer-d6-kau.pdf',        roles:['admin','superadmin','captain'], district:'kau'         },
   { category:'District Flyers', icon:'🗺', title:'District 7 — South Kona Flyer',  desc:'Promotional flyer for South Kona businesses.',  file:'files/flyer-d7-south-kona.pdf', roles:['admin','superadmin','captain'], district:'south-kona'  },
   { category:'District Flyers', icon:'🗺', title:'District 8 — North Kona Flyer',  desc:'Promotional flyer for North Kona businesses.',  file:'files/flyer-d8-north-kona.pdf', roles:['admin','superadmin','captain'], district:'north-kona'  },
-  { category:'District Flyers', icon:'🗺', title:'District 9 — Kohala Flyer',      desc:'Promotional flyer for Kohala businesses.',      file:'files/flyer-d9-kohala.pdf',     roles:['admin','superadmin','captain'], district:'north-kohala'},
+  { category:'District Flyers', icon:'🗺', title:'District 9 — Kohala Flyer',      desc:'Promotional flyer for Kohala businesses.',      file:'files/flyer-d9-north-kohala.pdf',roles:['admin','superadmin','captain'], district:'north-kohala'},
   { category:'General Flyers',  icon:'📄', title:'HIBCW General Awareness Flyer',  desc:'General flyer suitable for any district.',      file:'files/flyer-general.pdf',       roles:['admin','superadmin','captain'] },
   { category:'General Flyers',  icon:'📄', title:'Join HIBCW — Recruitment Flyer', desc:'Encourage businesses to apply for membership.', file:'files/flyer-recruitment.pdf',   roles:['admin','superadmin','captain'] },
   { category:'Forms & Templates',icon:'📝', title:'Incident Report Form (Paper)',  desc:'Paper form for capturing incidents offline.',   file:'files/form-incident-paper.pdf', roles:['admin','superadmin','captain'] },
@@ -2259,16 +2321,17 @@ function renderMobTracker() {
   const el = document.getElementById('mobileTrackerWrap');
   if (!el) return;
 
-  const yd = mobTrackerData[mobTrackerYear]||{};
-  const allM = Object.values(yd);
+  const allM = Object.values(mobTrackerLive);
   const totalMembers   = Math.max(...allM.map(m=>parseInt(m.members_total)||0).concat([0]));
   const totalIncidents = allM.reduce((s,m)=>s+(parseInt(m.incidents)||0),0);
   const totalAlerts    = allM.reduce((s,m)=>s+(parseInt(m.alerts_sent)||0),0);
   const totalNew       = allM.reduce((s,m)=>s+(parseInt(m.members_new)||0),0);
+  const totalBiz       = (typeof mobRegistryList !== 'undefined') ? mobRegistryList.length : 0;
+  const pendingBiz     = (typeof mobRegistryList !== 'undefined') ? mobRegistryList.filter(b=>b.status==='pending').length : 0;
 
   el.innerHTML = `
     <!-- KPI strip -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 12px 12px">
       <div style="background:var(--navy2);border:1px solid rgba(0,201,167,.25);border-top:2px solid #00c9a7;border-radius:7px;padding:10px 12px">
         <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">Total Members</div>
         <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#00c9a7;line-height:1">${totalMembers}</div>
@@ -2284,6 +2347,11 @@ function renderMobTracker() {
       <div style="background:var(--navy2);border:1px solid rgba(59,130,246,.25);border-top:2px solid #3b82f6;border-radius:7px;padding:10px 12px">
         <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">New Members</div>
         <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#3b82f6;line-height:1">${totalNew}</div>
+      </div>
+      <div style="background:var(--navy2);border:1px solid rgba(245,158,11,.25);border-top:2px solid #f59e0b;border-radius:7px;padding:10px 12px;grid-column:span 2">
+        <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">🏢 Business Registrations</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#f59e0b;line-height:1">${totalBiz}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.54rem;color:var(--slate2);margin-top:2px">${pendingBiz} pending review</div>
       </div>
     </div>
 
@@ -2798,7 +2866,8 @@ function openMobBizSheet(id) {
     </div>
     <div style="font-size:.78rem;color:var(--slate);margin-bottom:14px">${esc(b.business_type||'—')}</div>
     ${[
-      ['📍 Address',    b.full_address||[b.street_address,b.city,'HI',b.zip].filter(Boolean).join(', ')],
+      ['📍 Physical',   b.full_address||[b.street_address,b.city,'HI',b.zip].filter(Boolean).join(', ')],
+      ['📬 Mailing',    b.mailing_same_as_physical||!b.mailing_address ? 'Same as physical' : b.mailing_address],
       ['👤 Contact',    b.contact_name],
       ['📞 Phone',      b.phone?fmtPhone(b.phone):null],
       ['✉️ Email',      b.email],
@@ -2885,10 +2954,23 @@ function mobEditBusiness(id) {
       <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:16px 18px;min-height:0">
         ${fld('Business Name','mebName',b.business_name)}
         ${fld('Business Type','mebType',b.business_type)}
-        ${fld('Street Address','mebStreet',b.street_address)}
+        ${fld('Street Address (Physical)','mebStreet',b.street_address,'text','oninput="mebSyncMailing()"')}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          ${fld('City','mebCity',b.city)}
-          ${fld('ZIP','mebZip',b.zip)}
+          ${fld('City (Physical)','mebCity',b.city,'text','oninput="mebSyncMailing()"')}
+          ${fld('ZIP (Physical)','mebZip',b.zip,'text','oninput="mebSyncMailing()"')}
+        </div>
+        <div style="margin-bottom:12px;border-top:1px solid var(--b2);padding-top:12px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;color:var(--slate)">
+            <input type="checkbox" id="mebSameAs" ${(b.mailing_same_as_physical!==false&&!b.mailing_street)?'checked':''} onchange="mebToggleSameAs()" style="width:15px;height:15px;accent-color:var(--teal);cursor:pointer;flex-shrink:0">
+            Mailing same as physical address
+          </label>
+        </div>
+        <div id="mebMailingFields" style="${(b.mailing_same_as_physical!==false&&!b.mailing_street)?'display:none':''}">
+          ${fld('Mailing Street','mebMailStreet',b.mailing_street)}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            ${fld('Mailing City','mebMailCity',b.mailing_city)}
+            ${fld('Mailing ZIP','mebMailZip',b.mailing_zip)}
+          </div>
         </div>
         <div style="margin-bottom:12px">
           <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">District</div>
@@ -2923,16 +3005,41 @@ function mobEditBusiness(id) {
   document.body.appendChild(sheet);
 }
 
+function mebSyncMailing() {
+  if (!document.getElementById('mebSameAs')?.checked) return;
+  document.getElementById('mebMailStreet').value = document.getElementById('mebStreet')?.value||'';
+  document.getElementById('mebMailCity').value   = document.getElementById('mebCity')?.value||'';
+  document.getElementById('mebMailZip').value    = document.getElementById('mebZip')?.value||'';
+}
+
+function mebToggleSameAs() {
+  const same = document.getElementById('mebSameAs').checked;
+  document.getElementById('mebMailingFields').style.display = same ? 'none' : 'block';
+  if (same) mebSyncMailing();
+}
+
 async function saveMobEditBusiness(id) {
   const b = mobRegistryList.find(b=>b.id===id);
   if (!b) return;
+  const sameAs     = document.getElementById('mebSameAs')?.checked;
+  const phyStreet  = document.getElementById('mebStreet')?.value.trim();
+  const phyCity    = document.getElementById('mebCity')?.value.trim();
+  const phyZip     = document.getElementById('mebZip')?.value.trim();
+  const mailStreet = sameAs ? phyStreet : document.getElementById('mebMailStreet')?.value.trim();
+  const mailCity   = sameAs ? phyCity   : document.getElementById('mebMailCity')?.value.trim();
+  const mailZip    = sameAs ? phyZip    : document.getElementById('mebMailZip')?.value.trim();
   const updates = {
     business_name:  document.getElementById('mebName')?.value.trim(),
     business_type:  document.getElementById('mebType')?.value.trim(),
-    street_address: document.getElementById('mebStreet')?.value.trim(),
-    city:           document.getElementById('mebCity')?.value.trim(),
-    zip:            document.getElementById('mebZip')?.value.trim(),
-    full_address:   [document.getElementById('mebStreet')?.value.trim(), document.getElementById('mebCity')?.value.trim(), 'HI', document.getElementById('mebZip')?.value.trim()].filter(Boolean).join(', '),
+    street_address: phyStreet,
+    city:           phyCity,
+    zip:            phyZip,
+    full_address:   [phyStreet, phyCity, 'HI', phyZip].filter(Boolean).join(', '),
+    mailing_street: mailStreet||null,
+    mailing_city:   mailCity||null,
+    mailing_zip:    mailZip||null,
+    mailing_address: mailStreet ? `${mailStreet}, ${mailCity}, HI ${mailZip}` : null,
+    mailing_same_as_physical: sameAs,
     contact_name:   document.getElementById('mebContact')?.value.trim(),
     phone:          document.getElementById('mebPhone')?.value.replace(/\D/g,''),
     email:          document.getElementById('mebEmail')?.value.trim().toLowerCase(),
@@ -3271,6 +3378,170 @@ function printDistrictRoster() {
   if (!win) { showToast('⚠️','Pop-ups blocked — please allow pop-ups and try again.','err'); return; }
   win.document.write(html);
   win.document.close();
+}
+
+/* ════════════════════════════════════════════════
+   MOBILE MAP VIEW
+════════════════════════════════════════════════ */
+const MOB_TYPE_EMOJI = {
+  'Robbery':'🔫','Burglary':'🏠','Assault':'🤜','Drug Activity':'💊',
+  'Theft / Shoplifting':'🛍','Vandalism':'🔨','Vehicle Break-In':'🚗',
+  'Fraud / Scam':'💳','Trespassing':'🚫','Suspicious Activity':'👁',
+  'Graffiti':'🎨','Other':'📋'
+};
+
+const MOB_DISTRICT_GEO = [
+  {id:'hamakua',    label:'D1 — Hāmākua',    color:'#84cc16', coords:[[20.27,-155.07],[20.27,-155.87],[19.90,-155.65],[19.78,-155.47],[19.73,-155.32],[19.73,-155.10],[19.87,-155.08],[20.02,-155.10],[20.15,-155.25],[20.27,-155.07]]},
+  {id:'north-hilo', label:'D2 — North Hilo',  color:'#3b82f6', coords:[[19.87,-155.08],[19.73,-155.10],[19.73,-155.18],[19.78,-155.22],[19.80,-155.12],[19.87,-155.08]]},
+  {id:'south-hilo', label:'D3 — South Hilo',  color:'#00c9a7', coords:[[19.73,-155.10],[19.73,-155.32],[19.66,-155.30],[19.60,-155.22],[19.54,-155.08],[19.58,-155.01],[19.65,-154.99],[19.70,-155.04],[19.73,-155.10]]},
+  {id:'lower-puna', label:'D4 — Lower Puna',  color:'#c084fc', coords:[[19.58,-155.01],[19.54,-155.08],[19.40,-155.13],[19.28,-155.04],[19.18,-154.85],[19.18,-154.79],[19.35,-154.82],[19.52,-154.93],[19.58,-155.01]]},
+  {id:'upper-puna', label:'D5 — Upper Puna',  color:'#a855f7', coords:[[19.73,-155.32],[19.78,-155.47],[19.56,-155.45],[19.45,-155.35],[19.40,-155.13],[19.28,-155.04],[19.35,-154.82],[19.52,-154.93],[19.58,-155.01],[19.65,-154.99],[19.70,-155.04],[19.73,-155.10],[19.73,-155.32]]},
+  {id:'kau',        label:'D6 — Kaʻū',        color:'#ef4444', coords:[[19.45,-155.35],[19.40,-155.13],[19.28,-155.04],[19.18,-154.85],[19.10,-154.95],[19.02,-155.25],[18.91,-155.68],[18.95,-155.84],[19.03,-155.92],[19.18,-155.87],[19.28,-155.72],[19.45,-155.35]]},
+  {id:'south-kona', label:'D7 — South Kona',  color:'#f59e0b', coords:[[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.45,-155.88],[19.33,-155.80],[19.28,-155.72],[19.18,-155.87],[19.03,-155.92],[18.95,-155.84],[18.91,-155.68],[19.02,-155.25],[19.28,-155.04],[19.45,-155.35],[19.78,-155.47],[19.90,-155.65]]},
+  {id:'north-kona', label:'D8 — North Kona',  color:'#f97316', coords:[[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.60,-156.07],[19.73,-156.10],[19.85,-156.05],[19.90,-155.96],[19.90,-155.65]]},
+  {id:'north-kohala',label:'D9 — Kohala',     color:'#10b981', coords:[[20.27,-155.87],[20.27,-156.10],[20.10,-156.07],[20.01,-156.00],[19.94,-155.98],[19.85,-156.05],[19.73,-156.10],[19.60,-156.07],[19.55,-155.93],[19.63,-155.99],[19.72,-155.98],[19.87,-155.87],[19.90,-155.65],[20.27,-155.87]]}
+];
+
+let mobMap = null;
+let mobClusterGroup = null;
+let mobHeatLayer = null;
+let mobMapMarkers = {};
+let mobClusterOn = true;
+let mobHeatOn = false;
+let mobStreetLayer = null;
+let mobSatLayer = null;
+let mobDistrictLayers = [];
+let mobDistrictsOn = false;
+
+function initMobMap() {
+  if (mobMap) { setTimeout(()=>mobMap.invalidateSize(),80); return; }
+  mobStreetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19});
+  mobSatLayer    = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});
+  mobMap = L.map('mobMap',{center:[19.7024,-155.0824],zoom:11,zoomControl:true});
+  mobStreetLayer.addTo(mobMap);
+  mobClusterGroup = L.markerClusterGroup({maxClusterRadius:50,showCoverageOnHover:false,zoomToBoundsOnClick:true,spiderfyOnMaxZoom:true});
+  mobClusterGroup.addTo(mobMap);
+  setTimeout(()=>mobMap.invalidateSize(),120);
+}
+
+function mobMakeMarker(type, color) {
+  const c = color==='red'?'#e8415a':color==='gold'?'#f5a623':'#00c9a7';
+  const emoji = MOB_TYPE_EMOJI[type]||'📍';
+  return L.divIcon({
+    className:'',
+    html:`<div class="mob-adm-marker" style="background:${c}"><div class="mob-adm-marker-inner">${emoji}</div></div>`,
+    iconSize:[32,32],iconAnchor:[16,32],popupAnchor:[0,-32]
+  });
+}
+
+function mobRefreshMarkers() {
+  if (!mobMap) return;
+  mobClusterGroup.clearLayers();
+  Object.values(mobMapMarkers).forEach(m=>mobMap.removeLayer(m));
+  mobMapMarkers = {};
+  const active = allIncidents.filter(i=>i.status==='active'&&i.lat&&i.lng);
+  active.forEach(inc=>{
+    const tc = inc.type_color==='red'?'#e8415a':inc.type_color==='gold'?'#f5a623':'#00c9a7';
+    const m = L.marker([inc.lat,inc.lng],{icon:mobMakeMarker(inc.type,inc.type_color)});
+    m.bindPopup(`
+      <div class="mob-pu-type" style="color:${tc}">${inc.type.toUpperCase()}</div>
+      <div class="mob-pu-addr">📍 ${esc(inc.address)}</div>
+      <div class="mob-pu-time">${fmt(inc.occurred_at)}</div>
+      <button class="mob-pu-btn" onclick="openDetail('${inc.id}')">View Details</button>
+    `);
+    m.on('click',()=>mobHlCard(inc.id));
+    mobMapMarkers[inc.id]=m;
+    if(mobClusterOn) mobClusterGroup.addLayer(m);
+    else m.addTo(mobMap);
+  });
+  if(mobHeatOn){mobToggleHeat();mobToggleHeat();}
+  mobRenderSheet(active);
+}
+
+function mobRenderSheet(incidents) {
+  const el = document.getElementById('mobMapList');
+  const countEl = document.getElementById('mobMapCount');
+  if(!el) return;
+  const pinned = incidents.filter(i=>i.lat&&i.lng);
+  if(countEl) countEl.textContent = pinned.length+' pinned';
+  if(!pinned.length){el.innerHTML='<div class="mob-map-empty">No active incidents with GPS pins yet.</div>';return;}
+  el.innerHTML = pinned.map(inc=>{
+    const bc = inc.type_color==='red'?'b-red':inc.type_color==='gold'?'b-gold':'b-teal';
+    const emoji = MOB_TYPE_EMOJI[inc.type]||'📍';
+    const dc = DISTRICT_COLORS[inc.district]||'var(--teal)';
+    return `<div class="mob-map-inc" id="mobmapc-${inc.id}" onclick="mobCardClick('${inc.id}')">
+      <div class="mob-map-inc-row">
+        <span class="badge ${bc}">${emoji} ${esc(inc.type)}</span>
+        <span class="mob-map-inc-time">${fmt(inc.occurred_at)}</span>
+      </div>
+      <div class="mob-map-inc-addr">${esc(inc.address)}</div>
+      ${inc.district?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:${dc};margin-top:2px">${districtLabel(inc.district)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function mobCardClick(id) {
+  const inc = allIncidents.find(i=>i.id===id);
+  if(!inc||!inc.lat) return;
+  mobMap.flyTo([inc.lat,inc.lng],16,{duration:0.7});
+  mobMapMarkers[id]?.openPopup();
+  mobHlCard(id);
+}
+
+function mobHlCard(id) {
+  document.querySelectorAll('.mob-map-inc').forEach(c=>c.classList.remove('hl'));
+  const c = document.getElementById('mobmapc-'+id);
+  if(c){c.classList.add('hl');c.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+
+function mobSetLayer(t) {
+  if(!mobMap) return;
+  if(t==='street'){mobMap.addLayer(mobStreetLayer);mobMap.removeLayer(mobSatLayer);}
+  else{mobMap.addLayer(mobSatLayer);mobMap.removeLayer(mobStreetLayer);}
+  document.getElementById('mmb-street').classList.toggle('on',t==='street');
+  document.getElementById('mmb-sat').classList.toggle('on',t==='sat');
+}
+
+function mobToggleCluster() {
+  if(!mobMap) return;
+  mobClusterOn=!mobClusterOn;
+  document.getElementById('mmb-cluster').classList.toggle('on',mobClusterOn);
+  Object.values(mobMapMarkers).forEach(m=>{
+    mobClusterGroup.removeLayer(m);mobMap.removeLayer(m);
+    if(mobClusterOn) mobClusterGroup.addLayer(m);else m.addTo(mobMap);
+  });
+}
+
+function mobToggleHeat() {
+  if(!mobMap) return;
+  mobHeatOn=!mobHeatOn;
+  document.getElementById('mmb-heat').classList.toggle('on',mobHeatOn);
+  if(mobHeatOn){
+    const pts=allIncidents.filter(i=>i.lat&&i.status==='active').map(i=>[i.lat,i.lng,1]);
+    if(mobHeatLayer) mobMap.removeLayer(mobHeatLayer);
+    mobHeatLayer=L.heatLayer(pts,{radius:30,blur:22,maxZoom:16,gradient:{0.3:'#002266',0.6:'#C8960C',0.85:'#e8415a',1.0:'#ffffff'}});
+    mobHeatLayer.addTo(mobMap);
+  } else {
+    if(mobHeatLayer){mobMap.removeLayer(mobHeatLayer);mobHeatLayer=null;}
+  }
+}
+
+function mobToggleDistricts(btn) {
+  if(!mobMap) return;
+  mobDistrictsOn=!mobDistrictsOn;
+  btn.classList.toggle('on',mobDistrictsOn);
+  btn.textContent=mobDistrictsOn?'DIST ON':'DISTRICTS';
+  if(mobDistrictsOn){
+    mobDistrictLayers=MOB_DISTRICT_GEO.map(d=>{
+      const poly=L.polygon(d.coords,{color:d.color,weight:2,opacity:0.8,fillColor:d.color,fillOpacity:0.12,interactive:true});
+      poly.bindTooltip('<strong>'+d.label+'</strong>',{permanent:true,direction:'center',className:'district-label'});
+      poly.addTo(mobMap);
+      return poly;
+    });
+  } else {
+    mobDistrictLayers.forEach(l=>mobMap.removeLayer(l));
+    mobDistrictLayers=[];
+  }
 }
 </script>
 </body>
