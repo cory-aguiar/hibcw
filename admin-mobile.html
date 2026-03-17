@@ -886,8 +886,39 @@ const DISTRICT_COLORS = {
   "south-kona":"#f59e0b","north-kona":"#f97316","north-kohala":"#10b981"
 };
 
+// Maps district id → leading digit of the 5-digit business number
+const DISTRICT_NUMBER_PREFIX = {
+  'hamakua':1,'north-hilo':2,'south-hilo':3,'lower-puna':4,'upper-puna':5,
+  'kau':6,'south-kona':7,'north-kona':8,'north-kohala':9
+};
+
 function districtLabel(v) {
   return DISTRICTS.find(d=>d[0]===v)?.[1] || v;
+}
+
+// Generate the next available 5-digit business number for a district.
+// Format: [district_digit][0001–9999]  e.g. 30001 for first South Hilo business.
+async function generateBusinessNumber(districtId) {
+  const prefix = DISTRICT_NUMBER_PREFIX[districtId];
+  if (!prefix) return null;
+  try {
+    const { data } = await sb
+      .from('business_registry')
+      .select('business_number')
+      .like('business_number', `${prefix}%`)
+      .not('business_number', 'is', null);
+    let maxSeq = 0;
+    if (data && data.length) {
+      data.forEach(row => {
+        const seq = parseInt(row.business_number.slice(1), 10);
+        if (!isNaN(seq) && seq > maxSeq) maxSeq = seq;
+      });
+    }
+    return `${prefix}${String(maxSeq + 1).padStart(4, '0')}`;
+  } catch(e) {
+    console.warn('Could not generate business number:', e.message);
+    return null;
+  }
 }
 
 /* ════════════════════════════════════════════════
@@ -2631,8 +2662,9 @@ function mobExportRegistryCSV() {
     const matchD = !distF || b.district === distF;
     return matchQ && matchS && matchD;
   });
-  const headers = ['Business Name','Type','Status','District','Street Address','City','ZIP','Contact Name','Phone','Email','Employees','Website','Captain','Submitted','Approved','Packet Sent','Notes'];
+  const headers = ['Biz #','Business Name','Type','Status','District','Street Address','City','ZIP','Contact Name','Phone','Email','Employees','Website','Captain','Submitted','Approved','Packet Sent','Notes'];
   const csvRows = [headers, ...rows.map(b => [
+    b.business_number||'',
     b.business_name||'', b.business_type||'', b.status||'', DIST_LABELS[b.district]||b.district||'',
     b.street_address||'', b.city||'', b.zip||'',
     b.contact_name||'', b.phone?fmtPhone(b.phone):'', b.email||'',
@@ -2697,10 +2729,11 @@ function mobPrintRegistry() {
     </div>
   </div>
   <table>
-    <thead><tr><th>#</th><th>Business</th><th>Type</th><th>District</th><th>Contact</th><th>Phone</th><th>Status</th><th>Packet</th></tr></thead>
+    <thead><tr><th>#</th><th>Biz #</th><th>Business</th><th>Type</th><th>District</th><th>Contact</th><th>Phone</th><th>Status</th><th>Packet</th></tr></thead>
     <tbody>
       ${rows.map((b,i)=>`<tr>
         <td style="color:#7a8fa6;width:28px">${i+1}</td>
+        <td style="font-family:monospace;font-weight:700;white-space:nowrap">${b.business_number||'—'}</td>
         <td><strong>${esc(b.business_name||'—')}</strong><br><span style="color:#7a8fa6">${esc(b.city||'')}${b.zip?' '+b.zip:''}</span></td>
         <td>${esc(b.business_type||'—')}</td>
         <td>${esc(DIST_LABELS[b.district]||b.district||'—')}</td>
@@ -2776,10 +2809,11 @@ function mobPrintDistrictBusinesses() {
     </div>
   </div>
   <table>
-    <thead><tr><th>#</th><th>Business</th><th>Type</th><th>Contact</th><th>Phone</th><th>Email</th><th>Status</th><th>Packet</th></tr></thead>
+    <thead><tr><th>#</th><th>Biz #</th><th>Business</th><th>Type</th><th>Contact</th><th>Phone</th><th>Email</th><th>Status</th><th>Packet</th></tr></thead>
     <tbody>
       ${businesses.map((b,i)=>`<tr>
         <td style="color:#7a8fa6;width:28px">${i+1}</td>
+        <td style="font-family:monospace;font-weight:700;white-space:nowrap">${b.business_number||'—'}</td>
         <td><strong>${esc(b.business_name||'—')}</strong><br><span style="color:#7a8fa6">${esc(b.city||'')}${b.zip?' '+b.zip:''}</span></td>
         <td>${esc(b.business_type||'—')}</td>
         <td>${esc(b.contact_name||'—')}</td>
@@ -2829,6 +2863,7 @@ function renderMobRegistry() {
         <div style="flex:1;min-width:0">
           <div style="font-size:.84rem;font-weight:600;color:var(--white);margin-bottom:2px">${esc(b.business_name)}</div>
           <div style="font-size:.7rem;color:var(--slate)">${esc(b.business_type||'')}${b.city?' · '+esc(b.city):''}</div>
+          ${b.business_number?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:700;color:var(--white);margin-top:3px;letter-spacing:.04em"># ${esc(b.business_number)}</div>`:''}
           ${b.packet_sent_at?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);margin-top:3px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</div>`:''}
         </div>
         <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;padding:2px 7px;border-radius:3px;border:1px solid;color:${sc};background:${sc}18;border-color:${sc}44;white-space:nowrap;flex-shrink:0;text-transform:capitalize">${b.status}</span>
@@ -2859,6 +2894,14 @@ function openMobBizSheet(id) {
 
   // Body — all info
   document.getElementById('mobBizSheetBody').innerHTML = `
+    ${b.business_number ? `
+    <div style="background:rgba(0,201,167,.07);border:1.5px solid rgba(0,201,167,.3);border-radius:7px;padding:9px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate)">Business #</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--teal);letter-spacing:.06em">${esc(b.business_number)}</div>
+    </div>` : `
+    <div style="background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.25);border-radius:7px;padding:8px 14px;margin-bottom:12px;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--gold)">
+      ⚠️ No business number yet — approve to auto-assign one.
+    </div>`}
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;padding:3px 8px;border-radius:3px;border:1px solid;color:${dc};background:${dc}18;border-color:${dc}44">${DIST_LABELS[b.district]||b.district||'—'}</span>
       <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;padding:3px 8px;border-radius:3px;border:1px solid;color:${sc};background:${sc}18;border-color:${sc}44;text-transform:capitalize">${b.status}</span>
@@ -3064,14 +3107,25 @@ async function saveMobEditBusiness(id) {
 
 async function mobApproveReg(id) {
   if (!confirm('Approve this business?')) return;
-  const {error} = await sb.from('business_registry').update({status:'approved',approved_at:new Date().toISOString(),approved_by:currentUserName}).eq('id',id);
+  const b = mobRegistryList.find(b=>b.id===id);
+  if (!b) return;
+
+  // Generate business number if not already assigned
+  let bizNumber = b.business_number || null;
+  if (!bizNumber && b.district) {
+    bizNumber = await generateBusinessNumber(b.district);
+  }
+
+  const updates = { status:'approved', approved_at:new Date().toISOString(), approved_by:currentUserName };
+  if (bizNumber) updates.business_number = bizNumber;
+
+  const {error} = await sb.from('business_registry').update(updates).eq('id', id);
   if (!error) {
-    const b = mobRegistryList.find(b=>b.id===id);
-    if (b) b.status = 'approved';
+    Object.assign(b, updates);
     closeMobBizSheet();
     renderMobRegistry();
-    showToast('✅','Business approved!');
-  } else showToast('⚠️',error.message,'err');
+    showToast('✅', bizNumber ? 'Business approved! ID: ' + bizNumber : 'Business approved!');
+  } else showToast('⚠️', error.message, 'err');
 }
 
 async function mobRejectReg(id) {
@@ -3100,6 +3154,7 @@ async function mobGeneratePacket(id) {
     district:DIST_LABELS[b.district]||b.district||'', captain:b.captain_name||'',
     phone:b.phone?`(${b.phone.slice(0,3)}) ${b.phone.slice(3,6)}-${b.phone.slice(6)}`:'',
     email:b.email||'', type:b.business_type||'', distId:b.district||'',
+    bizNum:b.business_number||'',
   });
   window.open(`packet-print.html?${params.toString()}`, '_blank', 'noopener');
   const {error} = await sb.from('business_registry').update({packet_sent_at:new Date().toISOString()}).eq('id',id);
