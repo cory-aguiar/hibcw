@@ -585,6 +585,11 @@ body.light .strip-cell{background:#fff}
 
         <div class="more-section-title">Tools</div>
         <div class="more-card">
+          <div class="more-row" onclick="showMobBizLookup()">
+            <div class="more-ico">🔎</div>
+            <div><div class="more-label">Biz # Lookup</div><div class="more-sub">Search by 5-digit business number</div></div>
+            <div class="more-arrow">›</div>
+          </div>
           <div class="more-row admin-only" onclick="exportCSV('active')">
             <div class="more-ico">📥</div>
             <div><div class="more-label">Export Active CSV</div><div class="more-sub">Download active incidents</div></div>
@@ -649,6 +654,52 @@ body.light .strip-cell{background:#fff}
             </div>
           </div>
           <div id="mobRegistryList" style="padding:0 12px 12px"></div>
+        </div>
+
+        <!-- Biz # Lookup slide-in screen -->
+        <div id="mobBizLookupScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:500;overflow-y:auto;padding-bottom:80px">
+          <!-- Header -->
+          <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+            <button onclick="closeMobBizLookup()" style="background:none;border:none;color:var(--teal);font-size:.9rem;cursor:pointer;padding:2px 6px">‹ Back</button>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">🔎 Biz # Lookup</div>
+          </div>
+
+          <!-- Search input -->
+          <div style="padding:16px 14px 0">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:8px">Enter 5-Digit Business Number</div>
+            <div style="display:flex;gap:8px;margin-bottom:6px">
+              <input
+                id="mobBizLookupInput"
+                type="tel"
+                inputmode="numeric"
+                maxlength="5"
+                placeholder="e.g. 30001"
+                oninput="this.value=this.value.replace(/[^0-9]/g,'');mobBizLookupClear()"
+                onkeydown="if(event.key==='Enter')mobBizLookupSearch()"
+                style="flex:1;background:var(--navy2);border:1.5px solid var(--b2);border-radius:7px;padding:11px 14px;color:var(--white);font-family:'IBM Plex Mono',monospace;font-size:1.2rem;letter-spacing:.15em;outline:none"
+              >
+              <button id="mobBizLookupBtn" onclick="mobBizLookupSearch()"
+                style="background:var(--teal);border:none;border-radius:7px;padding:11px 18px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap">
+                Search
+              </button>
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">First digit = district (1–9) · Last 4 digits = sequence</div>
+          </div>
+
+          <!-- Result -->
+          <div id="mobBizLookupResult" style="padding:14px"></div>
+
+          <!-- Format guide -->
+          <div style="margin:0 14px 20px;background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:12px 14px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:10px">District Prefix Guide</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              ${[['1','Hāmākua'],['2','North Hilo'],['3','South Hilo'],['4','Lower Puna'],['5','Upper Puna'],['6','Kaʻū'],['7','South Kona'],['8','North Kona'],['9','Kohala']].map(([d,n])=>`
+              <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">${d}</span>
+                <span style="color:var(--slate)">D${d} — ${n}</span>
+              </div>`).join('')}
+            </div>
+          </div>
         </div>
 
         <!-- Business detail sheet -->
@@ -3126,6 +3177,134 @@ async function mobApproveReg(id) {
     renderMobRegistry();
     showToast('✅', bizNumber ? 'Business approved! ID: ' + bizNumber : 'Business approved!');
   } else showToast('⚠️', error.message, 'err');
+}
+
+/* ════════════════════════════════════════════════
+   BIZ # LOOKUP
+════════════════════════════════════════════════ */
+function showMobBizLookup() {
+  document.getElementById('mobBizLookupScreen').style.display = 'block';
+  setTimeout(() => document.getElementById('mobBizLookupInput')?.focus(), 120);
+}
+
+function closeMobBizLookup() {
+  document.getElementById('mobBizLookupScreen').style.display = 'none';
+}
+
+function mobBizLookupClear() {
+  document.getElementById('mobBizLookupResult').innerHTML = '';
+}
+
+async function mobBizLookupSearch() {
+  const raw = (document.getElementById('mobBizLookupInput')?.value || '').trim();
+  const resultEl = document.getElementById('mobBizLookupResult');
+  const btn = document.getElementById('mobBizLookupBtn');
+
+  if (!raw) {
+    resultEl.innerHTML = `<div style="color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.76rem;padding:4px 0">Please enter a 5-digit business number.</div>`;
+    return;
+  }
+  if (!/^\d{5}$/.test(raw)) {
+    resultEl.innerHTML = `<div style="color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.76rem;padding:4px 0">Business numbers are exactly 5 digits (e.g. 30001).</div>`;
+    return;
+  }
+
+  btn.textContent = '…';
+  btn.disabled = true;
+  resultEl.innerHTML = `<div style="color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.74rem">Searching ${raw}…</div>`;
+
+  try {
+    const { data, error } = await sb
+      .from('business_registry')
+      .select('*')
+      .eq('business_number', raw)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!data) {
+      resultEl.innerHTML = `
+        <div style="background:rgba(232,65,90,.07);border:1.5px solid rgba(232,65,90,.25);border-radius:8px;padding:16px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:1.5rem">🔍</span>
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;font-weight:700;color:var(--red)">No business found</div>
+            <div style="font-size:.76rem;color:var(--slate);margin-top:3px">Number <strong style="color:var(--white)">${esc(raw)}</strong> is not in the registry.</div>
+          </div>
+        </div>`;
+      return;
+    }
+
+    const b = data;
+    const DIST_COLORS = {
+      'hamakua':'#84cc16','north-hilo':'#3b82f6','south-hilo':'#00c9a7',
+      'lower-puna':'#c084fc','upper-puna':'#a855f7','kau':'#ef4444',
+      'south-kona':'#f59e0b','north-kona':'#f97316','north-kohala':'#10b981'
+    };
+    const DIST_LABELS = {
+      'hamakua':'District 1 — Hāmākua','north-hilo':'District 2 — North Hilo','south-hilo':'District 3 — South Hilo',
+      'lower-puna':'District 4 — Lower Puna','upper-puna':'District 5 — Upper Puna','kau':'District 6 — Kaʻū',
+      'south-kona':'District 7 — South Kona','north-kona':'District 8 — North Kona','north-kohala':'District 9 — Kohala'
+    };
+    const dc = DIST_COLORS[b.district] || 'var(--teal)';
+    const dl = DIST_LABELS[b.district] || b.district || '—';
+    const sc = b.status==='approved'?'var(--teal)':b.status==='pending'?'var(--gold)':'var(--red)';
+    const canEdit = currentRole === 'admin' || currentRole === 'superadmin';
+
+    const row = (label, val) => val ? `
+      <div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--b2);font-size:.82rem">
+        <span style="color:var(--slate);flex-shrink:0;width:96px;font-size:.76rem">${label}</span>
+        <span style="color:var(--white);word-break:break-word">${esc(val)}</span>
+      </div>` : '';
+
+    resultEl.innerHTML = `
+      <div style="background:var(--navy2);border:1.5px solid rgba(0,201,167,.3);border-radius:10px;overflow:hidden">
+
+        <!-- Result header -->
+        <div style="background:rgba(0,201,167,.07);border-bottom:1px solid rgba(0,201,167,.18);padding:14px 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--teal);letter-spacing:.06em">${esc(b.business_number)}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${dc}15;color:${dc};border:1px solid ${dc}33;border-radius:3px;padding:2px 8px">${esc(dl)}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${sc}15;color:${sc};border:1px solid ${sc}33;border-radius:3px;padding:2px 8px;text-transform:capitalize">${b.status}</span>
+            </div>
+          </div>
+          <div style="font-size:.95rem;font-weight:600;color:var(--white)">${esc(b.business_name)}</div>
+          <div style="font-size:.74rem;color:var(--slate);margin-top:2px">${esc(b.business_type||'—')}</div>
+          ${b.packet_sent_at?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal);margin-top:5px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</div>`:''}
+        </div>
+
+        <!-- Detail rows -->
+        <div style="padding:0 16px">
+          ${row('📍 Physical',  b.full_address||[b.street_address,b.city,'HI',b.zip].filter(Boolean).join(', '))}
+          ${row('📬 Mailing',   b.mailing_same_as_physical||!b.mailing_address ? 'Same as physical' : b.mailing_address)}
+          ${row('👤 Contact',   b.contact_name)}
+          ${row('📞 Phone',     b.phone?fmtPhone(b.phone):null)}
+          ${row('✉️ Email',     b.email)}
+          ${row('👥 Employees', b.employees)}
+          ${row('🌐 Website',   b.website)}
+          ${row('👮 Captain',   b.captain_name)}
+          ${row('📝 Notes',     b.notes)}
+        </div>
+
+        <!-- Footer -->
+        <div style="padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--b2)">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
+            Submitted ${b.submitted_at?new Date(b.submitted_at).toLocaleDateString():'—'}${b.approved_at?' · Approved '+new Date(b.approved_at).toLocaleDateString():''}
+          </div>
+          ${canEdit ? `
+          <button onclick="closeMobBizLookup();loadMobRegistry();setTimeout(()=>{showMobRegistry();setTimeout(()=>{document.getElementById('mobRegSearch').value='${esc(b.business_number)}';renderMobRegistry();},200)},100)"
+            style="background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:7px 14px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.66rem;cursor:pointer">
+            Open in Registry →
+          </button>` : ''}
+        </div>
+      </div>`;
+
+  } catch(e) {
+    resultEl.innerHTML = `<div style="color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.76rem">Lookup failed: ${esc(e.message)}</div>`;
+  } finally {
+    btn.textContent = 'Search';
+    btn.disabled = false;
+  }
 }
 
 async function mobRejectReg(id) {
