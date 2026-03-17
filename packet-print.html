@@ -85,6 +85,10 @@
       <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6;margin-bottom:4px">Packet Generated</div>
       <div id="packetDate" style="font-size:.84rem;color:#1a2a3a;font-weight:600"></div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#7a8fa6;margin-top:2px">Captain: <span id="bizCaptain">—</span></div>
+      <div id="bizNumWrap" style="display:none;margin-top:6px;background:#f0fdf9;border:1.5px solid #00c9a7;border-radius:4px;padding:4px 10px;text-align:center">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:#7a8fa6">Business #</div>
+        <div id="bizNumDisplay" style="font-family:'IBM Plex Mono',monospace;font-size:1.1rem;font-weight:700;color:#00c9a7;letter-spacing:.06em"></div>
+      </div>
     </div>
   </div>
 
@@ -128,6 +132,7 @@ const bizCaptain = p.get('captain') || '';
 const bizPhone   = p.get('phone')   || '';
 const bizEmail   = p.get('email')   || '';
 const bizType    = p.get('type')    || '';
+const bizNum     = p.get('bizNum')  || '';
 
 const DIST_COLORS = {
   'hamakua':'#84cc16','north-hilo':'#3b82f6','south-hilo':'#00c9a7',
@@ -144,6 +149,11 @@ document.getElementById('bizEmail').textContent    = bizEmail   ? '✉️ '+bizE
 document.getElementById('bizAddress').textContent  = bizAddr    ? '📍 '+bizAddr    : '';
 document.getElementById('bizCaptain').textContent  = bizCaptain || '—';
 document.getElementById('packetDate').textContent  = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+if (bizNum) {
+  document.getElementById('bizNumDisplay').textContent = bizNum;
+  document.getElementById('bizNumWrap').style.display = 'block';
+}
 
 const badge = document.getElementById('bizDistrictBadge');
 badge.textContent = bizDist || '—';
