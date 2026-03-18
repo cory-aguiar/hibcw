@@ -1,0 +1,240 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>HIBCW Data Export Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+@page{size:letter;margin:0}
+body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10.5px;color:#1a2a3a;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.toolbar{background:#0b1524;padding:8px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.toolbar-brand{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#00c9a7}
+.t-btn{padding:5px 11px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;border:none}
+.t-ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
+.t-teal{background:#00c9a7;color:#0b1524}
+.page{width:816px;min-height:1056px;background:#fff;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
+.stripe-top{height:4px;background:#0b1524}
+.stripe-teal{height:3px;background:#00c9a7}
+.stripe-bot{height:3px;background:#00c9a7}
+.stripe-bot2{height:4px;background:#0b1524}
+
+/* Header */
+.hdr{background:linear-gradient(90deg,#0b1524,#111e30);padding:13px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,201,167,.2)}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-logo{width:40px;height:40px;object-fit:contain;flex-shrink:0}
+.hdr-org{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:#00c9a7;margin-bottom:2px}
+.hdr-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:.04em;line-height:1}
+.hdr-right{text-align:right}
+.hdr-badge{font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);color:#00c9a7;padding:4px 10px;border-radius:3px}
+.hdr-sub{font-size:8px;color:rgba(255,255,255,.35);margin-top:5px}
+
+/* Body */
+.body{padding:14px 32px 12px;flex:1;display:flex;flex-direction:column;gap:12px}
+
+/* Section label */
+.sec{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.sec-num{width:18px;height:18px;border-radius:50%;background:#0b1524;color:#00c9a7;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#0b1524;letter-spacing:.04em}
+.sec-line{flex:1;height:1px;background:rgba(0,201,167,.25)}
+
+/* Export cards */
+.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.export-card{background:#f5f9f8;border:1px solid rgba(0,201,167,.18);border-left:3px solid #00c9a7;border-radius:0 5px 5px 0;padding:9px 11px}
+.export-card.gold{border-left-color:#f5a623;background:#fff9f0;border-color:rgba(245,166,35,.2)}
+.export-card.slate{border-left-color:#7a8fa6;background:#f5f7f9;border-color:rgba(122,143,166,.2)}
+.export-title{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:#0b1524;margin-bottom:2px;display:flex;align-items:center;gap:5px}
+.export-filename{font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:#7a8fa6;margin-bottom:4px}
+.export-desc{font-size:9px;color:#4a6070;line-height:1.5}
+.export-where{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:#00c9a7;margin-top:4px}
+.export-card.gold .export-where{color:#f5a623}
+.export-card.slate .export-where{color:#7a8fa6}
+
+/* Column tables */
+.col-table{width:100%;border-collapse:collapse;margin-bottom:4px;font-size:9px}
+.col-table th{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6;font-weight:400;padding:4px 8px;border-bottom:2px solid #e0e8f0;text-align:left;background:#f8fbff}
+.col-table td{padding:4px 8px;border-bottom:1px solid #f0f4f8;vertical-align:top;line-height:1.45}
+.col-table tr:last-child td{border-bottom:none}
+.col-table tr:hover td{background:#f5f9f8}
+.col-name{font-family:'IBM Plex Mono',monospace;font-size:8px;color:#0b1524;font-weight:500;white-space:nowrap}
+.col-type{font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:#00c9a7;white-space:nowrap}
+.col-type.gold{color:#f5a623}
+.col-type.slate{color:#7a8fa6}
+.col-desc{color:#4a6070;font-size:8.5px}
+.col-note{font-family:'IBM Plex Mono',monospace;font-size:7px;color:#7a8fa6;font-style:italic}
+
+/* Tips box */
+.tips{background:#f0f4f8;border:1px solid #d0dce8;border-radius:5px;padding:9px 12px}
+.tips-title{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:#0b1524;margin-bottom:5px}
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.tip{display:flex;gap:7px;align-items:flex-start}
+.tip-icon{font-size:11px;flex-shrink:0;margin-top:0px}
+.tip-text{font-size:8.5px;color:#4a6070;line-height:1.5}
+.tip-text strong{color:#0b1524}
+
+/* Inline code */
+code{font-family:'IBM Plex Mono',monospace;font-size:8px;background:#eef2f6;border:1px solid #d0dce8;border-radius:2px;padding:0 3px;color:#0b1524}
+
+/* Footer */
+.ftr{background:#f5f8fa;border-top:1px solid #e0e8f0;padding:7px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ftr-left{font-size:7.5px;color:#7a8fa6;line-height:1.7}
+.ftr-left strong{color:#0b1524}
+.ftr-right{font-family:'IBM Plex Mono',monospace;font-size:7px;color:#b0c0cc;text-align:right;line-height:1.6}
+@media print{.toolbar{display:none!important}.page{margin:0;width:100%}}
+</style></head><body>
+
+<div class="toolbar">
+  <div class="toolbar-brand">HIBCW · Data Export Guide</div>
+  <div style="display:flex;gap:6px">
+    <a href="javascript:window.print()" class="t-btn t-teal">🖨 Print / Save PDF</a>
+    <button class="t-btn t-ghost" onclick="window.close()">✕ Close</button>
+  </div>
+</div>
+
+<div class="page">
+<div class="stripe-top"></div><div class="stripe-teal"></div>
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-left">
+    <img src="../logo-shield.svg" alt="HIBCW Shield" class="hdr-logo">
+    <div>
+      <div class="hdr-org">Hawaiʻi Island Business Community Watch · Admin Resources</div>
+      <div class="hdr-title">Data Export Guide</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-badge">Admin &amp; Superadmin Only</div>
+    <div class="hdr-sub">All exports are .csv files · Open in Excel, Numbers, or Google Sheets</div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- Available exports -->
+  <div>
+    <div class="sec">
+      <div class="sec-num">1</div>
+      <div class="sec-title">Available Exports</div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="export-grid">
+      <div class="export-card">
+        <div class="export-title">🚨 Incident Export</div>
+        <div class="export-filename">HIBCW_active_YYYY-MM-DD.csv &nbsp;/&nbsp; HIBCW_archived_YYYY-MM-DD.csv</div>
+        <div class="export-desc">All reported incidents including suspect descriptions, vehicle details, and map coordinates. Three views: Active, Archived, and All.</div>
+        <div class="export-where">Admin Panel → Incidents → ⬇ Export CSV</div>
+      </div>
+      <div class="export-card gold">
+        <div class="export-title">👥 Member Export</div>
+        <div class="export-filename">HIBCW-Members-YYYY-MM-DD.csv</div>
+        <div class="export-desc">All approved members with contact info, business details, district assignment, and days active in the program.</div>
+        <div class="export-where">Admin Panel → Members → ⬇ Export CSV</div>
+      </div>
+      <div class="export-card">
+        <div class="export-title">📋 Business Registry Export</div>
+        <div class="export-filename">HIBCW_BusinessRegistry_YYYY-MM-DD.csv</div>
+        <div class="export-desc">Full registry of all businesses (all statuses) including approval dates, packet sent status, and Captain assignments. Respects active search filters.</div>
+        <div class="export-where">Admin Panel → Registry → ⬇ Export CSV</div>
+      </div>
+      <div class="export-card slate">
+        <div class="export-title">📊 Annual Tracker Export</div>
+        <div class="export-filename">HIBCW_Tracker_YYYY.csv</div>
+        <div class="export-desc">Monthly statistical summary for the selected year — incidents, members, alerts, captain logins, and application counts.</div>
+        <div class="export-where">Admin Panel → Statistics → Tracker → ⬇ Export CSV</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Incident columns -->
+  <div>
+    <div class="sec">
+      <div class="sec-num">2</div>
+      <div class="sec-title">Incident Export — Column Reference</div>
+      <div class="sec-line"></div>
+    </div>
+    <table class="col-table">
+      <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td class="col-name">ID</td><td class="col-type">UUID</td><td class="col-desc">Unique identifier for the incident — matches the database record. Use to cross-reference with Supabase.</td></tr>
+        <tr><td class="col-name">Type</td><td class="col-type">Text</td><td class="col-desc">Incident category: <code>Theft/Shoplifting</code>, <code>Burglary</code>, <code>Robbery</code>, <code>Vandalism</code>, <code>Vehicle Break-In</code>, <code>Drug Activity</code>, <code>Fraud/Scam</code>, <code>Suspicious Activity</code>, <code>Other</code></td></tr>
+        <tr><td class="col-name">Status</td><td class="col-type">Text</td><td class="col-desc"><code>active</code> — visible on public map &nbsp;·&nbsp; <code>archived</code> — removed from map, retained for records</td></tr>
+        <tr><td class="col-name">Date/Time</td><td class="col-type">Timestamp</td><td class="col-desc">When the incident occurred (not when it was submitted), formatted in local time.</td></tr>
+        <tr><td class="col-name">Address</td><td class="col-type">Text</td><td class="col-desc">Street address or nearest intersection as entered by the reporter.</td></tr>
+        <tr><td class="col-name">Description</td><td class="col-type">Text</td><td class="col-desc">Free-text narrative from the reporter. May contain line breaks; quoted in the CSV.</td></tr>
+        <tr><td class="col-name">Reporter</td><td class="col-type">Text</td><td class="col-desc">Reporter's name if provided. Many reporters submit anonymously — this field will be blank.</td></tr>
+        <tr><td class="col-name">Police Report</td><td class="col-type">Text</td><td class="col-desc">HPD report number if the reporter filed one. Blank if no report was filed or unknown.</td></tr>
+        <tr><td class="col-name">Suspect Height … Suspect Other</td><td class="col-type">Text</td><td class="col-desc">Seven suspect description fields. All optional — blank if not observed or not entered.</td></tr>
+        <tr><td class="col-name">Vehicle Make … Vehicle Notes</td><td class="col-type">Text</td><td class="col-desc">Six vehicle fields. All optional — blank if no vehicle was involved or details unknown.</td></tr>
+        <tr><td class="col-name">Lat / Lng</td><td class="col-type">Decimal</td><td class="col-desc">Map pin coordinates. Blank if the reporter only typed an address without confirming a pin location.</td></tr>
+        <tr><td class="col-name">Media Count</td><td class="col-type">Integer</td><td class="col-desc">Number of photos/videos attached to the incident. Media files are stored in Supabase Storage.</td></tr>
+        <tr><td class="col-name">Submitted</td><td class="col-type">Timestamp</td><td class="col-desc">When the report was submitted to the system (may differ from Date/Time of the incident).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Registry & Member columns side by side -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div>
+      <div class="sec">
+        <div class="sec-num">3</div>
+        <div class="sec-title">Registry Export — Key Columns</div>
+        <div class="sec-line"></div>
+      </div>
+      <table class="col-table">
+        <thead><tr><th>Column</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">Biz #</td><td class="col-desc">Assigned membership number. Blank until approved.</td></tr>
+          <tr><td class="col-name">Status</td><td class="col-desc"><code>pending</code> · <code>approved</code> · <code>rejected</code> · <code>archived</code></td></tr>
+          <tr><td class="col-name">District</td><td class="col-desc">Full district label (e.g. <em>District 3 — South Hilo</em>).</td></tr>
+          <tr><td class="col-name">Submitted</td><td class="col-desc">Date application was received.</td></tr>
+          <tr><td class="col-name">Approved</td><td class="col-desc">Date Captain approved the application.</td></tr>
+          <tr><td class="col-name">Packet Sent</td><td class="col-desc">Date welcome packet was generated &amp; mailed.</td></tr>
+          <tr><td class="col-name">Captain</td><td class="col-desc">Assigned District Captain name.</td></tr>
+          <tr><td class="col-name">Notes</td><td class="col-desc">Admin/Captain internal notes. Not public.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="sec">
+        <div class="sec-num">4</div>
+        <div class="sec-title">Member Export — Key Columns</div>
+        <div class="sec-line"></div>
+      </div>
+      <table class="col-table">
+        <thead><tr><th>Column</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">#</td><td class="col-desc">Sequential row number in the export (not a database ID).</td></tr>
+          <tr><td class="col-name">Full Name</td><td class="col-desc">Member's contact name.</td></tr>
+          <tr><td class="col-name">District</td><td class="col-desc">Full label of the member's assigned district.</td></tr>
+          <tr><td class="col-name">Captain</td><td class="col-desc">District Captain assigned at time of export.</td></tr>
+          <tr><td class="col-name">Date Added</td><td class="col-desc">Date the member was added to the system.</td></tr>
+          <tr><td class="col-name">Days Active</td><td class="col-desc">Computed from Date Added to today. <code>Today</code> if added same day.</td></tr>
+          <tr><td class="col-name">Business Address</td><td class="col-desc">Street · City · State · Zip in separate columns.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tips -->
+  <div class="tips">
+    <div class="tips-title">💡 Tips for Working with HIBCW CSV Exports</div>
+    <div class="tips-grid">
+      <div class="tip"><div class="tip-icon">📅</div><div class="tip-text"><strong>Dates are local Hawaiʻi time.</strong> Timestamps exported from the Incidents view are formatted in your browser's local timezone. For UTC values, query Supabase directly.</div></div>
+      <div class="tip"><div class="tip-icon">🔤</div><div class="tip-text"><strong>Text fields are double-quoted.</strong> Any field that may contain commas (Description, Address, Notes) is wrapped in quotes with internal quotes escaped as <code>""</code>.</div></div>
+      <div class="tip"><div class="tip-icon">🔍</div><div class="tip-text"><strong>Registry export respects filters.</strong> If you have a search term or district filter active when you click Export CSV, only the visible rows will be exported — not the full dataset.</div></div>
+      <div class="tip"><div class="tip-icon">🗂</div><div class="tip-text"><strong>Opening in Excel?</strong> Use Data → From Text/CSV and set encoding to UTF-8. This preserves Hawaiian diacriticals (ā, ʻ, ō) in district and place names.</div></div>
+    </div>
+  </div>
+
+</div><!-- /body -->
+
+<div class="ftr">
+  <div class="ftr-left">
+    <strong>Hawaiʻi Island Business Community Watch · A Program of KIAA</strong><br>
+    hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422
+  </div>
+  <div class="ftr-right">
+    Data Export Guide · Admin Resource<br>
+    For authorized administrators only
+  </div>
+</div>
+<div class="stripe-bot"></div><div class="stripe-bot2"></div>
+</div><!-- /page -->
+</body></html>
