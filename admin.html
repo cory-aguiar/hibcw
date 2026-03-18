@@ -6290,7 +6290,7 @@
               <td style="padding:10px 14px;text-align:right" class="captain-hidden">
                 <div style="display:flex;gap:5px;justify-content:flex-end">
                   <button onclick="closeDistBizModal();openRegistryDetail('${b.id}')" style="background:transparent;border:1px solid var(--b2);border-radius:4px;padding:3px 9px;color:var(--slate);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">View</button>
-                  ${b.status==='approved'&&!b.packet_sent_at?`<button onclick="closeDistBizModal();generatePacket('${b.id}')" style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:4px;padding:3px 9px;color:var(--gold);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">📦</button>`:''}
+                  ${b.status==='approved'?`<button onclick="closeDistBizModal();generatePacket('${b.id}')" title="${b.packet_sent_at?'Reprint packet':'Generate packet'}" style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:4px;padding:3px 9px;color:var(--gold);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">${b.packet_sent_at?'🖨':'📦'}</button>`:''}
                 </div>
               </td>
             </tr>`;
@@ -7562,7 +7562,7 @@
                   <button onclick="openRegistryDetail('${b.id}')" style="background:transparent;border:1px solid var(--b2);border-radius:4px;padding:4px 9px;color:var(--slate);font-size:.68rem;cursor:pointer;transition:all .15s;font-family:'IBM Plex Mono',monospace" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">View</button>
                   ${b.status==='pending' ? `<button onclick="approveRegistry('${b.id}')" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);border-radius:4px;padding:4px 8px;color:var(--teal);font-size:.68rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✓</button>
                   <button onclick="rejectRegistry('${b.id}')" style="background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:4px;padding:4px 8px;color:var(--red);font-size:.68rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕</button>` : ''}
-                  ${b.status==='approved' && !b.packet_sent_at ? `<button onclick="generatePacket('${b.id}')" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:4px;padding:4px 8px;color:var(--gold);font-size:.68rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">📦 Packet</button>` : ''}
+                  ${b.status==='approved' ? `<button onclick="generatePacket('${b.id}')" title="${b.packet_sent_at?'Reprint packet':'Generate packet'}" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:4px;padding:4px 8px;color:var(--gold);font-size:.68rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">${b.packet_sent_at?'🖨 Reprint':'📦 Packet'}</button>` : ''}
                 </div>
               </div>`;
             }).join('')}
@@ -7658,7 +7658,7 @@
               ${b.status==='pending'?`
                 <button onclick="approveRegistry('${b.id}');closeBizModal('registryDetailModal')" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:8px 16px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">✅ Approve</button>
                 <button onclick="rejectRegistry('${b.id}');closeBizModal('registryDetailModal')" style="background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:8px 16px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">❌ Reject</button>`:''}
-              ${b.status==='approved'&&!b.packet_sent_at?`<button onclick="generatePacket('${b.id}');closeBizModal('registryDetailModal')" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:8px 16px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">📦 Generate Packet</button>`:''}
+              ${b.status==='approved'?`<button onclick="generatePacket('${b.id}');closeBizModal('registryDetailModal')" title="${b.packet_sent_at?'Reprint packet':'Generate packet'}" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:8px 16px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">${b.packet_sent_at?'🖨 Reprint Packet':'📦 Generate Packet'}</button>`:''}
               ${b.packet_sent_at?`<span style="font-size:.75rem;color:var(--teal);display:flex;align-items:center;gap:4px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</span>`:''}
               <button onclick="closeBizModal('registryDetailModal')" style="background:transparent;border:1px solid var(--b2);border-radius:5px;padding:8px 16px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">Close</button>
             </div>
@@ -7996,15 +7996,19 @@
             approvedAt: b.approved_at||'',
         });
         window.open(`packet-print.html?${params.toString()}`, '_blank', 'noopener');
-        // Mark packet as sent
-        const {error} = await sb.from('business_registry').update({
-            packet_sent_at: new Date().toISOString()
-        }).eq('id',id);
-        if (!error) {
-            const reg = registryList.find(r=>r.id===id);
-            if (reg) reg.packet_sent_at = new Date().toISOString();
-            renderRegistry();
-            showToast('📦','Packet generated! Mark as sent after printing.');
+        // Only mark as sent the first time; subsequent opens are reprints
+        if (!b.packet_sent_at) {
+            const {error} = await sb.from('business_registry').update({
+                packet_sent_at: new Date().toISOString()
+            }).eq('id',id);
+            if (!error) {
+                const reg = registryList.find(r=>r.id===id);
+                if (reg) reg.packet_sent_at = new Date().toISOString();
+                renderRegistry();
+                showToast('📦','Packet generated! Mark as sent after printing.');
+            }
+        } else {
+            showToast('🖨','Reprinting packet…');
         }
     }
 
