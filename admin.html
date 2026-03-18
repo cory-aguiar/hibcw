@@ -5179,13 +5179,20 @@
     async function removeMember(id) {
         if (!confirm('Remove this member? Their past verified reports will keep the badge.'))
             return;
+        const member = memberList.find(m => String(m.id) === String(id));
         const {error} = await sb.from('member_emails').delete().eq('id', id);
-        if (!error) {
-            await loadMembers();
-            showToast('🗑', 'Member removed.');
-        }
-        else
+        if (error) {
             showToast('⚠️', error.message, 'err');
+            return;
+        }
+        // Also reject the matching application so they don\'t linger as "approved"
+        if (member?.app_id) {
+            await sb.from('member_applications').update({status: 'rejected'}).eq('id', member.app_id);
+        } else if (member?.email) {
+            await sb.from('member_applications').update({status: 'rejected'}).eq('email', member.email.toLowerCase()).eq('status', 'approved');
+        }
+        await loadMembers();
+        showToast('🗑', 'Member removed.');
     }
 
     function importMemberCSV() {
@@ -8313,9 +8320,15 @@
     async function deleteApp(id) {
         if (!confirm('Permanently delete this application?'))
             return;
+        const app = allApplications.find(a => a.id === id);
+        // If the application was approved, also remove from member_emails so badge access is revoked
+        if (app?.email && app?.status === 'approved') {
+            await sb.from('member_emails').delete().eq('email', app.email.toLowerCase());
+        }
         const {error} = await sb.from('member_applications').delete().eq('id', id);
         if (!error) {
             allApplications = allApplications.filter(a => a.id !== id);
+            if (app?.status === 'approved') await loadMembers();
             renderApps();
             updateAppCount();
             showToast('🗑', 'Application deleted.');
