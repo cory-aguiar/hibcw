@@ -1387,8 +1387,11 @@ async function removeMember(id) {
   const m=memberList.find(x=>x.id===id);
   if(!m||!confirm(`Remove ${m.email} from verified members?`)) return;
   const {error}=await sb.from('member_emails').delete().eq('id',id);
-  if(!error){memberList=memberList.filter(x=>x.id!==id);renderMembers();updateMoreStrip();showToast('🗑','Member removed.');}
-  else showToast('⚠️',error.message,'err');
+  if(error){showToast('⚠️',error.message,'err');return;}
+  // Also reject the matching application so they don't linger as "approved"
+  if(m.app_id){await sb.from('member_applications').update({status:'rejected'}).eq('id',m.app_id);}
+  else if(m.email){await sb.from('member_applications').update({status:'rejected'}).eq('email',m.email.toLowerCase()).eq('status','approved');}
+  memberList=memberList.filter(x=>x.id!==id);renderMembers();updateMoreStrip();showToast('🗑','Member removed.');
 }
 function exportMembersCSV() {
   if(!memberList.length){showToast('ℹ️','No members to export.');return;}
@@ -1527,9 +1530,15 @@ async function rejectApp(id) {
 }
 async function deleteApp(id) {
   if(!confirm('Permanently delete this application?')) return;
+  const app=allApplications.find(a=>a.id===id);
+  // If approved, revoke badge access first
+  if(app?.email&&app?.status==='approved'){await sb.from('member_emails').delete().eq('email',app.email.toLowerCase());}
   const {error}=await sb.from('member_applications').delete().eq('id',id);
-  if(!error){allApplications=allApplications.filter(a=>a.id!==id);renderApps();updateAppBadge();updateMoreStrip();showToast('🗑','Application deleted.');}
-  else showToast('⚠️',error.message,'err');
+  if(!error){
+    allApplications=allApplications.filter(a=>a.id!==id);
+    if(app?.status==='approved')await loadMembers();
+    renderApps();updateAppBadge();updateMoreStrip();showToast('🗑','Application deleted.');
+  } else showToast('⚠️',error.message,'err');
 }
 
 /* ════════════════════════════════════════════════
