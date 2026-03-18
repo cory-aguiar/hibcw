@@ -7269,11 +7269,10 @@
     function renderQuarterly() {
         const el = document.getElementById('quarterlyForms');
         if (!el) return;
-        const yd = trackerData[trackerYear]||{};
         el.innerHTML = QUARTERS.map(q=>{
             const qData = quarterlyNotes[`${trackerYear}_${q.label}`]||{};
             const stats = q.months.map(mi=>{
-                const md = yd[mi]||{};
+                const md = trackerLive[mi]||{};
                 return {month:TRACKER_MONTHS[mi], new_members:md.members_new||0, incidents:md.incidents||0, alerts:md.alerts_sent||0, apps:md.apps_approved||0};
             });
             const totNewMem = stats.reduce((s,m)=>s+m.new_members,0);
@@ -7312,8 +7311,7 @@
     function renderSponsorReport() {
         const el = document.getElementById('sponsorReport');
         if (!el) return;
-        const yd = trackerData[trackerYear]||{};
-        const allM = Object.values(yd);
+        const allM = Object.values(trackerLive);
         const totalMembers   = Math.max(...allM.map(m=>parseInt(m.members_total)||0).concat([0]));
         const totalIncidents = allM.reduce((s,m)=>s+(parseInt(m.incidents)||0),0);
         const totalAlerts    = allM.reduce((s,m)=>s+(parseInt(m.alerts_sent)||0),0);
