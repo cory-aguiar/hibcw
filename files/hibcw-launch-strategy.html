@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HIBCW Launch Strategy — Social Media Campaign Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0b1524;--navy2:#111e30;--navy3:#18293f;
+  --teal:#00c9a7;--teal2:#00a589;
+  --gold:#f5a623;--red:#e8415a;
+  --slate:#7a8fa6;--slate2:#4a6070;
+  --white:#eef3f8;--border:rgba(0,201,167,.15);
+  --border2:rgba(255,255,255,.07);
+}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white);line-height:1.6}
+
+/* HEADER */
+.site-header{background:linear-gradient(135deg,#0b1524 0%,#111e30 50%,#0d1f34 100%);border-bottom:1px solid var(--border);padding:40px 0 0}
+.header-inner{max-width:960px;margin:0 auto;padding:0 32px}
+.header-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.header-title{font-family:'Rajdhani',sans-serif;font-size:48px;font-weight:700;line-height:1.05;margin-bottom:8px}
+.header-title span{color:var(--teal)}
+.header-sub{font-size:16px;color:var(--slate);max-width:600px;margin-bottom:32px}
+.phase-nav{display:flex;gap:0;border-top:1px solid var(--border2);margin-top:16px}
+.phase-tab{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:14px 24px;color:var(--slate);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.phase-tab.active,.phase-tab:hover{color:var(--teal);border-bottom-color:var(--teal)}
+
+/* CONTENT */
+.content{max-width:960px;margin:0 auto;padding:48px 32px}
+.phase-section{display:none}
+.phase-section.active{display:block}
+
+/* SECTION HEADERS */
+.sec-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;margin-bottom:6px}
+.sec-desc{font-size:15px;color:var(--slate);margin-bottom:36px;max-width:680px}
+
+/* CARDS */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+.card-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:32px}
+.card{background:var(--navy2);border:1px solid var(--border2);border-radius:10px;padding:24px}
+.card-accent{border-top:3px solid var(--teal)}
+.card-accent-gold{border-top:3px solid var(--gold)}
+.card-accent-red{border-top:3px solid var(--red)}
+.card h3{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;margin-bottom:8px}
+.card p{font-size:13px;color:var(--slate);line-height:1.65}
+.card ul{font-size:13px;color:var(--slate);padding-left:18px;line-height:1.9}
+.card .label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:32px;margin-bottom:40px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:1px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:28px}
+.tl-dot{position:absolute;left:-28px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--teal);border:2px solid var(--navy)}
+.tl-dot.gold{background:var(--gold)}
+.tl-dot.red{background:var(--red)}
+.tl-week{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:4px}
+.tl-week.gold{color:var(--gold)}
+.tl-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;margin-bottom:6px}
+.tl-body{font-size:13px;color:var(--slate);line-height:1.65}
+.tl-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:4px;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.2)}
+.tag.gold{background:rgba(245,166,35,.1);color:var(--gold);border-color:rgba(245,166,35,.2)}
+.tag.slate{background:rgba(122,143,166,.1);color:var(--slate);border-color:rgba(122,143,166,.2)}
+
+/* POST TEMPLATES */
+.post-card{background:var(--navy3);border:1px solid var(--border2);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.post-header{background:var(--navy2);padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border2)}
+.post-platform{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 10px;border-radius:4px}
+.platform-instagram{background:rgba(214,94,208,.15);color:#d65ed0;border:1px solid rgba(214,94,208,.25)}
+.platform-nextdoor{background:rgba(0,201,167,.12);color:var(--teal);border:1px solid var(--border)}
+.platform-linkedin{background:rgba(10,102,194,.15);color:#4a9fd5;border:1px solid rgba(10,102,194,.25)}
+.platform-youtube{background:rgba(255,70,70,.12);color:#ff6b6b;border:1px solid rgba(255,70,70,.2)}
+.platform-email{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.2)}
+.post-type{font-size:12px;color:var(--slate);margin-left:auto}
+.post-body{padding:20px;font-size:13.5px;color:#c8d8e8;line-height:1.75;white-space:pre-line}
+.post-note{padding:12px 20px;background:rgba(0,201,167,.06);border-top:1px solid var(--border);font-size:12px;color:var(--slate);font-style:italic}
+
+/* METRIC CARDS */
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px}
+.metric{background:var(--navy2);border:1px solid var(--border2);border-radius:8px;padding:16px}
+.metric-val{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--teal);margin-bottom:2px}
+.metric-val.gold{color:var(--gold)}
+.metric-lbl{font-size:12px;color:var(--slate)}
+
+/* DISTRICT TABLE */
+.district-table{width:100%;border-collapse:collapse;margin-bottom:32px;font-size:13px}
+.district-table th{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);padding:10px 14px;border-bottom:1px solid var(--border2);text-align:left}
+.district-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--slate)}
+.district-table td:first-child{color:var(--white);font-weight:500}
+.district-table tr:hover td{background:rgba(0,201,167,.04)}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
+.dot-green{background:#00c9a7}
+.dot-gold{background:#f5a623}
+.dot-slate{background:#4a6070}
+
+/* ALERT BOX */
+.alert{background:rgba(0,201,167,.07);border:1px solid rgba(0,201,167,.2);border-left:3px solid var(--teal);border-radius:6px;padding:16px 20px;margin-bottom:24px;font-size:13px;color:var(--slate);line-height:1.7}
+.alert strong{color:var(--white)}
+.alert.gold{background:rgba(245,166,35,.07);border-color:rgba(245,166,35,.2);border-left-color:var(--gold)}
+
+/* FOOTER */
+.site-footer{border-top:1px solid var(--border2);padding:32px;text-align:center;font-size:12px;color:var(--slate2);margin-top:48px}
+.site-footer span{color:var(--teal)}
+
+/* PRINT HEADER */
+.print-brand{display:flex;align-items:center;gap:14px;margin-bottom:48px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.print-shield{width:44px;height:44px}
+
+@media(max-width:700px){
+  .card-grid,.card-grid-3,.metric-row{grid-template-columns:1fr}
+  .header-title{font-size:32px}
+  .phase-nav{overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-eyebrow">Prepared by Your Social Media Management Team</div>
+    <h1 class="header-title">HIBCW Launch &amp; <span>Campaign Strategy</span></h1>
+    <p class="header-sub">A phased rollout plan to introduce <strong>hibcw.vercel.app</strong> to KIAA members first, then expand awareness across all 9 districts of Hawaii Island — without Facebook.</p>
+    <nav class="phase-nav">
+      <div class="phase-tab active" onclick="showPhase('overview')">Overview</div>
+      <div class="phase-tab" onclick="showPhase('phase1')">Phase 1 — KIAA Soft Launch</div>
+      <div class="phase-tab" onclick="showPhase('phase2')">Phase 2 — Island Rollout</div>
+      <div class="phase-tab" onclick="showPhase('posts')">Post Templates</div>
+      <div class="phase-tab" onclick="showPhase('kpis')">KPIs &amp; Tracking</div>
+    </nav>
+  </div>
+</header>
+
+<main class="content">
+
+<!-- OVERVIEW -->
+<section class="phase-section active" id="phase-overview">
+  <div class="sec-eyebrow">Campaign Summary</div>
+  <h2 class="sec-title">Your Launch Playbook</h2>
+  <p class="sec-desc">HIBCW is Hawaii Island's free, community-led business crime watch network. This strategy takes it from internal KIAA adoption to island-wide recognition across every district and platform — no Facebook required.</p>
+
+  <div class="metric-row">
+    <div class="metric"><div class="metric-val">2</div><div class="metric-lbl">Launch phases</div></div>
+    <div class="metric"><div class="metric-val">9</div><div class="metric-lbl">Districts targeted</div></div>
+    <div class="metric"><div class="metric-val gold">4</div><div class="metric-lbl">Active platforms</div></div>
+    <div class="metric"><div class="metric-val">12</div><div class="metric-lbl">Week campaign</div></div>
+  </div>
+
+  <div class="alert">
+    <strong>Platform Strategy:</strong> Instagram, Nextdoor, LinkedIn, and YouTube. Each platform reaches a distinct audience segment on Hawaii Island — Instagram for visual community reach, Nextdoor for hyperlocal neighborhood trust, LinkedIn for business owners and chamber professionals, YouTube for longer-form explainer content and search discoverability.
+  </div>
+
+  <div class="card-grid">
+    <div class="card card-accent">
+      <div class="label">Phase 1 · Weeks 1–4</div>
+      <h3>KIAA Soft Launch</h3>
+      <p>Introduce HIBCW to current KIAA members through a private email drip, a direct outreach letter, and an in-person (or virtual) demo session. Goal: onboard your founding member base before public launch. Create social proof before going wide.</p>
+    </div>
+    <div class="card card-accent-gold">
+      <div class="label">Phase 2 · Weeks 5–12</div>
+      <h3>Island-Wide Campaign</h3>
+      <p>Roll out district by district across Instagram, Nextdoor, LinkedIn, and YouTube. Coordinate with local chambers of commerce, neighborhood groups, and TPD community liaisons. Amplify real member stories as they emerge.</p>
+    </div>
+  </div>
+
+  <div class="sec-eyebrow" style="margin-top:40px">Platform Roles</div>
+  <h2 class="sec-title" style="font-size:24px">Why These 4 Platforms</h2>
+
+  <div class="card-grid-3" style="margin-top:16px">
+    <div class="card">
+      <div class="label" style="color:#d65ed0;border-bottom:1px solid rgba(214,94,208,.15);padding-bottom:8px;margin-bottom:12px">Instagram</div>
+      <h3>Visual Awareness</h3>
+      <p>Reels and Story posts reach small business owners, shop managers, and community-minded locals. District-specific posts with map visuals drive clicks to hibcw.vercel.app.</p>
+    </div>
+    <div class="card">
+      <div class="label" style="color:var(--teal);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Nextdoor</div>
+      <h3>Hyperlocal Trust</h3>
+      <p>Nextdoor is the #1 neighborhood platform in Hawaii. Each of the 9 districts maps to Nextdoor neighborhoods. Announcements here feel like a neighbor talking to a neighbor — ideal for community safety programs.</p>
+    </div>
+    <div class="card">
+      <div class="label" style="color:#4a9fd5;border-bottom:1px solid rgba(10,102,194,.2);padding-bottom:8px;margin-bottom:12px">LinkedIn</div>
+      <h3>Business Owner Reach</h3>
+      <p>Hawaii Island chamber members, business owners, and managers live on LinkedIn. KIAA's organizational credibility translates directly here. Posts announcing the tool get shared within professional networks.</p>
+    </div>
+  </div>
+  <div class="card-grid" style="margin-top:0">
+    <div class="card">
+      <div class="label" style="color:#ff6b6b;border-bottom:1px solid rgba(255,70,70,.15);padding-bottom:8px;margin-bottom:12px">YouTube</div>
+      <h3>Search-Discoverable Explainers</h3>
+      <p>A short 2–3 minute walkthrough video ("How to Report an Incident on HIBCW") will rank for local searches and can be embedded on future KIAA website pages. YouTube Shorts repurposed for Instagram Reels maximize production value.</p>
+    </div>
+    <div class="card card-accent-gold">
+      <div class="label">Also Recommended</div>
+      <h3>Email (KIAA List)</h3>
+      <p>Your existing KIAA email list is the highest-trust, highest-conversion channel you have. Three targeted emails over 4 weeks (announcement, demo invite, follow-up) will drive the majority of early sign-ups before social even warms up.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-phase1">
+  <div class="sec-eyebrow">Phase 1 · Weeks 1–4</div>
+  <h2 class="sec-title">KIAA Soft Launch</h2>
+  <p class="sec-desc">Before going public, bring your existing KIAA member network onboard. They become your founding members, social proof, and word-of-mouth engine.</p>
+
+  <div class="alert gold">
+    <strong>Why soft launch first?</strong> HIBCW's value compounds with network size. If community members visit the map on Day 1 and see zero incidents, they'll bounce. By seeding your KIAA members first, you build an active data layer before public launch — so when Island-wide promotion begins, the map is alive and credible.
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-week">Week 1</div>
+      <div class="tl-title">Member Announcement Email</div>
+      <div class="tl-body">Send a personal email from KIAA leadership to your full member list. Subject line: "KIAA just launched something new for Hawaii Island businesses." Introduce HIBCW, the URL, and invite them to explore the map. Keep it warm, direct, and brief — this is a teaser, not a manual.</div>
+      <div class="tl-tags">
+        <span class="tag">Email</span>
+        <span class="tag slate">KIAA List</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-week">Week 2</div>
+      <div class="tl-title">Intro Letter + Member Packet Distribution</div>
+      <div class="tl-body">Send the official HIBCW intro letter (template-intro-letter.pdf) via mail or hand-delivery to every KIAA member business. Include the district-specific flyer for their area. Captains should begin outreach to their district businesses directly. This is the formal onboarding touchpoint — tactile, professional, and stays on desks.</div>
+      <div class="tl-tags">
+        <span class="tag">Direct Mail</span>
+        <span class="tag slate">District Flyers</span>
+        <span class="tag">Captain Outreach</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-week">Week 3</div>
+      <div class="tl-title">Virtual or In-Person Demo Session</div>
+      <div class="tl-body">Host a 30-minute live walkthrough — Zoom or at the KIAA office — showing members exactly how to use hibcw.vercel.app: view the map, submit a report, and understand district alerts. Record the session for a YouTube explainer video. Invite questions and collect testimonials from early adopters. Aim for 15–30 attendees.</div>
+      <div class="tl-tags">
+        <span class="tag">Zoom / In-Person</span>
+        <span class="tag gold">Record for YouTube</span>
+        <span class="tag slate">Testimonial Collection</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot gold"></div>
+      <div class="tl-week gold">Week 4</div>
+      <div class="tl-title">Follow-Up + Pre-Launch Social Teaser</div>
+      <div class="tl-body">Send a follow-up email to members who haven't registered yet ("Have you joined HIBCW yet? It takes 2 minutes"). Post the first teaser on Instagram and LinkedIn — a simple shield graphic with the copy "Something new is coming to Hawaii Island. Built by KIAA. Built for business." No URL yet — build anticipation. Begin scheduling district-by-district Nextdoor posts for Phase 2.</div>
+      <div class="tl-tags">
+        <span class="tag">Email Follow-Up</span>
+        <span class="tag" style="background:rgba(214,94,208,.1);color:#d65ed0;border-color:rgba(214,94,208,.2)">Instagram Teaser</span>
+        <span class="tag" style="background:rgba(10,102,194,.1);color:#4a9fd5;border-color:rgba(10,102,194,.2)">LinkedIn Teaser</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-eyebrow">Districts</div>
+  <h3 style="font-family:'Rajdhani',sans-serif;font-size:22px;margin-bottom:16px">District Captain Activation</h3>
+
+  <table class="district-table">
+    <thead>
+      <tr>
+        <th>District</th>
+        <th>Area</th>
+        <th>Week 2 Captain Action</th>
+        <th>Flyer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>D1</td><td>Hamakua</td><td>Direct outreach to registered KIAA members in district</td><td>flyer-d1-hamakua.pdf</td></tr>
+      <tr><td>D2</td><td>North Hilo</td><td>Email + phone follow-up with priority businesses</td><td>flyer-d2-north-hilo.pdf</td></tr>
+      <tr><td>D3</td><td>South Hilo</td><td>Attend any local business association meetings</td><td>flyer-d3-south-hilo.pdf</td></tr>
+      <tr><td>D4</td><td>Lower Puna</td><td>Coordinate with neighborhood watch groups</td><td>flyer-d4-lower-puna.pdf</td></tr>
+      <tr><td>D5</td><td>Upper Puna</td><td>Connect with Pahoa business district contacts</td><td>flyer-d5-upper-puna.pdf</td></tr>
+      <tr><td>D6</td><td>Kau</td><td>Reach out to Naalehu and Ocean View businesses</td><td>flyer-d6-kau.pdf</td></tr>
+      <tr><td>D7</td><td>South Kona</td><td>Coffee belt business corridor outreach</td><td>flyer-d7-south-kona.pdf</td></tr>
+      <tr><td>D8</td><td>North Kona</td><td>Kailua-Kona high-density business cluster priority</td><td>flyer-d8-north-kona.pdf</td></tr>
+      <tr><td>D9</td><td>North Kohala</td><td>Hawi-Kapaau corridor small business contacts</td><td>flyer-d9-north-kohala.pdf</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card card-accent">
+    <div class="label">Phase 1 Success Gate</div>
+    <h3>Before Moving to Phase 2</h3>
+    <p>Confirm at least 20 KIAA member businesses are registered and the map has active incident data from at least 3 districts. This ensures your public launch lands on a living, credible platform — not an empty map.</p>
+  </div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-phase2">
+  <div class="sec-eyebrow">Phase 2 · Weeks 5–12</div>
+  <h2 class="sec-title">Island-Wide Campaign</h2>
+  <p class="sec-desc">With your founding members onboard and the map active, open the floodgates. A district-by-district rollout ensures each community feels personally addressed, not blasted with a generic island-wide ad.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-week">Week 5</div>
+      <div class="tl-title">Public Launch Announcement</div>
+      <div class="tl-body">Coordinate a simultaneous announcement across Instagram, LinkedIn, and Nextdoor (all districts at once). Post the YouTube explainer video. Issue a press release to West Hawaii Today and Hawaii Tribune-Herald covering HIBCW as a new KIAA community safety initiative. Email your full list with "HIBCW is now open to all Hawaii Island businesses — join free today."</div>
+      <div class="tl-tags">
+        <span class="tag" style="background:rgba(214,94,208,.1);color:#d65ed0;border-color:rgba(214,94,208,.2)">Instagram</span>
+        <span class="tag" style="background:rgba(10,102,194,.1);color:#4a9fd5;border-color:rgba(10,102,194,.2)">LinkedIn</span>
+        <span class="tag">Nextdoor</span>
+        <span class="tag" style="background:rgba(255,70,70,.1);color:#ff6b6b;border-color:rgba(255,70,70,.2)">YouTube Live</span>
+        <span class="tag slate">Press Release</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-week">Weeks 6–7</div>
+      <div class="tl-title">District Spotlight Series (Instagram + Nextdoor)</div>
+      <div class="tl-body">One district per post, rotating through all 9 over two weeks. Each Instagram carousel or Reel shows that district's map activity, names the district captain (with permission), and includes a call-to-action to "join your district." Simultaneously post on each district's Nextdoor neighborhood. This personalizes the campaign at the community level.</div>
+      <div class="tl-tags">
+        <span class="tag" style="background:rgba(214,94,208,.1);color:#d65ed0;border-color:rgba(214,94,208,.2)">Instagram Reels</span>
+        <span class="tag">Nextdoor</span>
+        <span class="tag slate">District-Specific</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-week">Week 8</div>
+      <div class="tl-title">Member Story Feature</div>
+      <div class="tl-body">Reach out to 2–3 early KIAA members who can speak to the value of HIBCW. A short quote or 30-second video testimonial from a real Hilo or Kona business owner is worth ten polished ads. Feature on Instagram Stories, LinkedIn, and Nextdoor. Caption: "A business like yours, protected by their community."</div>
+      <div class="tl-tags">
+        <span class="tag gold">Testimonials</span>
+        <span class="tag" style="background:rgba(214,94,208,.1);color:#d65ed0;border-color:rgba(214,94,208,.2)">Instagram Stories</span>
+        <span class="tag" style="background:rgba(10,102,194,.1);color:#4a9fd5;border-color:rgba(10,102,194,.2)">LinkedIn</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-week">Weeks 9–10</div>
+      <div class="tl-title">Chamber &amp; TPD Partnership Posts</div>
+      <div class="tl-body">Coordinate co-branded posts with the Kona-Kohala Chamber, East Hawaii Regional Chamber, and any TPD community liaison officers who support the program. Partner posts get organic reach into networks you don't currently own. A brief quote from a law enforcement contact lends immediate credibility to the platform.</div>
+      <div class="tl-tags">
+        <span class="tag">Chamber Partners</span>
+        <span class="tag gold">TPD Endorsement</span>
+        <span class="tag" style="background:rgba(10,102,194,.1);color:#4a9fd5;border-color:rgba(10,102,194,.2)">LinkedIn</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot gold"></div>
+      <div class="tl-week gold">Weeks 11–12</div>
+      <div class="tl-title">Milestone Celebration + Sustained Cadence</div>
+      <div class="tl-body">Celebrate any membership milestones publicly ("50 Hawaii Island businesses now on HIBCW — mahalo!"). Post a 12-week campaign wrap summary on LinkedIn. Set up a monthly content cadence: one Nextdoor district update, two Instagram posts, one LinkedIn piece, and one email per month to sustain awareness after the launch push.</div>
+      <div class="tl-tags">
+        <span class="tag">All Platforms</span>
+        <span class="tag gold">Milestone Post</span>
+        <span class="tag slate">Monthly Cadence Setup</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card card-accent">
+      <div class="label">Sustained Monthly Content</div>
+      <h3>After Week 12</h3>
+      <ul>
+        <li>Monthly Nextdoor safety tip per district</li>
+        <li>Instagram: 2 posts/month (map activity, member spotlight)</li>
+        <li>LinkedIn: 1 post/month (business safety angle)</li>
+        <li>Email: Monthly HIBCW digest to full member list</li>
+        <li>YouTube: Quarterly short-form update</li>
+      </ul>
+    </div>
+    <div class="card card-accent-gold">
+      <div class="label">Community Amplifiers</div>
+      <h3>Who to Partner With</h3>
+      <ul>
+        <li>Kona-Kohala Chamber of Commerce</li>
+        <li>East Hawaii Regional Chamber</li>
+        <li>Hawaii Island Economic Development Board</li>
+        <li>Hawaii Police Department (community division)</li>
+        <li>Pahoa, Naalehu, Hawi business associations</li>
+        <li>Local TV news (Big Island Video News, KHON2)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- POST TEMPLATES -->
+<section class="phase-section" id="phase-posts">
+  <div class="sec-eyebrow">Ready-to-Post Content</div>
+  <h2 class="sec-title">Post Templates</h2>
+  <p class="sec-desc">Copy, customize, and post. Every template below is written for its platform's voice and optimal length. Swap in your district name, captain name, or specific details where indicated in [brackets].</p>
+
+  <!-- EMAIL 1 -->
+  <div class="post-card">
+    <div class="post-header">
+      <span class="post-platform platform-email">Email</span>
+      <span class="post-type">Week 1 · KIAA Member Announcement</span>
+    </div>
+    <div class="post-body">Subject: KIAA just launched something new for Hawaii Island businesses
+
+Aloha [First Name],
+
+As a valued KIAA member, you're the first to hear about something we've been building for our community.
+
+It's called HIBCW — Hawaii Island Business Crime Watch. It's a free, live platform at hibcw.vercel.app where any Hawaii Island business can report incidents, view a real-time map of activity across all 9 districts, and receive alerts from their District Captain.
+
+No app to download. No account required to view the map. Just go to hibcw.vercel.app.
+
+If you witness suspicious activity, a break-in, theft, or anything worth flagging — it takes under 2 minutes to report it. Your report goes live on the public map immediately and gets reviewed by your District Captain.
+
+We built this for businesses like yours. Take a look and let us know what you think.
+
+Mahalo,
+[Your Name]
+Hawaii Island Business Crime Watch · A Program of KIAA
+hibcw.vercel.app | hibcw@kiaahilo.org | (808) 961-5422</div>
+    <div class="post-note">Personalize the first name. Send from your main KIAA email address for maximum open rate.</div>
+  </div>
+
+  <!-- INSTAGRAM TEASER -->
+  <div class="post-card">
+    <div class="post-header">
+      <span class="post-platform platform-instagram">Instagram</span>
+      <span class="post-type">Week 4 · Pre-Launch Teaser</span>
+    </div>
+    <div class="post-body">Something new is coming to Hawaii Island. 🛡️
+
+Built by @KIAAHilo. Built for our business community.
+
+Stay tuned.
+
+#HawaiiIsland #BigIsland #KonaBusiness #HiloBusiness #HawaiiSmallBusiness #KIAA #CommunitySafety</div>
+    <div class="post-note">Use the HIBCW shield logo (logo-shield.svg) as the image. Navy background, teal shield. Don't reveal the URL yet — build curiosity.</div>
+  </div>
+
+  <!-- INSTAGRAM LAUNCH -->
+  <div class="post-card">
+    <div class="post-header">
+      <span class="post-platform platform-instagram">Instagram</span>
+      <span class="post-type">Week 5 · Public Launch</span>
+    </div>
+    <div class="post-body">Hawaii Island just got its own business crime watch. 🗺️
+
+HIBCW is live at hibcw.vercel.app — a free, real-time incident map for businesses across all 9 districts of Hawaii Island.
+
+Here's how it works:
+→ You see something suspicious? Report it in 2 minutes.
+→ Your report goes live on the public map immediately.
+→ Your District Captain gets notified and sends alerts to your area.
+→ Neighboring businesses stay informed.
+
+No app. No cost. No friction. Just community looking out for community.
+
+Join free: hibcw.vercel.app
+A program of KIAA · (808) 961-5422
+
+#HawaiiIslandBusinessCrimeWatch #HIBCW #BigIsland #HawaiiIsland #CommunitySafety #HiloBusiness #KonaBusiness #SmallBusinessHawaii #NeighborhoodWatch</div>
+    <div class="post-note">Pair with a Reel showing a 15-second screen recording of the live map zoomed in on Hawaii Island. Record the demo session from Week 3 and clip the map portion.</div>
+  </div>
+
+  <!-- INSTAGRAM DISTRICT SPOTLIGHT -->
+  <div class="post-card">
+    <div class="post-header">
+      <span class="post-platform platform-instagram">Instagram</span>
+      <span class="post-type">Weeks 6–7 · District Spotlight (repeat for each district)</span>
+    </div>
+    <div class="post-body">Spotlight: [District Name] — District [#] 🏝️
+
+Businesses in [area names — e.g., "Kailua-Kona, Holualoa, and Keauhou"] — this one's for you.
+
+HIBCW District [#] covers [District Name]. Your District Captain is [Name], and they're already monitoring the map for your area.
+
+📍 View your district live: hibcw.vercel.app
+📋 Report an incident in under 2 minutes — no account needed
+📢 Receive real-time district alerts
+
+Join [#] other businesses already on the network. It's free.
+
+#[DistrictName]Hawaii #BigIsland #HIBCW #HawaiiIslandBusinessCrimeWatch #CommunitySafety</div>
+    <div class="post-note">Create a simple graphic using the district flyer as reference. Show the district name, captain name, and a cropped view of the HIBCW map for that area. Post one per district across the 9-district series.</div>
+  </div>
+
+  <!-- NEXTDOOR -->
+  <div class="post-card">
+    <div class="post-header">
+      <span class="post-platform platform-nextdoor">Nextdoor</span>
+      <span class="post-type">Week 5 · Neighborhood Announcement (post in each relevant neighborhood)</span>
+    </div>
+    <div class="post-body">Aloha neighbors — KIAA just launched a free business safety tool for Hawaii Island.
+
+It's called HIBCW (Hawaii Island Business Crime Watch) and it's live at hibcw.vercel.app.
+
+If you own or manage a business in [neighborhood/district name], you can:
+• Report incidents (theft, break-ins, suspicious activity) in about 2 minutes
+• View a live map of reported incidents across the whole island
+• Receive alerts from your District Captain when something happens nearby
+
+There's no app to download and no login required to view the map. Reporting is quick and your information goes directly to your local captain.
+
+We're covering all 9 districts — Hamakua, North Hilo, South Hilo, Lower Puna, Upper Puna, Kau, South Kona, North Kona, and North Kohala.
+
+Questions? Reach us at hibcw@kiaahilo.org or (808) 961-5422.
+
+Mahalo for keeping our community safe. 🤙</div>
+    <div class="post-note">Nextdoor works best with a personal, conversational tone. Avoid hashtags — they don't work well on Nextdoor. Post in each district's corresponding Nextdoor neighborhoods separately. Have district captains post in their own neighborhoods for maximum trust.</div>
+  </div>
+
+  <!-- LINKEDIN -->
+  <div class="post-card">
+    <div class="post-header">
+      <span class="post-platform platform-linkedin">LinkedIn</span>
+      <span class="post-type">Week 5 · Public Launch (post from KIAA organization page)</span>
+    </div>
+    <div class="post-body">KIAA is proud to announce the launch of HIBCW — Hawaii Island Business Crime Watch.
+
+hibcw.vercel.app is now live and free for all businesses across Hawaii Island.
+
+The platform gives local business owners and managers a direct tool to:
+✅ Report incidents in real time (2-minute submission, no account needed)
+✅ View a live, public map of reported incidents across all 9 island districts
+✅ Receive district alerts from trained local captains
+✅ Connect with a network of neighboring businesses committed to community safety
+
+HIBCW is powered by KIAA and built entirely for Hawaii Island. It covers every district from Hamakua to North Kohala — 9 districts, one connected community.
+
+If you're a business owner, manager, or chamber member on Hawaii Island, I encourage you to visit hibcw.vercel.app and explore the map.
+
+Registration is free. Reporting is anonymous. The network gets stronger with every member.
+
+→ hibcw.vercel.app
+→ hibcw@kiaahilo.org
+→ (808) 961-5422
+
+#HawaiiIsland #SmallBusiness #CommunitySafety #KIAA #HIBCW #BusinessSecurity #Hawaii</div>
+    <div class="post-note">Post from the KIAA LinkedIn organization page if available, not a personal profile. Tag the Hawaii Island Economic Development Board and any chamber partners. Encourage employees and captains to share from their personal profiles.</div>
+  </div>
+
+  <!-- YOUTUBE -->
+  <div class="post-card">
+    <div class="post-header">
+      <span class="post-platform platform-youtube">YouTube</span>
+      <span class="post-type">Week 5 · Explainer Video Script Outline</span>
+    </div>
+    <div class="post-body">Title: "How to Use HIBCW — Hawaii Island Business Crime Watch (Free Tool)"
+
+[0:00 - 0:20] Hook
+"If you own a business on Hawaii Island and you've ever had something stolen, vandalized, or felt unsafe — this 3-minute video is for you."
+
+[0:20 - 0:45] What is HIBCW?
+Show hibcw.vercel.app on screen. "This is HIBCW — a free, real-time incident map for businesses across all 9 districts of Hawaii Island. Built by KIAA right here in Hilo."
+
+[0:45 - 1:30] The Map
+Scroll the live map. Show incident markers. "Every dot on this map is a real report from a real business on the island. You can see what's happening in your district — right now, no login required."
+
+[1:30 - 2:15] How to Report
+Click "Report an Incident." Fill in the form. "It takes about 2 minutes. You don't need an account. Your report goes live on the map immediately and your District Captain gets notified."
+
+[2:15 - 2:45] How to Join
+"If you want district alerts sent directly to you, register your business. It's free. Just click 'Register Business' and fill in your info."
+
+[2:45 - 3:00] Close
+"HIBCW is free. It's local. And it gets stronger every time a business joins. Visit hibcw.vercel.app today — link is in the description."
+
+Description:
+HIBCW — Hawaii Island Business Crime Watch
+Free real-time incident reporting and map for all Hawaii Island businesses.
+🌐 hibcw.vercel.app
+📧 hibcw@kiaahilo.org
+📞 (808) 961-5422
+A program of KIAA · Hilo, Hawaii</div>
+    <div class="post-note">Record using screen capture + voiceover. Use the live site — the real map makes the most compelling demo. Keep under 3:30 minutes. Upload as both a full video and repurpose the map section as a YouTube Short (60s max) for Instagram Reels cross-posting.</div>
+  </div>
+
+  <!-- MEMBER STORY -->
+  <div class="post-card">
+    <div class="post-header">
+      <span class="post-platform platform-instagram">Instagram</span>
+      <span class="post-type">Week 8 · Member Story Feature</span>
+    </div>
+    <div class="post-body">Real businesses. Real community. 🤝
+
+"[Quote from a KIAA member about HIBCW — e.g., 'Within a week of joining HIBCW, our district captain flagged suspicious activity two blocks from our shop. We were able to warn our staff before anything happened.' — Business Owner, [District Name]]"
+
+This is what HIBCW looks like in action.
+
+Join the network for free: hibcw.vercel.app
+
+#HIBCW #HawaiiIsland #BigIslandBusiness #CommunitySafety #LocalBusiness</div>
+    <div class="post-note">Pair with a photo of the business owner (with their permission) or their storefront. Authentic imagery performs significantly better than graphics for testimonial posts. Collect 2–3 quotes during Week 3's demo session.</div>
+  </div>
+</section>
+
+<!-- KPIs -->
+<section class="phase-section" id="phase-kpis">
+  <div class="sec-eyebrow">Measurement</div>
+  <h2 class="sec-title">KPIs &amp; Tracking</h2>
+  <p class="sec-desc">What gets measured gets managed. These are the metrics that actually tell you whether the campaign is working — not vanity numbers like follower count.</p>
+
+  <div class="alert">
+    <strong>Primary metric:</strong> Registered businesses on HIBCW. Everything else — social reach, video views, email opens — is a leading indicator. The number that matters most is how many Hawaii Island businesses are actively participating in the network.
+  </div>
+
+  <div class="card-grid-3">
+    <div class="card card-accent">
+      <div class="label">Phase 1 Goals · Weeks 1–4</div>
+      <h3>KIAA Onboarding</h3>
+      <ul>
+        <li>20+ KIAA members registered on HIBCW</li>
+        <li>Email open rate ≥ 35%</li>
+        <li>Demo session: 15+ attendees</li>
+        <li>Active incidents from 3+ districts</li>
+        <li>100+ website visits from email links</li>
+      </ul>
+    </div>
+    <div class="card card-accent-gold">
+      <div class="label">Phase 2 Goals · Weeks 5–12</div>
+      <h3>Island-Wide Growth</h3>
+      <ul>
+        <li>50+ total registered businesses</li>
+        <li>All 9 districts with at least 1 member</li>
+        <li>Instagram: 200+ followers gained</li>
+        <li>YouTube explainer: 500+ views</li>
+        <li>Nextdoor posts: 3 district engagements</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="label">Ongoing · Month 3+</div>
+      <h3>Sustained Health</h3>
+      <ul>
+        <li>5+ new businesses per month</li>
+        <li>Monthly active incident reports</li>
+        <li>Email list growth from referrals</li>
+        <li>At least 1 press mention secured</li>
+        <li>District captain retention: all 9 active</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec-eyebrow" style="margin-top:40px">Tracking Setup</div>
+  <h3 style="font-family:'Rajdhani',sans-serif;font-size:22px;margin-bottom:16px">What to Measure &amp; How</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="label">Website Traffic</div>
+      <h3>Google Analytics (Free)</h3>
+      <p>Add Google Analytics 4 to hibcw.vercel.app to track page views, session source (email vs Instagram vs Nextdoor vs direct), and which pages visitors land on. This tells you which channels are driving actual traffic vs. just impressions.</p>
+    </div>
+    <div class="card">
+      <div class="label">Link Tracking</div>
+      <h3>UTM Parameters</h3>
+      <p>Add ?utm_source=instagram, ?utm_source=nextdoor, etc. to every URL you post on social media. Then Analytics shows you exactly which post drove which visits. Free. Takes 30 seconds per link.</p>
+    </div>
+    <div class="card">
+      <div class="label">Email</div>
+      <h3>Open Rate + Click Rate</h3>
+      <p>Track via Mailchimp, Constant Contact, or whatever email platform KIAA uses. Goal: 35%+ open rate (achievable with a warm list like KIAA members). Click rate goal: 10%+ on launch email.</p>
+    </div>
+    <div class="card">
+      <div class="label">Social</div>
+      <h3>Reach &amp; Saves (not Likes)</h3>
+      <p>On Instagram, track Reach and Saves — not Likes. Saves indicate the content was useful enough to return to. On LinkedIn, track impressions and profile visits. On Nextdoor, track replies and direct messages from business owners.</p>
+    </div>
+  </div>
+
+  <div class="alert gold" style="margin-top:8px">
+    <strong>Monthly Reporting Cadence:</strong> At the end of each month, compile a simple one-page report: total registered businesses, new registrations this month, top-performing post, website sessions by source, and one qualitative win (member story, press mention, captain note). Share with KIAA leadership to maintain organizational buy-in for the program.
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  Prepared for <span>Hawaii Island Business Crime Watch</span> · A Program of KIAA · hibcw.vercel.app · hibcw@kiaahilo.org
+</footer>
+
+<script>
+function showPhase(id) {
+  document.querySelectorAll('.phase-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('phase-' + id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>
