@@ -7069,13 +7069,13 @@
 
             const [
                 {data:incidents},
-                {data:approvedMembers},
+                {data:verifiedMembers},
                 {data:alerts},
                 {data:apps},
                 {data:adminUsers},
             ] = await Promise.all([
                 sb.from('incidents').select('id,occurred_at,status,police_report').gte('occurred_at', yearStart).lte('occurred_at', yearEnd + 'T23:59:59'),
-                sb.from('member_applications').select('id,created_at,status').eq('status','approved'),
+                sb.from('member_emails').select('id,created_at'),
                 sb.from('district_alerts').select('id,created_at').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
                 sb.from('member_applications').select('id,created_at,status').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
                 sb.from('admin_users').select('id,district,role').not('role','is',null),
@@ -7112,11 +7112,12 @@
                 if (a.status === 'rejected')  trackerLive[m].apps_rejected++;
             });
 
-            // Cumulative member totals
-            const allApproved = (approvedMembers||[]).filter(m=>m.created_at).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
-            const baseMembers = allApproved.filter(m=>new Date(m.created_at) < new Date(yearStart)).length;
+            // Cumulative member totals — sourced from member_emails (the verified allowlist)
+            // so this always matches exactly what the Members panel shows
+            const allVerified = (verifiedMembers||[]).filter(m=>m.created_at).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+            const baseMembers = allVerified.filter(m=>new Date(m.created_at) < new Date(yearStart)).length;
             const newByMonth  = Array(12).fill(0);
-            allApproved.forEach(m => {
+            allVerified.forEach(m => {
                 const d = new Date(m.created_at);
                 if (d >= new Date(yearStart) && d <= new Date(yearEnd+'T23:59:59'))
                     newByMonth[d.getMonth()]++;
