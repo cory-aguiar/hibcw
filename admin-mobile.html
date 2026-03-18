@@ -3333,7 +3333,7 @@ async function mobGeneratePacket(id) {
     district:DIST_LABELS[b.district]||b.district||'', captain:b.captain_name||'',
     phone:b.phone?`(${b.phone.slice(0,3)}) ${b.phone.slice(3,6)}-${b.phone.slice(6)}`:'',
     email:b.email||'', type:b.business_type||'', distId:b.district||'',
-    bizNum:b.business_number||'',
+    bizNum:b.business_number||'', approvedAt:b.approved_at||'',
   });
   window.open(`packet-print.html?${params.toString()}`, '_blank', 'noopener');
   const {error} = await sb.from('business_registry').update({packet_sent_at:new Date().toISOString()}).eq('id',id);
