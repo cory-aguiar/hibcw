@@ -3605,6 +3605,9 @@
         currentUserName = roleData.full_name || email;
         captainDistrict = roleData.district || null;
 
+        // Record this sign-in timestamp
+        await sb.from('admin_roles').update({ last_sign_in_at: new Date().toISOString() }).eq('user_id', userId);
+
         // Enter the app
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('appShell').classList.add('visible');
