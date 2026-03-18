@@ -7982,17 +7982,18 @@
         if (!b) return;
         // Open the packet print page in a new tab with business data encoded
         const params = new URLSearchParams({
-            id:      b.id,
-            name:    b.business_name||'',
-            contact: b.contact_name||'',
-            address: b.full_address||[b.street_address,b.city,'HI',b.zip].filter(Boolean).join(', '),
-            district:KIAA_DISTRICTS.find(d=>d.id===b.district)?.label||b.district||'',
-            captain: b.captain_name||'',
-            phone:   b.phone?fmtPhone(b.phone):'',
-            email:   b.email||'',
-            type:    b.business_type||'',
-            distId:  b.district||'',
-            bizNum:  b.business_number||'',
+            id:         b.id,
+            name:       b.business_name||'',
+            contact:    b.contact_name||'',
+            address:    b.full_address||[b.street_address,b.city,'HI',b.zip].filter(Boolean).join(', '),
+            district:   KIAA_DISTRICTS.find(d=>d.id===b.district)?.label||b.district||'',
+            captain:    b.captain_name||'',
+            phone:      b.phone?fmtPhone(b.phone):'',
+            email:      b.email||'',
+            type:       b.business_type||'',
+            distId:     b.district||'',
+            bizNum:     b.business_number||'',
+            approvedAt: b.approved_at||'',
         });
         window.open(`packet-print.html?${params.toString()}`, '_blank', 'noopener');
         // Mark packet as sent
