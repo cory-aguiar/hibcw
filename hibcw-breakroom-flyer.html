@@ -1,656 +1,493 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIBCW Member Packet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box
-    }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HIBCW Breakroom Flyer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-        font-family: 'IBM Plex Sans', sans-serif;
-        background: #f0f4f8;
-        color: #1a2a3a;
-        min-height: 100vh
+      background: #c0c8d0;
+      font-family: 'IBM Plex Sans', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      min-height: 100vh;
     }
 
-    header {
-        background: linear-gradient(90deg, #0b1524, #111e30);
-        padding: 14px 28px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 2px solid rgba(0, 201, 167, .25)
+    /* ── Letter page: 8.5 × 11 in at 96dpi = 816 × 1056px ── */
+    .flyer {
+      width: 816px;
+      min-height: 1056px;
+      background: #f0f4f8;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
-    .logo-wrap {
-        display: flex;
-        align-items: center;
-        gap: 10px
+    /* ── Dark header band ── */
+    .flyer-header {
+      background: linear-gradient(90deg, #0b1524, #111e30);
+      border-bottom: 3px solid #00c9a7;
+      padding: 20px 36px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
 
-    .logo-text {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1.1rem;
-        font-weight: 700;
-        letter-spacing: .08em;
-        color: #eef3f8
+    .shield-wrap {
+      flex-shrink: 0;
     }
 
-    .logo-sub {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .55rem;
-        color: #00c9a7;
-        letter-spacing: .12em;
-        text-transform: uppercase
+    .header-text {
+      flex: 1;
     }
 
-    .hdr-actions {
-        display: flex;
-        gap: 10px;
-        align-items: center
+    .header-org {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      color: #eef3f8;
+      line-height: 1;
     }
 
-    .btn {
-        padding: 7px 16px;
-        border-radius: 5px;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .68rem;
-        cursor: pointer;
-        transition: all .15s;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px
+    .header-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .55rem;
+      color: #00c9a7;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin-top: 4px;
     }
 
-    .btn-primary {
-        background: linear-gradient(135deg, #00c9a7, #00a589);
-        border: none;
-        color: #0b1524;
-        font-weight: 700
+    .header-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .58rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      background: rgba(0,201,167,.12);
+      border: 1px solid rgba(0,201,167,.3);
+      color: #00c9a7;
+      padding: 5px 12px;
+      border-radius: 3px;
     }
 
-    .btn-ghost {
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, .15);
-        color: #7a8fa6
+    /* ── Hero call-to-action strip ── */
+    .hero-strip {
+      background: linear-gradient(135deg, #0b1524 0%, #111e30 60%, #0d2035 100%);
+      padding: 28px 36px 24px;
+      border-bottom: 1px solid rgba(0,201,167,.2);
+      position: relative;
+      overflow: hidden;
     }
 
-    .btn-ghost:hover {
-        border-color: #00c9a7;
-        color: #00c9a7
+    .hero-strip::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(0,201,167,.1) 0%, transparent 70%);
+      pointer-events: none;
     }
 
-    .page {
-        max-width: 860px;
-        margin: 0 auto;
-        padding: 32px 24px 60px
+    .hero-eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: #00c9a7;
+      margin-bottom: 8px;
     }
 
-    .biz-header {
-        background: white;
-        border: 1px solid #d0dce8;
-        border-left: 4px solid #00c9a7;
-        border-radius: 0 8px 8px 0;
-        padding: 20px 24px;
-        margin-bottom: 28px;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 16px;
-        align-items: start
+    .hero-headline {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #eef3f8;
+      line-height: 1.05;
+      letter-spacing: .03em;
     }
 
-    .biz-name {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #0b1524;
-        margin-bottom: 4px
+    .hero-headline span {
+      color: #00c9a7;
     }
 
-    .biz-meta {
-        font-size: .82rem;
-        color: #4a6070;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px
+    .hero-sub {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: .82rem;
+      color: #7a8fa6;
+      margin-top: 8px;
+      font-weight: 300;
+      max-width: 520px;
+      line-height: 1.5;
     }
 
-    .biz-district {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .7rem;
-        padding: 3px 10px;
-        border-radius: 3px;
-        border: 1px solid;
-        margin-top: 6px;
-        display: inline-block
+    /* ── Main body ── */
+    .flyer-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 0;
     }
 
-    .checklist {
-        background: white;
-        border: 1px solid #d0dce8;
-        border-radius: 8px;
-        padding: 24px;
-        margin-bottom: 28px
+    /* ── Left column: benefits ── */
+    .col-left {
+      padding: 28px 28px 28px 36px;
+      border-right: 1px solid #d0dce8;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    .checklist-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #0b1524;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px
+    .section-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .58rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: #00c9a7;
+      margin-bottom: 12px;
     }
 
-    .item {
-        display: flex;
-        align-items: flex-start;
-        gap: 14px;
-        padding: 12px 0;
-        border-bottom: 1px solid #e8f0f8;
-        cursor: pointer;
-        transition: background .1s;
-        border-radius: 4px;
-        padding-left: 4px
+    .benefit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .item:last-child {
-        border-bottom: none
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      background: white;
+      border: 1px solid #d0dce8;
+      border-left: 3px solid #00c9a7;
+      border-radius: 0 6px 6px 0;
     }
 
-    .item:hover {
-        background: #f8fbff
+    .benefit-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+      line-height: 1;
     }
 
-    .item-check {
-        width: 22px;
-        height: 22px;
-        border: 2px solid #c8d8e4;
-        border-radius: 4px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 1px;
-        transition: all .15s
+    .benefit-body {}
+
+    .benefit-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #0b1524;
+      letter-spacing: .03em;
+      line-height: 1.1;
     }
 
-    .item.done .item-check {
-        background: #00c9a7;
-        border-color: #00c9a7;
-        color: white
+    .benefit-desc {
+      font-size: .74rem;
+      color: #4a6070;
+      margin-top: 3px;
+      line-height: 1.45;
+      font-weight: 300;
     }
 
-    .item-icon {
-        font-size: 1.1rem;
-        flex-shrink: 0;
-        margin-top: 1px
+    /* ── Incident map row ── */
+    .map-cta {
+      padding: 14px 16px;
+      background: white;
+      border: 1px solid #d0dce8;
+      border-left: 3px solid #f5a623;
+      border-radius: 0 6px 6px 0;
     }
 
-    .item-body {
-        flex: 1
+    .map-cta-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #0b1524;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .item-title {
-        font-weight: 600;
-        font-size: .9rem;
-        color: #1a2a3a;
-        margin-bottom: 2px
+    .map-cta-desc {
+      font-size: .74rem;
+      color: #4a6070;
+      margin-top: 3px;
+      line-height: 1.45;
+      font-weight: 300;
     }
 
-    .item-desc {
-        font-size: .76rem;
-        color: #7a8fa6;
-        line-height: 1.5
+    /* ── Right column: QR ── */
+    .col-right {
+      padding: 28px 28px 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
     }
 
-    .item-actions {
-        display: flex;
-        gap: 7px;
-        margin-top: 7px;
-        flex-wrap: wrap
+    .qr-label-top {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .58rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: #7a8fa6;
+      text-align: center;
     }
 
-    .item-btn {
-        padding: 5px 12px;
-        border-radius: 4px;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .62rem;
-        cursor: pointer;
-        transition: all .15s;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        border: 1px solid
+    .qr-frame {
+      background: white;
+      border: 2px solid #d0dce8;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 4px 16px rgba(11,21,36,.08);
+      width: 240px;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
-    .item-btn-primary {
-        background: rgba(0, 201, 167, .1);
-        border-color: rgba(0, 201, 167, .3);
-        color: #007a65
+    .qr-img {
+      width: 216px;
+      height: 216px;
+      object-fit: contain;
+      border-radius: 4px;
     }
 
-    .item-btn-primary:hover {
-        background: rgba(0, 201, 167, .2)
+    .qr-cta-box {
+      width: 100%;
+      background: linear-gradient(135deg, #0b1524, #111e30);
+      border: 1px solid rgba(0,201,167,.25);
+      border-radius: 6px;
+      padding: 14px 16px;
+      text-align: center;
     }
 
-    .item-btn-ghost {
-        background: transparent;
-        border-color: #d0dce8;
-        color: #7a8fa6
+    .qr-cta-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .55rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: #00c9a7;
+      margin-bottom: 4px;
     }
 
-    .item-btn-ghost:hover {
-        border-color: #00c9a7;
-        color: #007a65
+    .qr-cta-text {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #eef3f8;
+      line-height: 1.2;
     }
 
-    .progress-wrap {
-        margin-bottom: 24px
+    .qr-cta-sub {
+      font-size: .68rem;
+      color: #7a8fa6;
+      margin-top: 4px;
+      font-weight: 300;
+      line-height: 1.4;
     }
 
-    .progress-bar {
-        height: 6px;
-        background: #e0e8f0;
-        border-radius: 3px;
-        overflow: hidden
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, #00c9a7, transparent);
+      margin: 0 36px;
     }
 
-    .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #00c9a7, #00a589);
-        border-radius: 3px;
-        transition: width .3s
+    /* ── Footer ── */
+    .flyer-footer {
+      background: linear-gradient(90deg, #0b1524, #111e30);
+      border-top: 2px solid rgba(0,201,167,.25);
+      padding: 14px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .progress-label {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .65rem;
-        color: #7a8fa6;
-        margin-top: 5px;
-        text-align: right
+    .footer-left {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .55rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #7a8fa6;
     }
 
-    .notes-card {
-        background: white;
-        border: 1px solid #d0dce8;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 28px
+    .footer-url {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .62rem;
+      color: #00c9a7;
+      letter-spacing: .05em;
     }
 
-    .notes-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1rem;
-        font-weight: 700;
-        color: #0b1524;
-        margin-bottom: 10px
+    .footer-right {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .5rem;
+      color: #4a6070;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-align: right;
     }
 
-    textarea {
-        width: 100%;
-        border: 1px solid #d0dce8;
-        border-radius: 5px;
-        padding: 10px;
-        font-family: 'IBM Plex Sans', sans-serif;
-        font-size: .84rem;
-        color: #1a2a3a;
-        resize: vertical;
-        min-height: 80px;
-        outline: none;
-        transition: border-color .2s
-    }
-
-    textarea:focus {
-        border-color: #00c9a7
-    }
-
+    /* ── Print styles ── */
     @media print {
-        header .hdr-actions, .checklist-title button, .item-actions, textarea {
-            display:none !important
-        }
-
-        body {
-            background:white
-        }
-
-        * {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact
-        }
+      body { background: white; padding: 0; }
+      .flyer {
+        width: 8.5in;
+        min-height: 11in;
+        box-shadow: none;
+      }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
-    </style>
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-wrap">
-            <img src="logo-shield.svg" alt="HIBCW Shield" style="width:32px;height:32px;flex-shrink:0;object-fit:contain">
-            <div>
-                <div class="logo-text">HIBCW Member Packet</div>
-                <div class="logo-sub">Hawaii Island Business Crime Watch</div>
+<div class="flyer">
+
+  <!-- Header -->
+  <div class="flyer-header">
+    <div class="shield-wrap">
+      <img src="logo-shield.svg" alt="HIBCW Shield" style="width:52px;height:52px;flex-shrink:0;object-fit:contain">
+    </div>
+    <div class="header-text">
+      <div class="header-org">HIBCW</div>
+      <div class="header-sub">Hawaiʻi Island Business Community Watch</div>
+    </div>
+    <div class="header-badge">Member Program</div>
+  </div>
+
+  <!-- Hero strip -->
+  <div class="hero-strip">
+    <div class="hero-eyebrow">→ Join Today — It's Free</div>
+    <div class="hero-headline">Protect Your Business.<br><span>Connect With Your Community.</span></div>
+    <div class="hero-sub">HIBCW is a free member network dedicated to keeping Hawaiʻi Island businesses safe, informed, and connected. Scan the QR code to join — takes less than 2 minutes.</div>
+  </div>
+
+  <!-- Body grid -->
+  <div class="flyer-body">
+
+    <!-- Left: Benefits -->
+    <div class="col-left">
+
+      <div>
+        <div class="section-label">Member Benefits</div>
+        <div class="benefit-list">
+
+          <div class="benefit-item">
+            <div class="benefit-icon">🗺️</div>
+            <div class="benefit-body">
+              <div class="benefit-title">Real-Time Incident Map</div>
+              <div class="benefit-desc">Report and track criminal incidents, suspicious activity, and safety alerts across your district — updated live by your community.</div>
             </div>
-        </div>
-        <div class="hdr-actions">
-            <button class="btn btn-ghost" onclick="window.close()">← Close</button>
-            <button class="btn btn-primary" onclick="window.print()">🖨 Print Checklist</button>
-        </div>
-    </header>
-
-    <div class="page">
-
-        <!-- Business header -->
-        <div class="biz-header" id="bizHeader">
-            <div>
-                <div class="biz-name" id="bizName">Loading…</div>
-                <div class="biz-meta">
-                    <span id="bizContact"></span>
-                    <span id="bizPhone"></span>
-                    <span id="bizEmail"></span>
-                </div>
-                <div class="biz-meta" style="margin-top:4px">
-                    <span id="bizAddress"></span>
-                </div>
-                <div id="bizDistrictBadge" class="biz-district"></div>
-            </div>
-            <div style="text-align:right">
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6;margin-bottom:4px">Packet Generated</div>
-                <div id="packetDate" style="font-size:.84rem;color:#1a2a3a;font-weight:600"></div>
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#7a8fa6;margin-top:2px">
-                    Captain: 
-                    <span id="bizCaptain">—</span>
-                </div>
-                <div id="bizNumWrap" style="display:none;margin-top:6px;background:#f0fdf9;border:1.5px solid #00c9a7;border-radius:4px;padding:4px 10px;text-align:center">
-                    <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:#7a8fa6">Business #</div>
-                    <div id="bizNumDisplay" style="font-family:'IBM Plex Mono',monospace;font-size:1.1rem;font-weight:700;color:#00c9a7;letter-spacing:.06em"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Progress -->
-        <div class="progress-wrap">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width:0%"></div>
-            </div>
-            <div class="progress-label">
-                <span id="progressLabel">0 of 8 items checked</span>
-            </div>
-        </div>
-
-        <!-- Assembly Checklist -->
-        <div class="checklist">
-            <div class="checklist-title">
-
-                      📋 Packet Assembly Checklist
-                      
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:400;color:#7a8fa6;margin-left:8px">Check each item as you print and assemble</span>
-            </div>
-            <div id="checklistItems"></div>
-        </div>
-
-        <!-- Assembly notes -->
-        <div class="notes-card">
-            <div class="notes-title">📝 Assembly Notes</div>
-            <textarea id="packetNotes" placeholder="Add notes about this packet (e.g. hand-delivered by Captain on 3/15, mailed to PO Box, business closed — will retry)…"></textarea>
-        </div>
-
-        <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:#b0c0cc;margin-top:8px">
-            HIBCW · Hawaii Island Business Crime Watch · A Program of KIAA · kiaahilo.org
           </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">🔔</div>
+            <div class="benefit-body">
+              <div class="benefit-title">Instant District Alerts</div>
+              <div class="benefit-desc">Receive timely notifications about break-ins, thefts, and activity in your area so you can act before it affects your business.</div>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">🤝</div>
+            <div class="benefit-body">
+              <div class="benefit-title">District Captain Support</div>
+              <div class="benefit-desc">Each district has a dedicated Captain who advocates for member businesses, coordinates resources, and maintains local connections with law enforcement.</div>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">📋</div>
+            <div class="benefit-body">
+              <div class="benefit-title">Business Registry Listing</div>
+              <div class="benefit-desc">Get listed in the official HIBCW registry, increasing your visibility to partner businesses and district leadership across the island.</div>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">🛡️</div>
+            <div class="benefit-body">
+              <div class="benefit-title">Community Safety Network</div>
+              <div class="benefit-desc">Join a coordinated network of Hawaiʻi Island businesses working together to deter crime, share intelligence, and protect their employees.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Incident map highlight -->
+      <div class="map-cta">
+        <div class="map-cta-title">
+          <span>📍</span> Report an Incident Right Now
+        </div>
+        <div class="map-cta-desc">Already a member? Use the QR code to open the incident map and submit a report directly from your phone — no app download required.</div>
+      </div>
 
     </div>
 
-    <script>
-    // Parse URL params
-    const p = new URLSearchParams(window.location.search);
-    const bizId = p.get('id') || '';
-    const bizName = p.get('name') || 'Business Name';
-    const bizContact = p.get('contact') || '';
-    const bizAddr = p.get('address') || '';
-    const bizDist = p.get('district') || '';
-    const bizDistId = p.get('distId') || '';
-    const bizCaptain = p.get('captain') || '';
-    const bizPhone = p.get('phone') || '';
-    const bizEmail = p.get('email') || '';
-    const bizType = p.get('type') || '';
-    const bizNum = p.get('bizNum') || '';
-    const bizApprovedAt = p.get('approvedAt') || '';
+    <!-- Right: QR Code -->
+    <div class="col-right">
 
-    const DIST_COLORS = {
-        'hamakua': '#84cc16',
-        'north-hilo': '#3b82f6',
-        'south-hilo': '#00c9a7',
-        'lower-puna': '#c084fc',
-        'upper-puna': '#a855f7',
-        'kau': '#ef4444',
-        'south-kona': '#f59e0b',
-        'north-kona': '#f97316',
-        'north-kohala': '#10b981'
-    };
-    const distColor = DIST_COLORS[bizDistId] || '#00c9a7';
+      <div class="qr-label-top">Scan to Join &amp; Report</div>
 
-    // Populate header
-    document.getElementById('bizName').textContent = bizName;
-    document.getElementById('bizContact').textContent = bizContact ? '👤 ' + bizContact : '';
-    document.getElementById('bizPhone').textContent = bizPhone ? '📞 ' + bizPhone : '';
-    document.getElementById('bizEmail').textContent = bizEmail ? '✉️ ' + bizEmail : '';
-    document.getElementById('bizAddress').textContent = bizAddr ? '📍 ' + bizAddr : '';
-    document.getElementById('bizCaptain').textContent = bizCaptain || '—';
-    document.getElementById('packetDate').textContent = new Date().toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric'
-    });
+      <div class="qr-frame">
+        <img class="qr-img" src="HIBCW_Web_App.png" alt="HIBCW QR Code — Scan to join or report an incident">
+      </div>
 
-    if (bizNum) {
-        document.getElementById('bizNumDisplay').textContent = bizNum;
-        document.getElementById('bizNumWrap').style.display = 'block';
-    }
+      <div class="qr-cta-box">
+        <div class="qr-cta-label">Point your camera here</div>
+        <div class="qr-cta-text">Join HIBCW &amp; Access the Incident Map</div>
+        <div class="qr-cta-sub">Free membership · No app needed · Opens in your browser</div>
+      </div>
 
-    const badge = document.getElementById('bizDistrictBadge');
-    badge.textContent = bizDist || '—';
-    badge.style.color = distColor;
-    badge.style.borderColor = distColor + '55';
-    badge.style.background = distColor + '11';
+      <!-- Membership is free callout -->
+      <div style="width:100%;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.25);border-radius:6px;padding:12px 14px;text-align:center">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:#007a65;margin-bottom:3px">Membership is</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#00c9a7;line-height:1">100% FREE</div>
+        <div style="font-size:.68rem;color:#4a6070;margin-top:3px;font-weight:300">Open to all Hawaiʻi Island businesses</div>
+      </div>
 
-    document.getElementById('bizHeader').style.borderLeftColor = distColor;
-
-    // Flyer filename from district
-    const flyerMap = {
-        'hamakua': 'files/flyer-d1-hamakua.pdf',
-        'north-hilo': 'files/flyer-d2-north-hilo.pdf',
-        'south-hilo': 'files/flyer-d3-south-hilo.pdf',
-        'lower-puna': 'files/flyer-d4-lower-puna.pdf',
-        'upper-puna': 'files/flyer-d5-upper-puna.pdf',
-        'kau': 'files/flyer-d6-kau.pdf',
-        'south-kona': 'files/flyer-d7-south-kona.pdf',
-        'north-kona': 'files/flyer-d8-north-kona.pdf',
-        'north-kohala': 'files/flyer-d9-north-kohala.pdf'
-    };
-    const distFlyer = flyerMap[bizDistId] || null;
-
-    // Build letter URL with pre-filled params
-    const letterParams = new URLSearchParams({
-        prefill: '1',
-        distNum: bizDistId ? bizDistId.replace(/[^0-9]/g, '') : '',
-        distName: bizDist,
-        captain: bizCaptain,
-        recipient: bizContact || bizName,
-        business: bizName,
-        address: bizAddr,
-    });
-
-    const packetItems = [
-    {
-        id: 'welcome',
-        icon: '✉️',
-        title: 'Welcome Letter from District Captain',
-        desc: 'Open the interactive letter, fill in any remaining details, then print on HIBCW or KIAA letterhead.',
-        actions: [
-        {
-            label: '✍️ Open & Fill Letter',
-            url: `files/template-intro-letter.html?${letterParams.toString()}`,
-            primary: true
-        },
-        {
-            label: '📄 Blank PDF',
-            url: 'files/template-intro-letter.pdf'
-        },
-        ]
-    },
-    {
-        id: 'certificate',
-        icon: '🏅',
-        title: 'HIBCW Membership Certificate',
-        desc: `Personalized certificate for ${bizName}. Print on heavy stock if available.`,
-        actions: [
-        {
-            label: '🖨 Print Certificate',
-            url: `packet-certificate.html?name=${encodeURIComponent(bizName)}&district=${encodeURIComponent(bizDist)}&captain=${encodeURIComponent(bizCaptain)}&approvedAt=${encodeURIComponent(bizApprovedAt)}&bizNum=${encodeURIComponent(bizNum)}`,
-            primary: true
-        },
-        ]
-    },
-    {
-        id: 'flyer',
-        icon: '📍',
-        title: `District Flyer — ${bizDist || 'Your District'}`,
-        desc: 'Color-coded flyer for the business\'s specific district with QR code linking to apply.hibcw.vercel.app.',
-        actions: distFlyer ? [
-        {
-            label: '🖨 Print Flyer',
-            url: distFlyer,
-            primary: true
-        },
-        ] : [{
-            label: '📁 Upload district flyer to files/',
-            url: null
-        }]
-    },
-    {
-        id: 'overview',
-        icon: '📋',
-        title: 'HIBCW Program Overview',
-        desc: 'One-page overview of the HIBCW program, how it works, and benefits for businesses.',
-        actions: [
-        {
-            label: '🖨 Print Overview',
-            url: `files/packet-overview.html?district=${encodeURIComponent(bizDist)}&distId=${encodeURIComponent(bizDistId)}`,
-            primary: true
-        },
-        ]
-    },
-    {
-        id: 'howto',
-        icon: '🚨',
-        title: 'How to Report an Incident',
-        desc: 'Step-by-step guide showing how to report a crime or suspicious activity to HIBCW.',
-        actions: [
-        {
-            label: '🖨 Print Guide',
-            url: `files/packet-how-to-report.html?district=${encodeURIComponent(bizDist)}&distId=${encodeURIComponent(bizDistId)}`,
-            primary: true
-        },
-        ]
-    },
-    {
-        id: 'quickref',
-        icon: '⚡',
-        title: 'Quick Reference Guide',
-        desc: 'Two half-page cards: what to report, when to call 911, HIBCW vs. Crime Stoppers, and description checklists.',
-        actions: [
-        {
-            label: '🖨 Print Quick Ref',
-            url: `files/packet-quick-reference.html?district=${encodeURIComponent(bizDist)}&captain=${encodeURIComponent(bizCaptain)}&phone=${encodeURIComponent(bizPhone)}`,
-            primary: true
-        },
-        ]
-    },
-    {
-        id: 'contactcard',
-        icon: '📇',
-        title: 'Emergency Contact Card (Wallet Size)',
-        desc: 'Prints 4 wallet-size cards per page. Trim and include one in the packet.',
-        actions: [
-        {
-            label: '🖨 Print Contact Cards',
-            url: `files/packet-contact-card.html?district=${encodeURIComponent(bizDist)}&captain=${encodeURIComponent(bizCaptain)}&phone=${encodeURIComponent(bizPhone)}`,
-            primary: true
-        },
-        ]
-    },
-    {
-        id: 'breakroomflyer',
-        icon: '📌',
-        title: 'Breakroom QR Code Flyer',
-        desc: 'Full-page flyer for the business to post in their breakroom — includes the HIBCW QR code, member benefits, and incident reporting instructions.',
-        actions: [
-        {
-            label: '🖨 Print Flyer',
-            url: 'hibcw-breakroom-flyer.html',
-            primary: true
-        },
-        ]
-    },
-    ];
-
-    // Render checklist
-    const checked = new Set(JSON.parse(localStorage.getItem(`hibcw-packet-${bizId}`) || '[]'));
-
-    function renderChecklist() {
-        const el = document.getElementById('checklistItems');
-        el.innerHTML = packetItems.map((item, i) => `
-    <div class="item ${checked.has(item.id) ? 'done' : ''}" id="item-${item.id}" onclick="toggleItem('${item.id}',event)">
-      <div class="item-check">${checked.has(item.id) ? '✓' : ''}</div>
-      <div class="item-icon">${item.icon}</div>
-      <div class="item-body">
-        <div class="item-title">${
-        item.title}</div>
-        <div class="item-desc">${item.desc}</div>
-        <div class="item-actions" onclick="event.stopPropagation()">
-          ${
-        item.actions.map(a => a.url ? `<a href="${a.url}" target="_blank" rel="noopener" class="item-btn ${a.primary ? 'item-btn-primary' : 'item-btn-ghost'}">${a.label}</a>` : `<span class="item-btn item-btn-ghost" style="opacity:.5;cursor:default">${a.label}</span>`).join('')}
+      <!-- Districts served -->
+      <div style="width:100%;background:white;border:1px solid #d0dce8;border-radius:6px;padding:12px 14px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:#7a8fa6;margin-bottom:7px">Districts Served</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;background:#f0f4f8;border:1px solid #d0dce8;border-radius:3px;padding:2px 7px;color:#4a6070">Hāmākua</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;background:#f0f4f8;border:1px solid #d0dce8;border-radius:3px;padding:2px 7px;color:#4a6070">N. Hilo</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;background:#f0f4f8;border:1px solid #d0dce8;border-radius:3px;padding:2px 7px;color:#4a6070">S. Hilo</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;background:#f0f4f8;border:1px solid #d0dce8;border-radius:3px;padding:2px 7px;color:#4a6070">Puna</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;background:#f0f4f8;border:1px solid #d0dce8;border-radius:3px;padding:2px 7px;color:#4a6070">Kaʻū</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;background:#f0f4f8;border:1px solid #d0dce8;border-radius:3px;padding:2px 7px;color:#4a6070">S. Kona</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;background:#f0f4f8;border:1px solid #d0dce8;border-radius:3px;padding:2px 7px;color:#4a6070">N. Kona</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.52rem;background:#f0f4f8;border:1px solid #d0dce8;border-radius:3px;padding:2px 7px;color:#4a6070">Kohala</span>
         </div>
       </div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#b0c0cc;flex-shrink:0;margin-top:2px">${
 
-        i + 1}/${packetItems.length}</div>
-    </div>`
-        ).join('');
-        updateProgress();
-    }
+    </div>
+  </div>
 
-    function toggleItem(id, e) {
-        if (e.target.closest('a'))
-            return;
-        if (checked.has(id))
-            checked.delete(id);
-        else
-            checked.add(id);
-        if (bizId)
-            localStorage.setItem(`hibcw-packet-${bizId}`, JSON.stringify([...checked]));
-        renderChecklist();
-    }
+  <!-- Footer -->
+  <div class="flyer-footer">
+    <div>
+      <div class="footer-left">Hawaiʻi Island Business Community Watch</div>
+      <div class="footer-url">hibcw.org</div>
+    </div>
+    <div class="footer-right">
+      Post this flyer in your breakroom<br>
+      Questions? Contact your District Captain
+    </div>
+  </div>
 
-    function updateProgress() {
-        const pct = Math.round((checked.size / packetItems.length) * 100);
-        document.getElementById('progressFill').style.width = pct + '%';
-        document.getElementById('progressLabel').textContent =
-        `${checked.size} of ${packetItems.length} items checked${pct === 100 ? ' — Packet Complete! 🎉' : ''}`;
-    }
+</div>
 
-    renderChecklist();
-    </script>
 </body>
 </html>
