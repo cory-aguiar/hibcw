@@ -1037,6 +1037,9 @@ async function handleAuthSession(session) {
   }
   currentRole=roleData.role; currentUserEmail=session.user.email;
   currentUserName=roleData.full_name||session.user.email; captainDistrict=roleData.district||null;
+
+  // Record this sign-in timestamp
+  await sb.from('admin_roles').update({ last_sign_in_at: new Date().toISOString() }).eq('user_id', session.user.id);
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').classList.add('visible');
   applyRoleUI();
