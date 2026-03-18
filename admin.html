@@ -8041,6 +8041,7 @@
         // ── General Flyers ────────────────────────────────
         { category:'General Flyers',  icon:'📄', title:'HIBCW General Awareness Flyer',   desc:'General HIBCW flyer suitable for any district. Share with local businesses.', file:'files/flyer-general.pdf',       roles:['admin','superadmin','captain'] },
         { category:'General Flyers',  icon:'📄', title:'Join HIBCW — Recruitment Flyer',  desc:'Encourages businesses to apply for HIBCW membership. Include your contact info before distributing.', file:'files/flyer-recruitment.pdf',   roles:['admin','superadmin','captain'] },
+        { category:'General Flyers',  icon:'📌', title:'Breakroom QR Code Flyer',         desc:'Full-page flyer for members to post in their employee breakroom — includes the HIBCW QR code, member benefits, and incident reporting instructions.', file:'hibcw-breakroom-flyer.html', roles:['admin','superadmin','captain'], openInBrowser:true, printable:true },
         // ── Forms & Templates ─────────────────────────────
         { category:'Forms & Templates', icon:'📝', title:'Incident Report Form (Paper)',  desc:'Printable paper form for capturing incident details when internet is unavailable.', file:'files/form-incident-paper.pdf', roles:['admin','superadmin','captain'] },
         { category:'Forms & Templates', icon:'📝', title:'Member Sign-Up Sheet',          desc:'Paper sign-up sheet for collecting member information at community events.',       file:'files/form-member-signup.pdf',  roles:['admin','superadmin','captain'] },
@@ -8148,7 +8149,10 @@
                         <div style="font-size:.84rem;font-weight:500;color:var(--white);margin-bottom:2px">${esc(f.title)}</div>
                         <div style="font-size:.72rem;color:var(--slate);line-height:1.4">${esc(f.desc)}</div>
                       </div>
-                      <a href="${f.file}" ${f.openInBrowser ? 'target="_blank" rel="noopener"' : 'download'} style="display:inline-flex;align-items:center;gap:5px;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--teal);text-decoration:none;white-space:nowrap;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--teal)';this.style.background='rgba(0,201,167,.08)'" onmouseout="this.style.borderColor='var(--b2)';this.style.background='var(--navy3)'">${f.openInBrowser ? '✍️ Open & Fill In' : '⬇ Download PDF'}</a>
+                      <div style="display:flex;gap:6px;flex-shrink:0">
+                        <a href="${f.file}" ${f.openInBrowser ? 'target="_blank" rel="noopener"' : 'download'} style="display:inline-flex;align-items:center;gap:5px;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--teal);text-decoration:none;white-space:nowrap;transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.background='rgba(0,201,167,.08)'" onmouseout="this.style.borderColor='var(--b2)';this.style.background='var(--navy3)'">${f.openInBrowser ? '✍️ Open & Fill In' : '⬇ Download PDF'}</a>
+                        ${f.printable ? `<button onclick="printHandbook('${f.file}')" style="display:inline-flex;align-items:center;gap:5px;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--slate);white-space:nowrap;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.background='rgba(0,201,167,.08)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.background='var(--navy3)';this.style.color='var(--slate)'">🖨 Print</button>` : ''}
+                      </div>
                     </div>`).join('')}
                   </div>
                 </div>`;
