@@ -2380,7 +2380,7 @@ async function computeMobLiveData() {
       {data:incidents},{data:approvedMembers},{data:alerts},{data:apps},{data:adminUsers},
     ] = await Promise.all([
       sb.from('incidents').select('id,occurred_at,status,police_report').gte('occurred_at',yearStart).lte('occurred_at',yearEnd+'T23:59:59'),
-      sb.from('member_applications').select('id,created_at,status').eq('status','approved'),
+      sb.from('member_emails').select('id,created_at'),
       sb.from('district_alerts').select('id,created_at').gte('created_at',yearStart).lte('created_at',yearEnd+'T23:59:59'),
       sb.from('member_applications').select('id,created_at,status').gte('created_at',yearStart).lte('created_at',yearEnd+'T23:59:59'),
       sb.from('admin_users').select('id,district,role').not('role','is',null),
@@ -2390,10 +2390,11 @@ async function computeMobLiveData() {
     (incidents||[]).forEach(inc=>{const m=gm(inc.occurred_at);if(m<0||m>11)return;mobTrackerLive[m].incidents++;if(inc.status==='archived')mobTrackerLive[m].incidents_archived++;if(inc.police_report)mobTrackerLive[m].police_reports++;});
     (alerts||[]).forEach(a=>{const m=gm(a.created_at);if(m>=0&&m<=11)mobTrackerLive[m].alerts_sent++;});
     (apps||[]).forEach(a=>{const m=gm(a.created_at);if(m<0||m>11)return;mobTrackerLive[m].apps_received++;if(a.status==='approved')mobTrackerLive[m].apps_approved++;if(a.status==='rejected')mobTrackerLive[m].apps_rejected++;});
-    const allApproved=(approvedMembers||[]).filter(m=>m.created_at).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
-    const base=allApproved.filter(m=>new Date(m.created_at)<new Date(yearStart)).length;
+    // Use member_emails as source of truth so count matches the Members panel exactly
+    const allVerified=(approvedMembers||[]).filter(m=>m.created_at).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+    const base=allVerified.filter(m=>new Date(m.created_at)<new Date(yearStart)).length;
     const nbm=Array(12).fill(0);
-    allApproved.forEach(m=>{const d=new Date(m.created_at);if(d>=new Date(yearStart)&&d<=new Date(yearEnd+'T23:59:59'))nbm[d.getMonth()]++;});
+    allVerified.forEach(m=>{const d=new Date(m.created_at);if(d>=new Date(yearStart)&&d<=new Date(yearEnd+'T23:59:59'))nbm[d.getMonth()]++;});
     let run=base;
     for(let m=0;m<12;m++){run+=nbm[m];mobTrackerLive[m].members_new=nbm[m];mobTrackerLive[m].members_total=run;}
     const ad=new Set((adminUsers||[]).filter(u=>u.role==='captain'&&u.district).map(u=>u.district));
