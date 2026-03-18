@@ -36,7 +36,7 @@
   --border2: rgba(255,255,255,.07);
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bot: env(safe-area-inset-bottom, 0px);
-  --nav-h:   60px;
+  --nav-h:   72px;
   --hdr-h:   52px;
 }
 
@@ -375,7 +375,7 @@ a.nav-btn{text-decoration:none;color:inherit}
 /* Map controls - floating */
 .map-fab-row{
   position:absolute;
-  top:10px;right:10px;
+  top:10px;left:10px;
   display:flex;flex-direction:column;gap:6px;
   z-index:500;
 }
@@ -1774,7 +1774,7 @@ function showScreen(name) {
    MAIN MAP
 ═══════════════════════════════════════════════ */
 const map = L.map('map', { center:[19.7024,-155.0824], zoom:11, zoomControl:false });
-L.control.zoom({ position: 'topright' }).addTo(map); // won't show; we use FABs
+L.control.zoom({ position: 'bottomright' }).addTo(map); // won't show; we use FABs
 
 const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap', maxZoom:19 });
 const satLayer    = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution:'© Esri', maxZoom:19 });
