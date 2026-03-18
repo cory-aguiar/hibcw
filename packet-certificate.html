@@ -7,8 +7,75 @@
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .toolbar{background:#0b1524;border-bottom:1px solid rgba(56,187,161,.25);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+
+  /* ── Light mode tokens ── */
+  :root{
+    --bg-page:      #e8edf2;
+    --bg-cert:      #ffffff;
+    --cert-border:  #0b2040;
+    --toolbar-bg:   #0b1524;
+    --toolbar-bdr:  rgba(56,187,161,.25);
+    --hdr-bg:       #0b1524;
+    --body-text:    #2a3a4a;
+    --name-text:    #0b1524;
+    --address-text: #4a6070;
+    --para-strong:  #0b1524;
+    --strip-bg:     #e4f8f5;
+    --strip-lbl:    #0f4f44;
+    --strip-val:    #0b1524;
+    --strip-active: #1e7a68;
+    --sig-line:     #c0d4dc;
+    --sig-name:     #0b1524;
+    --sig-role:     #4a6070;
+    --seal-bg:      #e4f8f5;
+    --seal-text:    #0f4f44;
+    --footer-bg:    #e4f8f5;
+    --footer-org:   #0b1524;
+    --footer-sub:   #4a6070;
+    --footer-phone: #0b1524;
+    --footer-email: #1e7a68;
+    --rule-color:   #38bba1;
+    --presents-clr: #7a8fa6;
+    --no-label:     rgba(255,255,255,.3);
+    --no-val:       #38bba1;
+  }
+
+  /* ── Dark mode tokens ── */
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg-page:      #0a1220;
+      --bg-cert:      #111c2e;
+      --cert-border:  #38bba1;
+      --toolbar-bg:   #070e1a;
+      --toolbar-bdr:  rgba(56,187,161,.2);
+      --hdr-bg:       #070e1a;
+      --body-text:    #94b4c4;
+      --name-text:    #e2edf5;
+      --address-text: #6a8fa0;
+      --para-strong:  #cce8f0;
+      --strip-bg:     #0d2a26;
+      --strip-lbl:    #38bba1;
+      --strip-val:    #d4eff0;
+      --strip-active: #38bba1;
+      --sig-line:     #1e3a48;
+      --sig-name:     #cce8f0;
+      --sig-role:     #6a8fa0;
+      --seal-bg:      #0d2a26;
+      --seal-text:    #38bba1;
+      --footer-bg:    #0d1f1c;
+      --footer-org:   #cce8f0;
+      --footer-sub:   #4a7a80;
+      --footer-phone: #cce8f0;
+      --footer-email: #38bba1;
+      --rule-color:   #38bba1;
+      --presents-clr: #4a7a80;
+      --no-label:     rgba(56,187,161,.45);
+      --no-val:       #38bba1;
+    }
+  }
+
+  body{background:var(--bg-page);font-family:'IBM Plex Sans',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .toolbar{background:var(--toolbar-bg);border-bottom:1px solid var(--toolbar-bdr);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
   .t-logo{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:#eef3f8;letter-spacing:.06em}
   .t-sub{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:#38bba1;letter-spacing:.12em;text-transform:uppercase}
   .t-btn{padding:6px 14px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer;transition:all .15s;border:none}
@@ -17,8 +84,8 @@
   .t-close{background:transparent;border:1px solid rgba(255,255,255,.15)!important;color:#7a8fa6}
   .t-close:hover{border-color:#38bba1!important;color:#38bba1}
   .cert-wrap{display:flex;align-items:flex-start;justify-content:center;padding:32px 24px;min-height:calc(100vh - 53px)}
-  .cert{width:8.5in;min-height:11in;background:white;border:2px solid #0b2040;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.18);display:flex;flex-direction:column}
-  .cert-header{background:#0b1524;border-bottom:3px solid #38bba1;padding:16px 28px 0;flex-shrink:0}
+  .cert{width:8.5in;min-height:11in;background:var(--bg-cert);border:2px solid var(--cert-border);position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.35);display:flex;flex-direction:column}
+  .cert-header{background:var(--hdr-bg);border-bottom:3px solid #38bba1;padding:16px 28px 0;flex-shrink:0}
   .cert-header-inner{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:14px}
   .cert-header-left{display:flex;align-items:flex-start;gap:14px}
   .cert-header-logo{width:48px;height:48px;flex-shrink:0;margin-top:2px}
@@ -26,42 +93,60 @@
   .cert-hdr-program{font-size:.72rem;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.03em;margin-bottom:5px}
   .cert-hdr-title{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.88);text-transform:uppercase}
   .cert-hdr-right{text-align:right}
-  .cert-no-label{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:rgba(255,255,255,.3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px}
-  .cert-no{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:#38bba1;letter-spacing:.12em}
+  .cert-no-label{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:var(--no-label);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px}
+  .cert-no{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--no-val);letter-spacing:.12em}
   .cert-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 64px 32px;gap:0}
-  .cert-presents{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:#7a8fa6;text-align:center;margin-bottom:14px}
-  .cert-bizname{font-family:'Rajdhani',sans-serif;font-size:2.8rem;font-weight:700;color:#0b1524;text-align:center;letter-spacing:-.5px;line-height:1.05;margin-bottom:8px;word-break:break-word;max-width:100%}
-  .cert-address{font-size:.78rem;color:#4a6070;text-align:center;margin-bottom:22px}
-  .cert-rule{width:100%;border:none;border-top:2px solid #38bba1;margin-bottom:24px}
-  .cert-para{font-size:.84rem;color:#2a3a4a;text-align:center;line-height:1.85;max-width:5.4in;margin-bottom:28px}
-  .cert-para strong{color:#0b1524}
-  .cert-strip{width:100%;background:#e4f8f5;border:2px solid #38bba1;border-radius:8px;display:flex;align-items:center;justify-content:space-around;padding:15px 20px;margin-bottom:36px}
+  .cert-presents{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--presents-clr);text-align:center;margin-bottom:14px}
+  .cert-bizname{font-family:'Rajdhani',sans-serif;font-size:2.8rem;font-weight:700;color:var(--name-text);text-align:center;letter-spacing:-.5px;line-height:1.05;margin-bottom:8px;word-break:break-word;max-width:100%}
+  .cert-address{font-size:.78rem;color:var(--address-text);text-align:center;margin-bottom:22px}
+  .cert-rule{width:100%;border:none;border-top:2px solid var(--rule-color);margin-bottom:24px}
+  .cert-para{font-size:.84rem;color:var(--body-text);text-align:center;line-height:1.85;max-width:5.4in;margin-bottom:28px}
+  .cert-para strong{color:var(--para-strong)}
+  .cert-strip{width:100%;background:var(--strip-bg);border:2px solid #38bba1;border-radius:8px;display:flex;align-items:center;justify-content:space-around;padding:15px 20px;margin-bottom:36px}
   .strip-item{text-align:center;flex:1}
   .strip-div{width:1px;height:42px;background:#38bba1;opacity:.35;flex-shrink:0}
-  .strip-lbl{font-family:'IBM Plex Mono',monospace;font-size:.5rem;font-weight:500;letter-spacing:.18em;color:#0f4f44;text-transform:uppercase;margin-bottom:6px}
-  .strip-val{font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:#0b1524;line-height:1}
-  .strip-val.active{color:#1e7a68;display:flex;align-items:center;justify-content:center;gap:6px}
+  .strip-lbl{font-family:'IBM Plex Mono',monospace;font-size:.5rem;font-weight:500;letter-spacing:.18em;color:var(--strip-lbl);text-transform:uppercase;margin-bottom:6px}
+  .strip-val{font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:var(--strip-val);line-height:1}
+  .strip-val.active{color:var(--strip-active);display:flex;align-items:center;justify-content:center;gap:6px}
   .strip-dot{display:inline-block;width:8px;height:8px;background:#38bba1;border-radius:50%;flex-shrink:0}
   .cert-sigs{width:100%;display:flex;align-items:flex-end;justify-content:center;gap:0;margin-bottom:6px}
   .cert-sig{flex:1;text-align:center;padding:0 20px}
   .cert-sig-space{height:60px}
-  .cert-sig-line{border-top:1.5px solid #c0d4dc;padding-top:6px}
-  .cert-sig-name{font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:700;color:#0b1524;margin-bottom:2px}
-  .cert-sig-role{font-size:.72rem;color:#4a6070}
-  .cert-seal{width:110px;height:110px;flex-shrink:0;border:3px solid #38bba1;border-radius:50%;background:#e4f8f5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative}
+  .cert-sig-line{border-top:1.5px solid var(--sig-line);padding-top:6px}
+  .cert-sig-name{font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:700;color:var(--sig-name);margin-bottom:2px}
+  .cert-sig-role{font-size:.72rem;color:var(--sig-role)}
+  .cert-seal{width:110px;height:110px;flex-shrink:0;border:3px solid #38bba1;border-radius:50%;background:var(--seal-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative}
   .cert-seal-ring{position:absolute;inset:6px;border:1px dashed #38bba1;border-radius:50%;opacity:.45}
   .cert-seal-logo{width:52px;height:52px;position:relative;z-index:1;margin-bottom:3px}
-  .cert-seal-text{font-family:'IBM Plex Mono',monospace;font-size:.42rem;font-weight:500;color:#0f4f44;letter-spacing:.1em;line-height:1.6;position:relative;z-index:1;text-transform:uppercase}
-  .cert-footer{background:#e4f8f5;border-top:2.5px solid #38bba1;padding:8px 28px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-  .cert-ft-org{font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;color:#0b1524;margin-bottom:2px}
-  .cert-ft-sub{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:#4a6070;letter-spacing:.04em}
-  .cert-ft-phone{font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:500;color:#0b1524;text-align:right;margin-bottom:2px}
-  .cert-ft-contact{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:#1e7a68;text-align:right;letter-spacing:.04em}
+  .cert-seal-text{font-family:'IBM Plex Mono',monospace;font-size:.42rem;font-weight:500;color:var(--seal-text);letter-spacing:.1em;line-height:1.6;position:relative;z-index:1;text-transform:uppercase}
+  .cert-footer{background:var(--footer-bg);border-top:2.5px solid #38bba1;padding:8px 28px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+  .cert-ft-org{font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;color:var(--footer-org);margin-bottom:2px}
+  .cert-ft-sub{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:var(--footer-sub);letter-spacing:.04em}
+  .cert-ft-phone{font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:500;color:var(--footer-phone);text-align:right;margin-bottom:2px}
+  .cert-ft-contact{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:var(--footer-email);text-align:right;letter-spacing:.04em}
   @media print{
     body{background:white}
     .toolbar{display:none!important}
     .cert-wrap{padding:0;min-height:auto}
-    .cert{box-shadow:none;width:100%;min-height:auto;border:2px solid #0b2040}
+    .cert{box-shadow:none;width:100%;min-height:auto;border:2px solid #0b2040;background:white}
+    .cert-header{background:#0b1524}
+    .cert-strip{background:#e4f8f5}
+    .cert-footer{background:#e4f8f5}
+    .cert-bizname{color:#0b1524}
+    .cert-para{color:#2a3a4a}
+    .cert-para strong{color:#0b1524}
+    .strip-lbl{color:#0f4f44}
+    .strip-val{color:#0b1524}
+    .strip-val.active{color:#1e7a68}
+    .cert-sig-name{color:#0b1524}
+    .cert-sig-role{color:#4a6070}
+    .cert-seal-text{color:#0f4f44}
+    .cert-ft-org{color:#0b1524}
+    .cert-ft-sub{color:#4a6070}
+    .cert-ft-phone{color:#0b1524}
+    .cert-ft-contact{color:#1e7a68}
+    .cert-presents{color:#7a8fa6}
+    .cert-address{color:#4a6070}
     @page{size:letter portrait;margin:0}
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
