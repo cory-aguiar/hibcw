@@ -220,25 +220,25 @@ const packetItems = [
     title: 'HIBCW Program Overview',
     desc: 'One-page overview of the HIBCW program, how it works, and benefits for businesses.',
     actions: [
-      {label:'🖨 Print Overview', url:'files/packet-overview.pdf', primary:true},
+      {label:'🖨 Print Overview', url:`files/packet-overview.html?district=${encodeURIComponent(bizDist)}&distId=${encodeURIComponent(bizDistId)}`, primary:true},
     ]
   },
   {
     id: 'howto',
     icon: '🚨',
     title: 'How to Report an Incident',
-    desc: 'Step-by-step guide with illustrations showing how to report a crime or suspicious activity.',
+    desc: 'Step-by-step guide showing how to report a crime or suspicious activity to HIBCW.',
     actions: [
-      {label:'🖨 Print Guide', url:'files/packet-how-to-report.pdf', primary:true},
+      {label:'🖨 Print Guide', url:`files/packet-how-to-report.html?district=${encodeURIComponent(bizDist)}&distId=${encodeURIComponent(bizDistId)}`, primary:true},
     ]
   },
   {
     id: 'quickref',
     icon: '⚡',
     title: 'Quick Reference Guide',
-    desc: 'Half-page reference card: what to report, when to call 911, HIBCW vs. Crime Stoppers.',
+    desc: 'Two half-page cards: what to report, when to call 911, HIBCW vs. Crime Stoppers, and description checklists.',
     actions: [
-      {label:'🖨 Print Quick Ref', url:'files/packet-quick-reference.pdf', primary:true},
+      {label:'🖨 Print Quick Ref', url:`files/packet-quick-reference.html?district=${encodeURIComponent(bizDist)}&captain=${encodeURIComponent(bizCaptain)}&phone=${encodeURIComponent(bizPhone)}`, primary:true},
     ]
   },
   {
