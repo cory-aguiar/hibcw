@@ -2185,7 +2185,8 @@ function hlCard(id) {
 
 function updateCount() {
   const n = incidents.length;
-  document.getElementById('countBadge').textContent = `${n} inc.`;
+  const badge = document.getElementById('countBadge');
+  if (badge) badge.textContent = `${n} inc.`;
   document.getElementById('sheetCount').textContent = `${n} incident${n!==1?'s':''}`;
 }
 
