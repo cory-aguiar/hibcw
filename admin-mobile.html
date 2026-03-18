@@ -2986,8 +2986,8 @@ function openMobBizSheet(id) {
       <button onclick="mobApproveReg('${b.id}')" style="flex:1;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);border-radius:6px;padding:9px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">✅ Approve</button>
       <button onclick="mobRejectReg('${b.id}')" style="flex:1;background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:6px;padding:9px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">❌ Reject</button>
     ` : ''}
-    ${b.status==='approved' && !b.packet_sent_at && canEdit_ ? `
-      <button onclick="mobGeneratePacket('${b.id}')" style="width:100%;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:6px;padding:9px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">📦 Generate Packet</button>
+    ${b.status==='approved' && canEdit_ ? `
+      <button onclick="mobGeneratePacket('${b.id}')" title="${b.packet_sent_at?'Reprint packet':'Generate packet'}" style="width:100%;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:6px;padding:9px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">${b.packet_sent_at?'🖨 Reprint Packet':'📦 Generate Packet'}</button>
     ` : ''}
     <button onclick="closeMobBizSheet()" style="width:100%;background:transparent;border:1px solid var(--b2);border-radius:6px;padding:9px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">Close</button>`;
 
@@ -3336,13 +3336,19 @@ async function mobGeneratePacket(id) {
     bizNum:b.business_number||'', approvedAt:b.approved_at||'',
   });
   window.open(`packet-print.html?${params.toString()}`, '_blank', 'noopener');
-  const {error} = await sb.from('business_registry').update({packet_sent_at:new Date().toISOString()}).eq('id',id);
-  if (!error) {
-    const reg = mobRegistryList.find(r=>r.id===id);
-    if (reg) reg.packet_sent_at = new Date().toISOString();
+  // Only mark as sent the first time; subsequent opens are reprints
+  if (!b.packet_sent_at) {
+    const {error} = await sb.from('business_registry').update({packet_sent_at:new Date().toISOString()}).eq('id',id);
+    if (!error) {
+      const reg = mobRegistryList.find(r=>r.id===id);
+      if (reg) reg.packet_sent_at = new Date().toISOString();
+      closeMobBizSheet();
+      renderMobRegistry();
+      showToast('📦','Packet generated!');
+    }
+  } else {
     closeMobBizSheet();
-    renderMobRegistry();
-    showToast('📦','Packet generated!');
+    showToast('🖨','Reprinting packet…');
   }
 }
 
@@ -3509,7 +3515,7 @@ function renderDistBizSheetRows(businesses) {
       ${b.packet_sent_at?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal);margin-bottom:6px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</div>`:''}
       <div style="display:flex;gap:6px" class="captain-hidden">
         <button onclick="closeDistBiz();openMobBizSheet('${b.id}')" style="flex:1;background:transparent;border:1px solid var(--b2);border-radius:5px;padding:5px 8px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">View</button>
-        ${b.status==='approved'&&!b.packet_sent_at?`<button onclick="closeDistBiz();mobGeneratePacket('${b.id}')" style="flex:1;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:5px 8px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">📦 Packet</button>`:''}
+        ${b.status==='approved'?`<button onclick="closeDistBiz();mobGeneratePacket('${b.id}')" title="${b.packet_sent_at?'Reprint packet':'Generate packet'}" style="flex:1;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:5px 8px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">${b.packet_sent_at?'🖨 Reprint':'📦 Packet'}</button>`:''}
       </div>
     </div>`;
   }).join('');
