@@ -95,7 +95,7 @@
   <!-- Progress -->
   <div class="progress-wrap">
     <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-    <div class="progress-label"><span id="progressLabel">0 of 8 items checked</span></div>
+    <div class="progress-label"><span id="progressLabel">0 of 7 items checked</span></div>
   </div>
 
   <!-- Assembly Checklist -->
@@ -248,15 +248,6 @@ const packetItems = [
     desc: 'Prints 4 wallet-size cards per page. Trim and include one in the packet.',
     actions: [
       {label:'🖨 Print Contact Cards', url:`files/packet-contact-card.html?district=${encodeURIComponent(bizDist)}&captain=${encodeURIComponent(bizCaptain)}&phone=${encodeURIComponent(bizPhone)}`, primary:true},
-    ]
-  },
-  {
-    id: 'badge',
-    icon: '🏷',
-    title: 'HIBCW Member Window Badge',
-    desc: 'Printable 4"×4" window badge/decal. Business displays it to show HIBCW participation.',
-    actions: [
-      {label:'🖨 Print Window Badge', url:`files/packet-window-badge.html?name=${encodeURIComponent(bizName)}&district=${encodeURIComponent(bizDist)}`, primary:true},
     ]
   },
 ];
