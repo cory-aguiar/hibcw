@@ -2576,10 +2576,9 @@ function renderMobMilestonesTab() {
 
 function renderMobQuarterlyTab() {
   const quarters = [{label:'Q1',months:[0,1,2],color:'#00c9a7'},{label:'Q2',months:[3,4,5],color:'#f5a623'},{label:'Q3',months:[6,7,8],color:'#a855f7'},{label:'Q4',months:[9,10,11],color:'#f97316'}];
-  const yd = mobTrackerData[mobTrackerYear]||{};
   return quarters.map(q=>{
     const qData = mobQuarterlyNotes[`${mobTrackerYear}_${q.label}`]||{};
-    const allM = q.months.map(i=>yd[i]||{});
+    const allM = q.months.map(i=>getMobMonthData(i));
     const totNewMem = allM.reduce((s,m)=>s+(parseInt(m.members_new)||0),0);
     const totInc = allM.reduce((s,m)=>s+(parseInt(m.incidents)||0),0);
     const totAlerts = allM.reduce((s,m)=>s+(parseInt(m.alerts_sent)||0),0);
