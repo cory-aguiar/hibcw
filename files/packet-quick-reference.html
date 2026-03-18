@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>HIBCW Quick Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+@page{size:letter;margin:0}
+body{background:#f0f0f0;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:11px;color:#1a2a3a;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.page{width:816px;min-height:1056px;background:#fff;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
+.toolbar{background:#0b1524;padding:9px 18px;display:flex;align-items:center;justify-content:space-between}
+.toolbar-brand{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#38bba1}
+.t-btn{padding:5px 11px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);background:transparent}
+.t-btn-teal{background:#38bba1;color:#0b1524;border-color:#38bba1}
+/* Cut line between two cards */
+.cut-guide{width:100%;padding:6px 44px;display:flex;align-items:center;gap:8px;background:#f5f8fa}
+.cut-line{flex:1;height:1px;border-top:1px dashed #b0c0cc}
+.cut-label{font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:#b0c0cc;letter-spacing:.1em;white-space:nowrap}
+/* Each half is one card — letter size halves */
+.card{flex:1;display:flex;flex-direction:column;min-height:488px}
+.card-header{background:#0b1524;padding:14px 36px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #38bba1}
+.card-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:.04em}
+.card-org{font-family:'IBM Plex Mono',monospace;font-size:7px;color:#38bba1;letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
+.card-body{flex:1;padding:14px 36px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card-footer{background:#0b1524;padding:9px 36px;display:flex;align-items:center;justify-content:space-between;border-top:3px solid #38bba1}
+.cf-url{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:#38bba1}
+.cf-contact{font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:rgba(255,255,255,.5)}
+/* Section within card body */
+.ref-sec{}
+.ref-sec-title{font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:#38bba1;margin-bottom:7px;padding-bottom:4px;border-bottom:1px solid rgba(56,187,161,.2)}
+/* Decision tree */
+.decision-row{display:flex;gap:6px;margin-bottom:6px;align-items:flex-start}
+.decision-icon{font-size:13px;flex-shrink:0;width:18px;text-align:center;margin-top:1px}
+.decision-text{font-size:9px;color:#2a3a4a;line-height:1.55}
+.decision-text strong{color:#0b1524;font-size:9px}
+.decision-text .tag-911{display:inline-block;background:#e84a5f;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:7.5px;font-weight:700;border-radius:2px;padding:0px 5px;margin-left:3px;vertical-align:middle}
+.decision-text .tag-hibcw{display:inline-block;background:#38bba1;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:7.5px;font-weight:700;border-radius:2px;padding:0 5px;margin-left:3px;vertical-align:middle}
+.decision-text .tag-both{display:inline-block;background:#f59e0b;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:7.5px;font-weight:700;border-radius:2px;padding:0 5px;margin-left:3px;vertical-align:middle}
+/* Report types */
+.type-list{display:flex;flex-direction:column;gap:4px}
+.type-item{display:flex;gap:6px;align-items:flex-start;font-size:9px;color:#4a6070;line-height:1.5}
+.type-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.type-dot.red{background:#e84a5f}
+.type-dot.amber{background:#f59e0b}
+.type-dot.teal{background:#38bba1}
+/* Key contacts box */
+.contacts-box{background:#f4fbf9;border:1px solid rgba(56,187,161,.25);border-radius:5px;padding:10px 12px}
+.contact-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid rgba(56,187,161,.1)}
+.contact-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.contact-lbl{font-size:8px;font-weight:600;color:#0b1524}
+.contact-val{font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#1a7a68;font-weight:600}
+/* HIBCW vs 911 vs CrimeStopers */
+.compare-table{width:100%;border-collapse:collapse;font-size:8.5px}
+.compare-table th{background:#0b1524;color:#38bba1;font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;padding:5px 8px;text-align:left}
+.compare-table td{padding:5px 8px;border-bottom:1px solid #e8f0f8;color:#2a3a4a;vertical-align:top;line-height:1.4}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table td.check{color:#38bba1;font-weight:700;text-align:center}
+.compare-table td.cross{color:#e84a5f;font-weight:700;text-align:center}
+.compare-table td.partial{color:#f59e0b;font-weight:700;text-align:center}
+.compare-table .col-feature{font-weight:600;color:#0b1524;min-width:90px}
+@media print{.toolbar{display:none!important}.cut-guide{display:none!important}.page{margin:0;width:100%}}
+</style></head><body>
+<div class="toolbar">
+  <div class="toolbar-brand">HIBCW · Quick Reference Guide</div>
+  <div style="display:flex;gap:6px">
+    <button class="t-btn" onclick="window.close()">✕ Close</button>
+    <button class="t-btn t-btn-teal" onclick="window.print()">🖨 Print</button>
+  </div>
+</div>
+<div class="page">
+
+  <!-- ═══ CARD 1 — TOP HALF ═══ -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">HIBCW Quick Reference</div>
+        <div class="card-org">Hawaii Island Business Crime Watch &nbsp;·&nbsp; A Program of KIAA</div>
+      </div>
+      <img src="../logo-shield.svg" alt="HIBCW" style="width:36px;height:36px;object-fit:contain;opacity:.85">
+    </div>
+
+    <div class="card-body">
+
+      <!-- Left col: What to report -->
+      <div class="ref-sec">
+        <div class="ref-sec-title">What to Report</div>
+        <div class="type-list">
+          <div class="type-item"><div class="type-dot red"></div><div><strong style="color:#0b1524">Call 911 + Report to HIBCW:</strong> Active crimes, weapons, injuries, suspects on scene</div></div>
+          <div class="type-item"><div class="type-dot amber"></div><div><strong style="color:#0b1524">Report to HIBCW:</strong> Theft, break-ins, vandalism, fraud, trespassing, harassment</div></div>
+          <div class="type-item"><div class="type-dot teal"></div><div><strong style="color:#0b1524">Report to HIBCW:</strong> Suspicious persons, vehicles, or activity — even if uncertain</div></div>
+          <div class="type-item"><div class="type-dot teal"></div><div><strong style="color:#0b1524">Report to HIBCW:</strong> Shoplifting attempts, scam calls/visits targeting your business</div></div>
+          <div class="type-item"><div class="type-dot teal"></div><div><strong style="color:#0b1524">Report to HIBCW:</strong> Any patterns you notice — same person, same vehicle, repeat incidents</div></div>
+        </div>
+
+        <div class="ref-sec-title" style="margin-top:12px">When to Call 911 vs. HIBCW</div>
+        <div class="decision-row"><div class="decision-icon">🔴</div><div class="decision-text"><strong>Crime in progress, weapon, injury</strong><span class="tag-911">911 FIRST</span></div></div>
+        <div class="decision-row"><div class="decision-icon">🟡</div><div class="decision-text"><strong>Crime already happened, suspect gone</strong><span class="tag-both">911 + HIBCW</span></div></div>
+        <div class="decision-row"><div class="decision-icon">🟢</div><div class="decision-text"><strong>Suspicious activity, no immediate threat</strong><span class="tag-hibcw">HIBCW</span></div></div>
+        <div class="decision-row"><div class="decision-icon">🟢</div><div class="decision-text"><strong>Patterns, tips, community awareness</strong><span class="tag-hibcw">HIBCW</span></div></div>
+      </div>
+
+      <!-- Right col: Key contacts + quick steps -->
+      <div class="ref-sec">
+        <div class="ref-sec-title">Key Contacts</div>
+        <div class="contacts-box">
+          <div class="contact-row"><div class="contact-lbl">Emergency</div><div class="contact-val" style="color:#e84a5f">911</div></div>
+          <div class="contact-row"><div class="contact-lbl">Hawaii Island Police Non-Emergency</div><div class="contact-val">(808) 935-3311</div></div>
+          <div class="contact-row"><div class="contact-lbl">Crime Stoppers Hawaii</div><div class="contact-val">(808) 961-8300</div></div>
+          <div class="contact-row"><div class="contact-lbl">HIBCW / KIAA Office</div><div class="contact-val">(808) 961-5422</div></div>
+          <div class="contact-row"><div class="contact-lbl">HIBCW Email</div><div class="contact-val" style="font-size:7.5px">hibcw@kiaahilo.org</div></div>
+          <div class="contact-row" id="captainRow" style="display:none"><div class="contact-lbl">Your District Captain</div><div class="contact-val" id="captainPhone" style="font-size:7.5px">—</div></div>
+        </div>
+
+        <div class="ref-sec-title" style="margin-top:12px">Report in 3 Steps</div>
+        <div class="decision-row"><div class="decision-icon" style="background:#0b1524;color:#38bba1;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:monospace;font-weight:700">1</div><div class="decision-text">Go to <strong>hibcw.vercel.app</strong> on any device</div></div>
+        <div class="decision-row"><div class="decision-icon" style="background:#0b1524;color:#38bba1;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:monospace;font-weight:700">2</div><div class="decision-text">Click <strong>"Report an Incident"</strong> — no login needed</div></div>
+        <div class="decision-row"><div class="decision-icon" style="background:#0b1524;color:#38bba1;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:monospace;font-weight:700">3</div><div class="decision-text">Fill in what you know and <strong>submit</strong> — your captain is notified instantly</div></div>
+      </div>
+
+    </div>
+
+    <div class="card-footer">
+      <div class="cf-url">hibcw.vercel.app</div>
+      <div style="text-align:center"><div class="cf-contact" id="distLabelCard1">HIBCW Member</div></div>
+      <div class="cf-contact">(808) 961-5422 &nbsp;·&nbsp; hibcw@kiaahilo.org</div>
+    </div>
+  </div>
+
+  <!-- Cut guide -->
+  <div class="cut-guide">
+    <div class="cut-line"></div>
+    <div class="cut-label">✂ Cut here · Fold and keep at your register or post in break room</div>
+    <div class="cut-line"></div>
+  </div>
+
+  <!-- ═══ CARD 2 — BOTTOM HALF ═══ -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">HIBCW vs. 911 vs. Crime Stoppers</div>
+        <div class="card-org">Know which resource to use — and when</div>
+      </div>
+      <img src="../logo-shield.svg" alt="HIBCW" style="width:36px;height:36px;object-fit:contain;opacity:.85">
+    </div>
+
+    <div class="card-body" style="grid-template-columns:1.4fr 1fr;gap:14px">
+
+      <!-- Comparison table -->
+      <div class="ref-sec">
+        <div class="ref-sec-title">Feature Comparison</div>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th style="text-align:center">HIBCW</th>
+              <th style="text-align:center">911</th>
+              <th style="text-align:center">Crime Stoppers</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="col-feature">Emergency response</td><td class="cross">✗</td><td class="check">✔</td><td class="cross">✗</td></tr>
+            <tr><td class="col-feature">Non-emergency report</td><td class="check">✔</td><td class="partial">◐</td><td class="check">✔</td></tr>
+            <tr><td class="col-feature">Anonymous tips</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✔</td></tr>
+            <tr><td class="col-feature">Community alerts</td><td class="check">✔</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+            <tr><td class="col-feature">Public incident map</td><td class="check">✔</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+            <tr><td class="col-feature">District Captain contact</td><td class="check">✔</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+            <tr><td class="col-feature">Business-to-business network</td><td class="check">✔</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+            <tr><td class="col-feature">Cash rewards for tips</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✔</td></tr>
+            <tr><td class="col-feature">Law enforcement dispatch</td><td class="cross">✗</td><td class="check">✔</td><td class="partial">◐</td></tr>
+            <tr><td class="col-feature">No account required</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td></div></tr>
+          </tbody>
+        </table>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:#b0c0cc;margin-top:5px">✔ Yes &nbsp; ✗ No &nbsp; ◐ Varies</div>
+      </div>
+
+      <!-- Right: suspect description cheat sheet -->
+      <div class="ref-sec">
+        <div class="ref-sec-title">Suspect Description Checklist</div>
+        <div style="font-size:9px;color:#2a3a4a;line-height:2">
+          <div>☐ &nbsp;Gender &amp; approximate age</div>
+          <div>☐ &nbsp;Height &amp; build</div>
+          <div>☐ &nbsp;Hair color &amp; style</div>
+          <div>☐ &nbsp;Clothing (shirt, pants, shoes, hat)</div>
+          <div>☐ &nbsp;Tattoos, scars, or distinguishing marks</div>
+          <div>☐ &nbsp;Direction of travel</div>
+          <div>☐ &nbsp;On foot or in a vehicle</div>
+        </div>
+        <div class="ref-sec-title" style="margin-top:10px">Vehicle Description Checklist</div>
+        <div style="font-size:9px;color:#2a3a4a;line-height:2">
+          <div>☐ &nbsp;Make &amp; model (or body type)</div>
+          <div>☐ &nbsp;Color</div>
+          <div>☐ &nbsp;License plate (full or partial)</div>
+          <div>☐ &nbsp;Year / condition</div>
+          <div>☐ &nbsp;Direction of travel</div>
+          <div>☐ &nbsp;Number of occupants</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <div class="cf-url">hibcw.vercel.app</div>
+      <div style="text-align:center"><div class="cf-contact" id="distLabelCard2">HIBCW Member</div></div>
+      <div class="cf-contact">(808) 961-5422 &nbsp;·&nbsp; hibcw@kiaahilo.org</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const p = new URLSearchParams(window.location.search);
+const dist    = p.get('district') || '';
+const captain = p.get('captain')  || '';
+const phone   = p.get('phone')    || '';
+if (dist) {
+  document.getElementById('distLabelCard1').textContent = dist;
+  document.getElementById('distLabelCard2').textContent = dist;
+}
+if (captain && phone) {
+  document.getElementById('captainRow').style.display = 'flex';
+  document.getElementById('captainPhone').textContent = captain + '  ' + phone;
+} else if (captain) {
+  document.getElementById('captainRow').style.display = 'flex';
+  document.getElementById('captainPhone').textContent = captain;
+}
+</script>
+</body></html>

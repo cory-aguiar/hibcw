@@ -1,0 +1,178 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>HIBCW Program Overview</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+@page{size:letter;margin:0}
+body{background:#f0f0f0;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:11px;color:#1a2a3a;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.page{width:816px;min-height:1056px;background:#fff;margin:0 auto;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.toolbar{background:#0b1524;padding:9px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.toolbar-brand{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#38bba1}
+.t-btn{padding:5px 11px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);background:transparent}
+.t-btn-teal{background:#38bba1;color:#0b1524;border-color:#38bba1}
+.accent-top{height:5px;background:#0b1524}
+.accent-stripe{height:3px;background:#38bba1}
+/* Letterhead */
+.lh{padding:20px 44px 16px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #e0e8f0}
+.lh-logo{display:flex;align-items:center;gap:12px}
+.lh-org{font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:#38bba1;margin-bottom:3px}
+.lh-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:#0b1524;line-height:1}
+.lh-sub{font-size:8.5px;color:#7a8fa6;margin-top:2px}
+.lh-right{text-align:right}
+.lh-right-label{font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:#b0c0cc;margin-bottom:3px}
+.lh-right-dist{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#0b1524}
+/* Hero */
+.hero{background:#0b1524;padding:22px 44px 18px;display:flex;align-items:center;gap:18px}
+.hero-text{}
+.hero-hl{font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:700;color:#fff;line-height:1.1;margin-bottom:4px}
+.hero-sub{font-size:10.5px;color:rgba(255,255,255,.58);line-height:1.6;max-width:540px}
+/* Body */
+.body{padding:18px 44px;flex:1}
+.sec-lbl{font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:#38bba1;margin-bottom:9px;margin-top:16px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:#38bba1;opacity:.2}
+/* Benefits */
+.benefit-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:4px}
+.benefit{background:#f4fbf9;border:1px solid rgba(56,187,161,.2);border-top:3px solid #38bba1;border-radius:0 0 5px 5px;padding:10px 12px}
+.benefit-title{font-family:'Rajdhani',sans-serif;font-size:12.5px;font-weight:700;color:#0b1524;margin-bottom:3px}
+.benefit-desc{font-size:9.5px;color:#4a6070;line-height:1.55}
+/* Steps */
+.step-row{display:flex;gap:10px;margin-bottom:7px;align-items:flex-start}
+.step-num{width:22px;height:22px;border-radius:50%;background:#0b1524;color:#38bba1;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body{flex:1;font-size:10px;line-height:1.6;color:#2a3a4a}
+.step-body strong{color:#0b1524;font-weight:600}
+/* Stats */
+.stats{display:flex;border:1px solid rgba(56,187,161,.2);border-radius:6px;overflow:hidden;margin-bottom:14px}
+.stat{flex:1;padding:10px 8px;text-align:center;border-right:1px solid rgba(56,187,161,.15)}
+.stat:last-child{border-right:none}
+.stat-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#38bba1;line-height:1}
+.stat-lbl{font-size:8px;color:#7a8fa6;margin-top:2px;line-height:1.4}
+/* CTA */
+.cta-box{background:#0b1524;border-radius:6px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cta-label{font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(56,187,161,.7);margin-bottom:3px}
+.cta-url{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#fff}
+.cta-sub{font-size:8.5px;color:rgba(255,255,255,.4);margin-top:2px}
+/* Two-col layout for steps + stats */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+/* Footer */
+.footer{background:#f5f8fa;border-top:2px solid #0b1524;padding:11px 44px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.footer-left{font-size:8px;color:#7a8fa6;line-height:1.7}
+.footer-left strong{color:#0b1524}
+.footer-right{text-align:right;font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:#7a8fa6}
+.accent-bot{height:3px;background:#38bba1}
+.accent-bot2{height:4px;background:#0b1524}
+@media print{.toolbar{display:none!important}.page{margin:0;width:100%}}
+</style></head><body>
+<div class="toolbar">
+  <div class="toolbar-brand">HIBCW · Program Overview</div>
+  <div style="display:flex;gap:6px">
+    <button class="t-btn" onclick="window.close()">✕ Close</button>
+    <button class="t-btn t-btn-teal" onclick="window.print()">🖨 Print</button>
+  </div>
+</div>
+<div class="page">
+<div class="accent-top"></div><div class="accent-stripe"></div>
+
+<!-- Letterhead -->
+<div class="lh">
+  <div class="lh-logo">
+    <img src="../logo-shield.svg" alt="HIBCW" style="width:44px;height:44px;object-fit:contain;flex-shrink:0">
+    <div>
+      <div class="lh-org">A Program of KIAA</div>
+      <div class="lh-title">Hawaii Island Business Crime Watch</div>
+      <div class="lh-sub">hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422</div>
+    </div>
+  </div>
+  <div class="lh-right">
+    <div class="lh-right-label">Member Packet</div>
+    <div class="lh-right-dist" id="distLabel">Program Overview</div>
+  </div>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-text">
+    <div class="hero-hl">Protecting Hawaii Island — One Business at a Time</div>
+    <div class="hero-sub">HIBCW is a free, community-led safety network that connects local businesses, district captains, and law enforcement across all 9 districts of Hawaii Island. Together, we share information, report incidents, and keep our communities safer.</div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="body">
+
+  <div class="sec-lbl" style="margin-top:12px">Member Benefits</div>
+  <div class="benefit-grid">
+    <div class="benefit">
+      <div class="benefit-title">📢 Real-Time District Alerts</div>
+      <div class="benefit-desc">Your District Captain sends alerts the moment something significant happens in your area — suspicious activity, break-ins, known threats — so you're always informed before it escalates.</div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-title">🗺 Live Incident Map</div>
+      <div class="benefit-desc">View all active reported incidents across Hawaii Island in real time at hibcw.vercel.app. No login required — the map is public and always up to date.</div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-title">👮 Direct Captain Access</div>
+      <div class="benefit-desc">Your assigned District Captain is your personal point of contact for all safety concerns. They review reports, coordinate with law enforcement, and keep your district informed.</div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-title">🤝 Community Network</div>
+      <div class="benefit-desc">Connect with neighboring businesses who share your commitment to safety. When one business reports, everyone in the district benefits from that information.</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="sec-lbl">How It Works</div>
+      <div class="step-row"><div class="step-num">1</div><div class="step-body"><strong>Witness an incident?</strong> Visit hibcw.vercel.app and click "Report an Incident." Fill in details and submit — takes about 2 minutes. No account needed.</div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-body"><strong>Your report goes live</strong> on the public incident map immediately, visible to HIBCW members and District Captains across the island.</div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-body"><strong>Your District Captain reviews</strong> the report, coordinates with law enforcement if needed, and sends a district-wide alert if the threat is ongoing.</div></div>
+      <div class="step-row"><div class="step-num">4</div><div class="step-body"><strong>Stay informed</strong> — district alerts appear as a banner on the public map in real time. Share the site with your staff so everyone stays in the loop.</div></div>
+    </div>
+    <div>
+      <div class="sec-lbl">HIBCW at a Glance</div>
+      <div class="stats">
+        <div class="stat"><div class="stat-val">9</div><div class="stat-lbl">Districts across<br>Hawaii Island</div></div>
+        <div class="stat"><div class="stat-val">Free</div><div class="stat-lbl">No cost to<br>join, ever</div></div>
+        <div class="stat"><div class="stat-val">Live</div><div class="stat-lbl">Real-time<br>incident map</div></div>
+        <div class="stat"><div class="stat-val">KIAA</div><div class="stat-lbl">Backed by local<br>community</div></div>
+      </div>
+      <div class="sec-lbl">What to Report</div>
+      <div style="font-size:9.5px;color:#2a3a4a;line-height:1.7">
+        <div style="margin-bottom:3px">✔ Break-ins, theft, or vandalism</div>
+        <div style="margin-bottom:3px">✔ Suspicious persons or vehicles</div>
+        <div style="margin-bottom:3px">✔ Shoplifting or robbery attempts</div>
+        <div style="margin-bottom:3px">✔ Fraud or scam attempts targeting businesses</div>
+        <div style="margin-bottom:3px">✔ Threats, harassment, or trespassing</div>
+        <div style="margin-bottom:3px">✔ Anything that feels "off" — your instincts matter</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:14px">
+    <div class="cta-box">
+      <div>
+        <div class="cta-label">Access the platform at</div>
+        <div class="cta-url">hibcw.vercel.app</div>
+        <div class="cta-sub">Report incidents &nbsp;·&nbsp; View the live map &nbsp;·&nbsp; Read district alerts &nbsp;·&nbsp; No login required</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:rgba(255,255,255,.4);margin-bottom:5px">Questions? Contact us</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#38bba1">hibcw@kiaahilo.org</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#38bba1">(808) 961-5422</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-left"><strong>Hawaii Island Business Crime Watch &nbsp;·&nbsp; A Program of KIAA</strong><br>hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422</div>
+  <div class="footer-right">HIBCW Member Packet<br>Program Overview</div>
+</div>
+<div class="accent-bot"></div><div class="accent-bot2"></div>
+</div>
+
+<script>
+const p = new URLSearchParams(window.location.search);
+const dist = p.get('district')||'';
+if(dist) document.getElementById('distLabel').textContent = dist;
+</script>
+</body></html>
