@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>HIBCW Incident Report Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+@page{size:letter;margin:0}
+body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;color:#1a2a3a;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.toolbar{background:#0b1524;padding:8px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.toolbar-brand{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#00c9a7}
+.t-btn{padding:5px 11px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;border:none}
+.t-ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
+.t-teal{background:#00c9a7;color:#0b1524}
+.page{width:816px;height:1056px;background:#fff;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
+
+/* Accents */
+.stripe-top{height:4px;background:#0b1524}
+.stripe-teal{height:3px;background:#00c9a7}
+.stripe-bot{height:3px;background:#00c9a7}
+.stripe-bot2{height:4px;background:#0b1524}
+
+/* Header */
+.hdr{background:linear-gradient(90deg,#0b1524,#111e30);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,201,167,.2)}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-logo{width:38px;height:38px;object-fit:contain;flex-shrink:0}
+.hdr-org{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:#00c9a7;margin-bottom:2px}
+.hdr-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.04em;line-height:1}
+.hdr-right{text-align:right}
+.hdr-form-label{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.16em;text-transform:uppercase;color:rgba(0,201,167,.7);margin-bottom:3px}
+.hdr-ref{display:flex;align-items:center;gap:6px}
+.hdr-ref-lbl{font-size:8px;color:rgba(255,255,255,.4)}
+.hdr-ref-box{border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:3px 10px;width:100px;height:18px}
+
+/* Body */
+.body{padding:10px 32px 0;flex:1;display:flex;flex-direction:column;gap:8px}
+
+/* Section header */
+.sec{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.sec-num{width:18px;height:18px;border-radius:50%;background:#0b1524;color:#00c9a7;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:#0b1524;letter-spacing:.04em}
+.sec-line{flex:1;height:1px;background:rgba(0,201,167,.25)}
+
+/* Field rows */
+.row{display:flex;gap:10px;margin-bottom:6px}
+.fld{display:flex;flex-direction:column;gap:2px;flex:1}
+.fld.w2{flex:2}
+.fld.w3{flex:3}
+.fld-lbl{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:#7a8fa6}
+.fld-line{border-bottom:1.5px solid #c8d8e8;height:16px;width:100%}
+.fld-box{border:1.5px solid #c8d8e8;border-radius:3px;height:16px;width:100%}
+.fld-area{border:1.5px solid #c8d8e8;border-radius:3px;width:100%;height:36px}
+
+/* Incident type checkboxes */
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:6px}
+.type-item{display:flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid #d0dce8;border-radius:4px;background:#f8fbff}
+.type-box{width:13px;height:13px;border:1.5px solid #c8d8e8;border-radius:2px;flex-shrink:0}
+.type-lbl{font-size:9px;color:#2a3a4a;line-height:1.2}
+
+/* Two-panel section (suspect + vehicle side by side) */
+.two-panel{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.panel{border:1px solid #e0e8f0;border-radius:5px;padding:8px 10px}
+.panel-title{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:#0b1524;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.panel-title span{font-family:'IBM Plex Mono',monospace;font-size:7.5px;font-weight:400;color:#7a8fa6;letter-spacing:.04em}
+.mini-row{display:flex;gap:7px;margin-bottom:5px}
+.mini-fld{display:flex;flex-direction:column;gap:2px;flex:1}
+.mini-lbl{font-family:'IBM Plex Mono',monospace;font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6}
+.mini-line{border-bottom:1.5px solid #c8d8e8;height:14px;width:100%}
+
+/* Warning box */
+.warn{background:#fff8f0;border:1px solid rgba(245,166,35,.3);border-left:3px solid #f5a623;border-radius:0 4px 4px 0;padding:6px 10px;display:flex;gap:8px;align-items:flex-start}
+.warn-icon{font-size:11px;flex-shrink:0;margin-top:1px}
+.warn-text{font-size:8.5px;color:#4a3010;line-height:1.5}
+.warn-text strong{color:#8a4a00}
+
+/* Footer */
+.ftr{background:#f5f8fa;border-top:1px solid #e0e8f0;padding:7px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ftr-left{font-size:7.5px;color:#7a8fa6;line-height:1.7}
+.ftr-left strong{color:#0b1524}
+.ftr-right{font-family:'IBM Plex Mono',monospace;font-size:7px;color:#b0c0cc;text-align:right;line-height:1.6}
+
+@media print{.toolbar{display:none!important}.page{margin:0;width:100%}}
+</style></head><body>
+
+<div class="toolbar">
+  <div class="toolbar-brand">HIBCW · Paper Incident Report Form</div>
+  <div style="display:flex;gap:6px">
+    <a href="javascript:window.print()" class="t-btn t-teal">🖨 Print Form</a>
+    <button class="t-btn t-ghost" onclick="window.close()">✕ Close</button>
+  </div>
+</div>
+
+<div class="page">
+<div class="stripe-top"></div><div class="stripe-teal"></div>
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-left">
+    <img src="../logo-shield.svg" alt="HIBCW Shield" class="hdr-logo">
+    <div>
+      <div class="hdr-org">Hawaiʻi Island Business Community Watch · A Program of KIAA</div>
+      <div class="hdr-title">Incident Report Form</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-form-label">For office use</div>
+    <div class="hdr-ref">
+      <div class="hdr-ref-lbl">Report #</div>
+      <div class="hdr-ref-box"></div>
+    </div>
+    <div style="margin-top:4px" class="hdr-ref">
+      <div class="hdr-ref-lbl">Date received</div>
+      <div class="hdr-ref-box"></div>
+    </div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- 01 Incident type -->
+  <div>
+    <div class="sec">
+      <div class="sec-num">1</div>
+      <div class="sec-title">Incident Type</div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="type-grid">
+      <div class="type-item"><div class="type-box"></div><div class="type-lbl">Theft / Shoplifting</div></div>
+      <div class="type-item"><div class="type-box"></div><div class="type-lbl">Burglary / Break-In</div></div>
+      <div class="type-item"><div class="type-box"></div><div class="type-lbl">Robbery</div></div>
+      <div class="type-item"><div class="type-box"></div><div class="type-lbl">Vandalism / Graffiti</div></div>
+      <div class="type-item"><div class="type-box"></div><div class="type-lbl">Vehicle Break-In</div></div>
+      <div class="type-item"><div class="type-box"></div><div class="type-lbl">Drug Activity</div></div>
+      <div class="type-item"><div class="type-box"></div><div class="type-lbl">Fraud / Scam</div></div>
+      <div class="type-item"><div class="type-box"></div><div class="type-lbl">Suspicious Activity</div></div>
+      <div class="type-item" style="grid-column:span 2"><div class="type-box"></div><div class="type-lbl">Other — describe in Section 04</div></div>
+      <div class="type-item" style="grid-column:span 2;background:#fff"><div style="font-family:'IBM Plex Mono',monospace;font-size:6.5px;color:#7a8fa6;text-transform:uppercase;letter-spacing:.1em;margin-right:5px;white-space:nowrap">If other:</div><div class="fld-line" style="flex:1"></div></div>
+    </div>
+  </div>
+
+  <!-- 02 Location & time -->
+  <div>
+    <div class="sec">
+      <div class="sec-num">2</div>
+      <div class="sec-title">Location &amp; Time</div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="row">
+      <div class="fld w3"><div class="fld-lbl">Street address or nearest intersection</div><div class="fld-line"></div></div>
+      <div class="fld"><div class="fld-lbl">City / Town</div><div class="fld-line"></div></div>
+      <div class="fld"><div class="fld-lbl">District</div><div class="fld-line"></div></div>
+    </div>
+    <div class="row">
+      <div class="fld"><div class="fld-lbl">Date of incident</div><div class="fld-line"></div></div>
+      <div class="fld"><div class="fld-lbl">Approx. time</div><div class="fld-line"></div></div>
+      <div class="fld w2"><div class="fld-lbl">Business / location name (if applicable)</div><div class="fld-line"></div></div>
+    </div>
+  </div>
+
+  <!-- 03 Suspect & vehicle -->
+  <div>
+    <div class="sec">
+      <div class="sec-num">3</div>
+      <div class="sec-title">Suspect &amp; Vehicle Description <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:400;color:#7a8fa6">(fill in only what you personally observed)</span></div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="two-panel">
+      <div class="panel">
+        <div class="panel-title">👤 Suspect <span>— describe only what you directly witnessed</span></div>
+        <div class="mini-row">
+          <div class="mini-fld"><div class="mini-lbl">Gender</div><div class="mini-line"></div></div>
+          <div class="mini-fld"><div class="mini-lbl">Approx. Age</div><div class="mini-line"></div></div>
+          <div class="mini-fld"><div class="mini-lbl">Height</div><div class="mini-line"></div></div>
+          <div class="mini-fld"><div class="mini-lbl">Build</div><div class="mini-line"></div></div>
+        </div>
+        <div class="mini-row">
+          <div class="mini-fld" style="flex:2"><div class="mini-lbl">Clothing description</div><div class="mini-line"></div></div>
+          <div class="mini-fld" style="flex:1"><div class="mini-lbl">Race / Ethnicity</div><div class="mini-line"></div></div>
+        </div>
+        <div class="mini-row">
+          <div class="mini-fld"><div class="mini-lbl">Other distinguishing features</div><div class="mini-line"></div></div>
+        </div>
+        <div class="mini-row" style="margin-bottom:0">
+          <div class="mini-fld"><div class="mini-lbl">Direction fled / last seen</div><div class="mini-line"></div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">🚗 Vehicle <span>— if a vehicle was involved</span></div>
+        <div class="mini-row">
+          <div class="mini-fld"><div class="mini-lbl">Make</div><div class="mini-line"></div></div>
+          <div class="mini-fld"><div class="mini-lbl">Model</div><div class="mini-line"></div></div>
+          <div class="mini-fld"><div class="mini-lbl">Year</div><div class="mini-line"></div></div>
+          <div class="mini-fld"><div class="mini-lbl">Color</div><div class="mini-line"></div></div>
+        </div>
+        <div class="mini-row">
+          <div class="mini-fld" style="flex:2"><div class="mini-lbl">License plate (full or partial)</div><div class="mini-line"></div></div>
+          <div class="mini-fld"><div class="mini-lbl">State</div><div class="mini-line"></div></div>
+        </div>
+        <div class="mini-row">
+          <div class="mini-fld"><div class="mini-lbl">Direction of travel</div><div class="mini-line"></div></div>
+        </div>
+        <div class="mini-row" style="margin-bottom:0">
+          <div class="mini-fld"><div class="mini-lbl">Other notes (damage, stickers, etc.)</div><div class="mini-line"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 Description -->
+  <div>
+    <div class="sec">
+      <div class="sec-num">4</div>
+      <div class="sec-title">Incident Description</div>
+      <div class="sec-line"></div>
+    </div>
+    <div style="border:1.5px solid #c8d8e8;border-radius:4px;width:100%;height:58px"></div>
+  </div>
+
+  <!-- 05 Reporter -->
+  <div>
+    <div class="sec">
+      <div class="sec-num">5</div>
+      <div class="sec-title">Reporter Information <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:400;color:#7a8fa6">(optional — kept confidential)</span></div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="row">
+      <div class="fld w2"><div class="fld-lbl">Your name</div><div class="fld-line"></div></div>
+      <div class="fld w2"><div class="fld-lbl">Business name</div><div class="fld-line"></div></div>
+      <div class="fld"><div class="fld-lbl">Phone</div><div class="fld-line"></div></div>
+      <div class="fld"><div class="fld-lbl">Email</div><div class="fld-line"></div></div>
+    </div>
+    <div class="row" style="margin-bottom:0">
+      <div class="fld"><div class="fld-lbl">Was a police report filed?</div>
+        <div style="display:flex;gap:12px;margin-top:4px">
+          <div style="display:flex;align-items:center;gap:4px"><div class="type-box"></div><span style="font-size:9px">Yes</span></div>
+          <div style="display:flex;align-items:center;gap:4px"><div class="type-box"></div><span style="font-size:9px">No</span></div>
+          <div style="display:flex;align-items:center;gap:4px"><div class="type-box"></div><span style="font-size:9px">Pending</span></div>
+        </div>
+      </div>
+      <div class="fld w2"><div class="fld-lbl">HPD report number (if applicable)</div><div class="fld-line"></div></div>
+    </div>
+  </div>
+
+  <!-- Warning -->
+  <div class="warn">
+    <div class="warn-icon">⚠️</div>
+    <div class="warn-text">
+      <strong>This form does not constitute an official police report</strong> and does not notify the Hilo Police Department.
+      For emergencies call <strong>911</strong>. To file an official report contact HPD at <strong>(808) 935-3311</strong> or visit hawaiipolice.com.
+      For anonymous tips call Crime Stoppers at <strong>(808) 961-8300</strong>.
+      Once complete, deliver this form to your District Captain or submit online at <strong>hibcw.vercel.app</strong>.
+    </div>
+  </div>
+
+</div><!-- /body -->
+
+<div class="ftr">
+  <div class="ftr-left">
+    <strong>Hawaiʻi Island Business Community Watch · A Program of KIAA</strong><br>
+    hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422
+  </div>
+  <div class="ftr-right">
+    Paper Incident Report Form<br>
+    Submit completed form to your District Captain
+  </div>
+</div>
+<div class="stripe-bot"></div><div class="stripe-bot2"></div>
+</div><!-- /page -->
+</body></html>
