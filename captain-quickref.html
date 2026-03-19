@@ -288,7 +288,7 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
       </div>
       <div class="step-row">
         <div class="step-num">2</div>
-        <div class="step-text"><strong>Send district alert</strong> — Districts → Composer → Type message → 📤 Send Alert</div>
+        <div class="step-text"><strong>Send district alert</strong> — Districts → Composer → Select <strong>Alert Type</strong> → Type message → 📤 Send Alert</div>
       </div>
       <div class="step-row">
         <div class="step-num">3</div>
@@ -300,7 +300,7 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
       </div>
       <div class="step-row">
         <div class="step-num">5</div>
-        <div class="step-text"><strong>Cancel alert</strong> — Districts → Recent Alerts log → ✕ Cancel → Confirm</div>
+        <div class="step-text"><strong>Archive alert</strong> — Districts → Recent Alerts log → 📦 Archive → Confirm (kept as permanent record)</div>
       </div>
       <div class="step-row">
         <div class="step-num">6</div>
@@ -314,7 +314,8 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
       <div class="perm-row"><span class="perm-yes">✓</span> View &amp; archive incidents in my district</div>
       <div class="perm-row"><span class="perm-yes">✓</span> Restore archived incidents</div>
       <div class="perm-row"><span class="perm-yes">✓</span> Add follow-up notes to any incident</div>
-      <div class="perm-row"><span class="perm-yes">✓</span> Send &amp; cancel alerts to my district</div>
+      <div class="perm-row"><span class="perm-yes">✓</span> Send alerts (any type) to my district</div>
+      <div class="perm-row"><span class="perm-yes">✓</span> Archive alerts (permanent record) &amp; restore</div>
       <div class="perm-row"><span class="perm-yes">✓</span> Approve / reject / revoke applications in my district</div>
       <div class="perm-row"><span class="perm-yes">✓</span> View members in my district</div>
       <div class="perm-row"><span class="perm-yes">✓</span> View all 9 district captain cards &amp; directory</div>
@@ -342,16 +343,29 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
       <div class="link-row"><span class="link-label">Hawaii County Civil Defense</span><span class="url-text">hawaiicounty.gov/cd</span></div>
     </div>
 
-    <!-- Alert Writing Guide -->
+    <!-- Alert Types + Writing Guide -->
     <div class="qr-card">
-      <div class="card-title"><span class="card-title-icon">📢</span> Writing an effective alert</div>
-      <div style="font-size:.74rem;color:var(--text-dim);margin-bottom:8px">Every alert should answer all four of these:</div>
-      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">What</strong> — type of incident or threat (e.g. vehicle break-ins, fraud calls)</div></div>
-      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">Where</strong> — street name, area, intersection, or business</div></div>
-      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">When</strong> — date and time, or "ongoing / reported this week"</div></div>
-      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">What to do</strong> — secure valuables, report suspicious activity, avoid area</div></div>
+      <div class="card-title"><span class="card-title-icon">📢</span> Alert types &amp; writing guide</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;margin-bottom:10px">
+        <div style="font-size:.68rem;padding:2px 0;color:var(--text-dim)"><span style="color:#ff2d2d">⛔</span> <strong style="color:var(--white)">EMERGENCY</strong> — imminent threat</div>
+        <div style="font-size:.68rem;padding:2px 0;color:var(--text-dim)"><span style="color:#f97316">👁</span> <strong style="color:var(--white)">BOLO</strong> — suspect/vehicle lookout</div>
+        <div style="font-size:.68rem;padding:2px 0;color:var(--text-dim)"><span style="color:#f5a623">🟡</span> <strong style="color:var(--white)">AMBER / MISSING</strong> — missing person</div>
+        <div style="font-size:.68rem;padding:2px 0;color:var(--text-dim)"><span style="color:#e8415a">🚨</span> <strong style="color:var(--white)">INCIDENT</strong> — crime in progress / just occurred</div>
+        <div style="font-size:.68rem;padding:2px 0;color:var(--text-dim)"><span style="color:#c084fc">🔁</span> <strong style="color:var(--white)">PATTERN</strong> — repeat across businesses</div>
+        <div style="font-size:.68rem;padding:2px 0;color:var(--text-dim)"><span style="color:#3b82f6">💳</span> <strong style="color:var(--white)">SCAM</strong> — fraud / counterfeit</div>
+        <div style="font-size:.68rem;padding:2px 0;color:var(--text-dim)"><span style="color:#a855f7">🚫</span> <strong style="color:var(--white)">TRESPASS</strong> — known trespasser</div>
+        <div style="font-size:.68rem;padding:2px 0;color:var(--text-dim)"><span style="color:#7a8fa6">🫶</span> <strong style="color:var(--white)">WELFARE</strong> — concerning person</div>
+        <div style="font-size:.68rem;padding:2px 0;color:var(--text-dim)"><span style="color:#00c9a7">✅</span> <strong style="color:var(--white)">ALL CLEAR</strong> — situation resolved</div>
+        <div style="font-size:.68rem;padding:2px 0;color:var(--text-dim)"><span style="color:#4a6070">📋</span> <strong style="color:var(--white)">INFO</strong> — general advisory</div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:8px;margin-bottom:6px;font-size:.7rem;color:var(--text-dim)">Every alert should answer:</div>
+      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">What</strong> — type of incident or threat</div></div>
+      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">Where</strong> — street, area, intersection, or business</div></div>
+      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">When</strong> — date, time, or "ongoing this week"</div></div>
+      <div class="perm-row"><span class="perm-yes">✓</span><div><strong style="color:var(--white)">What to do</strong> — secure valuables, report, avoid area</div></div>
       <div class="alert-tip">
-        <strong>Never include</strong> — names of suspects or victims, unconfirmed details, or sensitive personal info. Alerts are <strong>visible to the public</strong> within seconds of sending.
+        <strong>Critical alerts</strong> (EMERGENCY, BOLO, AMBER) auto-display 911 &amp; HPD non-emergency buttons to the public — no need to add them to your message.<br>
+        <strong>Archive, don't delete</strong> — archived alerts are kept as a permanent record.
       </div>
     </div>
 
