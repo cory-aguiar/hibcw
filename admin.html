@@ -7921,10 +7921,12 @@
 
     async function sendApprovalEmail(businessId) {
         try {
-            const { error } = await sb.functions.invoke('send-approval-email', {
+            const { data, error } = await sb.functions.invoke('send-approval-email', {
                 body: { businessId }
             });
+            console.log('Email function response:', JSON.stringify(data));
             if (error) throw error;
+            if (data && !data.ok) throw new Error(data.error || 'Unknown error');
             showToast('📧', 'Approval email sent to business.');
         } catch(e) {
             console.warn('Approval email failed:', e.message);
