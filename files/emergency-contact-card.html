@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HIBCW – Emergency Contact Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:  #0b1524;
+  --navy2: #111e30;
+  --teal:  #38bba1;
+  --teal2: #2a9a84;
+  --red:   #e84a5f;
+  --gold:  #f5a623;
+  --slate: #7a8fa6;
+  --white: #eef3f8;
+
+  /*
+   * Wallet card — standard 3.5" × 2" at 96 dpi
+   * Bleed  3.66 × 2.16" = 351.36 × 207.36px
+   * Trim   3.50 × 2.00" = 336 × 192px
+   * Safe   3.34 × 1.84" = 320.64 × 176.64px
+   * Bleed margin each side = 7.68px
+   * Safe inset from bleed  = 15.36px
+   */
+  --bleed-w:    351.36px;
+  --bleed-h:    207.36px;
+  --bleed-mg:   7.68px;
+  --safe-inset: 15.36px;
+}
+
+body {
+  background: #1a1a2e;
+  font-family: 'IBM Plex Sans', sans-serif;
+  padding: 40px 24px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  min-height: 100vh;
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: #0b1524;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+  border-bottom: 1px solid rgba(56,187,161,.2);
+}
+.toolbar-brand { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #38bba1; }
+.t-btn { padding: 5px 12px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: .6rem; font-weight: 600; cursor: pointer; border: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.6); background: transparent; }
+.t-btn-teal { background: #38bba1; color: #0b1524; border-color: #38bba1; }
+
+/* ── Page header ── */
+.page-hd {
+  text-align: center;
+  margin-top: 40px;
+}
+.page-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #eef3f8;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.page-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .5rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #2a4055;
+  margin-top: 5px;
+}
+
+/* ── Card pair row ── */
+.card-pair {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.side-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .5rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #2a4055;
+}
+
+/* ══════════════════════════════════
+   BLEED CONTAINER
+══════════════════════════════════ */
+.bleed {
+  width: var(--bleed-w);
+  height: var(--bleed-h);
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Trim guide — dashed line at cut edge */
+.bleed::after {
+  content: '';
+  position: absolute;
+  top: var(--bleed-mg);
+  left: var(--bleed-mg);
+  right: var(--bleed-mg);
+  bottom: var(--bleed-mg);
+  border: 1px dashed rgba(255,255,255,.18);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* ══════════════════════════════════
+   SAFE AREA
+══════════════════════════════════ */
+.safe {
+  position: absolute;
+  top: var(--safe-inset);
+  left: var(--safe-inset);
+  right: var(--safe-inset);
+  bottom: var(--safe-inset);
+  z-index: 10;
+}
+
+/* ══════════════════════════════════
+   FRONT — Dark navy, teal accents
+══════════════════════════════════ */
+.front {
+  background: var(--navy);
+  box-shadow: 0 20px 50px rgba(0,0,0,.7), 0 4px 14px rgba(0,0,0,.5);
+}
+
+/* Full-bleed top teal bar */
+.front-topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--teal), var(--teal2) 60%, #1a7a68);
+  z-index: 5;
+}
+
+/* Full-bleed bottom red accent */
+.front-botbar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 10%, var(--red) 40%, var(--red) 60%, transparent 90%);
+  opacity: .7;
+  z-index: 5;
+}
+
+/* Shield watermark */
+.front-watermark {
+  position: absolute;
+  right: -16px; bottom: -14px;
+  width: 100px; height: 100px;
+  opacity: .05;
+  z-index: 2;
+}
+
+/* Front safe layout */
+.front-safe {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* Logo row */
+.front-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.front-shield {
+  width: 26px; height: 26px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 4px rgba(56,187,161,.35));
+}
+
+.front-hibcw {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: .05em;
+  line-height: 1;
+}
+
+.front-fullname {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: .48rem;
+  color: var(--white);
+  letter-spacing: .02em;
+  margin-top: 1px;
+  opacity: .8;
+}
+
+.front-program {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .4rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 1px;
+  opacity: .8;
+}
+
+/* Rule */
+.front-rule {
+  height: 1px;
+  background: linear-gradient(90deg, var(--teal) 0%, rgba(56,187,161,.15) 60%, transparent 100%);
+}
+
+/* 911 emergency big block */
+.front-911 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.front-911-badge {
+  background: var(--red);
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .06em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.front-911-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .48rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--red);
+  line-height: 1.5;
+}
+
+/* Contacts list */
+.front-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.front-contact-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.fc-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .43rem;
+  color: var(--slate);
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+.fc-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+.fc-val.teal { color: var(--teal); }
+.fc-val.red  { color: var(--red);  }
+
+/* Bottom URL strip */
+.front-url {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+
+.front-url-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .46rem;
+  color: var(--teal);
+  letter-spacing: .05em;
+}
+
+.front-url-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .4rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(56,187,161,.45);
+}
+
+/* ══════════════════════════════════
+   BACK — White with navy text
+══════════════════════════════════ */
+.back {
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.1);
+}
+
+/* Full-bleed top navy bar */
+.back-topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--navy);
+  z-index: 5;
+}
+
+/* Full-bleed bottom teal accent */
+.back-botbar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 8%, var(--teal) 35%, var(--teal) 65%, transparent 92%);
+  opacity: .6;
+  z-index: 5;
+}
+
+/* Back safe layout */
+.back-safe {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* When to call section */
+.back-section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .44rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--teal2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.back-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--teal2);
+  opacity: .2;
+}
+
+/* Decision rows */
+.decision-rows { display: flex; flex-direction: column; gap: 3px; }
+
+.decision-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.d-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.d-text {
+  font-size: .52rem;
+  color: #1a2a3a;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.d-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .38rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  padding: 1px 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.d-tag.red   { background: var(--red);  color: #fff; }
+.d-tag.both  { background: #1a2a3a;     color: #fff; }
+.d-tag.hibcw { background: rgba(56,187,161,.15); color: var(--teal2); border: 1px solid rgba(56,187,161,.3); }
+
+/* Report steps */
+.report-steps { display: flex; flex-direction: column; gap: 3px; }
+
+.report-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rs-num {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--teal);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .46rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rs-text {
+  font-size: .52rem;
+  color: #1a2a3a;
+  line-height: 1.4;
+}
+
+/* Captain line */
+.back-captain {
+  background: rgba(56,187,161,.06);
+  border: 1px solid rgba(56,187,161,.2);
+  border-radius: 4px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.bc-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .42rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--teal2);
+}
+.bc-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: .03em;
+}
+.bc-write {
+  font-size: .45rem;
+  color: #b0bec5;
+  font-style: italic;
+  letter-spacing: .03em;
+}
+
+/* Bottom branding */
+.back-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 3px;
+  border-top: 1px solid rgba(0,0,0,.07);
+}
+.back-foot-left {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .4rem;
+  color: #9ab0c0;
+  letter-spacing: .04em;
+  line-height: 1.5;
+}
+.back-foot-right {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .4rem;
+  color: #9ab0c0;
+  text-align: right;
+  line-height: 1.5;
+}
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .48rem;
+  letter-spacing: .09em;
+  color: #2a4055;
+}
+.legend-swatch {
+  width: 18px; height: 8px;
+  border-radius: 2px;
+}
+
+/* ── Print note ── */
+.print-note {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .5rem;
+  letter-spacing: .09em;
+  color: #2a3f55;
+  text-align: center;
+  line-height: 1.9;
+}
+.print-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .58rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  background: rgba(56,187,161,.1);
+  border: 1px solid rgba(56,187,161,.3);
+  color: var(--teal);
+  padding: 8px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all .15s;
+  margin-top: 8px;
+  display: inline-block;
+}
+.print-btn:hover { background: rgba(56,187,161,.18); border-color: var(--teal); }
+
+/* ── Print styles ── */
+@media print {
+  body { background: white; padding: 20px; gap: 24px; }
+  .toolbar, .page-hd, .side-label, .legend, .print-note { display: none; }
+  .bleed::after { display: none; }
+  .bleed { box-shadow: none !important; break-inside: avoid; }
+  .card-pair { gap: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="toolbar-brand">HIBCW · Emergency Contact Card · Wallet Size</div>
+  <div style="display:flex;gap:6px">
+    <button class="t-btn" onclick="window.close()">✕ Close</button>
+    <button class="t-btn t-btn-teal" onclick="window.print()">🖨 Print</button>
+  </div>
+</div>
+
+<div class="page-hd">
+  <div class="page-title">HIBCW · Emergency Contact Card</div>
+  <div class="page-sub">Wallet Size · 3.5" × 2" · Print on cardstock and cut along trim line</div>
+</div>
+
+<div class="card-pair">
+
+  <!-- ══ FRONT ══ -->
+  <div class="card-col">
+    <div class="side-label">Front</div>
+    <div class="bleed front">
+      <div class="front-topbar"></div>
+      <div class="front-botbar"></div>
+
+      <!-- Shield watermark -->
+      <svg class="front-watermark" viewBox="0 0 1016.87 972.01" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#38bba1" d="M508.14,944.68C236.67,781.06,52.63,508.15,24.44,179.16,164.21,75.35,336.46,23.29,508.14,23.01c172.55,0,344.8,52.05,484.28,156.15-28.47,328.98-212.52,601.9-484.28,765.52Z"/>
+      </svg>
+
+      <div class="safe">
+        <div class="front-safe">
+
+          <!-- Logo -->
+          <div class="front-logo-row">
+            <svg class="front-shield" viewBox="0 0 1016.87 972.01" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#38bba1" d="M99.5,416.99l5.75,16.97,21.86,52.91,24.73,51.19,27.9,49.18,30.48,47.74,33.36,45.44,35.95,43.71,38.54,41.41,41.12,39.4,43.13,37.1,45.44,34.8c19.85,14.09,39.69,27.6,60.39,40.55,12.94-8.05,25.31-16.39,37.96-24.73,7.48-5.18,14.95-10.35,22.43-15.82l45.72-34.8,43.43-37.1,40.83-39.4,38.54-41.41,35.95-43.71,33.36-45.44,30.48-47.74,27.9-49.18,24.73-51.19,21.86-52.91,6.04-17.25c-113.31-63.84-241.56-98.35-371.26-103.82-154.71-6.61-311.73,28.18-446.6,104.1Z"/>
+              <path fill="#38bba1" d="M978.91,141.2l-27.9-18.41-28.75-16.97-29.62-15.53-29.91-14.38-30.48-13.23-30.77-12.08-31.63-10.64-31.63-9.49-32.21-8.05-32.5-6.9-32.49-5.75-33.07-4.31-32.79-3.16-33.36-1.73-33.07-.58h-.58l-32.5.58-32.78,1.73-33.07,3.16-33.07,4.31-32.5,5.75-32.5,6.9-32.21,8.05-31.92,9.49-31.63,10.64-30.77,12.08-30.77,13.23-29.91,14.38-29.62,15.53-28.76,16.97-28.18,18.41L0,168.23l4.31,44.29,4.03,31.06,5.18,30.77,5.75,30.19,6.9,30.2,7.77,29.33,8.34,29.33,19.55,56.94,23.01,55.5,25.88,53.78,29.33,51.76,31.92,49.75,35.09,47.74,37.67,45.72,40.26,43.43,42.85,41.41,45.44,38.82,47.45,36.23,49.75,33.94,37.67,23.58,37.67-23.58,25.31-16.68,48.89-35.09,46.3-37.67,44.29-39.97,41.69-42.27,38.83-44.57,36.52-46.88,33.36-48.89,30.77-50.61,27.61-52.91,24.44-54.35,20.99-56.36,18.12-58.09,7.48-29.33,6.9-30.2,5.75-30.19,5.18-30.77,4.02-31.06,4.61-44.29-37.96-27.03ZM508.14,944.68C236.67,781.06,52.63,508.15,24.44,179.16,164.21,75.35,336.46,23.29,508.14,23.01c172.55,0,344.8,52.05,484.28,156.15-28.47,328.98-212.52,601.9-484.28,765.52Z"/>
+            </svg>
+            <div>
+              <div class="front-hibcw">HIBCW</div>
+              <div class="front-fullname">Hawaii Island Business Crime Watch</div>
+              <div class="front-program">A Program of KIAA</div>
+            </div>
+          </div>
+
+          <div class="front-rule"></div>
+
+          <!-- 911 block -->
+          <div class="front-911">
+            <div class="front-911-badge">911</div>
+            <div class="front-911-label">Call first for any<br>crime in progress</div>
+          </div>
+
+          <!-- Contact numbers -->
+          <div class="front-contacts">
+            <div class="front-contact-row">
+              <span class="fc-label">HPD Non-Emergency</span>
+              <span class="fc-val teal">(808) 935-3311</span>
+            </div>
+            <div class="front-contact-row">
+              <span class="fc-label">Crime Stoppers Hawaiʻi</span>
+              <span class="fc-val">(808) 961-8300</span>
+            </div>
+            <div class="front-contact-row">
+              <span class="fc-label">HIBCW / KIAA Office</span>
+              <span class="fc-val">(808) 961-5422</span>
+            </div>
+          </div>
+
+          <!-- URL strip -->
+          <div class="front-url">
+            <span class="front-url-val">hibcw.vercel.app</span>
+            <span class="front-url-tag">Report · Alerts · Map</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BACK ══ -->
+  <div class="card-col">
+    <div class="side-label">Back</div>
+    <div class="bleed back">
+      <div class="back-topbar"></div>
+      <div class="back-botbar"></div>
+
+      <div class="safe">
+        <div class="back-safe">
+
+          <!-- When to call -->
+          <div>
+            <div class="back-section-label" style="margin-bottom:5px">When to call what</div>
+            <div class="decision-rows">
+              <div class="decision-row">
+                <div class="d-dot" style="background:#e84a5f"></div>
+                <div class="d-text">Crime in progress, weapon, or injury</div>
+                <div class="d-tag red">911 FIRST</div>
+              </div>
+              <div class="decision-row">
+                <div class="d-dot" style="background:#f5a623"></div>
+                <div class="d-text">Crime happened, suspect gone</div>
+                <div class="d-tag both">911 + HIBCW</div>
+              </div>
+              <div class="decision-row">
+                <div class="d-dot" style="background:#38bba1"></div>
+                <div class="d-text">Suspicious activity, no threat</div>
+                <div class="d-tag hibcw">HIBCW</div>
+              </div>
+              <div class="decision-row">
+                <div class="d-dot" style="background:#38bba1"></div>
+                <div class="d-text">Patterns, tips, community alerts</div>
+                <div class="d-tag hibcw">HIBCW</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Report steps -->
+          <div>
+            <div class="back-section-label" style="margin-bottom:5px">Report to HIBCW in 3 steps</div>
+            <div class="report-steps">
+              <div class="report-step">
+                <div class="rs-num">1</div>
+                <div class="rs-text">Go to <strong>hibcw.vercel.app</strong> — any device, no login</div>
+              </div>
+              <div class="report-step">
+                <div class="rs-num">2</div>
+                <div class="rs-text">Click <strong>"Report an Incident"</strong> and fill in what you know</div>
+              </div>
+              <div class="report-step">
+                <div class="rs-num">3</div>
+                <div class="rs-text">Submit — your District Captain is notified instantly</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Your captain line -->
+          <div class="back-captain">
+            <div>
+              <div class="bc-label">Your District Captain</div>
+              <div class="bc-val" id="captainName">_______________________</div>
+            </div>
+            <div style="text-align:right">
+              <div class="bc-label">Captain Phone</div>
+              <div class="bc-val" id="captainPhone">___________________</div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="back-foot">
+            <div class="back-foot-left">
+              hibcw@kiaahilo.org<br>
+              (808) 961-5422
+            </div>
+            <div class="back-foot-right">
+              HIBCW Member Card<br>
+              kiaahilo.org
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /card-pair -->
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:transparent;border:1px dashed rgba(255,255,255,.2)"></div>
+    Trim line — cut here (3.5" × 2")
+  </div>
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:rgba(56,187,161,.08);border:1px solid rgba(56,187,161,.2)"></div>
+    Bleed area (3.66" × 2.16")
+  </div>
+</div>
+
+<div class="print-note">
+  Print on 16pt cardstock · Cut along trim line · Laminate optional<br>
+  Fill in captain name &amp; phone before distributing
+  <br>
+  <button class="print-btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+</div>
+
+<script>
+// Pre-fill from URL params if provided
+// e.g. ?captain=John+Smith&phone=(808)+555-1234
+const p = new URLSearchParams(window.location.search);
+if (p.get('captain')) document.getElementById('captainName').textContent  = p.get('captain');
+if (p.get('phone'))   document.getElementById('captainPhone').textContent = p.get('phone');
+</script>
+</body>
+</html>
