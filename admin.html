@@ -2505,6 +2505,10 @@
                     <span class="nav-count" id="nc-all">—</span>
                 </button>
                 <div class="nav-section">District Alerts</div>
+                <button class="nav-btn admin-only" id="nav-active-alerts" onclick="showView('active-alerts')">
+                    📢 Active Alerts
+                    <span class="nav-count" id="nc-active-alerts">—</span>
+                </button>
                 <button class="nav-btn admin-only" id="nav-district-alerts" onclick="showView('district-alerts')">
                     📦 Archived Alerts
                     <span class="nav-count" id="nc-district-alerts">—</span>
@@ -2805,6 +2809,22 @@
                     <div class="result-count" id="rcount-all"></div>
                     <div class="table-wrap">
                         <div id="table-all"></div>
+                    </div>
+                </div>
+
+                <!-- ── DISTRICT ALERTS ACTIVE ── -->
+                <div class="view" id="view-active-alerts">
+                    <div class="page-hd">
+                        <div>
+                            <div class="page-title">Active District Alerts</div>
+                            <div class="page-sub">Alerts currently visible on the public feed</div>
+                        </div>
+                        <div class="page-actions">
+                            <button class="btn btn-ghost btn-lg" onclick="loadActiveAlertsView()">🔄 Refresh</button>
+                        </div>
+                    </div>
+                    <div id="active-alerts-body" style="max-width:820px;margin-top:8px">
+                        <div style="font-size:.8rem;color:var(--slate2);font-style:italic;padding:40px 0;text-align:center">Loading active alerts…</div>
                     </div>
                 </div>
 
@@ -4015,6 +4035,8 @@
             renderResources();
         } else if (v === 'district-alerts') {
             loadDistrictAlertsView();
+        } else if (v === 'active-alerts') {
+            loadActiveAlertsView();
         } else {
             renderCurrentView();
         }
@@ -4294,6 +4316,10 @@
         if (sb) {
             sb.from('district_alerts').select('id', {count:'exact',head:true}).not('archived_at','is',null).then(({count}) => {
                 const badge = document.getElementById('nc-district-alerts');
+                if (badge && count != null) badge.textContent = count;
+            });
+            sb.from('district_alerts').select('id', {count:'exact',head:true}).is('archived_at',null).then(({count}) => {
+                const badge = document.getElementById('nc-active-alerts');
                 if (badge && count != null) badge.textContent = count;
             });
         }
@@ -8843,6 +8869,51 @@
             }).join('');
         } catch(e) {
             el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load archived alerts: ${esc(e.message)}</div>`;
+        }
+    }
+
+    async function loadActiveAlertsView() {
+        const el = document.getElementById('active-alerts-body');
+        if (!el || !sb) return;
+        el.innerHTML = '<div style="font-size:.8rem;color:var(--slate2);padding:20px 0;text-align:center">Loading…</div>';
+        try {
+            const {data, error} = await sb
+                .from('district_alerts')
+                .select('*')
+                .is('archived_at', null)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+
+            const badge = document.getElementById('nc-active-alerts');
+            if (badge) badge.textContent = data.length || '0';
+
+            if (!data.length) {
+                el.innerHTML = '<div style="font-size:.82rem;color:var(--slate2);font-style:italic;padding:60px 0;text-align:center">No active district alerts.</div>';
+                return;
+            }
+            el.innerHTML = data.map(a => {
+                const distColor = KIAA_DISTRICTS.find(d => d.id === a.district)?.color || 'var(--teal)';
+                const t = alertTypeMeta(a.alert_type);
+                const sentDate = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+                return `
+                <div style="background:${t.color}0d;border:1px solid ${t.color}30;border-left:3px solid ${t.color};border-radius:6px;padding:12px 14px;margin-bottom:10px">
+                  <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap">
+                    ${alertTypeBadge(a.alert_type)}
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${distColor}18;color:${distColor};border:1px solid ${distColor}44;border-radius:3px;padding:1px 6px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
+                  </div>
+                  <div style="font-size:.83rem;line-height:1.55;color:var(--white);margin-bottom:7px">${esc(a.message)}</div>
+                  ${a.media_url ? `<div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2);max-width:280px">${a.media_type==='video'?`<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:180px"></video>`:`<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:180px;object-fit:cover">`}</div>` : ''}
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);margin-bottom:8px">
+                    📤 Sent by ${esc(a.sent_by_name||'Admin')} · ${sentDate}${a.is_edited?' · <em>edited</em>':''}
+                  </div>
+                  <div style="display:flex;gap:6px">
+                    <button onclick="archiveAdminAlert('${a.id}');loadActiveAlertsView();" style="background:none;border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:3px 10px;color:var(--gold);font-size:.62rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">📦 Archive</button>
+                    <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url||'')}');loadActiveAlertsView();" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:3px 10px;color:var(--red);font-size:.62rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete</button>
+                  </div>
+                </div>`;
+            }).join('');
+        } catch(e) {
+            el.innerHTML = `<div style="font-size:.78rem;color:var(--slate2)">Could not load active alerts: ${esc(e.message)}</div>`;
         }
     }
 
