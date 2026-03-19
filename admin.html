@@ -7914,7 +7914,22 @@
             showToast('✅', bizNumber ? `Business approved! ID: ${bizNumber}` : 'Business approved!');
             // Notify captain dashboard
             notifyCaptainNewBusiness(id);
+            // Send approval email to the business
+            sendApprovalEmail(id);
         } else showToast('⚠️', error.message, 'err');
+    }
+
+    async function sendApprovalEmail(businessId) {
+        try {
+            const { error } = await sb.functions.invoke('send-approval-email', {
+                body: { businessId }
+            });
+            if (error) throw error;
+            showToast('📧', 'Approval email sent to business.');
+        } catch(e) {
+            console.warn('Approval email failed:', e.message);
+            showToast('⚠️', 'Business approved but email failed to send. Check Edge Function logs.', 'err');
+        }
     }
 
     // Generate the next available 5-digit business number for a district.
