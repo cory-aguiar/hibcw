@@ -1,291 +1,976 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>HIBCW Supabase Database Reference</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-@page{size:letter;margin:0}
-body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;color:#1a2a3a;print-color-adjust:exact;-webkit-print-color-adjust:exact}
-.toolbar{background:#0b1524;padding:8px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.toolbar-brand{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#00c9a7}
-.t-btn{padding:5px 11px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;border:none}
-.t-ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
-.t-teal{background:#00c9a7;color:#0b1524}
-.page{width:816px;min-height:1056px;background:#fff;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
-.stripe-top{height:4px;background:#0b1524}
-.stripe-teal{height:3px;background:#00c9a7}
-.stripe-bot{height:3px;background:#00c9a7}
-.stripe-bot2{height:4px;background:#0b1524}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HIBCW Supabase Database Reference</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box
+    }
 
-/* Header */
-.hdr{background:linear-gradient(90deg,#0b1524,#111e30);padding:13px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,201,167,.2)}
-.hdr-left{display:flex;align-items:center;gap:12px}
-.hdr-logo{width:40px;height:40px;object-fit:contain;flex-shrink:0}
-.hdr-org{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:#00c9a7;margin-bottom:2px}
-.hdr-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:.04em;line-height:1}
-.hdr-badge{font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);color:#00c9a7;padding:4px 10px;border-radius:3px}
-.hdr-sub{font-size:8px;color:rgba(255,255,255,.35);margin-top:5px}
+    @page {
+        size: letter;
+        margin: 0
+    }
 
-/* Body */
-.body{padding:12px 32px 10px;flex:1;display:flex;flex-direction:column;gap:10px}
+    body {
+        background: #e8edf2;
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-size: 10px;
+        color: #1a2a3a;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact
+    }
 
-/* Section */
-.sec{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.sec-num{width:18px;height:18px;border-radius:50%;background:#0b1524;color:#00c9a7;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sec-title{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:#0b1524;letter-spacing:.04em}
-.sec-line{flex:1;height:1px;background:rgba(0,201,167,.25)}
+    .toolbar {
+        background: #0b1524;
+        padding: 8px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px
+    }
 
-/* Table map */
-.table-map{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px}
-.tbl-card{border:1px solid #d0dce8;border-top:3px solid #00c9a7;border-radius:0 0 5px 5px;padding:7px 9px}
-.tbl-card.gold{border-top-color:#f5a623}
-.tbl-card.purple{border-top-color:#a855f7}
-.tbl-card.blue{border-top-color:#3b82f6}
-.tbl-card.red{border-top-color:#ef4444}
-.tbl-card.slate{border-top-color:#7a8fa6}
-.tbl-name{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#0b1524;margin-bottom:3px}
-.tbl-desc{font-size:8.5px;color:#4a6070;line-height:1.45;margin-bottom:3px}
-.tbl-rls{font-family:'IBM Plex Mono',monospace;font-size:7px;color:#7a8fa6}
+    .toolbar-brand {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        color: #00c9a7
+    }
 
-/* Column detail tables */
-.col-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.col-block{}
-.col-block-title{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:#0b1524;margin-bottom:4px;display:flex;align-items:center;gap:5px}
-.col-block-title .tbl-tag{font-family:'IBM Plex Mono',monospace;font-size:7px;font-weight:400;background:#eef2f6;border:1px solid #d0dce8;border-radius:2px;padding:1px 5px;color:#7a8fa6}
-.ctbl{width:100%;border-collapse:collapse;font-size:8.5px}
-.ctbl th{font-family:'IBM Plex Mono',monospace;font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6;font-weight:400;padding:3px 6px;border-bottom:1.5px solid #e0e8f0;text-align:left;background:#f8fbff}
-.ctbl td{padding:3px 6px;border-bottom:1px solid #f0f4f8;vertical-align:top}
-.ctbl tr:last-child td{border-bottom:none}
-.cn{font-family:'IBM Plex Mono',monospace;font-size:8px;color:#0b1524;white-space:nowrap}
-.ct{font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:#00c9a7;white-space:nowrap}
-.ct.gold{color:#f5a623}
-.ct.blue{color:#3b82f6}
-.ct.purple{color:#a855f7}
-.cd{font-size:8px;color:#4a6070;line-height:1.4}
-code{font-family:'IBM Plex Mono',monospace;font-size:7.5px;background:#eef2f6;border:1px solid #d0dce8;border-radius:2px;padding:0 3px;color:#0b1524}
+    .t-btn {
+        padding: 5px 11px;
+        border-radius: 4px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .6rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .15s;
+        text-decoration: none;
+        border: none
+    }
 
-/* RLS summary */
-.rls-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.rls-card{background:#f5f8fa;border:1px solid #d0dce8;border-radius:5px;padding:7px 10px}
-.rls-title{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:#0b1524;margin-bottom:4px}
-.rls-row{display:flex;align-items:flex-start;gap:6px;margin-bottom:3px;font-size:8.5px;color:#4a6070;line-height:1.4}
-.rls-op{font-family:'IBM Plex Mono',monospace;font-size:7.5px;font-weight:500;width:40px;flex-shrink:0}
-.rls-op.pub{color:#00c9a7}
-.rls-op.auth{color:#f5a623}
-.rls-op.none{color:#ef4444}
+    .t-ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, .2);
+        color: rgba(255, 255, 255, .6)
+    }
 
-/* Storage section */
-.storage-row{display:flex;gap:8px}
-.storage-card{flex:1;background:#f5f9f8;border:1px solid rgba(0,201,167,.18);border-left:3px solid #00c9a7;border-radius:0 5px 5px 0;padding:7px 10px}
-.storage-title{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:#0b1524;margin-bottom:2px}
-.storage-desc{font-size:8.5px;color:#4a6070;line-height:1.5}
-.storage-path{font-family:'IBM Plex Mono',monospace;font-size:8px;background:#eef2f6;border:1px solid #d0dce8;border-radius:3px;padding:3px 7px;margin-top:4px;color:#0b1524}
+    .t-teal {
+        background: #00c9a7;
+        color: #0b1524
+    }
 
-/* Footer */
-.ftr{background:#f5f8fa;border-top:1px solid #e0e8f0;padding:7px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.ftr-left{font-size:7.5px;color:#7a8fa6;line-height:1.7}
-.ftr-left strong{color:#0b1524}
-.ftr-right{font-family:'IBM Plex Mono',monospace;font-size:7px;color:#b0c0cc;text-align:right;line-height:1.6}
-@media print{.toolbar{display:none!important}.page{margin:0;width:100%}}
-</style></head><body>
+    .page {
+        width: 816px;
+        min-height: 1056px;
+        background: #fff;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden
+    }
 
-<div class="toolbar">
-  <div class="toolbar-brand">HIBCW · Supabase Database Reference</div>
-  <div style="display:flex;gap:6px">
-    <a href="javascript:window.print()" class="t-btn t-teal">🖨 Print / Save PDF</a>
-    <button class="t-btn t-ghost" onclick="window.close()">✕ Close</button>
-  </div>
-</div>
+    .stripe-top {
+        height: 4px;
+        background: #0b1524
+    }
 
-<div class="page">
-<div class="stripe-top"></div><div class="stripe-teal"></div>
+    .stripe-teal {
+        height: 3px;
+        background: #00c9a7
+    }
 
-<!-- Header -->
-<div class="hdr">
-  <div class="hdr-left">
-    <img src="../logo-shield.svg" alt="HIBCW Shield" class="hdr-logo">
-    <div>
-      <div class="hdr-org">Hawaiʻi Island Business Community Watch · Admin Resources</div>
-      <div class="hdr-title">Supabase Database Reference</div>
+    .stripe-bot {
+        height: 3px;
+        background: #00c9a7
+    }
+
+    .stripe-bot2 {
+        height: 4px;
+        background: #0b1524
+    }/* Header */
+    .hdr {
+        background: linear-gradient(90deg, #0b1524, #111e30);
+        padding: 13px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(0, 201, 167, .2)
+    }
+
+    .hdr-left {
+        display: flex;
+        align-items: center;
+        gap: 12px
+    }
+
+    .hdr-logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        flex-shrink: 0
+    }
+
+    .hdr-org {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7px;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+        color: #00c9a7;
+        margin-bottom: 2px
+    }
+
+    .hdr-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: .04em;
+        line-height: 1
+    }
+
+    .hdr-badge {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7.5px;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        background: rgba(0, 201, 167, .12);
+        border: 1px solid rgba(0, 201, 167, .25);
+        color: #00c9a7;
+        padding: 4px 10px;
+        border-radius: 3px
+    }
+
+    .hdr-sub {
+        font-size: 8px;
+        color: rgba(255, 255, 255, .35);
+        margin-top: 5px
+    }/* Body */
+    .body {
+        padding: 12px 32px 10px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px
+    }/* Section */
+    .sec {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 5px
+    }
+
+    .sec-num {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #0b1524;
+        color: #00c9a7;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0
+    }
+
+    .sec-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        color: #0b1524;
+        letter-spacing: .04em
+    }
+
+    .sec-line {
+        flex: 1;
+        height: 1px;
+        background: rgba(0, 201, 167, .25)
+    }/* Table map */
+    .table-map {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        margin-bottom: 4px
+    }
+
+    .tbl-card {
+        border: 1px solid #d0dce8;
+        border-top: 3px solid #00c9a7;
+        border-radius: 0 0 5px 5px;
+        padding: 7px 9px
+    }
+
+    .tbl-card.gold {
+        border-top-color: #f5a623
+    }
+
+    .tbl-card.purple {
+        border-top-color: #a855f7
+    }
+
+    .tbl-card.blue {
+        border-top-color: #3b82f6
+    }
+
+    .tbl-card.red {
+        border-top-color: #ef4444
+    }
+
+    .tbl-card.slate {
+        border-top-color: #7a8fa6
+    }
+
+    .tbl-name {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        font-weight: 500;
+        color: #0b1524;
+        margin-bottom: 3px
+    }
+
+    .tbl-desc {
+        font-size: 8.5px;
+        color: #4a6070;
+        line-height: 1.45;
+        margin-bottom: 3px
+    }
+
+    .tbl-rls {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7px;
+        color: #7a8fa6
+    }/* Column detail tables */
+    .col-wrap {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px
+    }
+
+    .col-block {
+    }
+
+    .col-block-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        color: #0b1524;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 5px
+    }
+
+    .col-block-title .tbl-tag {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7px;
+        font-weight: 400;
+        background: #eef2f6;
+        border: 1px solid #d0dce8;
+        border-radius: 2px;
+        padding: 1px 5px;
+        color: #7a8fa6
+    }
+
+    .ctbl {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 8.5px
+    }
+
+    .ctbl th {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 6.5px;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: #7a8fa6;
+        font-weight: 400;
+        padding: 3px 6px;
+        border-bottom: 1.5px solid #e0e8f0;
+        text-align: left;
+        background: #f8fbff
+    }
+
+    .ctbl td {
+        padding: 3px 6px;
+        border-bottom: 1px solid #f0f4f8;
+        vertical-align: top
+    }
+
+    .ctbl tr:last-child td {
+        border-bottom: none
+    }
+
+    .cn {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 8px;
+        color: #0b1524;
+        white-space: nowrap
+    }
+
+    .ct {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7.5px;
+        color: #00c9a7;
+        white-space: nowrap
+    }
+
+    .ct.gold {
+        color: #f5a623
+    }
+
+    .ct.blue {
+        color: #3b82f6
+    }
+
+    .ct.purple {
+        color: #a855f7
+    }
+
+    .cd {
+        font-size: 8px;
+        color: #4a6070;
+        line-height: 1.4
+    }
+
+    code {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7.5px;
+        background: #eef2f6;
+        border: 1px solid #d0dce8;
+        border-radius: 2px;
+        padding: 0 3px;
+        color: #0b1524
+    }/* RLS summary */
+    .rls-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px
+    }
+
+    .rls-card {
+        background: #f5f8fa;
+        border: 1px solid #d0dce8;
+        border-radius: 5px;
+        padding: 7px 10px
+    }
+
+    .rls-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        color: #0b1524;
+        margin-bottom: 4px
+    }
+
+    .rls-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 3px;
+        font-size: 8.5px;
+        color: #4a6070;
+        line-height: 1.4
+    }
+
+    .rls-op {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7.5px;
+        font-weight: 500;
+        width: 40px;
+        flex-shrink: 0
+    }
+
+    .rls-op.pub {
+        color: #00c9a7
+    }
+
+    .rls-op.auth {
+        color: #f5a623
+    }
+
+    .rls-op.none {
+        color: #ef4444
+    }/* Storage section */
+    .storage-row {
+        display: flex;
+        gap: 8px
+    }
+
+    .storage-card {
+        flex: 1;
+        background: #f5f9f8;
+        border: 1px solid rgba(0, 201, 167, .18);
+        border-left: 3px solid #00c9a7;
+        border-radius: 0 5px 5px 0;
+        padding: 7px 10px
+    }
+
+    .storage-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        color: #0b1524;
+        margin-bottom: 2px
+    }
+
+    .storage-desc {
+        font-size: 8.5px;
+        color: #4a6070;
+        line-height: 1.5
+    }
+
+    .storage-path {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 8px;
+        background: #eef2f6;
+        border: 1px solid #d0dce8;
+        border-radius: 3px;
+        padding: 3px 7px;
+        margin-top: 4px;
+        color: #0b1524
+    }/* Footer */
+    .ftr {
+        background: #f5f8fa;
+        border-top: 1px solid #e0e8f0;
+        padding: 7px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0
+    }
+
+    .ftr-left {
+        font-size: 7.5px;
+        color: #7a8fa6;
+        line-height: 1.7
+    }
+
+    .ftr-left strong {
+        color: #0b1524
+    }
+
+    .ftr-right {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7px;
+        color: #b0c0cc;
+        text-align: right;
+        line-height: 1.6
+    }
+
+    @media print {
+        .toolbar {
+            display:none !important
+        }
+
+        .page {
+            margin: 0;
+            width: 100%
+        }
+    }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <div class="toolbar-brand">HIBCW · Supabase Database Reference</div>
+        <div style="display:flex;gap:6px">
+            <a href="javascript:window.print()" class="t-btn t-teal">🖨 Print / Save PDF</a>
+            <button class="t-btn t-ghost" onclick="window.close()">✕ Close</button>
+        </div>
     </div>
-  </div>
-  <div style="text-align:right">
-    <div class="hdr-badge">Admin &amp; Superadmin Only</div>
-    <div class="hdr-sub">Schema v2 · PostgreSQL via Supabase · All tables use UUID primary keys</div>
-  </div>
-</div>
 
-<div class="body">
+    <div class="page">
+        <div class="stripe-top"></div>
+        <div class="stripe-teal"></div>
 
-  <!-- Table overview -->
-  <div>
-    <div class="sec">
-      <div class="sec-num">1</div>
-      <div class="sec-title">Table Overview</div>
-      <div class="sec-line"></div>
+        <!-- Header -->
+        <div class="hdr">
+            <div class="hdr-left">
+                <img src="../logo-shield.svg" alt="HIBCW Shield" class="hdr-logo">
+                <div>
+                    <div class="hdr-org">Hawaiʻi Island Business Community Watch · Admin Resources</div>
+                    <div class="hdr-title">Supabase Database Reference</div>
+                </div>
+            </div>
+            <div style="text-align:right">
+                <div class="hdr-badge">Admin &amp; Superadmin Only</div>
+                <div class="hdr-sub">Schema v2 · PostgreSQL via Supabase · All tables use UUID primary keys</div>
+            </div>
+        </div>
+
+        <div class="body">
+
+            <!-- Table overview -->
+            <div>
+                <div class="sec">
+                    <div class="sec-num">1</div>
+                    <div class="sec-title">Table Overview</div>
+                    <div class="sec-line"></div>
+                </div>
+                <div class="table-map">
+                    <div class="tbl-card">
+                        <div class="tbl-name">incidents</div>
+                        <div class="tbl-desc">All reported incidents — type, location, time, description, suspect &amp; vehicle details, map coordinates.</div>
+                        <div class="tbl-rls">Public: SELECT (active), INSERT · Admin: UPDATE, DELETE</div>
+                    </div>
+                    <div class="tbl-card">
+                        <div class="tbl-name">incident_media</div>
+                        <div class="tbl-desc">
+                            Photos and videos attached to incidents. Linked via 
+                            <code>incident_id</code>
+                            . Files stored in Supabase Storage.
+                        </div>
+                        <div class="tbl-rls">Public: SELECT, INSERT · Admin: DELETE</div>
+                    </div>
+                    <div class="tbl-card">
+                        <div class="tbl-name">incident_notes</div>
+                        <div class="tbl-desc">Admin/Captain internal notes attached to specific incidents. Not visible to the public.</div>
+                        <div class="tbl-rls">Auth only: SELECT, INSERT, DELETE</div>
+                    </div>
+                    <div class="tbl-card gold">
+                        <div class="tbl-name">business_registry</div>
+                        <div class="tbl-desc">Business membership applications and approved members. Tracks status, approval, and packet delivery.</div>
+                        <div class="tbl-rls">Public: INSERT · Auth: SELECT, UPDATE, DELETE</div>
+                    </div>
+                    <div class="tbl-card gold">
+                        <div class="tbl-name">member_applications</div>
+                        <div class="tbl-desc">
+                            Legacy member application table. New registrations use 
+                            <code>business_registry</code>
+                            .
+                        </div>
+                        <div class="tbl-rls">Public: INSERT · Auth: SELECT, UPDATE, DELETE</div>
+                    </div>
+                    <div class="tbl-card gold">
+                        <div class="tbl-name">member_emails</div>
+                        <div class="tbl-desc">Approved member email list used to verify identity on incident submissions. Unique constraint on email.</div>
+                        <div class="tbl-rls">Public: SELECT · Auth: INSERT, DELETE</div>
+                    </div>
+                    <div class="tbl-card blue">
+                        <div class="tbl-name">district_alerts</div>
+                        <div class="tbl-desc">District-level alerts sent by Captains. Displayed as banners on the public map. Supports media attachments.</div>
+                        <div class="tbl-rls">Auth only: SELECT, INSERT, UPDATE, DELETE</div>
+                    </div>
+                    <div class="tbl-card purple">
+                        <div class="tbl-name">admin_roles</div>
+                        <div class="tbl-desc">
+                            Maps authenticated Supabase users to roles: 
+                            <code>superadmin</code>
+                            , 
+                            <code>admin</code>
+                            , 
+                            <code>captain</code>
+                            . Links to 
+                            <code>auth.users</code>
+                            .
+                        </div>
+                        <div class="tbl-rls">Auth only: SELECT, INSERT, UPDATE, DELETE</div>
+                    </div>
+                    <div class="tbl-card slate">
+                        <div class="tbl-name">Storage: incident-media</div>
+                        <div class="tbl-desc">
+                            Public Supabase Storage bucket. Files stored at path 
+                            <code>incidents/&lt;id&gt;/&lt;filename&gt;</code>
+                            .
+                        </div>
+                        <div class="tbl-rls">Public: SELECT, INSERT · Auth: DELETE</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column detail — two column layout -->
+            <div class="col-wrap">
+
+                <!-- incidents -->
+                <div class="col-block">
+                    <div class="col-block-title">
+                        incidents 
+                        <span class="tbl-tag">primary table</span>
+                    </div>
+                    <table class="ctbl">
+                        <thead>
+                            <tr>
+                                <th>Column</th>
+                                <th>Type</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="cn">id</td>
+                                <td class="ct">uuid</td>
+                                <td class="cd">PK · auto-generated</td>
+                            </tr>
+                            <tr>
+                                <td class="cn">created_at</td>
+                                <td class="ct">timestamptz</td>
+                                <td class="cd">
+                                    Submission timestamp, defaults to 
+                                    <code>now()</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="cn">type</td>
+                                <td class="ct">text</td>
+                                <td class="cd">Incident category — required</td>
+                            </tr>
+                            <tr>
+                                <td class="cn">type_color</td>
+                                <td class="ct">text</td>
+                                <td class="cd">
+                                    <code>red</code>
+                                     · 
+                                    <code>gold</code>
+                                     · 
+                                    <code>teal</code>
+                                     — controls map pin color
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="cn">occurred_at</td>
+                                <td class="ct">timestamptz</td>
+                                <td class="cd">When incident happened — required</td>
+                            </tr>
+                            <tr>
+                                <td class="cn">address</td>
+                                <td class="ct">text</td>
+                                <td class="cd">Street address or intersection — required</td>
+                            </tr>
+                            <tr>
+                                <td class="cn">description</td>
+                                <td class="ct">text</td>
+                                <td class="cd">Reporter's narrative — required</td>
+                            </tr>
+                            <tr>
+                                <td class="cn">reporter_name</td>
+                                <td class="ct">text?</td>
+                                <td class="cd">Optional — many reports are anonymous</td>
+                            </tr>
+                            <tr>
+                                <td class="cn">police_report</td>
+                                <td class="ct">text?</td>
+                                <td class="cd">HPD report number if filed</td>
+                            </tr>
+                            <tr>
+                                <td class="cn">suspect_height … suspect_other</td>
+                                <td class="ct">text?</td>
+                                <td class="cd">7 optional suspect description fields</td>
+                            </tr>
+                            <tr>
+                                <td class="cn">vehicle_make … vehicle_notes</td>
+                                <td class="ct">text?</td>
+                                <td class="cd">6 optional vehicle description fields</td>
+                            </tr>
+                            <tr>
+                                <td class="cn">lat / lng</td>
+                                <td class="ct">float8?</td>
+                                <td class="cd">Map pin coordinates — may be null</td>
+                            </tr>
+                            <tr>
+                                <td class="cn">status</td>
+                                <td class="ct">text</td>
+                                <td class="cd">
+                                    <code>active</code>
+                                     (default) · 
+                                    <code>archived</code>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Right column: smaller tables -->
+                <div style="display:flex;flex-direction:column;gap:6px">
+
+                    <!-- admin_roles -->
+                    <div class="col-block">
+                        <div class="col-block-title">
+                            admin_roles 
+                            <span class="tbl-tag">authentication</span>
+                        </div>
+                        <table class="ctbl">
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="cn">id</td>
+                                    <td class="ct">uuid</td>
+                                    <td class="cd">PK</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">user_id</td>
+                                    <td class="ct">uuid</td>
+                                    <td class="cd">
+                                        FK → 
+                                        <code>auth.users(id)</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">role</td>
+                                    <td class="ct">text</td>
+                                    <td class="cd">
+                                        <code>superadmin</code>
+                                         · 
+                                        <code>admin</code>
+                                         · 
+                                        <code>captain</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">email / full_name</td>
+                                    <td class="ct">text?</td>
+                                    <td class="cd">Display info — denormalized from auth</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">district</td>
+                                    <td class="ct">text?</td>
+                                    <td class="cd">
+                                        Captain's district ID (e.g. 
+                                        <code>south-hilo</code>
+                                        )
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">last_sign_in_at</td>
+                                    <td class="ct">timestamptz?</td>
+                                    <td class="cd">Updated on each login</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- district_alerts -->
+                    <div class="col-block">
+                        <div class="col-block-title">
+                            district_alerts 
+                            <span class="tbl-tag">captain alerts</span>
+                        </div>
+                        <table class="ctbl">
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="cn">district</td>
+                                    <td class="ct">text</td>
+                                    <td class="cd">
+                                        District ID (e.g. 
+                                        <code>north-hilo</code>
+                                        )
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">message</td>
+                                    <td class="ct">text</td>
+                                    <td class="cd">Alert body text — required</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">alert_type</td>
+                                    <td class="ct">text</td>
+                                    <td class="cd">
+                                        <code>emergency</code>
+                                         · 
+                                        <code>bolo</code>
+                                         · 
+                                        <code>amber</code>
+                                         · 
+                                        <code>incident</code>
+                                         · 
+                                        <code>pattern</code>
+                                         · 
+                                        <code>scam</code>
+                                         · 
+                                        <code>trespass</code>
+                                         · 
+                                        <code>welfare</code>
+                                         · 
+                                        <code>allclear</code>
+                                         · 
+                                        <code>info</code>
+                                         — default: 
+                                        <code>incident</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">media_url / media_type</td>
+                                    <td class="ct">text?</td>
+                                    <td class="cd">Optional attached image or video</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">is_edited</td>
+                                    <td class="ct">bool</td>
+                                    <td class="cd">True if alert was updated after posting</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">sent_by_email / name</td>
+                                    <td class="ct">text?</td>
+                                    <td class="cd">Captain who sent the alert</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">archived_at</td>
+                                    <td class="ct">timestamptz?</td>
+                                    <td class="cd">Set when archived — null means publicly visible. Archived alerts are hidden from the public feed but retained permanently as a record</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">archived_by</td>
+                                    <td class="ct">text?</td>
+                                    <td class="cd">Email of the admin or captain who archived the alert — audit trail for proof of concept reporting</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- business_registry key columns -->
+                    <div class="col-block">
+                        <div class="col-block-title">
+                            business_registry 
+                            <span class="tbl-tag">membership</span>
+                        </div>
+                        <table class="ctbl">
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="cn">business_number</td>
+                                    <td class="ct">text?</td>
+                                    <td class="cd">
+                                        Assigned on approval (e.g. 
+                                        <code>D3-042</code>
+                                        )
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">status</td>
+                                    <td class="ct">text</td>
+                                    <td class="cd">
+                                        <code>pending</code>
+                                         · 
+                                        <code>approved</code>
+                                         · 
+                                        <code>rejected</code>
+                                         · 
+                                        <code>archived</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">district</td>
+                                    <td class="ct">text?</td>
+                                    <td class="cd">District ID auto-detected from address</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">captain_name</td>
+                                    <td class="ct">text?</td>
+                                    <td class="cd">Assigned at approval</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">submitted_at</td>
+                                    <td class="ct">timestamptz?</td>
+                                    <td class="cd">Application received date</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">approved_at</td>
+                                    <td class="ct">timestamptz?</td>
+                                    <td class="cd">Approval date — null until approved</td>
+                                </tr>
+                                <tr>
+                                    <td class="cn">packet_sent_at</td>
+                                    <td class="ct">timestamptz?</td>
+                                    <td class="cd">Welcome packet generation date</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- RLS summary -->
+            <div>
+                <div class="sec">
+                    <div class="sec-num">2</div>
+                    <div class="sec-title">Row Level Security (RLS) Summary</div>
+                    <div class="sec-line"></div>
+                </div>
+                <div class="rls-grid">
+                    <div class="rls-card">
+                        <div class="rls-title">Public (unauthenticated) access</div>
+                        <div class="rls-row">
+                            <div class="rls-op pub">SELECT</div>
+                            Active incidents, incident media, member_emails (for verification)
+                        </div>
+                        <div class="rls-row">
+                            <div class="rls-op pub">INSERT</div>
+                            New incidents, incident media, new business applications
+                        </div>
+                        <div class="rls-row">
+                            <div class="rls-op none">BLOCKED</div>
+                            All other operations on all other tables
+                        </div>
+                    </div>
+                    <div class="rls-card">
+                        <div class="rls-title">Authenticated (admin / captain) access</div>
+                        <div class="rls-row">
+                            <div class="rls-op auth">FULL</div>
+                            incidents (update, delete, view archived), incident_notes, admin_roles, district_alerts
+                        </div>
+                        <div class="rls-row">
+                            <div class="rls-op auth">FULL</div>
+                            business_registry, member_applications, member_emails
+                        </div>
+                        <div class="rls-row">
+                            <div class="rls-op auth">DELETE</div>
+                            incident_media, storage objects in 
+                            <code>incident-media</code>
+                             bucket
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /body -->
+
+        <div class="ftr">
+            <div class="ftr-left">
+                <strong>Hawaiʻi Island Business Community Watch · A Program of KIAA</strong>
+                <br>
+
+                    hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422
+                  
+            </div>
+            <div class="ftr-right">
+
+                    Supabase Database Reference · Admin Resource
+                <br>
+
+                    For authorized administrators only
+                  
+            </div>
+        </div>
+        <div class="stripe-bot"></div>
+        <div class="stripe-bot2"></div>
     </div>
-    <div class="table-map">
-      <div class="tbl-card">
-        <div class="tbl-name">incidents</div>
-        <div class="tbl-desc">All reported incidents — type, location, time, description, suspect &amp; vehicle details, map coordinates.</div>
-        <div class="tbl-rls">Public: SELECT (active), INSERT · Admin: UPDATE, DELETE</div>
-      </div>
-      <div class="tbl-card">
-        <div class="tbl-name">incident_media</div>
-        <div class="tbl-desc">Photos and videos attached to incidents. Linked via <code>incident_id</code>. Files stored in Supabase Storage.</div>
-        <div class="tbl-rls">Public: SELECT, INSERT · Admin: DELETE</div>
-      </div>
-      <div class="tbl-card">
-        <div class="tbl-name">incident_notes</div>
-        <div class="tbl-desc">Admin/Captain internal notes attached to specific incidents. Not visible to the public.</div>
-        <div class="tbl-rls">Auth only: SELECT, INSERT, DELETE</div>
-      </div>
-      <div class="tbl-card gold">
-        <div class="tbl-name">business_registry</div>
-        <div class="tbl-desc">Business membership applications and approved members. Tracks status, approval, and packet delivery.</div>
-        <div class="tbl-rls">Public: INSERT · Auth: SELECT, UPDATE, DELETE</div>
-      </div>
-      <div class="tbl-card gold">
-        <div class="tbl-name">member_applications</div>
-        <div class="tbl-desc">Legacy member application table. New registrations use <code>business_registry</code>.</div>
-        <div class="tbl-rls">Public: INSERT · Auth: SELECT, UPDATE, DELETE</div>
-      </div>
-      <div class="tbl-card gold">
-        <div class="tbl-name">member_emails</div>
-        <div class="tbl-desc">Approved member email list used to verify identity on incident submissions. Unique constraint on email.</div>
-        <div class="tbl-rls">Public: SELECT · Auth: INSERT, DELETE</div>
-      </div>
-      <div class="tbl-card blue">
-        <div class="tbl-name">district_alerts</div>
-        <div class="tbl-desc">District-level alerts sent by Captains. Displayed as banners on the public map. Supports media attachments.</div>
-        <div class="tbl-rls">Auth only: SELECT, INSERT, UPDATE, DELETE</div>
-      </div>
-      <div class="tbl-card purple">
-        <div class="tbl-name">admin_roles</div>
-        <div class="tbl-desc">Maps authenticated Supabase users to roles: <code>superadmin</code>, <code>admin</code>, <code>captain</code>. Links to <code>auth.users</code>.</div>
-        <div class="tbl-rls">Auth only: SELECT, INSERT, UPDATE, DELETE</div>
-      </div>
-      <div class="tbl-card slate">
-        <div class="tbl-name">Storage: incident-media</div>
-        <div class="tbl-desc">Public Supabase Storage bucket. Files stored at path <code>incidents/&lt;id&gt;/&lt;filename&gt;</code>.</div>
-        <div class="tbl-rls">Public: SELECT, INSERT · Auth: DELETE</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Column detail — two column layout -->
-  <div class="col-wrap">
-
-    <!-- incidents -->
-    <div class="col-block">
-      <div class="col-block-title">incidents <span class="tbl-tag">primary table</span></div>
-      <table class="ctbl">
-        <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
-        <tbody>
-          <tr><td class="cn">id</td><td class="ct">uuid</td><td class="cd">PK · auto-generated</td></tr>
-          <tr><td class="cn">created_at</td><td class="ct">timestamptz</td><td class="cd">Submission timestamp, defaults to <code>now()</code></td></tr>
-          <tr><td class="cn">type</td><td class="ct">text</td><td class="cd">Incident category — required</td></tr>
-          <tr><td class="cn">type_color</td><td class="ct">text</td><td class="cd"><code>red</code> · <code>gold</code> · <code>teal</code> — controls map pin color</td></tr>
-          <tr><td class="cn">occurred_at</td><td class="ct">timestamptz</td><td class="cd">When incident happened — required</td></tr>
-          <tr><td class="cn">address</td><td class="ct">text</td><td class="cd">Street address or intersection — required</td></tr>
-          <tr><td class="cn">description</td><td class="ct">text</td><td class="cd">Reporter's narrative — required</td></tr>
-          <tr><td class="cn">reporter_name</td><td class="ct">text?</td><td class="cd">Optional — many reports are anonymous</td></tr>
-          <tr><td class="cn">police_report</td><td class="ct">text?</td><td class="cd">HPD report number if filed</td></tr>
-          <tr><td class="cn">suspect_height … suspect_other</td><td class="ct">text?</td><td class="cd">7 optional suspect description fields</td></tr>
-          <tr><td class="cn">vehicle_make … vehicle_notes</td><td class="ct">text?</td><td class="cd">6 optional vehicle description fields</td></tr>
-          <tr><td class="cn">lat / lng</td><td class="ct">float8?</td><td class="cd">Map pin coordinates — may be null</td></tr>
-          <tr><td class="cn">status</td><td class="ct">text</td><td class="cd"><code>active</code> (default) · <code>archived</code></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Right column: smaller tables -->
-    <div style="display:flex;flex-direction:column;gap:6px">
-
-      <!-- admin_roles -->
-      <div class="col-block">
-        <div class="col-block-title">admin_roles <span class="tbl-tag">authentication</span></div>
-        <table class="ctbl">
-          <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td class="cn">id</td><td class="ct">uuid</td><td class="cd">PK</td></tr>
-            <tr><td class="cn">user_id</td><td class="ct">uuid</td><td class="cd">FK → <code>auth.users(id)</code></td></tr>
-            <tr><td class="cn">role</td><td class="ct">text</td><td class="cd"><code>superadmin</code> · <code>admin</code> · <code>captain</code></td></tr>
-            <tr><td class="cn">email / full_name</td><td class="ct">text?</td><td class="cd">Display info — denormalized from auth</td></tr>
-            <tr><td class="cn">district</td><td class="ct">text?</td><td class="cd">Captain's district ID (e.g. <code>south-hilo</code>)</td></tr>
-            <tr><td class="cn">last_sign_in_at</td><td class="ct">timestamptz?</td><td class="cd">Updated on each login</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- district_alerts -->
-      <div class="col-block">
-        <div class="col-block-title">district_alerts <span class="tbl-tag">captain alerts</span></div>
-        <table class="ctbl">
-          <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td class="cn">district</td><td class="ct">text</td><td class="cd">District ID (e.g. <code>north-hilo</code>)</td></tr>
-            <tr><td class="cn">message</td><td class="ct">text</td><td class="cd">Alert body text — required</td></tr>
-            <tr><td class="cn">media_url / media_type</td><td class="ct">text?</td><td class="cd">Optional attached image or video</td></tr>
-            <tr><td class="cn">is_edited</td><td class="ct">bool</td><td class="cd">True if alert was updated after posting</td></tr>
-            <tr><td class="cn">sent_by_email / name</td><td class="ct">text?</td><td class="cd">Captain who sent the alert</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- business_registry key columns -->
-      <div class="col-block">
-        <div class="col-block-title">business_registry <span class="tbl-tag">membership</span></div>
-        <table class="ctbl">
-          <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td class="cn">business_number</td><td class="ct">text?</td><td class="cd">Assigned on approval (e.g. <code>D3-042</code>)</td></tr>
-            <tr><td class="cn">status</td><td class="ct">text</td><td class="cd"><code>pending</code> · <code>approved</code> · <code>rejected</code> · <code>archived</code></td></tr>
-            <tr><td class="cn">district</td><td class="ct">text?</td><td class="cd">District ID auto-detected from address</td></tr>
-            <tr><td class="cn">captain_name</td><td class="ct">text?</td><td class="cd">Assigned at approval</td></tr>
-            <tr><td class="cn">submitted_at</td><td class="ct">timestamptz?</td><td class="cd">Application received date</td></tr>
-            <tr><td class="cn">approved_at</td><td class="ct">timestamptz?</td><td class="cd">Approval date — null until approved</td></tr>
-            <tr><td class="cn">packet_sent_at</td><td class="ct">timestamptz?</td><td class="cd">Welcome packet generation date</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- RLS summary -->
-  <div>
-    <div class="sec">
-      <div class="sec-num">2</div>
-      <div class="sec-title">Row Level Security (RLS) Summary</div>
-      <div class="sec-line"></div>
-    </div>
-    <div class="rls-grid">
-      <div class="rls-card">
-        <div class="rls-title">Public (unauthenticated) access</div>
-        <div class="rls-row"><div class="rls-op pub">SELECT</div>Active incidents, incident media, member_emails (for verification)</div>
-        <div class="rls-row"><div class="rls-op pub">INSERT</div>New incidents, incident media, new business applications</div>
-        <div class="rls-row"><div class="rls-op none">BLOCKED</div>All other operations on all other tables</div>
-      </div>
-      <div class="rls-card">
-        <div class="rls-title">Authenticated (admin / captain) access</div>
-        <div class="rls-row"><div class="rls-op auth">FULL</div>incidents (update, delete, view archived), incident_notes, admin_roles, district_alerts</div>
-        <div class="rls-row"><div class="rls-op auth">FULL</div>business_registry, member_applications, member_emails</div>
-        <div class="rls-row"><div class="rls-op auth">DELETE</div>incident_media, storage objects in <code>incident-media</code> bucket</div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /body -->
-
-<div class="ftr">
-  <div class="ftr-left">
-    <strong>Hawaiʻi Island Business Community Watch · A Program of KIAA</strong><br>
-    hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422
-  </div>
-  <div class="ftr-right">
-    Supabase Database Reference · Admin Resource<br>
-    For authorized administrators only
-  </div>
-</div>
-<div class="stripe-bot"></div><div class="stripe-bot2"></div>
-</div><!-- /page -->
-</body></html>
+    <!-- /page -->
+</body>
+</html>
