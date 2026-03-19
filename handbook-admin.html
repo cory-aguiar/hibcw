@@ -294,8 +294,9 @@ body.light .hb-cover-sub { color: var(--slate); }
           <tr><td>Delete applications</td><td class="yes">✅ Yes</td><td class="yes">✅ Yes</td></tr>
           <tr><td>Assign district captains</td><td class="yes">✅ Yes</td><td class="yes">✅ Yes</td></tr>
           <tr><td>Upload captain photos</td><td class="yes">✅ Any district</td><td class="yes">✅ Any district</td></tr>
-          <tr><td>Send district alerts</td><td class="yes">✅ Any district</td><td class="yes">✅ Any district</td></tr>
-          <tr><td>Delete district alerts</td><td class="yes">✅ Yes</td><td class="yes">✅ Yes</td></tr>
+          <tr><td>Send district alerts (any type, any district)</td><td class="yes">✅ Any district</td><td class="yes">✅ Any district</td></tr>
+          <tr><td>Archive / restore district alerts</td><td class="yes">✅ Yes</td><td class="yes">✅ Yes</td></tr>
+          <tr><td>Delete district alerts permanently</td><td class="yes">✅ Yes</td><td class="yes">✅ Yes</td></tr>
           <tr><td>Export CSV (incidents/members)</td><td class="yes">✅ Yes</td><td class="yes">✅ Yes</td></tr>
           <tr><td>Invite new admins / captains</td><td class="no">❌ No</td><td class="yes">✅ Yes</td></tr>
           <tr><td>Remove admin accounts</td><td class="no">❌ No</td><td class="yes">✅ Yes</td></tr>
@@ -491,25 +492,60 @@ body.light .hb-cover-sub { color: var(--slate); }
   <!-- SECTION 8 -->
   <div class="hb-section" id="s8">
     <div class="hb-h1"><span class="hb-num">8.</span> District Alerts</div>
-    <p class="hb-p">District alerts allow admins and captains to send messages directly to the community. Alerts appear on the public-facing website and mobile app within seconds of being sent.</p>
+    <p class="hb-p">District alerts allow admins and captains to send typed, categorized messages directly to the community. Alerts appear on the public-facing website and mobile app within seconds of being sent, with a colored type badge, a map pop-up banner, and 911 / HPD non-emergency call buttons for viewer safety.</p>
     <div class="hb-callout danger"><div class="hb-callout-label">🚫 No Advertising Policy</div><p>District alerts may only be used to communicate safety-relevant information directly related to community crime awareness. Alerts may <strong>not</strong> be used to promote businesses, products, services, events, or any commercial interest — even if the sender has a legitimate relationship with the subject. Any alert used for advertising or promotional purposes will be removed and may result in loss of platform access.</p></div>
-    <div class="hb-h2">8.1 Sending an Alert</div>
+
+    <div class="hb-h2">8.1 Alert Types</div>
+    <p class="hb-p">Every alert must have a type selected before sending. The type controls the color coding, icon, and priority displayed to the public. Choose the type that most accurately describes the situation.</p>
+    <table class="hb-table">
+      <thead><tr><th>Type</th><th>Tier</th><th>Use When</th></tr></thead>
+      <tbody>
+        <tr><td>⛔ <strong>EMERGENCY</strong></td><td style="color:#ff2d2d">🔴 Critical</td><td>Active threat or imminent danger — triggers prominent 911 call buttons on the public site</td></tr>
+        <tr><td>👁 <strong>BOLO</strong></td><td style="color:#f97316">🔴 Critical</td><td>Be on the lookout — known suspect, vehicle, or individual; include description and last known location</td></tr>
+        <tr><td>🟡 <strong>AMBER / MISSING</strong></td><td style="color:#f5a623">🔴 Critical</td><td>Missing child or vulnerable adult — triggers 911 call buttons on the public site</td></tr>
+        <tr><td>🚨 <strong>INCIDENT ALERT</strong></td><td style="color:#e8415a">🟠 High</td><td>Crime just occurred or is in progress — shoplifting, theft, break-in, assault</td></tr>
+        <tr><td>🔁 <strong>PATTERN ALERT</strong></td><td style="color:#c084fc">🟠 High</td><td>Same suspect, scam, or MO has hit more than one business in the district</td></tr>
+        <tr><td>💳 <strong>SCAM ALERT</strong></td><td style="color:#3b82f6">🟠 High</td><td>Fraud, counterfeit bills, card skimmers, fake vendors, phone scams targeting businesses</td></tr>
+        <tr><td>🚫 <strong>TRESPASS ALERT</strong></td><td style="color:#a855f7">🟠 High</td><td>Known trespasser from one business — notify neighboring businesses to do the same</td></tr>
+        <tr><td>🫶 <strong>WELFARE CHECK</strong></td><td style="color:#7a8fa6">🟡 Medium</td><td>Suspicious or concerning person with no clear criminal behavior yet</td></tr>
+        <tr><td>✅ <strong>ALL CLEAR</strong></td><td style="color:#00c9a7">🟢 Low</td><td>Follow-up to a prior alert — suspect apprehended, situation resolved, false alarm confirmed</td></tr>
+        <tr><td>📋 <strong>INFO / ADVISORY</strong></td><td style="color:#4a6070">⚪ Info</td><td>General awareness — law enforcement advisories, holiday crime trends, community notices</td></tr>
+      </tbody>
+    </table>
+    <div class="hb-callout tip"><div class="hb-callout-label">💡 Tip</div><p>Critical tier alerts (EMERGENCY, BOLO, AMBER) automatically display prominent "Call 911" and "HPD Non-Emergency (808) 935-2100" tap-to-call buttons on the public site alongside the alert. All other alert types show a quieter safety reminder line. You do not need to add these numbers to your message manually.</p></div>
+
+    <div class="hb-h2">8.2 Sending an Alert</div>
     <ol class="hb-ol">
       <li>Click the "📢 Send District Alert" button in the Districts toolbar</li>
       <li>Select the target district from the dropdown</li>
+      <li>Select the <strong>Alert Type</strong> that best describes the situation</li>
       <li>Type your message</li>
       <li>Optionally attach a photo or video using the 📎 Attach File button</li>
       <li>Click "📤 Send Alert"</li>
     </ol>
-    <div class="hb-h2">8.2 Editing an Alert</div>
-    <p class="hb-p">In the alert log, click the "✏️ Edit" button on any alert to load its content back into the composer. Update the message or media and click "💾 Save Changes". Edited alerts show an "edited" tag publicly.</p>
-    <div class="hb-h2">8.3 Deleting an Alert</div>
-    <p class="hb-p">Click the "✕" button on any alert in the log to permanently remove it. If the alert had media attached, the media file is also deleted from storage.</p>
-    <div class="hb-h2">8.4 Where Alerts Appear Publicly</div>
+
+    <div class="hb-h2">8.3 Editing an Alert</div>
+    <p class="hb-p">In the alert log, click the "✏️ Edit" button on any alert to load its content back into the composer. You can update the message, type, or media and click "💾 Save Changes". Edited alerts show an "edited" tag publicly.</p>
+
+    <div class="hb-h2">8.4 Archiving an Alert</div>
+    <p class="hb-p">Archiving removes an alert from the public feed immediately but <strong>keeps it permanently in the database as a record</strong>. Use archiving — not deletion — to preserve proof of activity, document incidents for reporting, or remove resolved alerts while retaining the history.</p>
+    <ol class="hb-ol">
+      <li>Find the alert in the "📋 Recent Alerts" log</li>
+      <li>Click the "📦 Archive" button</li>
+      <li>Confirm when prompted — the alert is immediately removed from the public site</li>
+    </ol>
+    <p class="hb-p">To view archived alerts, scroll to the "📦 Archived Alerts" section and click "Load". Each archived record shows who sent it, when it was sent, who archived it, and when — a complete audit trail. Archived alerts can be restored to the public feed using the "↩ Restore" button, or permanently deleted with "✕ Delete Permanently".</p>
+    <div class="hb-callout tip"><div class="hb-callout-label">📋 Proof of Concept</div><p>Archived alerts serve as a permanent activity log — useful for grant reporting, law enforcement briefings, community meetings, and demonstrating HIBCW's value to stakeholders. Archive alerts rather than deleting them whenever possible.</p></div>
+
+    <div class="hb-h2">8.5 Deleting an Alert</div>
+    <p class="hb-p">Click the "✕" button on any alert to permanently remove it. If the alert had media attached, the media file is also deleted from storage. <strong>Prefer archiving over deletion</strong> to preserve the activity record.</p>
+
+    <div class="hb-h2">8.6 Where Alerts Appear Publicly</div>
     <ul class="hb-ul">
-      <li>A slide-up banner on the map page (desktop and mobile) for alerts from the last 48 hours</li>
-      <li>The "📢 Alerts" tab in the side panel (desktop) or the More screen (mobile)</li>
+      <li>A slide-up banner on the map page (desktop and mobile) for alerts from the last 48 hours — includes the alert type icon, district, message, and safety call buttons</li>
+      <li>The "📢 Alerts" tab in the side panel (desktop) or the Alerts screen (mobile) — full feed with type badge, district badge, and safety reminders on every card</li>
       <li>Alerts are real-time — visitors see new alerts without refreshing</li>
+      <li>Archived alerts are automatically hidden from the public feed</li>
     </ul>
   </div>
 
@@ -572,7 +608,7 @@ body.light .hb-cover-sub { color: var(--slate); }
           <tr><td>Approve, reject, revoke, and delete applications</td><td></td></tr>
           <tr><td>Assign and reassign district captains</td><td></td></tr>
           <tr><td>Upload captain photos for any district</td><td></td></tr>
-          <tr><td>Send, edit, and delete district alerts for any district</td><td></td></tr>
+          <tr><td>Send, edit, archive, restore, and delete district alerts for any district</td><td></td></tr>
           <tr><td>View full statistics and district breakdown</td><td></td></tr>
           <tr><td>Use the map view with all overlays</td><td></td></tr>
           <tr><td>Print the captain directory and district rosters</td><td></td></tr>
@@ -599,9 +635,11 @@ body.light .hb-cover-sub { color: var(--slate); }
     </ul>
     <div class="hb-h2">District Alerts</div>
     <ul class="hb-ul">
+      <li><strong>Always select the correct alert type</strong> — the type determines the color, icon, and priority displayed publicly. Critical types (EMERGENCY, BOLO, AMBER) automatically display 911 and HPD call buttons to the public</li>
       <li>Only send alerts for actionable, district-relevant information — over-alerting reduces community engagement</li>
       <li>Include media (photo or video) where available to increase credibility and urgency</li>
-      <li>Cancel outdated alerts so the public feed stays current</li>
+      <li><strong>Archive rather than delete</strong> — archived alerts are permanently preserved as a record of activity. Use this for proof of concept reporting, law enforcement briefings, and grant documentation</li>
+      <li>Send an ALL CLEAR alert to close out a prior BOLO, INCIDENT, or EMERGENCY alert once resolved</li>
       <li><strong>Never use alerts for advertising or promotion</strong> — alerts are strictly for community safety information. This includes promotions for businesses, events, or services, even ones you support. See Section 15 of the Terms of Use.</li>
     </ul>
     <div class="hb-h2">Account Security (Superadmins)</div>
