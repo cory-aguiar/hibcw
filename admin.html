@@ -7914,32 +7914,7 @@
             showToast('✅', bizNumber ? `Business approved! ID: ${bizNumber}` : 'Business approved!');
             // Notify captain dashboard
             notifyCaptainNewBusiness(id);
-            // Send approval email to the business
-            sendApprovalEmail(id);
         } else showToast('⚠️', error.message, 'err');
-    }
-
-   async function sendApprovalEmail(businessId) {
-        try {
-            const res = await fetch(
-                'https://pyiwxjdzztqdnaljkwsc.supabase.co/functions/v1/send-approval-email',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    },
-                    body: JSON.stringify({ businessId })
-                }
-            );
-            const data = await res.json();
-            console.log('Email function raw response:', JSON.stringify(data));
-            if (!res.ok) throw new Error(data.error || JSON.stringify(data));
-            showToast('📧', 'Approval email sent to business.');
-        } catch(e) {
-            console.warn('Approval email failed:', e.message);
-            showToast('⚠️', 'Business approved but email failed to send: ' + e.message, 'err');
-        }
     }
 
     // Generate the next available 5-digit business number for a district.
