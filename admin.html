@@ -7919,18 +7919,26 @@
         } else showToast('⚠️', error.message, 'err');
     }
 
-    async function sendApprovalEmail(businessId) {
+   async function sendApprovalEmail(businessId) {
         try {
-            const { data, error } = await sb.functions.invoke('send-approval-email', {
-                body: { businessId }
-            });
-            console.log('Email function response:', JSON.stringify(data));
-            if (error) throw error;
-            if (data && !data.ok) throw new Error(data.error || 'Unknown error');
+            const res = await fetch(
+                'https://pyiwxjdzztqdnaljkwsc.supabase.co/functions/v1/send-approval-email',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    },
+                    body: JSON.stringify({ businessId })
+                }
+            );
+            const data = await res.json();
+            console.log('Email function raw response:', JSON.stringify(data));
+            if (!res.ok) throw new Error(data.error || JSON.stringify(data));
             showToast('📧', 'Approval email sent to business.');
         } catch(e) {
             console.warn('Approval email failed:', e.message);
-            showToast('⚠️', 'Business approved but email failed to send. Check Edge Function logs.', 'err');
+            showToast('⚠️', 'Business approved but email failed to send: ' + e.message, 'err');
         }
     }
 
