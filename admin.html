@@ -465,9 +465,6 @@
 
     .td-desc {
         max-width: 260px;
-    }
-
-    .td-desc-inner {
         color: rgba(238, 243, 248, .75);
         font-size: .78rem;
         display: -webkit-box;
@@ -1987,7 +1984,7 @@
         color: #4a5f72
     }
 
-    body.light .td-desc-inner {
+    body.light .td-desc {
         color: rgba(15, 30, 46, .7)
     }
 
@@ -2504,15 +2501,6 @@
                     ☰ All 
                     <span class="nav-count" id="nc-all">—</span>
                 </button>
-                <div class="nav-section">District Alerts</div>
-                <button class="nav-btn admin-only" id="nav-active-alerts" onclick="showView('active-alerts')">
-                    📢 Active Alerts
-                    <span class="nav-count" id="nc-active-alerts">—</span>
-                </button>
-                <button class="nav-btn admin-only" id="nav-district-alerts" onclick="showView('district-alerts')">
-                    📦 Archived Alerts
-                    <span class="nav-count" id="nc-district-alerts">—</span>
-                </button>
                 <div class="nav-section">Reports</div>
                 <button class="nav-btn" id="nav-stats" onclick="showView('stats')">📊 Statistics</button>
                 <button class="nav-btn" id="nav-map" onclick="showView('map')">🗺 Map View</button>
@@ -2809,38 +2797,6 @@
                     <div class="result-count" id="rcount-all"></div>
                     <div class="table-wrap">
                         <div id="table-all"></div>
-                    </div>
-                </div>
-
-                <!-- ── DISTRICT ALERTS ACTIVE ── -->
-                <div class="view" id="view-active-alerts">
-                    <div class="page-hd">
-                        <div>
-                            <div class="page-title">Active District Alerts</div>
-                            <div class="page-sub">Alerts currently visible on the public feed</div>
-                        </div>
-                        <div class="page-actions">
-                            <button class="btn btn-ghost btn-lg" onclick="loadActiveAlertsView()">🔄 Refresh</button>
-                        </div>
-                    </div>
-                    <div id="active-alerts-body" style="max-width:820px;margin-top:8px">
-                        <div style="font-size:.8rem;color:var(--slate2);font-style:italic;padding:40px 0;text-align:center">Loading active alerts…</div>
-                    </div>
-                </div>
-
-                <!-- ── DISTRICT ALERTS ARCHIVED ── -->
-                <div class="view" id="view-district-alerts">
-                    <div class="page-hd">
-                        <div>
-                            <div class="page-title">Archived District Alerts</div>
-                            <div class="page-sub">Alerts removed from the public feed — kept permanently as a record</div>
-                        </div>
-                        <div class="page-actions">
-                            <button class="btn btn-ghost btn-lg" onclick="loadDistrictAlertsView()">🔄 Refresh</button>
-                        </div>
-                    </div>
-                    <div id="district-alerts-body" style="max-width:820px;margin-top:8px">
-                        <div style="font-size:.8rem;color:var(--slate2);font-style:italic;padding:40px 0;text-align:center">Loading archived alerts…</div>
                     </div>
                 </div>
 
@@ -4033,10 +3989,6 @@
             setTimeout(() => document.getElementById('bizLookupInput')?.focus(), 80);
         } else if (v === 'resources') {
             renderResources();
-        } else if (v === 'district-alerts') {
-            loadDistrictAlertsView();
-        } else if (v === 'active-alerts') {
-            loadActiveAlertsView();
         } else {
             renderCurrentView();
         }
@@ -4312,17 +4264,6 @@
         document.getElementById('nc-active').textContent = active;
         document.getElementById('nc-archived').textContent = archived;
         document.getElementById('nc-all').textContent = allIncidents.length;
-        // Update district alerts archived count
-        if (sb) {
-            sb.from('district_alerts').select('id', {count:'exact',head:true}).not('archived_at','is',null).then(({count}) => {
-                const badge = document.getElementById('nc-district-alerts');
-                if (badge && count != null) badge.textContent = count;
-            });
-            sb.from('district_alerts').select('id', {count:'exact',head:true}).is('archived_at',null).then(({count}) => {
-                const badge = document.getElementById('nc-active-alerts');
-                if (badge && count != null) badge.textContent = count;
-            });
-        }
     }
 
     /* ════════════════════════════════════════════════════
@@ -4369,7 +4310,7 @@
       <td class="td-type"><span class="badge ${bc}">${inc.type}</span>${inc.is_recurring ? '<br><span class="recurring-flag" style="margin-top:3px">🔁 Recurring</span>' : ''} ${inc.is_verified_member ? '<br><span class="verified-badge" style="margin-top:3px">✅ Member</span>' : ''}</td>
       <td class="td-time">${fmt(inc.occurred_at)}<br>${ageTag(inc.occurred_at)}</td>
       <td class="td-addr" title="${esc(inc.address)}">${esc(inc.address)}${inc.district ? `<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:${DISTRICT_GEO.find(d => d.id === inc.district)?.color || '#00c9a7'};letter-spacing:.03em">${DISTRICT_GEO.find(d => d.id === inc.district)?.label || inc.district}</span>` : ''}</td>
-      <td class="td-desc" title="${esc(inc.description)}"><div class="td-desc-inner">${esc(inc.description)}</div></td>
+      <td class="td-desc" title="${esc(inc.description)}">${esc(inc.description)}</td>
       <td style="font-size:.75rem;color:var(--slate)">${esc(inc.reporter_name || '—')}</td>
       <td>${mc ? `<span class="media-pill">📎 ${mc}</span>` : '<span style="color:var(--slate2)">—</span>'}</td>
       ${showStatus ? `<td><span class="badge ${archived ? 'b-arch' : 'b-teal'}">${inc.status}</span></td>` : ''}
@@ -7914,7 +7855,53 @@
             showToast('✅', bizNumber ? `Business approved! ID: ${bizNumber}` : 'Business approved!');
             // Notify captain dashboard
             notifyCaptainNewBusiness(id);
+            // Send approval email to the business contact
+            if (b.email) {
+                sendBusinessApprovalEmail(b, bizNumber || b.business_number);
+            }
         } else showToast('⚠️', error.message, 'err');
+    }
+
+    /* ════════════════════════════════════════════════════
+       RESEND — Business Approval Email
+    ════════════════════════════════════════════════════ */
+    /* ════════════════════════════════════════════════════
+       RESEND — Business Approval Email
+       Delegates to the Supabase Edge Function "send-approval-email"
+       so the Resend API key never touches the browser.
+    ════════════════════════════════════════════════════ */
+    async function sendBusinessApprovalEmail(b, bizNumber) {
+        // The Edge Function URL is derived from the project's Supabase URL
+        // (same origin as all other Supabase calls).
+        const fnUrl = `${SUPABASE_URL}/functions/v1/send-approval-email`;
+
+        try {
+            const res = await fetch(fnUrl, {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email:            b.email,
+                    contact_name:     b.contact_name     || null,
+                    business_name:    b.business_name    || null,
+                    business_address: b.business_address || null,
+                    business_city:    b.business_city    || null,
+                    business_state:   b.business_state   || null,
+                    business_zip:     b.business_zip     || null,
+                    business_number:  bizNumber          || null,
+                    district:         b.district         || null,
+                })
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                console.warn('HIBCW: approval email failed —', err.error || res.status);
+                showToast('⚠️', 'Approved, but approval email could not be sent.', 'err');
+            } else {
+                showToast('📧', `Approval email sent to ${b.email}`);
+            }
+        } catch (e) {
+            console.warn('HIBCW: approval email network error —', e.message);
+            showToast('⚠️', 'Approved, but approval email could not be sent.', 'err');
+        }
     }
 
     // Generate the next available 5-digit business number for a district.
@@ -8869,110 +8856,6 @@
             }).join('');
         } catch(e) {
             el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load archived alerts: ${esc(e.message)}</div>`;
-        }
-    }
-
-    async function loadActiveAlertsView() {
-        const el = document.getElementById('active-alerts-body');
-        if (!el || !sb) return;
-        el.innerHTML = '<div style="font-size:.8rem;color:var(--slate2);padding:20px 0;text-align:center">Loading…</div>';
-        try {
-            const {data, error} = await sb
-                .from('district_alerts')
-                .select('*')
-                .is('archived_at', null)
-                .order('created_at', { ascending: false });
-            if (error) throw error;
-
-            const badge = document.getElementById('nc-active-alerts');
-            if (badge) badge.textContent = data.length || '0';
-
-            if (!data.length) {
-                el.innerHTML = '<div style="font-size:.82rem;color:var(--slate2);font-style:italic;padding:60px 0;text-align:center">No active district alerts.</div>';
-                return;
-            }
-            el.innerHTML = data.map(a => {
-                const distColor = KIAA_DISTRICTS.find(d => d.id === a.district)?.color || 'var(--teal)';
-                const t = alertTypeMeta(a.alert_type);
-                const sentDate = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
-                return `
-                <div style="background:${t.color}0d;border:1px solid ${t.color}30;border-left:3px solid ${t.color};border-radius:6px;padding:12px 14px;margin-bottom:10px">
-                  <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap">
-                    ${alertTypeBadge(a.alert_type)}
-                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${distColor}18;color:${distColor};border:1px solid ${distColor}44;border-radius:3px;padding:1px 6px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
-                  </div>
-                  <div style="font-size:.83rem;line-height:1.55;color:var(--white);margin-bottom:7px">${esc(a.message)}</div>
-                  ${a.media_url ? `<div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2);max-width:280px">${a.media_type==='video'?`<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:180px"></video>`:`<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:180px;object-fit:cover">`}</div>` : ''}
-                  <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);margin-bottom:8px">
-                    📤 Sent by ${esc(a.sent_by_name||'Admin')} · ${sentDate}${a.is_edited?' · <em>edited</em>':''}
-                  </div>
-                  <div style="display:flex;gap:6px">
-                    <button onclick="archiveAdminAlert('${a.id}');loadActiveAlertsView();" style="background:none;border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:3px 10px;color:var(--gold);font-size:.62rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">📦 Archive</button>
-                    <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url||'')}');loadActiveAlertsView();" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:3px 10px;color:var(--red);font-size:.62rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete</button>
-                  </div>
-                </div>`;
-            }).join('');
-        } catch(e) {
-            el.innerHTML = `<div style="font-size:.78rem;color:var(--slate2)">Could not load active alerts: ${esc(e.message)}</div>`;
-        }
-    }
-
-    async function loadDistrictAlertsView() {
-        const el = document.getElementById('district-alerts-body');
-        if (!el || !sb) return;
-        el.innerHTML = '<div style="font-size:.8rem;color:var(--slate2);padding:20px 0;text-align:center">Loading…</div>';
-        try {
-            const {data, error} = await sb
-                .from('district_alerts')
-                .select('*')
-                .not('archived_at', 'is', null)
-                .order('archived_at', { ascending: false });
-            if (error) throw error;
-
-            // Update nav count badge
-            const badge = document.getElementById('nc-district-alerts');
-            if (badge) badge.textContent = data.length || '0';
-
-            if (!data.length) {
-                el.innerHTML = '<div style="font-size:.82rem;color:var(--slate2);font-style:italic;padding:60px 0;text-align:center">No archived district alerts yet.</div>';
-                return;
-            }
-            el.innerHTML = data.map(a => {
-                const distColor = KIAA_DISTRICTS.find(d => d.id === a.district)?.color || 'var(--teal)';
-                const t = alertTypeMeta(a.alert_type);
-                const archivedDate = new Date(a.archived_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
-                const sentDate = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
-                return `
-                <div style="background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.2);border-left:3px solid var(--gold);border-radius:6px;padding:12px 14px;margin-bottom:10px;opacity:.9">
-                  <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap">
-                    ${alertTypeBadge(a.alert_type)}
-                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${distColor}18;color:${distColor};border:1px solid ${distColor}44;border-radius:3px;padding:1px 6px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
-                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:1px 6px;white-space:nowrap">📦 ARCHIVED</span>
-                  </div>
-                  <div style="font-size:.83rem;line-height:1.55;color:var(--white);margin-bottom:7px">${esc(a.message)}</div>
-                  <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);display:flex;flex-direction:column;gap:2px;margin-bottom:8px">
-                    <span>📤 Sent by ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
-                    <span>📦 Archived by ${esc(a.archived_by||'Admin')} · ${archivedDate}</span>
-                  </div>
-                  <div style="display:flex;gap:6px">
-                    <button onclick="unarchiveAlertFromView('${a.id}')" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:3px 10px;color:var(--teal);font-size:.62rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">↩ Restore</button>
-                    <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url||'')}');loadDistrictAlertsView();" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:3px 10px;color:var(--red);font-size:.62rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete Permanently</button>
-                  </div>
-                </div>`;
-            }).join('');
-        } catch(e) {
-            el.innerHTML = `<div style="font-size:.78rem;color:var(--slate2)">Could not load archived alerts: ${esc(e.message)}</div>`;
-        }
-    }
-
-    async function unarchiveAlertFromView(id) {
-        const {error} = await sb.from('district_alerts').update({ archived_at: null, archived_by: null }).eq('id', id);
-        if (!error) {
-            showToast('↩', 'Alert restored to public feed.');
-            loadDistrictAlertsView();
-            loadAdminAlertLog();
-        } else {
-            showToast('⚠️', error.message, 'err');
         }
     }
 
