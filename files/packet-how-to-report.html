@@ -1,219 +1,624 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>HIBCW – How to Report an Incident</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-@page{size:letter;margin:0}
-body{background:#f0f0f0;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:11px;color:#1a2a3a;print-color-adjust:exact;-webkit-print-color-adjust:exact}
-.page{width:816px;min-height:1056px;background:#fff;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
-.toolbar{background:#0b1524;padding:9px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.toolbar-brand{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#38bba1}
-.t-btn{padding:5px 11px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);background:transparent}
-.t-btn-teal{background:#38bba1;color:#0b1524;border-color:#38bba1}
-.accent-top{height:5px;background:#0b1524}
-.accent-stripe{height:3px;background:#e84a5f}
-/* Red accent for "incident" theme */
-.lh{padding:18px 44px 14px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #e0e8f0}
-.lh-logo{display:flex;align-items:center;gap:12px}
-.lh-org{font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:#38bba1;margin-bottom:3px}
-.lh-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:#0b1524;line-height:1}
-.lh-sub{font-size:8.5px;color:#7a8fa6;margin-top:2px}
-.hero{background:#0b1524;padding:18px 44px;display:flex;align-items:center;gap:16px}
-.hero-icon{width:52px;height:52px;background:#e84a5f;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px}
-.hero-hl{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:#fff;line-height:1.1;margin-bottom:3px}
-.hero-sub{font-size:10px;color:rgba(255,255,255,.55);line-height:1.6}
-.body{padding:16px 44px;flex:1}
-/* Step cards */
-.steps{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-.step-card{display:flex;gap:14px;background:#f8fafb;border:1px solid #e0e8f0;border-left:4px solid #38bba1;border-radius:0 6px 6px 0;padding:11px 14px;align-items:flex-start}
-.step-card.urgent{border-left-color:#e84a5f;background:#fff9f9}
-.step-num{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:#38bba1;line-height:1;flex-shrink:0;width:28px;text-align:center}
-.step-card.urgent .step-num{color:#e84a5f}
-.step-content{}
-.step-title{font-family:'Rajdhani',sans-serif;font-size:13.5px;font-weight:700;color:#0b1524;margin-bottom:3px}
-.step-desc{font-size:9.5px;color:#4a6070;line-height:1.6}
-.step-desc strong{color:#0b1524}
-.step-tip{display:inline-block;margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:8px;background:#e4f8f5;color:#1a7a68;border-radius:3px;padding:2px 7px}
-.step-card.urgent .step-tip{background:#fdeef0;color:#c0304a}
-/* Suspect / vehicle tables */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.info-box{border:1px solid #e0e8f0;border-radius:6px;overflow:hidden}
-.info-box-hdr{background:#0b1524;padding:7px 12px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:#38bba1;letter-spacing:.04em}
-.info-list{padding:8px 12px}
-.info-item{font-size:9px;color:#4a6070;padding:3px 0;border-bottom:1px solid #f0f4f8;display:flex;gap:6px}
-.info-item:last-child{border-bottom:none}
-.info-item-lbl{font-weight:600;color:#0b1524;min-width:64px;flex-shrink:0}
-/* When to call 911 */
-.emergency-box{background:#e84a5f;border-radius:6px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
-.emergency-icon{font-size:22px;flex-shrink:0;margin-top:1px}
-.emergency-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:5px}
-.emergency-list{display:flex;flex-direction:column;gap:2px}
-.emergency-item{font-size:9px;color:rgba(255,255,255,.88);line-height:1.5}
-/* URL box */
-.url-row{background:#0b1524;border-radius:6px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.url-label{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:rgba(56,187,161,.7);margin-bottom:2px}
-.url-val{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#fff}
-.url-sub{font-size:8px;color:rgba(255,255,255,.38);margin-top:1px}
-/* Footer */
-.footer{background:#f5f8fa;border-top:2px solid #0b1524;padding:10px 44px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.footer-left{font-size:8px;color:#7a8fa6;line-height:1.7}
-.footer-left strong{color:#0b1524}
-.footer-right{text-align:right;font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:#7a8fa6}
-.accent-bot{height:3px;background:#e84a5f}
-.accent-bot2{height:4px;background:#0b1524}
-.sec-lbl{font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:#38bba1;margin-bottom:9px;margin-top:2px;display:flex;align-items:center;gap:8px}
-.sec-lbl::after{content:'';flex:1;height:1px;background:#38bba1;opacity:.2}
-@media print{.toolbar{display:none!important}.page{margin:0;width:100%}}
-</style></head><body>
-<div class="toolbar">
-  <div class="toolbar-brand">HIBCW · How to Report an Incident</div>
-  <div style="display:flex;gap:6px">
-    <button class="t-btn" onclick="window.close()">✕ Close</button>
-    <button class="t-btn t-btn-teal" onclick="window.print()">🖨 Print</button>
-  </div>
-</div>
-<div class="page">
-<div class="accent-top"></div><div class="accent-stripe"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HIBCW – How to Report an Incident</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box
+    }
 
-<!-- Letterhead -->
-<div class="lh">
-  <div class="lh-logo">
-    <img src="../logo-shield.svg" alt="HIBCW" style="width:40px;height:40px;object-fit:contain;flex-shrink:0">
-    <div>
-      <div class="lh-org">A Program of KIAA</div>
-      <div class="lh-title">Hawaii Island Business Crime Watch</div>
-      <div class="lh-sub">hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422</div>
-    </div>
-  </div>
-  <div style="text-align:right">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:#b0c0cc;margin-bottom:3px">Member Packet</div>
-    <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#0b1524" id="distLabel">Incident Reporting Guide</div>
-  </div>
-</div>
+    @page {
+        size: letter;
+        margin: 0
+    }
 
-<!-- Hero -->
-<div class="hero">
-  <div class="hero-icon">🚨</div>
-  <div>
-    <div class="hero-hl">How to Report an Incident</div>
-    <div class="hero-sub">When you see something suspicious or criminal, your report to HIBCW helps protect every business in your district. Here's exactly what to do — step by step.</div>
-  </div>
-</div>
+    body {
+        background: #f0f0f0;
+        font-family: 'IBM Plex Sans', Arial, sans-serif;
+        color: #1a2a3a;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact
+    }
 
-<div class="body">
+    .toolbar {
+        background: #0b1524;
+        padding: 7px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px
+    }
 
-  <!-- Emergency callout first -->
-  <div class="emergency-box" style="margin-top:12px">
-    <div class="emergency-icon">🔴</div>
-    <div>
-      <div class="emergency-title">Call 911 First if Any of These Apply</div>
-      <div class="emergency-list">
-        <div class="emergency-item">⚡ A crime is actively in progress or someone is in immediate danger</div>
-        <div class="emergency-item">⚡ There is a weapon involved or a physical threat to any person</div>
-        <div class="emergency-item">⚡ Someone is injured or needs medical attention</div>
-        <div class="emergency-item">⚡ A suspect is still on the premises or fleeing the area right now</div>
-      </div>
-    </div>
-  </div>
+    .toolbar-brand {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 8px;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        color: #38bba1
+    }
 
-  <div class="sec-lbl">Step-by-Step: Reporting to HIBCW</div>
-  <div class="steps">
-    <div class="step-card">
-      <div class="step-num">1</div>
-      <div class="step-content">
-        <div class="step-title">Stay Safe & Observe</div>
-        <div class="step-desc">Do not confront a suspect. From a safe position, take note of everything you can: <strong>time, location, description of persons, vehicles, and actions.</strong> If it's safe to do so, take photos or video from a distance.</div>
-        <span class="step-tip">📸 Photo or video evidence is extremely helpful</span>
-      </div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">2</div>
-      <div class="step-content">
-        <div class="step-title">Go to hibcw.vercel.app</div>
-        <div class="step-desc">Open your phone or computer browser and visit <strong>hibcw.vercel.app</strong>. Click <strong>"Report an Incident"</strong> on the home page. No account or login is required — anyone can submit a report.</div>
-        <span class="step-tip">📱 Works on any smartphone browser</span>
-      </div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">3</div>
-      <div class="step-content">
-        <div class="step-title">Fill In the Incident Details</div>
-        <div class="step-desc">Complete as many fields as you can. The most important are: <strong>type of incident, exact address or cross-streets, time it occurred,</strong> and a brief description. Don't worry if you don't have every detail — partial information is still valuable.</div>
-        <span class="step-tip">📍 Pin the location on the map for accuracy</span>
-      </div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">4</div>
-      <div class="step-content">
-        <div class="step-title">Describe the Suspect &amp; Vehicle (if applicable)</div>
-        <div class="step-desc">Use the fields below as a guide. Include as much as you can remember. Even partial descriptions — a shirt color, vehicle make, or approximate age — can help law enforcement and your District Captain identify patterns.</div>
-      </div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">5</div>
-      <div class="step-content">
-        <div class="step-title">Submit &amp; Watch for District Alerts</div>
-        <div class="step-desc">Click Submit. Your report instantly appears on the live HIBCW map. Your <strong>District Captain</strong> will review it and may issue a district-wide alert if the threat is ongoing. Keep an eye on hibcw.vercel.app for updates in your area.</div>
-        <span class="step-tip">🔔 Share the site with your staff so they see alerts too</span>
-      </div>
-    </div>
-  </div>
+    .t-btn {
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: .58rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, .15);
+        color: rgba(255, 255, 255, .6);
+        background: transparent
+    }
 
-  <!-- Suspect / Vehicle description guide -->
-  <div class="sec-lbl">What to Note — Description Guide</div>
-  <div class="two-col">
-    <div class="info-box">
-      <div class="info-box-hdr">👤 Suspect Description</div>
-      <div class="info-list">
-        <div class="info-item"><div class="info-item-lbl">Gender</div><div>Male / Female / Unknown</div></div>
-        <div class="info-item"><div class="info-item-lbl">Age (est.)</div><div>Teens / 20s / 30s / 40s / 50s+</div></div>
-        <div class="info-item"><div class="info-item-lbl">Height (est.)</div><div>Short / Medium / Tall &amp; approx. feet</div></div>
-        <div class="info-item"><div class="info-item-lbl">Build</div><div>Slim / Medium / Heavy / Athletic</div></div>
-        <div class="info-item"><div class="info-item-lbl">Clothing</div><div>Shirt color, pants, shoes, hat</div></div>
-        <div class="info-item"><div class="info-item-lbl">Hair</div><div>Color, length, style</div></div>
-        <div class="info-item"><div class="info-item-lbl">Other</div><div>Tattoos, facial hair, glasses, accent</div></div>
-        <div class="info-item"><div class="info-item-lbl">Direction</div><div>Which way they left &amp; on foot or vehicle</div></div>
-      </div>
-    </div>
-    <div class="info-box">
-      <div class="info-box-hdr">🚗 Vehicle Description</div>
-      <div class="info-list">
-        <div class="info-item"><div class="info-item-lbl">Make</div><div>Toyota, Ford, Honda, etc.</div></div>
-        <div class="info-item"><div class="info-item-lbl">Model</div><div>Sedan, Pickup, SUV, Van, etc.</div></div>
-        <div class="info-item"><div class="info-item-lbl">Color</div><div>Primary &amp; any secondary color</div></div>
-        <div class="info-item"><div class="info-item-lbl">Year (est.)</div><div>Approximate decade is fine</div></div>
-        <div class="info-item"><div class="info-item-lbl">License Plate</div><div>Full plate or even partial letters/numbers</div></div>
-        <div class="info-item"><div class="info-item-lbl">Condition</div><div>Dents, damage, decals, tinted windows</div></div>
-        <div class="info-item"><div class="info-item-lbl">Direction</div><div>Which direction vehicle traveled</div></div>
-        <div class="info-item"><div class="info-item-lbl"># Occupants</div><div>How many people were in the vehicle</div></div>
-      </div>
-    </div>
-  </div>
+    .t-btn-teal {
+        background: #38bba1;
+        color: #0b1524;
+        border-color: #38bba1
+    }
 
-  <div class="url-row">
-    <div>
-      <div class="url-label">Submit your report at</div>
-      <div class="url-val">hibcw.vercel.app</div>
-      <div class="url-sub">Click "Report an Incident" &nbsp;·&nbsp; No login required &nbsp;·&nbsp; Works on any device</div>
+    .page {
+        width: 816px;
+        height: 1056px;
+        background: #fff;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden
+    }
+
+    .accent-top {
+        height: 4px;
+        background: #0b1524;
+        flex-shrink: 0
+    }
+
+    .accent-stripe {
+        height: 2px;
+        background: #e84a5f;
+        flex-shrink: 0
+    }
+
+    .lh {
+        padding: 9px 36px 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #e0e8f0;
+        flex-shrink: 0
+    }
+
+    .lh-org {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 6.5px;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: #38bba1;
+        margin-bottom: 2px
+    }
+
+    .lh-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        color: #0b1524;
+        line-height: 1
+    }
+
+    .lh-sub {
+        font-size: 7.5px;
+        color: #7a8fa6;
+        margin-top: 1px
+    }
+
+    .hero {
+        background: #0b1524;
+        padding: 10px 36px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0
+    }
+
+    .hero-icon {
+        width: 38px;
+        height: 38px;
+        background: #e84a5f;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 18px
+    }
+
+    .hero-hl {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1.1;
+        margin-bottom: 2px
+    }
+
+    .hero-sub {
+        font-size: 8.5px;
+        color: rgba(255, 255, 255, .55);
+        line-height: 1.5
+    }
+
+    .body {
+        padding: 9px 36px 8px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow: hidden
+    }
+
+    .emergency-box {
+        background: #e84a5f;
+        border-radius: 5px;
+        padding: 8px 12px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        flex-shrink: 0
+    }
+
+    .emergency-icon {
+        font-size: 16px;
+        flex-shrink: 0;
+        margin-top: 1px
+    }
+
+    .emergency-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 3px
+    }
+
+    .emergency-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px 14px
+    }
+
+    .emergency-item {
+        font-size: 8px;
+        color: rgba(255, 255, 255, .9);
+        line-height: 1.45
+    }
+
+    .sec-lbl {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7.5px;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: #38bba1;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-shrink: 0
+    }
+
+    .sec-lbl::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #38bba1;
+        opacity: .2
+    }
+
+    .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex-shrink: 0
+    }
+
+    .step-card {
+        display: flex;
+        gap: 10px;
+        background: #f8fafb;
+        border: 1px solid #e0e8f0;
+        border-left: 3px solid #38bba1;
+        border-radius: 0 5px 5px 0;
+        padding: 6px 10px;
+        align-items: flex-start
+    }
+
+    .step-num {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #38bba1;
+        line-height: 1;
+        flex-shrink: 0;
+        width: 22px;
+        text-align: center
+    }
+
+    .step-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #0b1524;
+        margin-bottom: 1px
+    }
+
+    .step-desc {
+        font-size: 8px;
+        color: #4a6070;
+        line-height: 1.5
+    }
+
+    .step-desc strong {
+        color: #0b1524
+    }
+
+    .step-tip {
+        display: inline-block;
+        margin-top: 2px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7px;
+        background: #e4f8f5;
+        color: #1a7a68;
+        border-radius: 3px;
+        padding: 1px 6px
+    }
+
+    .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        flex-shrink: 0
+    }
+
+    .info-box {
+        border: 1px solid #e0e8f0;
+        border-radius: 5px;
+        overflow: hidden
+    }
+
+    .info-box-hdr {
+        background: #0b1524;
+        padding: 5px 10px;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 10.5px;
+        font-weight: 700;
+        color: #38bba1;
+        letter-spacing: .04em
+    }
+
+    .info-list {
+        padding: 4px 10px
+    }
+
+    .info-item {
+        font-size: 7.8px;
+        color: #4a6070;
+        padding: 2px 0;
+        border-bottom: 1px solid #f0f4f8;
+        display: flex;
+        gap: 5px
+    }
+
+    .info-item:last-child {
+        border-bottom: none
+    }
+
+    .info-item-lbl {
+        font-weight: 600;
+        color: #0b1524;
+        min-width: 58px;
+        flex-shrink: 0
+    }
+
+    .url-row {
+        background: #0b1524;
+        border-radius: 5px;
+        padding: 7px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-shrink: 0
+    }
+
+    .url-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 6.5px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: rgba(56, 187, 161, .7);
+        margin-bottom: 1px
+    }
+
+    .url-val {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff
+    }
+
+    .url-sub {
+        font-size: 7px;
+        color: rgba(255, 255, 255, .38);
+        margin-top: 1px
+    }
+
+    .footer {
+        background: #f5f8fa;
+        border-top: 2px solid #0b1524;
+        padding: 6px 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0
+    }
+
+    .footer-left {
+        font-size: 7.5px;
+        color: #7a8fa6;
+        line-height: 1.6
+    }
+
+    .footer-left strong {
+        color: #0b1524
+    }
+
+    .footer-right {
+        text-align: right;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7px;
+        color: #7a8fa6
+    }
+
+    .accent-bot {
+        height: 2px;
+        background: #e84a5f;
+        flex-shrink: 0
+    }
+
+    .accent-bot2 {
+        height: 3px;
+        background: #0b1524;
+        flex-shrink: 0
+    }
+
+    @media print {
+        .toolbar {
+            display:none !important
+        }
+
+        .page {
+            margin: 0;
+            width: 100%;
+            height: 100vh
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <div class="toolbar-brand">HIBCW · How to Report an Incident</div>
+        <div style="display:flex;gap:6px">
+            <button class="t-btn" onclick="window.close()">✕ Close</button>
+            <button class="t-btn t-btn-teal" onclick="window.print()">🖨 Print</button>
+        </div>
     </div>
-    <div style="text-align:right">
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:rgba(255,255,255,.35);margin-bottom:3px">Questions? Contact</div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#38bba1">hibcw@kiaahilo.org</div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#38bba1">(808) 961-5422</div>
+    <div class="page">
+        <div class="accent-top"></div>
+        <div class="accent-stripe"></div>
+        <div class="lh">
+            <div style="display:flex;align-items:center;gap:10px">
+                <img src="../logo-shield.svg" alt="HIBCW" style="width:32px;height:32px;object-fit:contain;flex-shrink:0">
+                <div>
+                    <div class="lh-org">A Program of KIAA</div>
+                    <div class="lh-title">Hawaii Island Business Crime Watch</div>
+                    <div class="lh-sub">hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422</div>
+                </div>
+            </div>
+            <div style="text-align:right">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:#b0c0cc;margin-bottom:2px">Member Packet</div>
+                <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:#0b1524" id="distLabel">Incident Reporting Guide</div>
+            </div>
+        </div>
+        <div class="hero">
+            <div class="hero-icon">🚨</div>
+            <div>
+                <div class="hero-hl">How to Report an Incident</div>
+                <div class="hero-sub">When you see something suspicious or criminal, your report helps protect every business in your district. Here's exactly what to do.</div>
+            </div>
+        </div>
+        <div class="body">
+            <div class="emergency-box">
+                <div class="emergency-icon">🔴</div>
+                <div style="flex:1">
+                    <div class="emergency-title">Call 911 First if Any of These Apply</div>
+                    <div class="emergency-list">
+                        <div class="emergency-item">⚡ Crime actively in progress or immediate danger</div>
+                        <div class="emergency-item">⚡ Weapon involved or physical threat to a person</div>
+                        <div class="emergency-item">⚡ Someone is injured or needs medical attention</div>
+                        <div class="emergency-item">⚡ Suspect still on premises or fleeing right now</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sec-lbl">Step-by-Step: Reporting to HIBCW</div>
+            <div class="steps">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <div>
+                        <div class="step-title">Stay Safe &amp; Observe</div>
+                        <div class="step-desc">
+                            Do not confront a suspect. Note: 
+                            <strong>time, location, descriptions of persons, vehicles, and actions.</strong>
+                             Take photos or video from a safe distance if possible.
+                            <span class="step-tip">📸 Photos &amp; video are extremely helpful</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <div>
+                        <div class="step-title">Go to hibcw.vercel.app</div>
+                        <div class="step-desc">
+                            Open any browser and visit 
+                            <strong>hibcw.vercel.app</strong>
+                            . Click 
+                            <strong>"Report an Incident."</strong>
+                             No account or login required — anyone can submit.
+                            <span class="step-tip">📱 Works on any smartphone</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <div>
+                        <div class="step-title">Fill In the Incident Details</div>
+                        <div class="step-desc">
+                            Complete as many fields as possible: 
+                            <strong>type of incident, address or cross-streets, time,</strong>
+                             and description. Partial information is still valuable.
+                            <span class="step-tip">📍 Pin the location on the map for accuracy</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">4</div>
+                    <div>
+                        <div class="step-title">Describe the Suspect &amp; Vehicle</div>
+                        <div class="step-desc">Use the guide below. Even partial descriptions — a shirt color, vehicle make, or approximate age — help law enforcement and your District Captain identify patterns.</div>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">5</div>
+                    <div>
+                        <div class="step-title">Submit &amp; Watch for District Alerts</div>
+                        <div class="step-desc">
+                            Click Submit — your report instantly appears on the live HIBCW map. Your 
+                            <strong>District Captain</strong>
+                             may issue a district-wide alert if the threat is ongoing.
+                            <span class="step-tip">🔔 Share the site with staff so they see alerts too</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sec-lbl">What to Note — Description Guide</div>
+            <div class="two-col">
+                <div class="info-box">
+                    <div class="info-box-hdr">👤 Suspect Description</div>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <div class="info-item-lbl">Gender</div>
+                            <div>Male / Female / Unknown</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Age (est.)</div>
+                            <div>Teens / 20s / 30s / 40s / 50s+</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Height (est.)</div>
+                            <div>Short / Medium / Tall &amp; approx. ft</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Build</div>
+                            <div>Slim / Medium / Heavy / Athletic</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Clothing</div>
+                            <div>Shirt color, pants, shoes, hat</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Hair</div>
+                            <div>Color, length, style</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Other</div>
+                            <div>Tattoos, facial hair, glasses, accent</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Direction</div>
+                            <div>Which way &amp; on foot or vehicle</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <div class="info-box-hdr">🚗 Vehicle Description</div>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <div class="info-item-lbl">Make</div>
+                            <div>Toyota, Ford, Honda, etc.</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Model</div>
+                            <div>Sedan, Pickup, SUV, Van, etc.</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Color</div>
+                            <div>Primary &amp; any secondary color</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Year (est.)</div>
+                            <div>Approximate decade is fine</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">License Plate</div>
+                            <div>Full or partial letters/numbers</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Condition</div>
+                            <div>Dents, damage, decals, tint</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl">Direction</div>
+                            <div>Which direction vehicle traveled</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-lbl"># Occupants</div>
+                            <div>How many people in the vehicle</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="url-row">
+                <div>
+                    <div class="url-label">Submit your report at</div>
+                    <div class="url-val">hibcw.vercel.app</div>
+                    <div class="url-sub">Click "Report an Incident" &nbsp;·&nbsp; No login required &nbsp;·&nbsp; Works on any device</div>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:6.5px;color:rgba(255,255,255,.35);margin-bottom:2px">Questions? Contact</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#38bba1">hibcw@kiaahilo.org</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#38bba1">(808) 961-5422</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="footer-left">
+                <strong>Hawaii Island Business Crime Watch &nbsp;·&nbsp; A Program of KIAA</strong>
+                <br>
+                hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422
+            </div>
+            <div class="footer-right">
+                HIBCW Member Packet
+                <br>
+                Incident Reporting Guide
+            </div>
+        </div>
+        <div class="accent-bot"></div>
+        <div class="accent-bot2"></div>
     </div>
-  </div>
-
-</div>
-
-<div class="footer">
-  <div class="footer-left"><strong>Hawaii Island Business Crime Watch &nbsp;·&nbsp; A Program of KIAA</strong><br>hibcw.vercel.app &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422</div>
-  <div class="footer-right">HIBCW Member Packet<br>Incident Reporting Guide</div>
-</div>
-<div class="accent-bot"></div><div class="accent-bot2"></div>
-</div>
-
-<script>
-const p = new URLSearchParams(window.location.search);
-const dist = p.get('district')||'';
-if(dist) document.getElementById('distLabel').textContent = dist;
-</script>
-</body></html>
+    <script>
+    const p = new URLSearchParams(window.location.search);
+    const dist = p.get('district') || '';
+    if (dist)
+        document.getElementById('distLabel').textContent = dist;
+    </script>
+</body>
+</html>
