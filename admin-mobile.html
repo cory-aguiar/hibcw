@@ -644,6 +644,46 @@ body.light .strip-cell{background:#fff}
           </div>
         </div>
 
+        <div class="more-section-title admin-only">📢 District Alerts</div>
+        <div class="more-card admin-only">
+          <div class="more-row" onclick="showMobActiveAlerts()">
+            <div class="more-ico">📢</div>
+            <div><div class="more-label">Active Alerts</div><div class="more-sub" id="mobActiveAlertsSub">Tap to load active district alerts</div></div>
+            <div class="more-arrow">›</div>
+          </div>
+          <div class="more-row" onclick="showMobArchivedAlerts()">
+            <div class="more-ico">📦</div>
+            <div><div class="more-label">Archived Alerts</div><div class="more-sub" id="mobArchivedAlertsSub">Tap to load archived district alerts</div></div>
+            <div class="more-arrow">›</div>
+          </div>
+        </div>
+
+        <!-- Active District Alerts slide-in screen -->
+        <div id="mobActiveAlertsScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:500;overflow-y:auto;padding-bottom:80px">
+          <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+            <button onclick="closeMobActiveAlerts()" style="background:none;border:none;color:var(--teal);font-size:.9rem;cursor:pointer;padding:2px 6px">‹ Back</button>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">📢 Active Alerts</div>
+            <button onclick="loadMobActiveAlerts()" style="background:none;border:none;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer">🔄</button>
+          </div>
+          <div style="padding:10px 12px 4px;font-size:.68rem;color:var(--slate2)">Currently visible on the public feed.</div>
+          <div id="mobActiveAlertsList" style="padding:10px 12px 12px">
+            <div style="font-size:.78rem;color:var(--slate2);font-style:italic;text-align:center;padding:30px 0">Loading…</div>
+          </div>
+        </div>
+
+        <!-- Archived District Alerts slide-in screen -->
+        <div id="mobArchivedAlertsScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:500;overflow-y:auto;padding-bottom:80px">
+          <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+            <button onclick="closeMobArchivedAlerts()" style="background:none;border:none;color:var(--teal);font-size:.9rem;cursor:pointer;padding:2px 6px">‹ Back</button>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">📦 Archived Alerts</div>
+            <button onclick="loadMobArchivedAlerts()" style="background:none;border:none;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer">🔄</button>
+          </div>
+          <div style="padding:10px 12px 4px;font-size:.68rem;color:var(--slate2)">Removed from the public feed — kept permanently as a record.</div>
+          <div id="mobArchivedAlertsList" style="padding:10px 12px 12px">
+            <div style="font-size:.78rem;color:var(--slate2);font-style:italic;text-align:center;padding:30px 0">Loading…</div>
+          </div>
+        </div>
+
         <!-- Registry screen (slides in) -->
         <div id="mobRegistryScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:500;overflow-y:auto;padding-bottom:80px">
           <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
@@ -2091,6 +2131,115 @@ async function archiveAdminAlert(id) {
 async function unarchiveAlert(id) {
   const { error } = await sb.from('district_alerts').update({ archived_at: null, archived_by: null }).eq('id', id);
   if (!error) { showToast('↩','Alert restored to public feed.'); loadArchivedAlerts('mobArchivedLog'); loadAdminAlertLog(); }
+  else showToast('⚠️', error.message, 'err');
+}
+
+function showMobActiveAlerts() {
+  document.getElementById('mobActiveAlertsScreen').style.display = 'block';
+  loadMobActiveAlerts();
+}
+function closeMobActiveAlerts() {
+  document.getElementById('mobActiveAlertsScreen').style.display = 'none';
+}
+async function loadMobActiveAlerts() {
+  const el = document.getElementById('mobActiveAlertsList');
+  if (!el || !sb) return;
+  el.innerHTML = '<div style="font-size:.78rem;color:var(--slate2);text-align:center;padding:30px 0">Loading…</div>';
+  try {
+    const { data, error } = await sb.from('district_alerts').select('*').is('archived_at', null).order('created_at', { ascending: false });
+    if (error) throw error;
+    const sub = document.getElementById('mobActiveAlertsSub');
+    if (sub) sub.textContent = data.length ? `${data.length} active alert${data.length===1?'':'s'}` : 'No active alerts';
+    if (!data || !data.length) { el.innerHTML = '<div style="font-size:.78rem;color:var(--slate2);font-style:italic;text-align:center;padding:40px 0">No active district alerts.</div>'; return; }
+    const DCOL = {"hamakua":"#84cc16","north-hilo":"#3b82f6","south-hilo":"#00c9a7","lower-puna":"#c084fc","upper-puna":"#a855f7","kau":"#ef4444","south-kona":"#f59e0b","north-kona":"#f97316","north-kohala":"#10b981"};
+    el.innerHTML = data.map(a => {
+      const dc = DCOL[a.district] || 'var(--teal)';
+      const t = alertTypeMeta(a.alert_type);
+      const sentDate = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+      return `<div style="background:${t.color}0d;border:1px solid ${t.color}30;border-left:3px solid ${t.color};border-radius:8px;padding:12px 13px;margin-bottom:10px">
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+          ${alertTypeBadge(a.alert_type)}
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
+        </div>
+        <div style="font-size:.82rem;line-height:1.55;color:var(--white);margin-bottom:6px">${esc(a.message)}</div>
+        ${a.media_url ? `<div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2);max-width:100%">${a.media_type==='video'?`<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:180px"></video>`:`<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:180px;object-fit:cover">`}</div>` : ''}
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);margin-bottom:8px">
+          📤 ${esc(a.sent_by_name||'Admin')} · ${sentDate}${a.is_edited?' · <em>edited</em>':''}
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="archiveMobActiveAlert('${a.id}')" style="flex:1;background:none;border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:6px 8px;color:var(--gold);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">📦 Archive</button>
+          <button onclick="deleteMobActiveAlert('${a.id}','${esc(a.media_url||'')}')" style="flex:1;background:none;border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:6px 8px;color:var(--red);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load: ${esc(e.message)}</div>`; }
+}
+async function archiveMobActiveAlert(id) {
+  if (!confirm('Archive this alert? It will be removed from the public feed but kept as a record.')) return;
+  const { error } = await sb.from('district_alerts').update({ archived_at: new Date().toISOString(), archived_by: currentUserEmail }).eq('id', id);
+  if (!error) { showToast('📦','Alert archived.'); loadMobActiveAlerts(); loadMobArchivedAlerts(); }
+  else showToast('⚠️', error.message, 'err');
+}
+async function deleteMobActiveAlert(id, mediaUrl) {
+  if (!confirm('Delete this alert? It will be permanently removed from the public site.')) return;
+  if (mediaUrl) { const path = mediaUrl.split('/object/public/incident-media/')[1]; if (path) await sb.storage.from('incident-media').remove([path]); }
+  const { error } = await sb.from('district_alerts').delete().eq('id', id);
+  if (!error) { showToast('🗑','Alert deleted.'); loadMobActiveAlerts(); }
+  else showToast('⚠️', error.message, 'err');
+}
+
+function showMobArchivedAlerts() {
+  document.getElementById('mobArchivedAlertsScreen').style.display = 'block';
+  loadMobArchivedAlerts();
+}
+function closeMobArchivedAlerts() {
+  document.getElementById('mobArchivedAlertsScreen').style.display = 'none';
+}
+async function loadMobArchivedAlerts() {
+  const el = document.getElementById('mobArchivedAlertsList');
+  if (!el || !sb) return;
+  el.innerHTML = '<div style="font-size:.78rem;color:var(--slate2);text-align:center;padding:30px 0">Loading…</div>';
+  try {
+    const { data, error } = await sb.from('district_alerts').select('*').not('archived_at','is',null).order('archived_at',{ascending:false});
+    if (error) throw error;
+    // Update subtitle in More list
+    const sub = document.getElementById('mobArchivedAlertsSub');
+    if (sub) sub.textContent = data.length ? `${data.length} archived alert${data.length===1?'':'s'}` : 'No archived alerts yet';
+    if (!data || !data.length) { el.innerHTML = '<div style="font-size:.78rem;color:var(--slate2);font-style:italic;text-align:center;padding:40px 0">No archived district alerts yet.</div>'; return; }
+    const DCOL = {"hamakua":"#84cc16","north-hilo":"#3b82f6","south-hilo":"#00c9a7","lower-puna":"#c084fc","upper-puna":"#a855f7","kau":"#ef4444","south-kona":"#f59e0b","north-kona":"#f97316","north-kohala":"#10b981"};
+    el.innerHTML = data.map(a => {
+      const dc = DCOL[a.district] || 'var(--teal)';
+      const archivedDate = new Date(a.archived_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+      const sentDate = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+      return `<div style="background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.2);border-left:3px solid var(--gold);border-radius:8px;padding:12px 13px;margin-bottom:10px">
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+          ${alertTypeBadge(a.alert_type)}
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:1px 5px;white-space:nowrap">📦 ARCHIVED</span>
+        </div>
+        <div style="font-size:.82rem;line-height:1.55;color:var(--white);margin-bottom:6px">${esc(a.message)}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);display:flex;flex-direction:column;gap:2px;margin-bottom:8px">
+          <span>📤 ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
+          <span>📦 Archived by ${esc(a.archived_by||'Admin')} · ${archivedDate}</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="unarchiveMobAlert('${a.id}')" style="flex:1;background:none;border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:6px 8px;color:var(--teal);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">↩ Restore</button>
+          <button onclick="deleteMobArchivedAlert('${a.id}','${esc(a.media_url||'')}')" style="flex:1;background:none;border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:6px 8px;color:var(--red);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load: ${esc(e.message)}</div>`; }
+}
+async function unarchiveMobAlert(id) {
+  const { error } = await sb.from('district_alerts').update({ archived_at: null, archived_by: null }).eq('id', id);
+  if (!error) { showToast('↩','Alert restored to public feed.'); loadMobArchivedAlerts(); loadAdminAlertLog(); }
+  else showToast('⚠️', error.message, 'err');
+}
+async function deleteMobArchivedAlert(id, mediaUrl) {
+  if (!confirm('Permanently delete this archived alert? This cannot be undone.')) return;
+  if (mediaUrl) { const path = mediaUrl.split('/object/public/incident-media/')[1]; if (path) await sb.storage.from('incident-media').remove([path]); }
+  const { error } = await sb.from('district_alerts').delete().eq('id', id);
+  if (!error) { showToast('🗑','Alert permanently deleted.'); loadMobArchivedAlerts(); }
   else showToast('⚠️', error.message, 'err');
 }
 
