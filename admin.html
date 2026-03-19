@@ -2879,12 +2879,14 @@
                                 <button id="alertCancelEditBtn" onclick="cancelAlertEdit()" style="display:none;background:none;border:1px solid var(--b2);border-radius:4px;padding:3px 8px;font-size:.65rem;color:var(--slate);cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Cancel Edit</button>
                             </div>
                             <input type="hidden" id="alertEditId">
+                            <div style="margin-bottom:8px">
+                                <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:5px">Alert Type</div>
+                                <div id="captainAlertTypePicker"></div>
+                            </div>
                             <textarea id="captainAlertMsg" placeholder="Type a message to alert all members in your district…" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:5px;padding:10px 12px;color:var(--white);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:80px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--b2)'"></textarea>
                             <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                                 <label style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;padding:5px 10px;cursor:pointer;font-size:.7rem;color:var(--slate);transition:all .2s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--slate)'">
-
-                                                    📎 Attach Photo/Video
-                                                    
+                                    📎 Attach Photo/Video
                                     <input type="file" id="captainAlertMedia" accept="image/*,video/*" style="display:none" onchange="previewAlertMedia(this,'captainAlertPreview')">
                                 </label>
                                 <button id="captainAlertClearMedia" onclick="clearAlertMedia('captainAlertMedia','captainAlertPreview')" style="display:none;background:none;border:1px solid rgba(232,65,90,.3);border-radius:4px;padding:5px 10px;font-size:.7rem;color:var(--red);cursor:pointer">✕ Remove</button>
@@ -3308,6 +3310,10 @@
                     <select id="adminAlertDistrict" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b2);border-radius:5px;padding:9px 12px;color:var(--white);font-size:.82rem;outline:none">
                         <option value="">— Select a district —</option>
                     </select>
+                </div>
+                <div class="mf-row">
+                    <div class="mf-label">Alert Type</div>
+                    <div id="adminAlertTypePicker"></div>
                 </div>
                 <div class="mf-row">
                     <div class="mf-label">Message</div>
@@ -3828,6 +3834,11 @@
                 el.innerHTML = '<option value="">All Districts</option>' +
                 DISTRICTS.map(([val, lbl]) => '<option value="' + val + '">' + lbl + '</option>').join('');
         });
+        // Inject alert type pickers
+        const cp = document.getElementById('captainAlertTypePicker');
+        if (cp) cp.innerHTML = alertTypePicker('captainAlertType');
+        const ap = document.getElementById('adminAlertTypePicker');
+        if (ap) ap.innerHTML = alertTypePicker('adminAlertType');
         startRealtime();
     }
 
@@ -8646,26 +8657,26 @@
                 el.innerHTML = `<div style="font-size:.75rem;color:var(--slate2);font-style:italic">No alerts sent yet.</div>`;
                 return;
             }
-            el.innerHTML = data.map(a => `
-      <div style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.18);border-radius:6px;padding:10px 12px;margin-bottom:8px">
-        <div style="font-size:.82rem;line-height:1.5;color:var(--white);margin-bottom:6px">${
-            esc(a.message)}</div>
+            el.innerHTML = data.map(a => {
+                const t = alertTypeMeta(a.alert_type);
+                return `
+      <div style="background:${t.color}0d;border:1px solid ${t.color}30;border-left:3px solid ${t.color};border-radius:6px;padding:10px 12px;margin-bottom:8px">
+        <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:6px">
+          ${alertTypeBadge(a.alert_type)}
+          <span style="font-size:.82rem;line-height:1.5;color:var(--white);flex:1">${esc(a.message)}</span>
+        </div>
         ${a.media_url ? `
           <div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2);max-width:280px">
-            ${
-            a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:180px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:180px;object-fit:cover">`}
+            ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:180px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:180px;object-fit:cover">`}
           </div>` : ''}
         <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
-          <span>👤 ${
-            esc(a.sent_by_name || 'Captain')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
+          <span>👤 ${esc(a.sent_by_name || 'Captain')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
           <div style="display:flex;gap:6px">
-            <button data-alert-id="${
-            a.id}" onclick="startAlertEditById(this)" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 8px;color:var(--teal);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✏️ Edit</button>
+            <button data-alert-id="${a.id}" onclick="startAlertEditById(this)" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 8px;color:var(--teal);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✏️ Edit</button>
             <button onclick="deleteDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(232,65,90,.3);border-radius:3px;padding:2px 8px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Cancel</button>
           </div>
         </div>
-      </div>`
-
+      </div>`;}
             ).join('');
         } catch (e) {
             el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load alerts — make sure the district_alerts table exists in your database.</div>`;
@@ -8775,16 +8786,45 @@
     function cancelAlertEdit() {
         document.getElementById('alertEditId').value = '';
         document.getElementById('captainAlertMsg').value = '';
+        const typeSel = document.getElementById('captainAlertType');
+        if (typeSel) typeSel.value = 'incident';
         document.getElementById('alertComposerLabel').textContent = '📢 Send District Alert';
         document.getElementById('alertSendBtn').textContent = '📤 Send Alert';
         document.getElementById('alertCancelEditBtn').style.display = 'none';
         clearAlertMedia('captainAlertMedia', 'captainAlertPreview');
     }
 
+    /* ── Alert Types ─────────────────────────────────────────── */
+    const ALERT_TYPES = [
+        { value:'emergency', label:'EMERGENCY',     icon:'⛔', color:'#ff2d2d', tier:1, desc:'Active threat / imminent danger' },
+        { value:'bolo',      label:'BOLO',           icon:'👁', color:'#f97316', tier:1, desc:'Be on the lookout — suspect or vehicle' },
+        { value:'amber',     label:'AMBER / MISSING',icon:'🟡', color:'#f5a623', tier:1, desc:'Missing child or vulnerable adult' },
+        { value:'incident',  label:'INCIDENT ALERT', icon:'🚨', color:'#e8415a', tier:2, desc:'Crime in progress or just occurred' },
+        { value:'pattern',   label:'PATTERN ALERT',  icon:'🔁', color:'#c084fc', tier:2, desc:'Repeat behavior across multiple businesses' },
+        { value:'scam',      label:'SCAM ALERT',     icon:'💳', color:'#3b82f6', tier:2, desc:'Fraud, counterfeit, or con artist activity' },
+        { value:'trespass',  label:'TRESPASS ALERT', icon:'🚫', color:'#a855f7', tier:2, desc:'Known trespasser — notify neighboring businesses' },
+        { value:'welfare',   label:'WELFARE CHECK',  icon:'🫶', color:'#7a8fa6', tier:3, desc:'Suspicious or concerning person, no clear crime' },
+        { value:'allclear',  label:'ALL CLEAR',      icon:'✅', color:'#00c9a7', tier:3, desc:'Follow-up / situation resolved' },
+        { value:'info',      label:'INFO / ADVISORY',icon:'📋', color:'#4a6070', tier:4, desc:'General awareness, no immediate threat' },
+    ];
+    function alertTypeMeta(val) {
+        return ALERT_TYPES.find(t => t.value === val) || ALERT_TYPES.find(t => t.value === 'incident');
+    }
+    function alertTypePicker(selectId, defaultVal='incident') {
+        return `<select id="${selectId}" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b2);border-radius:5px;padding:8px 11px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer;transition:border-color .2s" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--b2)'">
+            ${ALERT_TYPES.map(t => `<option value="${t.value}" ${t.value===defaultVal?'selected':''} style="background:#111e30">${t.icon} ${t.label} — ${t.desc}</option>`).join('')}
+        </select>`;
+    }
+    function alertTypeBadge(val) {
+        const t = alertTypeMeta(val);
+        return `<span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;background:${t.color}18;color:${t.color};border:1px solid ${t.color}44;border-radius:3px;padding:1px 7px;white-space:nowrap;flex-shrink:0">${t.icon} ${t.label}</span>`;
+    }
+
     async function sendDistrictAlert() {
         const msg = document.getElementById('captainAlertMsg')?.value.trim();
         const editId = document.getElementById('alertEditId')?.value;
         const file = document.getElementById('captainAlertMedia')?.files?.[0];
+        const alertType = document.getElementById('captainAlertType')?.value || 'incident';
         if (!msg) {
             showToast('⚠️', 'Please enter a message.', 'err');
             return;
@@ -8820,6 +8860,7 @@
             if (editId) {
                 const {error} = await sb.from('district_alerts').update({
                     message: msg,
+                    alert_type: alertType,
                     media_url: mediaUrl,
                     media_type: mediaType,
                     updated_at: new Date().toISOString(),
@@ -8832,6 +8873,7 @@
                 const {error} = await sb.from('district_alerts').insert({
                     district: captainDistrict,
                     message: msg,
+                    alert_type: alertType,
                     media_url: mediaUrl,
                     media_type: mediaType,
                     sent_by_email: currentUserEmail,
@@ -8894,26 +8936,22 @@
             }
             el.innerHTML = data.map(a => {
                 const distColor = KIAA_DISTRICTS.find(d => d.id === a.district)?.color || 'var(--teal)';
+                const t = alertTypeMeta(a.alert_type);
                 return `
         <div style="padding:8px 0;border-bottom:1px solid var(--b2)">
-          <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:4px">
-            <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${
-
-                distColor}18;color:${distColor};border:1px solid ${distColor}44;border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0">${esc(districtLabel(a.district))}</span>
-            <span style="font-size:.8rem;line-height:1.4">${esc(a.message)}</span>
+          <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:4px;flex-wrap:wrap">
+            ${alertTypeBadge(a.alert_type)}
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${distColor}18;color:${distColor};border:1px solid ${distColor}44;border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0">${esc(districtLabel(a.district))}</span>
+            <span style="font-size:.8rem;line-height:1.4;color:var(--white)">${esc(a.message)}</span>
           </div>
-          ${
-                a.media_url ? `<div style="margin-bottom:5px;border-radius:4px;overflow:hidden;border:1px solid var(--b2);max-width:200px">
+          ${a.media_url ? `<div style="margin-bottom:5px;border-radius:4px;overflow:hidden;border:1px solid var(--b2);max-width:200px">
             ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:120px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:120px;object-fit:cover">`}
           </div>` : ''}
           <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);display:flex;justify-content:space-between;align-items:center">
-            <span>👤 ${
-                esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
+            <span>👤 ${esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
             <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url || '')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:1px 7px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕</button>
           </div>
-        </div>`
-
-                ;
+        </div>`;
             }).join('');
         } catch (e) {
             el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load alerts.</div>`;
@@ -8942,6 +8980,7 @@
         const msg = document.getElementById('adminAlertMsg')?.value.trim();
         const editId = document.getElementById('adminAlertEditId')?.value;
         const file = document.getElementById('adminAlertMedia')?.files?.[0];
+        const alertType = document.getElementById('adminAlertType')?.value || 'incident';
         if (!district) {
             showToast('⚠️', 'Select a district first.', 'err');
             return;
@@ -8966,6 +9005,7 @@
             if (editId) {
                 const {error} = await sb.from('district_alerts').update({
                     message: msg,
+                    alert_type: alertType,
                     media_url: mediaUrl,
                     media_type: mediaType,
                     updated_at: new Date().toISOString(),
@@ -8978,6 +9018,7 @@
                 const {error} = await sb.from('district_alerts').insert({
                     district,
                     message: msg,
+                    alert_type: alertType,
                     media_url: mediaUrl,
                     media_type: mediaType,
                     sent_by_email: currentUserEmail,
