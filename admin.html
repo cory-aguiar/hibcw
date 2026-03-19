@@ -465,6 +465,9 @@
 
     .td-desc {
         max-width: 260px;
+    }
+
+    .td-desc-inner {
         color: rgba(238, 243, 248, .75);
         font-size: .78rem;
         display: -webkit-box;
@@ -1984,7 +1987,7 @@
         color: #4a5f72
     }
 
-    body.light .td-desc {
+    body.light .td-desc-inner {
         color: rgba(15, 30, 46, .7)
     }
 
@@ -4310,7 +4313,7 @@
       <td class="td-type"><span class="badge ${bc}">${inc.type}</span>${inc.is_recurring ? '<br><span class="recurring-flag" style="margin-top:3px">🔁 Recurring</span>' : ''} ${inc.is_verified_member ? '<br><span class="verified-badge" style="margin-top:3px">✅ Member</span>' : ''}</td>
       <td class="td-time">${fmt(inc.occurred_at)}<br>${ageTag(inc.occurred_at)}</td>
       <td class="td-addr" title="${esc(inc.address)}">${esc(inc.address)}${inc.district ? `<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:${DISTRICT_GEO.find(d => d.id === inc.district)?.color || '#00c9a7'};letter-spacing:.03em">${DISTRICT_GEO.find(d => d.id === inc.district)?.label || inc.district}</span>` : ''}</td>
-      <td class="td-desc" title="${esc(inc.description)}">${esc(inc.description)}</td>
+      <td class="td-desc" title="${esc(inc.description)}"><div class="td-desc-inner">${esc(inc.description)}</div></td>
       <td style="font-size:.75rem;color:var(--slate)">${esc(inc.reporter_name || '—')}</td>
       <td>${mc ? `<span class="media-pill">📎 ${mc}</span>` : '<span style="color:var(--slate2)">—</span>'}</td>
       ${showStatus ? `<td><span class="badge ${archived ? 'b-arch' : 'b-teal'}">${inc.status}</span></td>` : ''}
