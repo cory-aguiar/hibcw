@@ -2504,6 +2504,11 @@
                     ☰ All 
                     <span class="nav-count" id="nc-all">—</span>
                 </button>
+                <div class="nav-section">District Alerts</div>
+                <button class="nav-btn admin-only" id="nav-district-alerts" onclick="showView('district-alerts')">
+                    📦 Archived Alerts
+                    <span class="nav-count" id="nc-district-alerts">—</span>
+                </button>
                 <div class="nav-section">Reports</div>
                 <button class="nav-btn" id="nav-stats" onclick="showView('stats')">📊 Statistics</button>
                 <button class="nav-btn" id="nav-map" onclick="showView('map')">🗺 Map View</button>
@@ -2800,6 +2805,22 @@
                     <div class="result-count" id="rcount-all"></div>
                     <div class="table-wrap">
                         <div id="table-all"></div>
+                    </div>
+                </div>
+
+                <!-- ── DISTRICT ALERTS ARCHIVED ── -->
+                <div class="view" id="view-district-alerts">
+                    <div class="page-hd">
+                        <div>
+                            <div class="page-title">Archived District Alerts</div>
+                            <div class="page-sub">Alerts removed from the public feed — kept permanently as a record</div>
+                        </div>
+                        <div class="page-actions">
+                            <button class="btn btn-ghost btn-lg" onclick="loadDistrictAlertsView()">🔄 Refresh</button>
+                        </div>
+                    </div>
+                    <div id="district-alerts-body" style="max-width:820px;margin-top:8px">
+                        <div style="font-size:.8rem;color:var(--slate2);font-style:italic;padding:40px 0;text-align:center">Loading archived alerts…</div>
                     </div>
                 </div>
 
@@ -3992,6 +4013,8 @@
             setTimeout(() => document.getElementById('bizLookupInput')?.focus(), 80);
         } else if (v === 'resources') {
             renderResources();
+        } else if (v === 'district-alerts') {
+            loadDistrictAlertsView();
         } else {
             renderCurrentView();
         }
@@ -4267,6 +4290,13 @@
         document.getElementById('nc-active').textContent = active;
         document.getElementById('nc-archived').textContent = archived;
         document.getElementById('nc-all').textContent = allIncidents.length;
+        // Update district alerts archived count
+        if (sb) {
+            sb.from('district_alerts').select('id', {count:'exact',head:true}).not('archived_at','is',null).then(({count}) => {
+                const badge = document.getElementById('nc-district-alerts');
+                if (badge && count != null) badge.textContent = count;
+            });
+        }
     }
 
     /* ════════════════════════════════════════════════════
@@ -8813,6 +8843,65 @@
             }).join('');
         } catch(e) {
             el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load archived alerts: ${esc(e.message)}</div>`;
+        }
+    }
+
+    async function loadDistrictAlertsView() {
+        const el = document.getElementById('district-alerts-body');
+        if (!el || !sb) return;
+        el.innerHTML = '<div style="font-size:.8rem;color:var(--slate2);padding:20px 0;text-align:center">Loading…</div>';
+        try {
+            const {data, error} = await sb
+                .from('district_alerts')
+                .select('*')
+                .not('archived_at', 'is', null)
+                .order('archived_at', { ascending: false });
+            if (error) throw error;
+
+            // Update nav count badge
+            const badge = document.getElementById('nc-district-alerts');
+            if (badge) badge.textContent = data.length || '0';
+
+            if (!data.length) {
+                el.innerHTML = '<div style="font-size:.82rem;color:var(--slate2);font-style:italic;padding:60px 0;text-align:center">No archived district alerts yet.</div>';
+                return;
+            }
+            el.innerHTML = data.map(a => {
+                const distColor = KIAA_DISTRICTS.find(d => d.id === a.district)?.color || 'var(--teal)';
+                const t = alertTypeMeta(a.alert_type);
+                const archivedDate = new Date(a.archived_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+                const sentDate = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+                return `
+                <div style="background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.2);border-left:3px solid var(--gold);border-radius:6px;padding:12px 14px;margin-bottom:10px;opacity:.9">
+                  <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap">
+                    ${alertTypeBadge(a.alert_type)}
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${distColor}18;color:${distColor};border:1px solid ${distColor}44;border-radius:3px;padding:1px 6px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:1px 6px;white-space:nowrap">📦 ARCHIVED</span>
+                  </div>
+                  <div style="font-size:.83rem;line-height:1.55;color:var(--white);margin-bottom:7px">${esc(a.message)}</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);display:flex;flex-direction:column;gap:2px;margin-bottom:8px">
+                    <span>📤 Sent by ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
+                    <span>📦 Archived by ${esc(a.archived_by||'Admin')} · ${archivedDate}</span>
+                  </div>
+                  <div style="display:flex;gap:6px">
+                    <button onclick="unarchiveAlertFromView('${a.id}')" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:3px 10px;color:var(--teal);font-size:.62rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">↩ Restore</button>
+                    <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url||'')}');loadDistrictAlertsView();" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:3px 10px;color:var(--red);font-size:.62rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete Permanently</button>
+                  </div>
+                </div>`;
+            }).join('');
+        } catch(e) {
+            el.innerHTML = `<div style="font-size:.78rem;color:var(--slate2)">Could not load archived alerts: ${esc(e.message)}</div>`;
+        }
+    }
+
+    async function unarchiveAlertFromView(id) {
+        const {error} = await sb.from('district_alerts').update({ archived_at: null, archived_by: null }).eq('id', id);
+        if (!error) {
+            showToast('↩', 'Alert restored to public feed.');
+            loadDistrictAlertsView();
+            loadAdminAlertLog();
+        } else {
+            showToast('⚠️', error.message, 'err');
         }
     }
 
