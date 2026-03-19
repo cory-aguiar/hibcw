@@ -7050,8 +7050,9 @@
         {key:'alerts_sent',       label:'Alerts\nSent',      color:'#a855f7'},
         {key:'captain_logins',    label:'Captain\nLogins',   color:'#10b981'},
         {key:'apps_received',     label:'Apps\nReceived',    color:'#f59e0b'},
-        {key:'apps_approved',     label:'Approved',           color:'#22c55e'},
+        {key:'apps_approved',     label:'Apps\nApproved',    color:'#22c55e'},
         {key:'apps_rejected',     label:'Rejected',           color:'#ef4444'},
+        {key:'biz_registrations', label:'Biz\nRegistrations', color:'#06b6d4'},
         {key:'notes',             label:'Notes',              color:'#7a8fa6'},
     ];
     const MS_COLORS = {
@@ -7117,12 +7118,14 @@
                 {data:alerts},
                 {data:apps},
                 {data:adminUsers},
+                {data:bizRegs},
             ] = await Promise.all([
                 sb.from('incidents').select('id,occurred_at,status,police_report').gte('occurred_at', yearStart).lte('occurred_at', yearEnd + 'T23:59:59'),
-                sb.from('member_emails').select('id,created_at'),
+                sb.from('member_emails').select('id,email,created_at'),
                 sb.from('district_alerts').select('id,created_at').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
-                sb.from('member_applications').select('id,created_at,status').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
+                sb.from('member_applications').select('id,email,created_at,status').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
                 sb.from('admin_users').select('id,district,role').not('role','is',null),
+                sb.from('business_registry').select('id,submitted_at,status').gte('submitted_at', yearStart).lte('submitted_at', yearEnd + 'T23:59:59'),
             ]);
 
             const getMonth = d => new Date(d).getMonth();
@@ -7132,6 +7135,7 @@
                     incidents:0, incidents_archived:0, police_reports:0,
                     alerts_sent:0, apps_received:0, apps_approved:0, apps_rejected:0,
                     members_total:0, members_new:0, captain_logins:0, active_districts:0,
+                    biz_registrations:0,
                 };
             }
 
@@ -7148,12 +7152,26 @@
                 if (m >= 0 && m <= 11) trackerLive[m].alerts_sent++;
             });
 
+            // Build set of emails currently in member_emails (verified allowlist)
+            // apps_approved only counts approvals where the member still exists —
+            // this prevents deleted members from inflating the approved count
+            const verifiedEmailSet = new Set((verifiedMembers||[]).map(m=>m.email?.toLowerCase()).filter(Boolean));
+
             (apps||[]).forEach(a => {
                 const m = getMonth(a.created_at);
                 if (m < 0 || m > 11) return;
                 trackerLive[m].apps_received++;
-                if (a.status === 'approved') trackerLive[m].apps_approved++;
-                if (a.status === 'rejected')  trackerLive[m].apps_rejected++;
+                // Only count as approved if the member email still exists in the allowlist
+                if (a.status === 'approved' && verifiedEmailSet.has(a.email?.toLowerCase())) trackerLive[m].apps_approved++;
+                if (a.status === 'rejected') trackerLive[m].apps_rejected++;
+            });
+
+            // Business registrations by submission month
+            (bizRegs||[]).forEach(b => {
+                const d = b.submitted_at || b.created_at;
+                if (!d) return;
+                const m = getMonth(d);
+                if (m >= 0 && m <= 11) trackerLive[m].biz_registrations++;
             });
 
             // Cumulative member totals — sourced from member_emails (the verified allowlist)
@@ -7487,7 +7505,7 @@
                       'Apps Received','Apps Approved','Apps Rejected','Notes'];
         const keys = ['active_districts','members_total','members_new','incidents',
                       'incidents_archived','police_reports','alerts_sent','captain_logins',
-                      'apps_received','apps_approved','apps_rejected','notes'];
+                      'apps_received','apps_approved','apps_rejected','biz_registrations','notes'];
         const rows = TRACKER_MONTHS.map((m,i)=>{
             const d = yd[i]||{};
             return [m,...keys.map(k=>d[k]||'')].join(',');
