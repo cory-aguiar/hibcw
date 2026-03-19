@@ -1618,11 +1618,15 @@ body.light .alert-feed-msg{color:var(--white)}
 
 <!-- DISTRICT ALERT BANNER -->
 <div class="alert-banner hidden" id="alertBanner">
-  <div class="alert-banner-ico">📢</div>
+  <div class="alert-banner-ico" id="alertBannerIcon">📢</div>
   <div class="alert-banner-body">
     <div class="alert-banner-district" id="alertBannerDistrict">District Alert</div>
     <div class="alert-banner-msg" id="alertBannerMsg"></div>
     <div class="alert-banner-meta" id="alertBannerMeta"></div>
+    <div id="alertBannerSafety" style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px">
+      <a href="tel:911" style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,45,45,.12);border:1px solid rgba(255,45,45,.3);border-radius:4px;padding:3px 8px;font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:#ff6b6b;text-decoration:none">🚨 911</a>
+      <a href="tel:8089352100" style="display:inline-flex;align-items:center;gap:3px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.25);border-radius:4px;padding:3px 8px;font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--teal);text-decoration:none">📞 HPD Non-Emergency</a>
+    </div>
   </div>
   <button class="alert-banner-close" onclick="dismissAlertBanner()">✕</button>
 </div>
@@ -2645,6 +2649,7 @@ async function loadDistrictAlerts() {
     const { data, error } = await sb
       .from('district_alerts')
       .select('*')
+      .is('archived_at', null)
       .order('created_at', { ascending: false })
       .limit(20);
     if (error) throw error;
@@ -2673,11 +2678,21 @@ function renderAlertFeed(alerts) {
             ? `<video src="${escHtml(a.media_url)}" controls playsinline style="width:100%;display:block;max-height:220px"></video>`
             : `<img src="${escHtml(a.media_url)}" style="width:100%;display:block;max-height:220px;object-fit:cover" loading="lazy">`}
         </div>` : '';
-    return `<div class="alert-feed-item">
-      <span class="alert-feed-district" style="background:${color}18;color:${color};border:1px solid ${color}44">${label}</span>
+    const ATPM2 = {emergency:{icon:'⛔',color:'#ff2d2d',label:'EMERGENCY'},bolo:{icon:'👁',color:'#f97316',label:'BOLO'},amber:{icon:'🟡',color:'#f5a623',label:'AMBER / MISSING'},incident:{icon:'🚨',color:'#e8415a',label:'INCIDENT ALERT'},pattern:{icon:'🔁',color:'#c084fc',label:'PATTERN ALERT'},scam:{icon:'💳',color:'#3b82f6',label:'SCAM ALERT'},trespass:{icon:'🚫',color:'#a855f7',label:'TRESPASS ALERT'},welfare:{icon:'🫶',color:'#7a8fa6',label:'WELFARE CHECK'},allclear:{icon:'✅',color:'#00c9a7',label:'ALL CLEAR'},info:{icon:'📋',color:'#4a6070',label:'INFO / ADVISORY'}};
+    const tm2 = ATPM2[a.alert_type] || ATPM2['incident'];
+    const isCritical2 = ['emergency','bolo','amber'].includes(a.alert_type);
+    return `<div class="alert-feed-item" style="border-left:3px solid ${tm2.color}">
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;letter-spacing:.08em;text-transform:uppercase;border-radius:3px;padding:1px 6px;background:${tm2.color}18;color:${tm2.color};border:1px solid ${tm2.color}44;white-space:nowrap">${tm2.icon} ${tm2.label}</span>
+        <span class="alert-feed-district" style="background:${color}18;color:${color};border:1px solid ${color}44">${label}</span>
+      </div>
       <div class="alert-feed-msg">${escHtml(a.message)}</div>
       ${mediaHtml}
       <div class="alert-feed-meta">👤 ${escHtml(a.sent_by_name||'HIBCW')} · ${date}${a.is_edited?' · <em>edited</em>':''}</div>
+      ${isCritical2 ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
+        <a href="tel:911" style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,45,45,.12);border:1px solid rgba(255,45,45,.3);border-radius:4px;padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:#ff6b6b;text-decoration:none">🚨 Call 911</a>
+        <a href="tel:8089352100" style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.25);border-radius:4px;padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);text-decoration:none">📞 HPD Non-Emergency</a>
+      </div>` : `<div style="font-family:'IBM Plex Mono',monospace;font-size:.54rem;color:var(--slate2);margin-top:5px;line-height:1.5">If you see something, call <a href="tel:911" style="color:var(--teal);text-decoration:none">911</a> or HPD non-emergency <a href="tel:8089352100" style="color:var(--teal);text-decoration:none">(808) 935-2100</a>.</div>`}
     </div>`;
   }).join('');
 }
@@ -2689,12 +2704,16 @@ function showLatestAlertBanner(alerts) {
   if (!recent) return;
   if (sessionStorage.getItem('hibcw-alert-dismissed') === recent.id) return;
 
+  const ATPM3 = {emergency:{icon:'⛔',color:'#ff2d2d'},bolo:{icon:'👁',color:'#f97316'},amber:{icon:'🟡',color:'#f5a623'},incident:{icon:'🚨',color:'#e8415a'},pattern:{icon:'🔁',color:'#c084fc'},scam:{icon:'💳',color:'#3b82f6'},trespass:{icon:'🚫',color:'#a855f7'},welfare:{icon:'🫶',color:'#7a8fa6'},allclear:{icon:'✅',color:'#00c9a7'},info:{icon:'📋',color:'#4a6070'}};
+  const tm3 = ATPM3[recent.alert_type] || ATPM3['incident'];
   const color = DISTRICT_COLORS_PUBLIC[recent.district] || 'var(--gold)';
   const label = DISTRICT_LABELS_PUBLIC[recent.district] || recent.district;
   const date  = new Date(recent.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 
+  const iconEl = document.getElementById('alertBannerIcon');
+  if (iconEl) iconEl.textContent = tm3.icon;
   document.getElementById('alertBannerDistrict').textContent = label;
-  document.getElementById('alertBannerDistrict').style.color = color;
+  document.getElementById('alertBannerDistrict').style.color = tm3.color;
   document.getElementById('alertBannerMsg').textContent = recent.message;
   document.getElementById('alertBannerMeta').textContent = '👤 ' + (recent.sent_by_name||'HIBCW') + ' · ' + date;
 
