@@ -1066,11 +1066,15 @@ body.light .logo-img{filter:none}
           body.light #alertBanner{background:#fff;border-color:rgba(184,124,10,.5);border-top-color:var(--gold);box-shadow:0 6px 24px rgba(0,0,0,.15)}
           #alertBanner .ab-msg{color:var(--white)}
         </style>
-        <div style="font-size:1.1rem;flex-shrink:0;margin-top:1px">📢</div>
+        <div style="font-size:1.1rem;flex-shrink:0;margin-top:1px" id="alertBannerIcon">📢</div>
         <div style="flex:1;min-width:0">
           <div id="alertBannerDistrict" style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:3px">District Alert</div>
           <div id="alertBannerMsg" class="ab-msg" style="font-size:.78rem;line-height:1.5"></div>
           <div id="alertBannerMeta" style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate);margin-top:4px"></div>
+          <div id="alertBannerSafety" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:6px;flex-wrap:wrap">
+            <a href="tel:911" style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,45,45,.12);border:1px solid rgba(255,45,45,.3);border-radius:4px;padding:3px 9px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:#ff6b6b;text-decoration:none">🚨 Call 911</a>
+            <a href="tel:8089352100" style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.25);border-radius:4px;padding:3px 9px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);text-decoration:none">📞 HPD Non-Emergency · (808) 935-2100</a>
+          </div>
         </div>
         <button onclick="dismissAlertBanner()" style="background:none;border:none;color:var(--slate);font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;line-height:1">✕</button>
       </div>
@@ -2326,6 +2330,7 @@ async function loadDistrictAlerts() {
     const { data, error } = await sb
       .from('district_alerts')
       .select('*')
+      .is('archived_at', null)
       .order('created_at', { ascending: false })
       .limit(20);
     if (error) throw error;
@@ -2354,11 +2359,21 @@ function renderAlertFeed(alerts) {
             ? `<video src="${escHtml(a.media_url)}" controls style="width:100%;display:block;max-height:200px"></video>`
             : `<img src="${escHtml(a.media_url)}" style="width:100%;display:block;max-height:200px;object-fit:cover" loading="lazy">`}
         </div>` : '';
-    return `<div style="padding:14px 16px;border-bottom:1px solid var(--border2)">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;padding:1px 6px;display:inline-block;margin-bottom:6px;background:${color}18;color:${color};border:1px solid ${color}44">${escHtml(label)}</span>
+    const ALERT_TYPE_META = {emergency:{icon:'⛔',color:'#ff2d2d',label:'EMERGENCY'},bolo:{icon:'👁',color:'#f97316',label:'BOLO'},amber:{icon:'🟡',color:'#f5a623',label:'AMBER / MISSING'},incident:{icon:'🚨',color:'#e8415a',label:'INCIDENT ALERT'},pattern:{icon:'🔁',color:'#c084fc',label:'PATTERN ALERT'},scam:{icon:'💳',color:'#3b82f6',label:'SCAM ALERT'},trespass:{icon:'🚫',color:'#a855f7',label:'TRESPASS ALERT'},welfare:{icon:'🫶',color:'#7a8fa6',label:'WELFARE CHECK'},allclear:{icon:'✅',color:'#00c9a7',label:'ALL CLEAR'},info:{icon:'📋',color:'#4a6070',label:'INFO / ADVISORY'}};
+    const tm = ALERT_TYPE_META[a.alert_type] || ALERT_TYPE_META['incident'];
+    const isCritical = ['emergency','bolo','amber'].includes(a.alert_type);
+    return `<div style="padding:14px 16px;border-bottom:1px solid var(--border2);border-left:3px solid ${tm.color}">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;border-radius:3px;padding:1px 6px;background:${tm.color}18;color:${tm.color};border:1px solid ${tm.color}44;white-space:nowrap">${tm.icon} ${tm.label}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;padding:1px 6px;display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44">${escHtml(label)}</span>
+      </div>
       <div style="font-size:.8rem;line-height:1.55;color:var(--white);margin-bottom:5px">${escHtml(a.message)}</div>
       ${mediaHtml}
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">👤 ${escHtml(a.sent_by_name||'HIBCW')} · ${date}${a.is_edited?' · <em>edited</em>':''}</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);margin-bottom:${isCritical?'8':'0'}px">👤 ${escHtml(a.sent_by_name||'HIBCW')} · ${date}${a.is_edited?' · <em>edited</em>':''}</div>
+      ${isCritical ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+        <a href="tel:911" style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,45,45,.12);border:1px solid rgba(255,45,45,.3);border-radius:4px;padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#ff6b6b;text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(255,45,45,.22)'" onmouseout="this.style.background='rgba(255,45,45,.12)'">🚨 Call 911</a>
+        <a href="tel:8089352100" style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.25);border-radius:4px;padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal);text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(0,201,167,.15)'" onmouseout="this.style.background='rgba(0,201,167,.08)'">📞 HPD Non-Emergency</a>
+      </div>` : `<div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);margin-top:5px;line-height:1.5">If you observe criminal activity, call <a href="tel:911" style="color:var(--teal);text-decoration:none">911</a> or HPD non-emergency <a href="tel:8089352100" style="color:var(--teal);text-decoration:none">(808) 935-2100</a>.</div>`}
     </div>`;
   }).join('');
 
@@ -2377,13 +2392,20 @@ function showLatestAlertBanner(alerts) {
   if (!recent) return;
   if (sessionStorage.getItem('hibcw-alert-dismissed') === recent.id) return;
 
+  const ATPM = {emergency:{icon:'⛔',color:'#ff2d2d'},bolo:{icon:'👁',color:'#f97316'},amber:{icon:'🟡',color:'#f5a623'},incident:{icon:'🚨',color:'#e8415a'},pattern:{icon:'🔁',color:'#c084fc'},scam:{icon:'💳',color:'#3b82f6'},trespass:{icon:'🚫',color:'#a855f7'},welfare:{icon:'🫶',color:'#7a8fa6'},allclear:{icon:'✅',color:'#00c9a7'},info:{icon:'📋',color:'#4a6070'}};
+  const tm = ATPM[recent.alert_type] || ATPM['incident'];
   const color = DISTRICT_COLORS_PUBLIC[recent.district] || '#f5a623';
   const label = DISTRICT_LABELS_PUBLIC[recent.district] || recent.district;
   const date  = new Date(recent.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 
   const banner = document.getElementById('alertBanner');
+  // Update icon and border color to match alert type
+  const iconEl = document.getElementById('alertBannerIcon');
+  if (iconEl) iconEl.textContent = tm.icon;
+  banner.style.borderTopColor = tm.color;
+  banner.style.borderColor = tm.color + '99';
   document.getElementById('alertBannerDistrict').textContent = label;
-  document.getElementById('alertBannerDistrict').style.color = color;
+  document.getElementById('alertBannerDistrict').style.color = tm.color;
   document.getElementById('alertBannerMsg').textContent = recent.message;
   document.getElementById('alertBannerMeta').textContent = '👤 ' + (recent.sent_by_name||'HIBCW') + ' · ' + date;
 
