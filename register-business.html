@@ -63,7 +63,7 @@
     .submit-btn:disabled{opacity:.5;cursor:not-allowed;filter:none}
     .disc{background:rgba(0,201,167,.05);border:1px solid rgba(0,201,167,.15);border-radius:6px;padding:12px 14px;margin-bottom:20px;font-size:.75rem;color:var(--slate);line-height:1.6}
     .captain-preview{display:none;background:rgba(0,201,167,.07);border:1px solid rgba(0,201,167,.2);border-radius:6px;padding:10px 14px;margin-top:8px;font-size:.8rem;color:var(--teal)}
-    .success-box{text-align:center;padding:40px 24px;display:none}
+    .success-box{text-align:center;padding:40px 0;display:none}
     .success-icon{font-size:3rem;margin-bottom:16px}
     .success-title{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:var(--teal);margin-bottom:10px}
     .success-msg{font-size:.88rem;color:var(--slate);line-height:1.7;max-width:400px;margin:0 auto 24px}
@@ -286,11 +286,87 @@
     <div class="success-box" id="successBox">
         <div class="success-icon">🤙🏼</div>
         <div class="success-title">Mahalo! Registration Received</div>
-        <div class="success-msg">Your business registration has been submitted to your District Captain for review. You will be contacted when your registration is processed and your Member Packet is ready.</div>
-        <a href="https://instagram.com/hibcw" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(225,48,108,.08);border:1px solid rgba(225,48,108,.25);border-radius:7px;padding:9px 16px;text-decoration:none;margin-bottom:16px;transition:all .15s" onmouseover="this.style.background='rgba(225,48,108,.15)';this.style.borderColor='rgba(225,48,108,.5)'" onmouseout="this.style.background='rgba(225,48,108,.08)';this.style.borderColor='rgba(225,48,108,.25)'">
+        <div class="success-msg">Your registration has been submitted to your District Captain for review. Once approved, your Member Packet will be mailed to your business.</div>
+
+        <a href="https://instagram.com/hibcw" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(225,48,108,.08);border:1px solid rgba(225,48,108,.25);border-radius:7px;padding:9px 16px;text-decoration:none;margin-bottom:28px;transition:all .15s" onmouseover="this.style.background='rgba(225,48,108,.15)';this.style.borderColor='rgba(225,48,108,.5)'" onmouseout="this.style.background='rgba(225,48,108,.08)';this.style.borderColor='rgba(225,48,108,.25)'">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
           <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:#e1306c;font-weight:600">Follow us @hibcw</span>
         </a>
+
+        <!-- What's in the packet -->
+        <div style="text-align:left;background:var(--navy2);border:1px solid var(--b2);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+            <div style="padding:18px 22px 14px;border-bottom:1px solid var(--b2);">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:5px;">What to expect</div>
+                <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);">Your Member Packet</div>
+                <div style="font-size:.8rem;color:var(--slate);margin-top:4px;line-height:1.6;">Once approved, your packet will be mailed to your business containing:</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;">
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);border-right:1px solid var(--b2);">
+                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">✉️</span>
+                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Welcome Letter</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">From your District Captain</div></div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);">
+                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">🏅</span>
+                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Membership Certificate</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">Personalized for your business</div></div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);border-right:1px solid var(--b2);">
+                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">📍</span>
+                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">District Flyer</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">Color-coded for your district</div></div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);">
+                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">📋</span>
+                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Program Overview</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">How HIBCW works and how to use it</div></div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);border-right:1px solid var(--b2);">
+                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">🚨</span>
+                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Incident Reporting Guide</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">Step-by-step how to submit a report</div></div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);">
+                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">⚡</span>
+                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Quick Reference Guide</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">What to report, when to call 911</div></div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-right:1px solid var(--b2);">
+                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">📇</span>
+                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Emergency Contact Card</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">Wallet-size with your Captain's contact</div></div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;">
+                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">📌</span>
+                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Breakroom QR Flyer</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">For staff to post and scan — see below</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff / Reporting Members -->
+        <div style="text-align:left;background:var(--navy2);border:1px solid rgba(245,166,35,.2);border-radius:12px;overflow:hidden;margin-bottom:24px;">
+            <div style="padding:18px 22px 14px;border-bottom:1px solid var(--b2);">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">For your staff</div>
+                <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);">Encourage Your Team to Register</div>
+                <div style="font-size:.8rem;color:var(--slate);margin-top:4px;line-height:1.6;">Your business is registered — but your employees can each sign up individually as reporting members. The breakroom flyer in your packet makes this easy.</div>
+            </div>
+            <div style="padding:16px 22px 6px;">
+                <div style="display:flex;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--b2);">
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;">🏢</div>
+                    <div>
+                        <div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:3px;">Registered Business <span style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 6px;vertical-align:middle;">That's you</span></div>
+                        <div style="font-size:.78rem;color:var(--slate);line-height:1.6;">Your business is on record with KIAA and connected to your District Captain. You receive the Member Packet. Your business name and contact info is kept within the admin system — it is <span style="color:var(--white);">not displayed publicly</span>.</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:12px;margin-bottom:16px;">
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;">✅</div>
+                    <div>
+                        <div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:3px;">Reporting Member <span style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 6px;vertical-align:middle;">Staff signup</span></div>
+                        <div style="font-size:.78rem;color:var(--slate);line-height:1.6;">Individual employees who sign up via the QR code in your breakroom. They do <span style="color:var(--white);">not</span> receive a packet — that belongs to the business. Their name is collected for verification but is <span style="color:var(--white);">never shown publicly</span>. Once approved, they earn a <span style="color:var(--teal);">✅ verified badge</span> on any incident reports they submit.</div>
+                    </div>
+                </div>
+            </div>
+            <div style="padding:0 22px 18px;">
+                <a href="apply.html" style="display:flex;align-items:center;justify-content:center;width:100%;padding:11px;border-radius:6px;cursor:pointer;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;box-sizing:border-box;">
+                    Share the Member Signup Link with Your Staff →
+                </a>
+                <div style="text-align:center;font-size:.7rem;color:var(--slate2);margin-top:8px;">No cost · Takes 2 minutes</div>
+            </div>
+        </div>
+
         <a href="index.html" class="back-btn" style="display:inline-flex;margin:0 auto">← Return to Map</a>
     </div>
 
