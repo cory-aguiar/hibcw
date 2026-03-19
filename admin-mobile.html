@@ -447,6 +447,10 @@ body.light .strip-cell{background:#fff}
             <button id="alertCancelEditBtn" onclick="cancelAlertEdit()" style="display:none;background:none;border:1px solid var(--b2);border-radius:4px;padding:2px 7px;font-size:.6rem;color:var(--slate);cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Cancel</button>
           </div>
           <input type="hidden" id="alertEditId">
+          <div style="margin-bottom:8px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:5px">Alert Type</div>
+            <div id="captainAlertTypePicker"></div>
+          </div>
           <textarea id="captainAlertMsg" placeholder="Type a message to alert your district members…" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:5px;padding:9px 11px;color:var(--white);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:70px;outline:none"></textarea>
           <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap">
             <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;padding:5px 9px;cursor:pointer;font-size:.68rem;color:var(--slate);flex:1;justify-content:center">
@@ -801,6 +805,10 @@ body.light .strip-cell{background:#fff}
         </select>
       </div>
       <div class="mf-row">
+        <div class="mf-label">Alert Type</div>
+        <div id="adminAlertTypePicker"></div>
+      </div>
+      <div class="mf-row">
         <div class="mf-label">Message</div>
         <textarea id="adminAlertMsg" placeholder="Type your alert message…" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b2);border-radius:5px;padding:10px 12px;color:var(--white);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:90px;outline:none"></textarea>
       </div>
@@ -1086,6 +1094,11 @@ async function initApp() {
   }
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   await Promise.all([loadAll(), loadMembers(), loadApplications()]);
+  // Inject alert type pickers
+  const cp = document.getElementById('captainAlertTypePicker');
+  if (cp) cp.innerHTML = alertTypePicker('captainAlertType');
+  const ap = document.getElementById('adminAlertTypePicker');
+  if (ap) ap.innerHTML = alertTypePicker('adminAlertType');
   startRealtime();
 }
 async function loadAll() {
@@ -2013,9 +2026,14 @@ async function loadDistrictAlerts() {
     const { data, error } = await sb.from('district_alerts').select('*').eq('district', captainDistrict).order('created_at', { ascending: false }).limit(10);
     if (error) throw error;
     if (!data || !data.length) { el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2);font-style:italic">No alerts sent yet.</div>`; return; }
-    el.innerHTML = data.map(a => `
-      <div data-id="${a.id}" data-msg="${a.message.replace(/"/g,'&quot;')}" data-media="${a.media_url||''}" data-mtype="${a.media_type||''}" style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.18);border-radius:6px;padding:10px 12px;margin-bottom:8px">
-        <div style="font-size:.8rem;line-height:1.5;color:var(--white);margin-bottom:6px">${esc(a.message)}</div>
+    el.innerHTML = data.map(a => {
+      const t = alertTypeMeta(a.alert_type);
+      return `
+      <div data-id="${a.id}" data-msg="${a.message.replace(/"/g,'&quot;')}" data-media="${a.media_url||''}" data-mtype="${a.media_type||''}" style="background:${t.color}0d;border:1px solid ${t.color}30;border-left:3px solid ${t.color};border-radius:6px;padding:10px 12px;margin-bottom:8px">
+        <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+          ${alertTypeBadge(a.alert_type)}
+          <span style="font-size:.8rem;line-height:1.5;color:var(--white);flex:1">${esc(a.message)}</span>
+        </div>
         ${a.media_url ? `
           <div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2)">
             ${a.media_type==='video'
@@ -2029,7 +2047,7 @@ async function loadDistrictAlerts() {
             <button onclick="deleteDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(232,65,90,.3);border-radius:3px;padding:2px 7px;color:var(--red);font-size:.58rem;cursor:pointer">✕</button>
           </div>
         </div>
-      </div>`).join('');
+      </div>`;}).join('');
   } catch(e) {
     el.innerHTML = `<div style="font-size:.68rem;color:var(--slate2)">Could not load alerts — ensure the district_alerts table exists.</div>`;
   }
@@ -2106,16 +2124,45 @@ function startAlertEdit(id, message, mediaUrl, mediaType) {
 function cancelAlertEdit() {
   document.getElementById('alertEditId').value = '';
   document.getElementById('captainAlertMsg').value = '';
+  const typeSel = document.getElementById('captainAlertType');
+  if (typeSel) typeSel.value = 'incident';
   document.getElementById('alertComposerLabel').textContent = '📢 Send District Alert';
   document.getElementById('alertSendBtn').textContent = '📤 Send';
   document.getElementById('alertCancelEditBtn').style.display = 'none';
   clearAlertMedia('captainAlertMedia', 'captainAlertPreview');
 }
 
+/* ── Alert Types ─────────────────────────────────────── */
+const ALERT_TYPES = [
+  { value:'emergency', label:'EMERGENCY',      icon:'⛔', color:'#ff2d2d', tier:1, desc:'Active threat / imminent danger' },
+  { value:'bolo',      label:'BOLO',            icon:'👁', color:'#f97316', tier:1, desc:'Be on the lookout — suspect or vehicle' },
+  { value:'amber',     label:'AMBER / MISSING', icon:'🟡', color:'#f5a623', tier:1, desc:'Missing child or vulnerable adult' },
+  { value:'incident',  label:'INCIDENT ALERT',  icon:'🚨', color:'#e8415a', tier:2, desc:'Crime in progress or just occurred' },
+  { value:'pattern',   label:'PATTERN ALERT',   icon:'🔁', color:'#c084fc', tier:2, desc:'Repeat behavior across multiple businesses' },
+  { value:'scam',      label:'SCAM ALERT',      icon:'💳', color:'#3b82f6', tier:2, desc:'Fraud, counterfeit, or con artist activity' },
+  { value:'trespass',  label:'TRESPASS ALERT',  icon:'🚫', color:'#a855f7', tier:2, desc:'Known trespasser — notify neighboring businesses' },
+  { value:'welfare',   label:'WELFARE CHECK',   icon:'🫶', color:'#7a8fa6', tier:3, desc:'Suspicious or concerning person, no clear crime' },
+  { value:'allclear',  label:'ALL CLEAR',       icon:'✅', color:'#00c9a7', tier:3, desc:'Follow-up / situation resolved' },
+  { value:'info',      label:'INFO / ADVISORY', icon:'📋', color:'#4a6070', tier:4, desc:'General awareness, no immediate threat' },
+];
+function alertTypeMeta(val) {
+  return ALERT_TYPES.find(t => t.value === val) || ALERT_TYPES.find(t => t.value === 'incident');
+}
+function alertTypePicker(selectId, defaultVal='incident') {
+  return `<select id="${selectId}" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b2);border-radius:5px;padding:8px 10px;color:var(--white);font-size:.75rem;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer">
+    ${ALERT_TYPES.map(t => `<option value="${t.value}" ${t.value===defaultVal?'selected':''} style="background:#111e30">${t.icon} ${t.label} — ${t.desc}</option>`).join('')}
+  </select>`;
+}
+function alertTypeBadge(val) {
+  const t = alertTypeMeta(val);
+  return `<span style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;background:${t.color}18;color:${t.color};border:1px solid ${t.color}44;border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0">${t.icon} ${t.label}</span>`;
+}
+
 async function sendDistrictAlert() {
   const msg    = document.getElementById('captainAlertMsg')?.value.trim();
   const editId = document.getElementById('alertEditId')?.value;
   const file   = document.getElementById('captainAlertMedia')?.files?.[0];
+  const alertType = document.getElementById('captainAlertType')?.value || 'incident';
   if (!msg) { showToast('⚠️','Please enter a message.','err'); return; }
   if (!captainDistrict) return;
   const btn = document.getElementById('alertSendBtn');
@@ -2129,11 +2176,11 @@ async function sendDistrictAlert() {
     }
     if (file) { const up = await uploadAlertMedia(file, captainDistrict); mediaUrl = up.url; mediaType = up.type; }
     if (editId) {
-      const { error } = await sb.from('district_alerts').update({ message: msg, media_url: mediaUrl, media_type: mediaType, updated_at: new Date().toISOString(), is_edited: true }).eq('id', editId);
+      const { error } = await sb.from('district_alerts').update({ message: msg, alert_type: alertType, media_url: mediaUrl, media_type: mediaType, updated_at: new Date().toISOString(), is_edited: true }).eq('id', editId);
       if (error) throw error;
       showToast('✅','Alert updated.');
     } else {
-      const { error } = await sb.from('district_alerts').insert({ district: captainDistrict, message: msg, media_url: mediaUrl, media_type: mediaType, sent_by_email: currentUserEmail, sent_by_name: currentUserName });
+      const { error } = await sb.from('district_alerts').insert({ district: captainDistrict, message: msg, alert_type: alertType, media_url: mediaUrl, media_type: mediaType, sent_by_email: currentUserEmail, sent_by_name: currentUserName });
       if (error) throw error;
       showToast('📢','Alert sent to your district.');
     }
@@ -2172,10 +2219,12 @@ async function loadAdminAlertLog() {
     if (!data || !data.length) { el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2);font-style:italic">No alerts sent yet.</div>`; return; }
     el.innerHTML = data.map(a => {
       const dc = DISTRICT_COLORS[a.district] || 'var(--teal)';
+      const t = alertTypeMeta(a.alert_type);
       return `<div style="padding:9px 0;border-bottom:1px solid var(--b2)">
-        <div style="display:flex;gap:7px;align-items:flex-start;margin-bottom:4px">
+        <div style="display:flex;gap:5px;align-items:flex-start;margin-bottom:4px;flex-wrap:wrap">
+          ${alertTypeBadge(a.alert_type)}
           <span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap;flex-shrink:0">${esc(districtLabel(a.district))}</span>
-          <span style="font-size:.78rem;line-height:1.4">${esc(a.message)}</span>
+          <span style="font-size:.78rem;line-height:1.4;color:var(--white)">${esc(a.message)}</span>
         </div>
         ${a.media_url ? `<div style="margin-bottom:5px;border-radius:4px;overflow:hidden;border:1px solid var(--b2);max-width:180px">
           ${a.media_type==='video'
@@ -2200,26 +2249,29 @@ async function deleteAdminAlert(id, mediaUrl) {
 }
 
 async function sendAdminDistrictAlert() {
-  const district = document.getElementById('adminAlertDistrict')?.value;
-  const msg      = document.getElementById('adminAlertMsg')?.value.trim();
-  const editId   = document.getElementById('adminAlertEditId')?.value;
-  const file     = document.getElementById('adminAlertMedia')?.files?.[0];
+  const district  = document.getElementById('adminAlertDistrict')?.value;
+  const msg       = document.getElementById('adminAlertMsg')?.value.trim();
+  const editId    = document.getElementById('adminAlertEditId')?.value;
+  const file      = document.getElementById('adminAlertMedia')?.files?.[0];
+  const alertType = document.getElementById('adminAlertType')?.value || 'incident';
   if (!district) { showToast('⚠️','Select a district first.','err'); return; }
   if (!msg)      { showToast('⚠️','Please enter a message.','err'); return; }
   try {
     let mediaUrl = null, mediaType = null;
     if (file) { const up = await uploadAlertMedia(file, district); mediaUrl = up.url; mediaType = up.type; }
     if (editId) {
-      const { error } = await sb.from('district_alerts').update({ message: msg, media_url: mediaUrl, media_type: mediaType, updated_at: new Date().toISOString(), is_edited: true }).eq('id', editId);
+      const { error } = await sb.from('district_alerts').update({ message: msg, alert_type: alertType, media_url: mediaUrl, media_type: mediaType, updated_at: new Date().toISOString(), is_edited: true }).eq('id', editId);
       if (error) throw error;
       showToast('✅','Alert updated.');
     } else {
-      const { error } = await sb.from('district_alerts').insert({ district, message: msg, media_url: mediaUrl, media_type: mediaType, sent_by_email: currentUserEmail, sent_by_name: currentUserName });
+      const { error } = await sb.from('district_alerts').insert({ district, message: msg, alert_type: alertType, media_url: mediaUrl, media_type: mediaType, sent_by_email: currentUserEmail, sent_by_name: currentUserName });
       if (error) throw error;
       showToast('📢',`Alert sent to ${districtLabel(district)}.`);
     }
     document.getElementById('adminAlertMsg').value = '';
     document.getElementById('adminAlertEditId').value = '';
+    const typeSel = document.getElementById('adminAlertType');
+    if (typeSel) typeSel.value = 'incident';
     clearAlertMedia('adminAlertMedia','adminAlertPreview');
     loadAdminAlertLog();
   } catch(e) { showToast('⚠️', e.message || 'Failed to save alert.', 'err'); }
