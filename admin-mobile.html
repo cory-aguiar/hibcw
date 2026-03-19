@@ -2516,19 +2516,25 @@ async function computeMobLiveData() {
     const yearStart = `${mobTrackerYear}-01-01`;
     const yearEnd   = `${mobTrackerYear}-12-31`;
     const [
-      {data:incidents},{data:approvedMembers},{data:alerts},{data:apps},{data:adminUsers},
+      {data:incidents},{data:approvedMembers},{data:alerts},{data:apps},{data:adminUsers},{data:bizRegs},
     ] = await Promise.all([
       sb.from('incidents').select('id,occurred_at,status,police_report').gte('occurred_at',yearStart).lte('occurred_at',yearEnd+'T23:59:59'),
-      sb.from('member_emails').select('id,created_at'),
+      sb.from('member_emails').select('id,email,created_at'),
       sb.from('district_alerts').select('id,created_at').gte('created_at',yearStart).lte('created_at',yearEnd+'T23:59:59'),
-      sb.from('member_applications').select('id,created_at,status').gte('created_at',yearStart).lte('created_at',yearEnd+'T23:59:59'),
+      sb.from('member_applications').select('id,email,created_at,status').gte('created_at',yearStart).lte('created_at',yearEnd+'T23:59:59'),
       sb.from('admin_users').select('id,district,role').not('role','is',null),
+      sb.from('business_registry').select('id,submitted_at,status').gte('submitted_at',yearStart).lte('submitted_at',yearEnd+'T23:59:59'),
     ]);
     const gm = d => new Date(d).getMonth();
-    for (let m=0;m<12;m++) mobTrackerLive[m]={incidents:0,incidents_archived:0,police_reports:0,alerts_sent:0,apps_received:0,apps_approved:0,apps_rejected:0,members_total:0,members_new:0,captain_logins:0,active_districts:0};
+    for (let m=0;m<12;m++) mobTrackerLive[m]={incidents:0,incidents_archived:0,police_reports:0,alerts_sent:0,apps_received:0,apps_approved:0,apps_rejected:0,members_total:0,members_new:0,captain_logins:0,active_districts:0,biz_registrations:0};
     (incidents||[]).forEach(inc=>{const m=gm(inc.occurred_at);if(m<0||m>11)return;mobTrackerLive[m].incidents++;if(inc.status==='archived')mobTrackerLive[m].incidents_archived++;if(inc.police_report)mobTrackerLive[m].police_reports++;});
     (alerts||[]).forEach(a=>{const m=gm(a.created_at);if(m>=0&&m<=11)mobTrackerLive[m].alerts_sent++;});
-    (apps||[]).forEach(a=>{const m=gm(a.created_at);if(m<0||m>11)return;mobTrackerLive[m].apps_received++;if(a.status==='approved')mobTrackerLive[m].apps_approved++;if(a.status==='rejected')mobTrackerLive[m].apps_rejected++;});
+    // Build verified email set — apps_approved only counts members still in the allowlist
+    // so deleted members don't inflate the approved count vs actual members
+    const verifiedEmailSet = new Set((approvedMembers||[]).map(m=>m.email?.toLowerCase()).filter(Boolean));
+    (apps||[]).forEach(a=>{const m=gm(a.created_at);if(m<0||m>11)return;mobTrackerLive[m].apps_received++;if(a.status==='approved'&&verifiedEmailSet.has(a.email?.toLowerCase()))mobTrackerLive[m].apps_approved++;if(a.status==='rejected')mobTrackerLive[m].apps_rejected++;});
+    // Business registrations by submission month
+    (bizRegs||[]).forEach(b=>{const d=b.submitted_at||b.created_at;if(!d)return;const m=gm(d);if(m>=0&&m<=11)mobTrackerLive[m].biz_registrations++;});
     // Use member_emails as source of truth so count matches the Members panel exactly
     const allVerified=(approvedMembers||[]).filter(m=>m.created_at).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
     const base=allVerified.filter(m=>new Date(m.created_at)<new Date(yearStart)).length;
@@ -2714,6 +2720,7 @@ function renderMobQuarterlyTab() {
     const totNewMem = allM.reduce((s,m)=>s+(parseInt(m.members_new)||0),0);
     const totInc = allM.reduce((s,m)=>s+(parseInt(m.incidents)||0),0);
     const totAlerts = allM.reduce((s,m)=>s+(parseInt(m.alerts_sent)||0),0);
+    const totBizReg = allM.reduce((s,m)=>s+(parseInt(m.biz_registrations)||0),0);
     return `<div style="background:var(--navy2);border:1px solid var(--b2);border-top:2px solid ${q.color};border-radius:7px;padding:14px;margin-bottom:10px">
       <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:${q.color};margin-bottom:8px">${q.label} · ${MOB_MONTHS_FULL[q.months[0]]}–${MOB_MONTHS_FULL[q.months[2]]}</div>
       <div style="display:flex;gap:6px;margin-bottom:10px">
@@ -2728,6 +2735,10 @@ function renderMobQuarterlyTab() {
         <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
           <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#a855f7">${totAlerts}</div>
           <div style="font-size:.58rem;color:var(--slate)">Alerts</div>
+        </div>
+        <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#06b6d4">${totBizReg}</div>
+          <div style="font-size:.58rem;color:var(--slate)">Biz Reg.</div>
         </div>
       </div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:${q.color};margin-bottom:4px">Summary</div>
