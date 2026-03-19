@@ -2407,7 +2407,6 @@ function renderMobileResources() {
         </div>
         <div style="display:flex;gap:7px">
           <button onclick="window.open('${r.url}','_blank','noopener')" style="flex:1;background:${r.color};border:none;border-radius:5px;padding:7px 10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;cursor:pointer">${r.btnLabel||'📖 Open'}</button>
-          <button onclick="const w=window.open('${r.url}','_blank','noopener,width=900,height=700');w.addEventListener('load',()=>{w.focus();w.print();})" style="background:transparent;border:1px solid ${r.color}44;border-radius:5px;padding:7px 10px;color:${r.color};font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">🖨 Print</button>
         </div>
       </div>`).join('');
   }
