@@ -581,11 +581,11 @@
         id: 'contactcard',
         icon: '📇',
         title: 'Emergency Contact Card (Wallet Size)',
-        desc: 'Prints 4 wallet-size cards per page. Trim and include one in the packet.',
+        desc: 'Standard 3.5" × 2" wallet card — front with key emergency numbers, back with 911 vs. HIBCW decision guide and captain contact. Print on cardstock and cut along trim line.',
         actions: [
         {
-            label: '🖨 Print Contact Cards',
-            url: `files/packet-contact-card.html?district=${encodeURIComponent(bizDist)}&captain=${encodeURIComponent(bizCaptain)}&phone=${encodeURIComponent(bizPhone)}`,
+            label: '🖨 Print Contact Card',
+            url: `files/emergency-contact-card.html?captain=${encodeURIComponent(bizCaptain)}&phone=${encodeURIComponent(bizPhone)}`,
             primary: true
         },
         ]
