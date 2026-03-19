@@ -2909,6 +2909,16 @@
                             </div>
                         </div>
 
+                        <!-- Archived alerts -->
+                        <div style="background:var(--navy2);border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:14px;margin-bottom:16px">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                                <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)">📦 Archived Alerts</div>
+                                <button class="btn btn-ghost" style="font-size:.65rem;padding:3px 8px" onclick="loadArchivedAlerts('captainArchivedLog')">🔄 Load</button>
+                            </div>
+                            <div style="font-size:.68rem;color:var(--slate2);margin-bottom:8px">Archived alerts are removed from the public feed but kept permanently as a record of activity.</div>
+                            <div id="captainArchivedLog"><div style="font-size:.72rem;color:var(--slate2);font-style:italic">Click Load to view archived alerts.</div></div>
+                        </div>
+
                         <!-- Recent incidents in district -->
                         <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:14px;margin-bottom:20px">
                             <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:10px">🚨 Recent Incidents</div>
@@ -3336,6 +3346,15 @@
                 <div class="mf-row">
                     <div class="mf-label" style="margin-bottom:8px">Recent Alerts (All Districts)</div>
                     <div id="adminAlertLogBody" style="max-height:200px;overflow-y:auto"></div>
+                </div>
+                <div class="mf-row">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                        <div class="mf-label" style="color:var(--gold)">📦 Archived Alerts</div>
+                        <button class="btn btn-ghost" style="font-size:.62rem;padding:2px 8px" onclick="loadArchivedAlerts('archivedAlertLog')">Load</button>
+                    </div>
+                    <div id="archivedAlertLog" style="max-height:220px;overflow-y:auto">
+                        <div style="font-size:.7rem;color:var(--slate2);font-style:italic">Click Load to view archived alerts.</div>
+                    </div>
                 </div>
             </div>
             <div class="modal-actions">
@@ -8673,7 +8692,8 @@
           <span>👤 ${esc(a.sent_by_name || 'Captain')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
           <div style="display:flex;gap:6px">
             <button data-alert-id="${a.id}" onclick="startAlertEditById(this)" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 8px;color:var(--teal);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✏️ Edit</button>
-            <button onclick="deleteDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(232,65,90,.3);border-radius:3px;padding:2px 8px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Cancel</button>
+            <button onclick="archiveDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:2px 8px;color:var(--gold);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace" title="Archive this alert — removes from public feed but keeps as record">📦 Archive</button>
+            <button onclick="deleteDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(232,65,90,.3);border-radius:3px;padding:2px 8px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete</button>
           </div>
         </div>
       </div>`;}
@@ -8695,11 +8715,96 @@
         }
         const {error} = await sb.from('district_alerts').delete().eq('id', id);
         if (!error) {
-            showToast('🗑', 'Alert cancelled.');
+            showToast('🗑', 'Alert deleted.');
             loadDistrictAlerts();
         }
         else
             showToast('⚠️', error.message, 'err');
+    }
+
+    async function archiveDistrictAlert(id) {
+        if (!confirm('Archive this alert? It will be removed from the public feed but kept as a permanent record.'))
+            return;
+        const {error} = await sb.from('district_alerts').update({
+            archived_at: new Date().toISOString(),
+            archived_by: currentUserEmail
+        }).eq('id', id);
+        if (!error) {
+            showToast('📦', 'Alert archived — kept as record.');
+            loadDistrictAlerts();
+        } else {
+            showToast('⚠️', error.message, 'err');
+        }
+    }
+
+    async function archiveAdminAlert(id) {
+        if (!confirm('Archive this alert? It will be removed from the public feed but kept as a permanent record.'))
+            return;
+        const {error} = await sb.from('district_alerts').update({
+            archived_at: new Date().toISOString(),
+            archived_by: currentUserEmail
+        }).eq('id', id);
+        if (!error) {
+            showToast('📦', 'Alert archived — kept as record.');
+            loadAdminAlertLog();
+        } else {
+            showToast('⚠️', error.message, 'err');
+        }
+    }
+
+    async function loadArchivedAlerts(containerId) {
+        const el = document.getElementById(containerId);
+        if (!el || !sb) return;
+        el.innerHTML = '<div style="font-size:.72rem;color:var(--slate2);padding:8px 0">Loading…</div>';
+        try {
+            const {data, error} = await sb
+                .from('district_alerts')
+                .select('*')
+                .not('archived_at', 'is', null)
+                .order('archived_at', { ascending: false })
+                .limit(50);
+            if (error) throw error;
+            if (!data.length) {
+                el.innerHTML = '<div style="font-size:.72rem;color:var(--slate2);font-style:italic;padding:8px 0">No archived alerts yet.</div>';
+                return;
+            }
+            el.innerHTML = data.map(a => {
+                const distColor = KIAA_DISTRICTS.find(d => d.id === a.district)?.color || 'var(--teal)';
+                const t = alertTypeMeta(a.alert_type);
+                const archivedDate = new Date(a.archived_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+                const sentDate = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+                return `
+                <div style="background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.2);border-left:3px solid var(--gold);border-radius:6px;padding:10px 12px;margin-bottom:8px;opacity:.85">
+                  <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:5px;flex-wrap:wrap">
+                    ${alertTypeBadge(a.alert_type)}
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${distColor}18;color:${distColor};border:1px solid ${distColor}44;border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0">${esc(districtLabel(a.district))}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0">📦 ARCHIVED</span>
+                  </div>
+                  <div style="font-size:.8rem;line-height:1.5;color:var(--white);margin-bottom:5px">${esc(a.message)}</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);display:flex;flex-direction:column;gap:2px">
+                    <span>📤 Sent by ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
+                    <span>📦 Archived by ${esc(a.archived_by||'Admin')} · ${archivedDate}</span>
+                  </div>
+                  <div style="display:flex;gap:6px;margin-top:7px">
+                    <button onclick="unarchiveAlert('${a.id}')" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 8px;color:var(--teal);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">↩ Restore</button>
+                    <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url||'')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:2px 8px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete Permanently</button>
+                  </div>
+                </div>`;
+            }).join('');
+        } catch(e) {
+            el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load archived alerts: ${esc(e.message)}</div>`;
+        }
+    }
+
+    async function unarchiveAlert(id) {
+        const {error} = await sb.from('district_alerts').update({ archived_at: null, archived_by: null }).eq('id', id);
+        if (!error) {
+            showToast('↩', 'Alert restored to public feed.');
+            loadArchivedAlerts('archivedAlertLog');
+            loadAdminAlertLog();
+        } else {
+            showToast('⚠️', error.message, 'err');
+        }
     }
 
     /* ── Alert media helpers ──────────────────────────────── */
@@ -8949,7 +9054,10 @@
           </div>` : ''}
           <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);display:flex;justify-content:space-between;align-items:center">
             <span>👤 ${esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
-            <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url || '')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:1px 7px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕</button>
+            <div style="display:flex;gap:4px">
+              <button onclick="archiveAdminAlert('${a.id}')" style="background:none;border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;color:var(--gold);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace" title="Archive — hides from public, keeps as record">📦</button>
+              <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url || '')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:1px 7px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕</button>
+            </div>
           </div>
         </div>`;
             }).join('');
