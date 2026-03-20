@@ -6319,6 +6319,14 @@
         const b = mobRegistryList.find(b => b.id === id);
         if (!b)
             return;
+
+        // Warn before reassigning district on an approved business (biz# will change)
+        const newDistrict = document.getElementById('mebDistrict')?.value || null;
+        if (newDistrict && newDistrict !== b.district && b.status === 'approved' && b.business_number) {
+            const distLabel = newDistrict.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+            if (!confirm(`Changing the district to "${distLabel}" will assign a new business number to replace ${b.business_number}. Continue?`)) return;
+        }
+
         const sameAs = document.getElementById('mebSameAs')?.checked;
         const phyStreet = document.getElementById('mebStreet')?.value.trim();
         const phyCity = document.getElementById('mebCity')?.value.trim();
