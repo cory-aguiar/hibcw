@@ -50,6 +50,10 @@
         color: var(--white);
         overscroll-behavior: none
     }/* ── Light mode ── */
+    body.light .shield-logo-login {
+        filter: none;
+    }
+
     body.light {
         --navy: #f0f4f8;
         --navy2: #e2ecf5;
@@ -1628,7 +1632,7 @@
     <div id="loginScreen">
         <div class="login-box">
             <div class="login-logo">
-                <img src="logo-shield.svg" alt="HIBCW" style="width:52px;height:52px;display:block;margin:0 auto 12px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))">
+                <img src="logo-shield.svg" alt="HIBCW" class="shield-logo-login" style="width:52px;height:52px;display:block;margin:0 auto 12px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))">
                 <div class="login-title">Admin</div>
                 <div class="login-sub">Hawaii Island Business Crime Watch</div>
             </div>
