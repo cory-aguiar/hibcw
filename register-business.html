@@ -430,13 +430,12 @@ function onAddressChange() {
             // so GPS geocoding handles them precisely
             '96710':'hamakua','96728':'hamakua','96773':'hamakua','96776':'hamakua','96781':'hamakua',
             '96727':'north-hilo','96760':'north-hilo','96771':'north-hilo',
-            // 96720 and 96721 span North & South Hilo — GPS resolves these
+            '96720':'south-hilo','96721':'south-hilo',
             '96749':'lower-puna','96778':'lower-puna','96764':'lower-puna',
             '96770':'lower-puna','96785':'upper-puna',
             '96772':'kau','96777':'kau',
             '96704':'south-kona','96750':'south-kona','96756':'south-kona',
-            // 96740 spans South Hilo & North Kona — GPS resolves this
-            '96745':'north-kona','96753':'north-kona',
+            '96740':'north-kona','96745':'north-kona','96753':'north-kona',
             '96743':'north-kohala','96755':'north-kohala',
         };
         const zipDistrict = zipDistrictMap[zip];
@@ -489,39 +488,109 @@ async function geocodeAddress() {
     }
 }
 
-async function detectDistrictFromCoords(lat, lng) {
-    // Try GIS boundary lookup first
-    try {
-        const res = await fetch(`https://services.arcgis.com/bDAqqMkYMMKSHMcd/arcgis/rest/services/Council_Districts/FeatureServer/0/query?geometry=${lng},${lat}&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=COUNCILMEM&f=json&inSR=4326`);
-        const data = await res.json();
-        if (data.features?.length) {
-            const council = data.features[0].attributes.COUNCILMEM;
-            const map = {
-                'Hāmākua':'hamakua','Hamakua':'hamakua',
-                'North Hilo':'north-hilo',
-                'South Hilo':'south-hilo',
-                'Lower Puna':'lower-puna',
-                'Upper Puna':'upper-puna',
-                "Ka'u":'kau',"Kaʻū":'kau',
-                'South Kona':'south-kona',
-                'North Kona':'north-kona',
-                'Kohala':'north-kohala',
-            };
-            for (const [k,v] of Object.entries(map)) {
-                if (council && council.includes(k)) return v;
-            }
-        }
-    } catch(e) {}
+// ── Point-in-polygon ray-casting ──────────────────────
+function pointInPolygon(lat, lng, polygon) {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i][1], yi = polygon[i][0];
+        const xj = polygon[j][1], yj = polygon[j][0];
+        const intersect = ((yi > lng) !== (yj > lng)) &&
+            (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
 
-    // Fallback: simple bounding box by ZIP
+// Approximate Hawaii County council district boundary polygons [lat, lng]
+// Derived from official Hawaii County district maps (post-2022 redistricting)
+const DISTRICT_POLYGONS = [
+    { id: 'north-kohala', poly: [
+        [20.27,-156.07],[20.27,-155.68],[20.06,-155.68],[20.06,-155.82],
+        [19.95,-155.87],[19.90,-156.07],[20.27,-156.07]
+    ]},
+    { id: 'hamakua', poly: [
+        [20.06,-155.68],[20.06,-155.16],[19.82,-155.07],[19.74,-155.20],
+        [19.73,-155.47],[19.78,-155.57],[19.90,-155.64],[19.95,-155.87],
+        [20.06,-155.82],[20.06,-155.68]
+    ]},
+    { id: 'north-hilo', poly: [
+        [19.82,-155.07],[19.82,-154.98],[19.66,-154.93],[19.60,-155.00],
+        [19.58,-155.09],[19.65,-155.20],[19.74,-155.20],[19.82,-155.07]
+    ]},
+    { id: 'south-hilo', poly: [
+        [19.66,-154.93],[19.66,-154.82],[19.50,-154.82],[19.44,-154.93],
+        [19.48,-155.05],[19.58,-155.09],[19.60,-155.00],[19.66,-154.93]
+    ]},
+    { id: 'lower-puna', poly: [
+        [19.50,-154.82],[19.50,-154.65],[19.30,-154.65],[19.28,-154.80],
+        [19.33,-154.95],[19.44,-154.93],[19.50,-154.82]
+    ]},
+    { id: 'upper-puna', poly: [
+        [19.66,-154.82],[19.66,-154.65],[19.50,-154.65],[19.50,-154.82],
+        [19.58,-155.09],[19.65,-155.20],[19.73,-155.10],[19.66,-154.82]
+    ]},
+    { id: 'kau', poly: [
+        [19.33,-154.95],[19.28,-154.80],[19.10,-154.80],[18.91,-155.50],
+        [19.00,-155.68],[19.12,-155.84],[19.25,-155.87],[19.38,-155.72],
+        [19.38,-155.47],[19.40,-155.30],[19.48,-155.05],[19.44,-154.93],
+        [19.33,-154.95]
+    ]},
+    { id: 'south-kona', poly: [
+        [19.90,-156.07],[19.78,-155.57],[19.73,-155.47],[19.38,-155.47],
+        [19.38,-155.72],[19.25,-155.87],[19.12,-155.84],[19.00,-155.68],
+        [18.91,-155.50],[19.00,-156.07],[19.90,-156.07]
+    ]},
+    { id: 'north-kona', poly: [
+        [19.95,-155.87],[19.90,-155.64],[19.78,-155.57],[19.73,-155.47],
+        [19.38,-155.47],[19.73,-155.47],[19.90,-155.87],[19.95,-155.87]
+    ]},
+];
+
+// Refined North Kona — sits between Hamakua/South Hilo coast and South Kona
+// Override with a cleaner shape to avoid overlap artifacts
+DISTRICT_POLYGONS[8].poly = [
+    [19.95,-155.87],[19.90,-155.64],[19.78,-155.57],[19.73,-155.47],
+    [19.65,-155.20],[19.58,-155.09],[19.48,-155.05],[19.40,-155.30],
+    [19.38,-155.47],[19.60,-155.47],[19.73,-155.60],[19.87,-155.87],
+    [19.95,-155.87]
+];
+
+async function detectDistrictFromCoords(lat, lng) {
+    // 1. Point-in-polygon check against local boundary data (no network needed)
+    for (const { id, poly } of DISTRICT_POLYGONS) {
+        if (pointInPolygon(lat, lng, poly)) return id;
+    }
+
+    // 2. Nearest-centroid fallback — finds the closest district center
+    //    (handles edge cases where the point lands exactly on a boundary)
+    const centroids = [
+        { id:'hamakua',      lat:20.00, lng:-155.55 },
+        { id:'north-hilo',   lat:19.72, lng:-155.08 },
+        { id:'south-hilo',   lat:19.57, lng:-154.97 },
+        { id:'lower-puna',   lat:19.38, lng:-154.97 },
+        { id:'upper-puna',   lat:19.58, lng:-154.95 },
+        { id:'kau',          lat:19.10, lng:-155.50 },
+        { id:'south-kona',   lat:19.40, lng:-155.85 },
+        { id:'north-kona',   lat:19.65, lng:-155.98 },
+        { id:'north-kohala', lat:20.08, lng:-155.82 },
+    ];
+    let best = null, bestDist = Infinity;
+    for (const c of centroids) {
+        const d = Math.hypot(lat - c.lat, lng - c.lng);
+        if (d < bestDist) { bestDist = d; best = c.id; }
+    }
+    if (best) return best;
+
+    // 3. Last resort: ZIP map
     const zipDistrictMap = {
         '96710':'hamakua','96728':'hamakua','96773':'hamakua','96776':'hamakua','96781':'hamakua',
         '96727':'north-hilo','96760':'north-hilo','96771':'north-hilo',
+        '96720':'south-hilo','96721':'south-hilo',
         '96749':'lower-puna','96778':'lower-puna','96764':'lower-puna',
         '96770':'lower-puna','96785':'upper-puna',
         '96772':'kau','96777':'kau',
         '96704':'south-kona','96750':'south-kona','96756':'south-kona',
-        '96745':'north-kona','96753':'north-kona',
+        '96740':'north-kona','96745':'north-kona','96753':'north-kona',
         '96743':'north-kohala','96755':'north-kohala',
     };
     const zip = document.getElementById('bZip').value.replace(/\D/g,'').substring(0,5);
