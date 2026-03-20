@@ -465,6 +465,9 @@
 
     .td-desc {
         max-width: 260px;
+    }
+
+    .td-desc-inner {
         color: rgba(238, 243, 248, .75);
         font-size: .78rem;
         display: -webkit-box;
@@ -1984,7 +1987,7 @@
         color: #4a5f72
     }
 
-    body.light .td-desc {
+    body.light .td-desc-inner {
         color: rgba(15, 30, 46, .7)
     }
 
@@ -2501,8 +2504,12 @@
                     ☰ All 
                     <span class="nav-count" id="nc-all">—</span>
                 </button>
-                <button class="nav-btn" id="nav-alert-archive" onclick="showView('alert-archive')">
-                    📦 Alert Archive
+                <div class="nav-section admin-only">Alerts</div>
+                <button class="nav-btn admin-only" id="nav-alerts-active" onclick="showView('alerts-active')">
+                    🔔 Active Alerts
+                </button>
+                <button class="nav-btn admin-only" id="nav-alerts-archived" onclick="showView('alerts-archived')">
+                    📦 Archived Alerts
                 </button>
                 <div class="nav-section">Reports</div>
                 <button class="nav-btn" id="nav-stats" onclick="showView('stats')">📊 Statistics</button>
@@ -3268,13 +3275,41 @@
                   </div>
                 </div>
 
-                <div class="view" id="view-alert-archive">
+                <!-- ── Active Alerts view ────────────────────────── -->
+                <div class="view" id="view-alerts-active">
                   <div style="padding:24px 24px 16px">
-                    <div class="page-title">📦 Alert Archive</div>
+                    <div class="page-title">🔔 Active Alerts</div>
+                    <div class="page-sub">All active district alerts currently visible on the public feed — archive or delete from here</div>
+                  </div>
+                  <div style="padding:0 24px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                    <select id="activeAlertDistrictFilter" onchange="loadActiveAlertsView()" style="background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 12px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer">
+                      <option value="">All Districts</option>
+                      <option value="hamakua">District 1 — Hāmākua</option>
+                      <option value="north-hilo">District 2 — North Hilo</option>
+                      <option value="south-hilo">District 3 — South Hilo</option>
+                      <option value="lower-puna">District 4 — Lower Puna</option>
+                      <option value="upper-puna">District 5 — Upper Puna</option>
+                      <option value="kau">District 6 — Kaʻū</option>
+                      <option value="south-kona">District 7 — South Kona</option>
+                      <option value="north-kona">District 8 — North Kona</option>
+                      <option value="north-kohala">District 9 — Kohala</option>
+                    </select>
+                    <select id="activeAlertTypeFilter" onchange="loadActiveAlertsView()" style="background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 12px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer">
+                      <option value="">All Types</option>
+                    </select>
+                    <span id="activeAlertCount" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);margin-left:4px"></span>
+                  </div>
+                  <div style="padding:0 24px 32px" id="activeAlertPanel">
+                    <div style="font-size:.75rem;color:var(--slate2);font-style:italic">Loading…</div>
+                  </div>
+                </div>
+
+                <!-- ── Archived Alerts view ───────────────────────── -->
+                <div class="view" id="view-alerts-archived">
+                  <div style="padding:24px 24px 16px">
+                    <div class="page-title">📦 Archived Alerts</div>
                     <div class="page-sub">All district alerts that have been archived — removed from the public feed but kept as a permanent record</div>
                   </div>
-
-                  <!-- Filters -->
                   <div style="padding:0 24px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
                     <select id="archiveDistrictFilter" onchange="filterArchivedAlerts()" style="background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 12px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer">
                       <option value="">All Districts</option>
@@ -3290,16 +3325,9 @@
                     </select>
                     <select id="archiveTypeFilter" onchange="filterArchivedAlerts()" style="background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 12px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer">
                       <option value="">All Types</option>
-                      <option value="general">General</option>
-                      <option value="theft">Theft</option>
-                      <option value="vandalism">Vandalism</option>
-                      <option value="suspicious">Suspicious Activity</option>
-                      <option value="emergency">Emergency</option>
                     </select>
                     <span id="archiveCount" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);margin-left:4px"></span>
                   </div>
-
-                  <!-- Alert list -->
                   <div style="padding:0 24px 32px" id="archiveAlertPanel">
                     <div style="font-size:.75rem;color:var(--slate2);font-style:italic">Loading archived alerts…</div>
                   </div>
@@ -4029,7 +4057,9 @@
             setTimeout(() => document.getElementById('bizLookupInput')?.focus(), 80);
         } else if (v === 'resources') {
             renderResources();
-        } else if (v === 'alert-archive') {
+        } else if (v === 'alerts-active') {
+            loadActiveAlertsView();
+        } else if (v === 'alerts-archived') {
             filterArchivedAlerts();
         } else {
             renderCurrentView();
@@ -4352,7 +4382,7 @@
       <td class="td-type"><span class="badge ${bc}">${inc.type}</span>${inc.is_recurring ? '<br><span class="recurring-flag" style="margin-top:3px">🔁 Recurring</span>' : ''} ${inc.is_verified_member ? '<br><span class="verified-badge" style="margin-top:3px">✅ Member</span>' : ''}</td>
       <td class="td-time">${fmt(inc.occurred_at)}<br>${ageTag(inc.occurred_at)}</td>
       <td class="td-addr" title="${esc(inc.address)}">${esc(inc.address)}${inc.district ? `<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:${DISTRICT_GEO.find(d => d.id === inc.district)?.color || '#00c9a7'};letter-spacing:.03em">${DISTRICT_GEO.find(d => d.id === inc.district)?.label || inc.district}</span>` : ''}</td>
-      <td class="td-desc" title="${esc(inc.description)}">${esc(inc.description)}</td>
+      <td class="td-desc" title="${esc(inc.description)}"><div class="td-desc-inner">${esc(inc.description)}</div></td>
       <td style="font-size:.75rem;color:var(--slate)">${esc(inc.reporter_name || '—')}</td>
       <td>${mc ? `<span class="media-pill">📎 ${mc}</span>` : '<span style="color:var(--slate2)">—</span>'}</td>
       ${showStatus ? `<td><span class="badge ${archived ? 'b-arch' : 'b-teal'}">${inc.status}</span></td>` : ''}
@@ -8855,12 +8885,111 @@
         }
     }
 
+    async function loadActiveAlertsView() {
+        const districtFilter = document.getElementById('activeAlertDistrictFilter')?.value || '';
+        const typeFilter     = document.getElementById('activeAlertTypeFilter')?.value || '';
+        const el             = document.getElementById('activeAlertPanel');
+        if (!el || !sb) return;
+        el.innerHTML = '<div style="font-size:.72rem;color:var(--slate2);padding:8px 0">Loading…</div>';
+
+        // Populate type filter if empty
+        const tfEl = document.getElementById('activeAlertTypeFilter');
+        if (tfEl && tfEl.options.length <= 1) {
+            ALERT_TYPES.forEach(t => {
+                const o = document.createElement('option');
+                o.value = t.value;
+                o.textContent = t.icon + ' ' + t.label;
+                tfEl.appendChild(o);
+            });
+            if (typeFilter) tfEl.value = typeFilter;
+        }
+
+        try {
+            let query = sb
+                .from('district_alerts')
+                .select('*')
+                .is('archived_at', null)
+                .order('created_at', { ascending: false })
+                .limit(200);
+            if (districtFilter) query = query.eq('district', districtFilter);
+            if (typeFilter)     query = query.eq('alert_type', typeFilter);
+            const {data, error} = await query;
+            if (error) throw error;
+
+            const countEl = document.getElementById('activeAlertCount');
+            if (countEl) countEl.textContent = data.length ? `${data.length} alert${data.length !== 1 ? 's' : ''}` : '';
+
+            if (!data.length) {
+                el.innerHTML = '<div style="font-size:.72rem;color:var(--slate2);font-style:italic;padding:8px 0">No active alerts match the selected filters.</div>';
+                return;
+            }
+
+            const isAdminUser = currentRole === 'admin' || currentRole === 'superadmin';
+            el.innerHTML = data.map(a => {
+                const distColor = KIAA_DISTRICTS.find(d => d.id === a.district)?.color || 'var(--teal)';
+                const t = alertTypeMeta(a.alert_type);
+                const sentDate = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+                return `
+                <div style="background:${t.color}0d;border:1px solid ${t.color}30;border-left:3px solid ${t.color};border-radius:6px;padding:12px 14px;margin-bottom:10px">
+                  <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap">
+                    ${alertTypeBadge(a.alert_type)}
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${distColor}18;color:${distColor};border:1px solid ${distColor}44;border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0">${esc(districtLabel(a.district))}</span>
+                    ${a.is_edited ? '<span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);font-style:italic">edited</span>' : ''}
+                  </div>
+                  <div style="font-size:.82rem;line-height:1.55;color:var(--white);margin-bottom:6px">${esc(a.message)}</div>
+                  ${a.media_url ? `
+                  <div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2);max-width:320px">
+                    ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:200px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:200px;object-fit:cover">`}
+                  </div>` : ''}
+                  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">📤 ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
+                    ${isAdminUser ? `
+                    <div style="display:flex;gap:6px">
+                      <button onclick="archiveActiveAlert('${a.id}')" style="background:none;border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:2px 8px;color:var(--gold);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace" title="Archive — removes from public feed, keeps as record">📦 Archive</button>
+                      <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url||'')}')" style="background:none;border:1px solid rgba(232,65,90,.3);border-radius:3px;padding:2px 8px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete</button>
+                    </div>` : ''}
+                  </div>
+                </div>`;
+            }).join('');
+        } catch(e) {
+            el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load alerts: ${esc(e.message)}</div>`;
+        }
+    }
+
+    async function archiveActiveAlert(id) {
+        if (!confirm('Archive this alert? It will be removed from the public feed but kept as a permanent record.'))
+            return;
+        const {error} = await sb.from('district_alerts').update({
+            archived_at: new Date().toISOString(),
+            archived_by: currentUserEmail
+        }).eq('id', id);
+        if (!error) {
+            showToast('📦', 'Alert archived — kept as record.');
+            loadActiveAlertsView();
+        } else {
+            showToast('⚠️', error.message, 'err');
+        }
+    }
+
     async function filterArchivedAlerts() {
         const districtFilter = document.getElementById('archiveDistrictFilter')?.value || '';
         const typeFilter = document.getElementById('archiveTypeFilter')?.value || '';
         const el = document.getElementById('archiveAlertPanel');
         if (!el || !sb) return;
         el.innerHTML = '<div style="font-size:.72rem;color:var(--slate2);padding:8px 0">Loading…</div>';
+
+        // Populate type filter if empty
+        const tfEl = document.getElementById('archiveTypeFilter');
+        if (tfEl && tfEl.options.length <= 1) {
+            ALERT_TYPES.forEach(t => {
+                const o = document.createElement('option');
+                o.value = t.value;
+                o.textContent = t.icon + ' ' + t.label;
+                tfEl.appendChild(o);
+            });
+            if (typeFilter) tfEl.value = typeFilter;
+        }
+
         try {
             let query = sb
                 .from('district_alerts')
@@ -8916,6 +9045,7 @@
             showToast('↩', 'Alert restored to public feed.');
             filterArchivedAlerts();
             loadAdminAlertLog();
+            if (currentView === 'alerts-active') loadActiveAlertsView();
         } else {
             showToast('⚠️', error.message, 'err');
         }
@@ -9181,7 +9311,7 @@
     }
 
     async function deleteAdminAlert(id, mediaUrl) {
-        if (!confirm('Delete this alert? It will be removed from the public site.'))
+        if (!confirm('Delete this alert permanently? It cannot be recovered.'))
             return;
         if (mediaUrl) {
             const path = mediaUrl.split('/object/public/incident-media/')[1];
@@ -9190,8 +9320,10 @@
         }
         const {error} = await sb.from('district_alerts').delete().eq('id', id);
         if (!error) {
-            showToast('🗑', 'Alert deleted.');
+            showToast('🗑', 'Alert deleted permanently.');
             loadAdminAlertLog();
+            if (currentView === 'alerts-active')   loadActiveAlertsView();
+            if (currentView === 'alerts-archived') filterArchivedAlerts();
         }
         else
             showToast('⚠️', error.message, 'err');
