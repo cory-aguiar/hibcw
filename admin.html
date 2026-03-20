@@ -2501,6 +2501,9 @@
                     ☰ All 
                     <span class="nav-count" id="nc-all">—</span>
                 </button>
+                <button class="nav-btn" id="nav-alert-archive" onclick="showView('alert-archive')">
+                    📦 Alert Archive
+                </button>
                 <div class="nav-section">Reports</div>
                 <button class="nav-btn" id="nav-stats" onclick="showView('stats')">📊 Statistics</button>
                 <button class="nav-btn" id="nav-map" onclick="showView('map')">🗺 Map View</button>
@@ -3265,6 +3268,43 @@
                   </div>
                 </div>
 
+                <div class="view" id="view-alert-archive">
+                  <div style="padding:24px 24px 16px">
+                    <div class="page-title">📦 Alert Archive</div>
+                    <div class="page-sub">All district alerts that have been archived — removed from the public feed but kept as a permanent record</div>
+                  </div>
+
+                  <!-- Filters -->
+                  <div style="padding:0 24px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                    <select id="archiveDistrictFilter" onchange="filterArchivedAlerts()" style="background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 12px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer">
+                      <option value="">All Districts</option>
+                      <option value="hamakua">District 1 — Hāmākua</option>
+                      <option value="north-hilo">District 2 — North Hilo</option>
+                      <option value="south-hilo">District 3 — South Hilo</option>
+                      <option value="lower-puna">District 4 — Lower Puna</option>
+                      <option value="upper-puna">District 5 — Upper Puna</option>
+                      <option value="kau">District 6 — Kaʻū</option>
+                      <option value="south-kona">District 7 — South Kona</option>
+                      <option value="north-kona">District 8 — North Kona</option>
+                      <option value="north-kohala">District 9 — Kohala</option>
+                    </select>
+                    <select id="archiveTypeFilter" onchange="filterArchivedAlerts()" style="background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 12px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer">
+                      <option value="">All Types</option>
+                      <option value="general">General</option>
+                      <option value="theft">Theft</option>
+                      <option value="vandalism">Vandalism</option>
+                      <option value="suspicious">Suspicious Activity</option>
+                      <option value="emergency">Emergency</option>
+                    </select>
+                    <span id="archiveCount" style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);margin-left:4px"></span>
+                  </div>
+
+                  <!-- Alert list -->
+                  <div style="padding:0 24px 32px" id="archiveAlertPanel">
+                    <div style="font-size:.75rem;color:var(--slate2);font-style:italic">Loading archived alerts…</div>
+                  </div>
+                </div>
+
                 <div class="view" id="view-map" style="flex-direction:row">
                     <div class="map-panel">
                         <div id="adminMap"></div>
@@ -3989,6 +4029,8 @@
             setTimeout(() => document.getElementById('bizLookupInput')?.focus(), 80);
         } else if (v === 'resources') {
             renderResources();
+        } else if (v === 'alert-archive') {
+            filterArchivedAlerts();
         } else {
             renderCurrentView();
         }
@@ -7855,53 +7897,7 @@
             showToast('✅', bizNumber ? `Business approved! ID: ${bizNumber}` : 'Business approved!');
             // Notify captain dashboard
             notifyCaptainNewBusiness(id);
-            // Send approval email to the business contact
-            if (b.email) {
-                sendBusinessApprovalEmail(b, bizNumber || b.business_number);
-            }
         } else showToast('⚠️', error.message, 'err');
-    }
-
-    /* ════════════════════════════════════════════════════
-       RESEND — Business Approval Email
-    ════════════════════════════════════════════════════ */
-    /* ════════════════════════════════════════════════════
-       RESEND — Business Approval Email
-       Delegates to the Supabase Edge Function "send-approval-email"
-       so the Resend API key never touches the browser.
-    ════════════════════════════════════════════════════ */
-    async function sendBusinessApprovalEmail(b, bizNumber) {
-        // The Edge Function URL is derived from the project's Supabase URL
-        // (same origin as all other Supabase calls).
-        const fnUrl = `${SUPABASE_URL}/functions/v1/send-approval-email`;
-
-        try {
-            const res = await fetch(fnUrl, {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email:            b.email,
-                    contact_name:     b.contact_name     || null,
-                    business_name:    b.business_name    || null,
-                    business_address: b.business_address || null,
-                    business_city:    b.business_city    || null,
-                    business_state:   b.business_state   || null,
-                    business_zip:     b.business_zip     || null,
-                    business_number:  bizNumber          || null,
-                    district:         b.district         || null,
-                })
-            });
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                console.warn('HIBCW: approval email failed —', err.error || res.status);
-                showToast('⚠️', 'Approved, but approval email could not be sent.', 'err');
-            } else {
-                showToast('📧', `Approval email sent to ${b.email}`);
-            }
-        } catch (e) {
-            console.warn('HIBCW: approval email network error —', e.message);
-            showToast('⚠️', 'Approved, but approval email could not be sent.', 'err');
-        }
     }
 
     // Generate the next available 5-digit business number for a district.
@@ -8859,11 +8855,66 @@
         }
     }
 
+    async function filterArchivedAlerts() {
+        const districtFilter = document.getElementById('archiveDistrictFilter')?.value || '';
+        const typeFilter = document.getElementById('archiveTypeFilter')?.value || '';
+        const el = document.getElementById('archiveAlertPanel');
+        if (!el || !sb) return;
+        el.innerHTML = '<div style="font-size:.72rem;color:var(--slate2);padding:8px 0">Loading…</div>';
+        try {
+            let query = sb
+                .from('district_alerts')
+                .select('*')
+                .not('archived_at', 'is', null)
+                .order('archived_at', { ascending: false })
+                .limit(100);
+            if (districtFilter) query = query.eq('district', districtFilter);
+            if (typeFilter) query = query.eq('alert_type', typeFilter);
+            const {data, error} = await query;
+            if (error) throw error;
+            const countEl = document.getElementById('archiveCount');
+            if (countEl) countEl.textContent = data.length ? `${data.length} alert${data.length !== 1 ? 's' : ''}` : '';
+            if (!data.length) {
+                el.innerHTML = '<div style="font-size:.72rem;color:var(--slate2);font-style:italic;padding:8px 0">No archived alerts match the selected filters.</div>';
+                return;
+            }
+            el.innerHTML = data.map(a => {
+                const distColor = KIAA_DISTRICTS.find(d => d.id === a.district)?.color || 'var(--teal)';
+                const t = alertTypeMeta(a.alert_type);
+                const archivedDate = new Date(a.archived_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+                const sentDate = new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+                return `
+                <div style="background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.2);border-left:3px solid var(--gold);border-radius:6px;padding:10px 12px;margin-bottom:8px;opacity:.85">
+                  <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:5px;flex-wrap:wrap">
+                    ${alertTypeBadge(a.alert_type)}
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${distColor}18;color:${distColor};border:1px solid ${distColor}44;border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0">${esc(districtLabel(a.district))}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0">📦 ARCHIVED</span>
+                  </div>
+                  <div style="font-size:.8rem;line-height:1.5;color:var(--white);margin-bottom:5px">${esc(a.message)}</div>
+                  ${a.media_url ? `
+                  <div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2);max-width:320px">
+                    ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:200px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:200px;object-fit:cover">`}
+                  </div>` : ''}
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);display:flex;flex-direction:column;gap:2px">
+                    <span>📤 Sent by ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
+                    <span>📦 Archived by ${esc(a.archived_by||'Admin')} · ${archivedDate}</span>
+                  </div>
+                  <div style="display:flex;gap:6px;margin-top:7px">
+                    <button onclick="unarchiveAlert('${a.id}')" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 8px;color:var(--teal);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">↩ Restore</button>
+                    <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url||'')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:2px 8px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete Permanently</button>
+                  </div>
+                </div>`;
+            }).join('');
+        } catch(e) {
+            el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load archived alerts: ${esc(e.message)}</div>`;
+        }
+    }
+
     async function unarchiveAlert(id) {
         const {error} = await sb.from('district_alerts').update({ archived_at: null, archived_by: null }).eq('id', id);
         if (!error) {
             showToast('↩', 'Alert restored to public feed.');
-            loadArchivedAlerts('archivedAlertLog');
+            filterArchivedAlerts();
             loadAdminAlertLog();
         } else {
             showToast('⚠️', error.message, 'err');
