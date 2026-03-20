@@ -12,7 +12,7 @@
 //   supabase secrets set RESEND_API_KEY=re_YOUR_KEY_HERE
 // ─────────────────────────────────────────────────────────────────────────────
 
-const RESEND_FROM = "HIBCW <noreply@hibcw.kiaahilo.org>";
+const RESEND_FROM = "HIBCW <noreply@support.kiaahilo.org>";
 
 const CORS = {
   "Access-Control-Allow-Origin":  "*",
