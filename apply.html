@@ -507,7 +507,7 @@
                     Business Street Address 
                     <span class="req">*</span>
                 </label>
-                <input type="text" id="aBizAddr" placeholder="123 Kamehameha Ave">
+                <input type="text" id="aBizAddr" placeholder="123 Kamehameha Ave" oninput="onApplyAddressChange()">
             </div>
             <div class="fld-row" style="grid-template-columns:2fr 1fr 1fr">
                 <div class="fld">
@@ -515,7 +515,7 @@
                         City 
                         <span class="req">*</span>
                     </label>
-                    <input type="text" id="aBizCity" placeholder="Hilo">
+                    <input type="text" id="aBizCity" placeholder="Hilo" oninput="onApplyAddressChange()">
                 </div>
                 <div class="fld">
                     <label>
@@ -529,7 +529,7 @@
                         Zip Code 
                         <span class="req">*</span>
                     </label>
-                    <input type="text" id="aBizZip" placeholder="96720" maxlength="10">
+                    <input type="text" id="aBizZip" placeholder="96720" maxlength="10" oninput="onApplyAddressChange()">
                 </div>
             </div>
 
@@ -537,8 +537,9 @@
                 <label>
                     Business District 
                     <span class="req">*</span>
+                    <span id="aDistrictAutoLabel" style="display:none;font-weight:300;text-transform:none;letter-spacing:0;font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;color:#00c9a7;margin-left:6px">✓ auto-detected</span>
                 </label>
-                <select id="aDistrict" onchange="lookupDistrictCaptain(this.value)" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:10px 13px;color:var(--white);font-size:.88rem;outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;-webkit-appearance:none">
+                <select id="aDistrict" onchange="onApplyDistrictManualChange(this.value)" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:10px 13px;color:var(--white);font-size:.88rem;outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;-webkit-appearance:none">
                     <option value="">— Select your district…</option>
                     <option value="hamakua">District 1 - Hāmākua</option>
                     <option value="north-hilo">District 2 - North Hilo</option>
@@ -617,6 +618,106 @@
 
     // Cache for looked-up captain names by district
     const captainCache = {};
+
+    // ── District auto-detect (same logic as register-business.html) ───────────
+    function applyPointInPolygon(lat, lng, polygon) {
+        let inside = false;
+        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+            const xi = polygon[i][1], yi = polygon[i][0];
+            const xj = polygon[j][1], yj = polygon[j][0];
+            const intersect = ((yi > lng) !== (yj > lng)) &&
+                (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
+        }
+        return inside;
+    }
+    const APPLY_DISTRICT_POLYGONS = [
+        { id:'hamakua',      poly:[[20.27,-155.07],[20.27,-155.87],[19.90,-155.65],[19.78,-155.47],[19.73,-155.32],[19.73,-155.10],[19.87,-155.08],[20.02,-155.10],[20.15,-155.25],[20.27,-155.07]] },
+        { id:'north-hilo',   poly:[[19.87,-155.08],[19.73,-155.10],[19.73,-155.18],[19.78,-155.22],[19.80,-155.12],[19.87,-155.08]] },
+        { id:'south-hilo',   poly:[[19.73,-155.10],[19.73,-155.32],[19.66,-155.30],[19.60,-155.22],[19.54,-155.08],[19.58,-155.01],[19.65,-154.99],[19.70,-155.04],[19.73,-155.10]] },
+        { id:'lower-puna',   poly:[[19.58,-155.01],[19.54,-155.08],[19.40,-155.13],[19.28,-155.04],[19.18,-154.85],[19.18,-154.79],[19.35,-154.82],[19.52,-154.93],[19.58,-155.01]] },
+        { id:'upper-puna',   poly:[[19.73,-155.32],[19.78,-155.47],[19.56,-155.45],[19.45,-155.35],[19.40,-155.13],[19.28,-155.04],[19.35,-154.82],[19.52,-154.93],[19.58,-155.01],[19.65,-154.99],[19.70,-155.04],[19.73,-155.10],[19.73,-155.32]] },
+        { id:'kau',          poly:[[19.45,-155.35],[19.40,-155.13],[19.28,-155.04],[19.18,-154.85],[19.10,-154.95],[19.02,-155.25],[18.91,-155.68],[18.95,-155.84],[19.03,-155.92],[19.18,-155.87],[19.28,-155.72],[19.45,-155.35]] },
+        { id:'south-kona',   poly:[[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.45,-155.88],[19.33,-155.80],[19.28,-155.72],[19.18,-155.87],[19.03,-155.92],[18.95,-155.84],[18.91,-155.68],[19.02,-155.25],[19.28,-155.04],[19.45,-155.35],[19.78,-155.47],[19.90,-155.65]] },
+        { id:'north-kona',   poly:[[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.60,-156.07],[19.73,-156.10],[19.85,-156.05],[19.90,-155.96],[19.90,-155.65]] },
+        { id:'north-kohala', poly:[[20.27,-155.87],[20.27,-156.10],[20.10,-156.07],[20.01,-156.00],[19.94,-155.98],[19.85,-156.05],[19.73,-156.10],[19.60,-156.07],[19.55,-155.93],[19.63,-155.99],[19.72,-155.98],[19.87,-155.87],[19.90,-155.65],[20.27,-155.87]] },
+    ];
+    const APPLY_ZIP_MAP = {
+        '96710':'hamakua','96728':'hamakua','96773':'hamakua','96776':'hamakua','96781':'hamakua',
+        '96727':'north-hilo','96760':'north-hilo','96771':'north-hilo',
+        '96720':'south-hilo','96721':'south-hilo',
+        '96749':'lower-puna','96778':'lower-puna','96764':'lower-puna','96770':'lower-puna',
+        '96785':'upper-puna',
+        '96772':'kau','96777':'kau',
+        '96704':'south-kona','96750':'south-kona','96756':'south-kona',
+        '96740':'north-kona','96745':'north-kona','96753':'north-kona',
+        '96743':'north-kohala','96755':'north-kohala',
+    };
+    let applyGeoTimer = null;
+    let applyAutoDetected = false;
+
+    function applyDetectFromCoords(lat, lng) {
+        for (const {id, poly} of APPLY_DISTRICT_POLYGONS) {
+            if (applyPointInPolygon(lat, lng, poly)) return id;
+        }
+        // Nearest centroid fallback
+        const centroids = [
+            {id:'hamakua',lat:20.00,lng:-155.55},{id:'north-hilo',lat:19.72,lng:-155.08},
+            {id:'south-hilo',lat:19.57,lng:-154.97},{id:'lower-puna',lat:19.38,lng:-154.97},
+            {id:'upper-puna',lat:19.58,lng:-154.95},{id:'kau',lat:19.10,lng:-155.50},
+            {id:'south-kona',lat:19.40,lng:-155.85},{id:'north-kona',lat:19.65,lng:-155.98},
+            {id:'north-kohala',lat:20.08,lng:-155.82},
+        ];
+        let best = null, bestD = Infinity;
+        for (const c of centroids) {
+            const d = Math.hypot(lat - c.lat, lng - c.lng);
+            if (d < bestD) { bestD = d; best = c.id; }
+        }
+        return best;
+    }
+
+    function applySetDistrict(districtId) {
+        const sel = document.getElementById('aDistrict');
+        if (!districtId || !sel) return;
+        sel.value = districtId;
+        sel.style.borderColor = 'rgba(0,201,167,.5)';
+        document.getElementById('aDistrictAutoLabel').style.display = 'inline';
+        applyAutoDetected = true;
+        lookupDistrictCaptain(districtId);
+    }
+
+    function onApplyDistrictManualChange(val) {
+        // User overrode auto-detect — clear the badge
+        applyAutoDetected = false;
+        document.getElementById('aDistrictAutoLabel').style.display = 'none';
+        document.getElementById('aDistrict').style.borderColor = '';
+        lookupDistrictCaptain(val);
+    }
+
+    function onApplyAddressChange() {
+        clearTimeout(applyGeoTimer);
+        const zip = document.getElementById('aBizZip').value.replace(/\D/g,'').substring(0,5);
+        // Immediate ZIP lookup
+        if (zip.length === 5 && APPLY_ZIP_MAP[zip]) {
+            applySetDistrict(APPLY_ZIP_MAP[zip]);
+        }
+        // Queue geocode for street+city confirmation
+        const street = document.getElementById('aBizAddr').value.trim();
+        const city   = document.getElementById('aBizCity').value.trim();
+        if (street && city) {
+            applyGeoTimer = setTimeout(async () => {
+                try {
+                    const q = encodeURIComponent(`${street}, ${city}, HI ${zip}`);
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1&countrycodes=us`);
+                    const data = await res.json();
+                    if (!data.length) return;
+                    const detected = applyDetectFromCoords(parseFloat(data[0].lat), parseFloat(data[0].lon));
+                    if (detected) applySetDistrict(detected);
+                } catch(e) { /* geocode failed silently — ZIP result stands */ }
+            }, 900);
+        }
+    }
+    // ── End district auto-detect ───────────────────────────────────────────────
 
     async function lookupDistrictCaptain(districtValue) {
       const preview = document.getElementById('captainPreview');
