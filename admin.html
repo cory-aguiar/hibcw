@@ -7945,18 +7945,26 @@
             showToast('✅', bizNumber ? `Business approved! ID: ${bizNumber}` : 'Business approved!');
             // Notify captain dashboard
             notifyCaptainNewBusiness(id);
-           // Send approval email
+            // Send approval email
             try {
                 console.log('Invoking email function for:', b.email);
-                const { data, error } = await sb.functions.invoke('send-approval-email', {
-                    body: {
+                const session = await sb.auth.getSession();
+                const token = session?.data?.session?.access_token || SUPABASE_ANON_KEY;
+                const res = await fetch(`${SUPABASE_URL}/functions/v1/send-approval-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
                         email: b.email,
                         contact_name: b.contact_name,
                         business_name: b.business_name,
                         business_number: bizNumber || b.business_number
-                    }
+                    })
                 });
-                console.log('Email result:', data, error);
+                const result = await res.json();
+                console.log('Email result:', result);
             } catch(e) {
                 console.error('Approval email error:', e);
             }
