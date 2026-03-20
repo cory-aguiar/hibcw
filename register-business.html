@@ -503,56 +503,17 @@ function pointInPolygon(lat, lng, polygon) {
 
 // Approximate Hawaii County council district boundary polygons [lat, lng]
 // Derived from official Hawaii County district maps (post-2022 redistricting)
+// District boundary polygons — coords match the DISTRICT_GEO_FALLBACK used in admin.html
 const DISTRICT_POLYGONS = [
-    { id: 'north-kohala', poly: [
-        [20.27,-156.07],[20.27,-155.68],[20.06,-155.68],[20.06,-155.82],
-        [19.95,-155.87],[19.90,-156.07],[20.27,-156.07]
-    ]},
-    { id: 'hamakua', poly: [
-        [20.06,-155.68],[20.06,-155.16],[19.82,-155.07],[19.74,-155.20],
-        [19.73,-155.47],[19.78,-155.57],[19.90,-155.64],[19.95,-155.87],
-        [20.06,-155.82],[20.06,-155.68]
-    ]},
-    { id: 'north-hilo', poly: [
-        [19.82,-155.07],[19.82,-154.98],[19.66,-154.93],[19.60,-155.00],
-        [19.58,-155.09],[19.65,-155.20],[19.74,-155.20],[19.82,-155.07]
-    ]},
-    { id: 'south-hilo', poly: [
-        [19.66,-154.93],[19.66,-154.82],[19.50,-154.82],[19.44,-154.93],
-        [19.48,-155.05],[19.58,-155.09],[19.60,-155.00],[19.66,-154.93]
-    ]},
-    { id: 'lower-puna', poly: [
-        [19.50,-154.82],[19.50,-154.65],[19.30,-154.65],[19.28,-154.80],
-        [19.33,-154.95],[19.44,-154.93],[19.50,-154.82]
-    ]},
-    { id: 'upper-puna', poly: [
-        [19.66,-154.82],[19.66,-154.65],[19.50,-154.65],[19.50,-154.82],
-        [19.58,-155.09],[19.65,-155.20],[19.73,-155.10],[19.66,-154.82]
-    ]},
-    { id: 'kau', poly: [
-        [19.33,-154.95],[19.28,-154.80],[19.10,-154.80],[18.91,-155.50],
-        [19.00,-155.68],[19.12,-155.84],[19.25,-155.87],[19.38,-155.72],
-        [19.38,-155.47],[19.40,-155.30],[19.48,-155.05],[19.44,-154.93],
-        [19.33,-154.95]
-    ]},
-    { id: 'south-kona', poly: [
-        [19.90,-156.07],[19.78,-155.57],[19.73,-155.47],[19.38,-155.47],
-        [19.38,-155.72],[19.25,-155.87],[19.12,-155.84],[19.00,-155.68],
-        [18.91,-155.50],[19.00,-156.07],[19.90,-156.07]
-    ]},
-    { id: 'north-kona', poly: [
-        [19.95,-155.87],[19.90,-155.64],[19.78,-155.57],[19.73,-155.47],
-        [19.38,-155.47],[19.73,-155.47],[19.90,-155.87],[19.95,-155.87]
-    ]},
-];
-
-// Refined North Kona — sits between Hamakua/South Hilo coast and South Kona
-// Override with a cleaner shape to avoid overlap artifacts
-DISTRICT_POLYGONS[8].poly = [
-    [19.95,-155.87],[19.90,-155.64],[19.78,-155.57],[19.73,-155.47],
-    [19.65,-155.20],[19.58,-155.09],[19.48,-155.05],[19.40,-155.30],
-    [19.38,-155.47],[19.60,-155.47],[19.73,-155.60],[19.87,-155.87],
-    [19.95,-155.87]
+    { id: 'hamakua',      poly: [[20.27,-155.07],[20.27,-155.87],[19.90,-155.65],[19.78,-155.47],[19.73,-155.32],[19.73,-155.10],[19.87,-155.08],[20.02,-155.10],[20.15,-155.25],[20.27,-155.07]] },
+    { id: 'north-hilo',   poly: [[19.87,-155.08],[19.73,-155.10],[19.73,-155.18],[19.78,-155.22],[19.80,-155.12],[19.87,-155.08]] },
+    { id: 'south-hilo',   poly: [[19.73,-155.10],[19.73,-155.32],[19.66,-155.30],[19.60,-155.22],[19.54,-155.08],[19.58,-155.01],[19.65,-154.99],[19.70,-155.04],[19.73,-155.10]] },
+    { id: 'lower-puna',   poly: [[19.58,-155.01],[19.54,-155.08],[19.40,-155.13],[19.28,-155.04],[19.18,-154.85],[19.18,-154.79],[19.35,-154.82],[19.52,-154.93],[19.58,-155.01]] },
+    { id: 'upper-puna',   poly: [[19.73,-155.32],[19.78,-155.47],[19.56,-155.45],[19.45,-155.35],[19.40,-155.13],[19.28,-155.04],[19.35,-154.82],[19.52,-154.93],[19.58,-155.01],[19.65,-154.99],[19.70,-155.04],[19.73,-155.10],[19.73,-155.32]] },
+    { id: 'kau',          poly: [[19.45,-155.35],[19.40,-155.13],[19.28,-155.04],[19.18,-154.85],[19.10,-154.95],[19.02,-155.25],[18.91,-155.68],[18.95,-155.84],[19.03,-155.92],[19.18,-155.87],[19.28,-155.72],[19.45,-155.35]] },
+    { id: 'south-kona',   poly: [[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.45,-155.88],[19.33,-155.80],[19.28,-155.72],[19.18,-155.87],[19.03,-155.92],[18.95,-155.84],[18.91,-155.68],[19.02,-155.25],[19.28,-155.04],[19.45,-155.35],[19.78,-155.47],[19.90,-155.65]] },
+    { id: 'north-kona',   poly: [[19.90,-155.65],[19.87,-155.87],[19.72,-155.98],[19.63,-155.99],[19.55,-155.93],[19.60,-156.07],[19.73,-156.10],[19.85,-156.05],[19.90,-155.96],[19.90,-155.65]] },
+    { id: 'north-kohala', poly: [[20.27,-155.87],[20.27,-156.10],[20.10,-156.07],[20.01,-156.00],[19.94,-155.98],[19.85,-156.05],[19.73,-156.10],[19.60,-156.07],[19.55,-155.93],[19.63,-155.99],[19.72,-155.98],[19.87,-155.87],[19.90,-155.65],[20.27,-155.87]] },
 ];
 
 async function detectDistrictFromCoords(lat, lng) {
@@ -620,15 +581,28 @@ function onManualDistrictSelect(val) {
 
 async function lookupCaptain(districtId) {
     try {
+        // Captain is an approved member whose full_name matches captain_name (same logic as admin)
         const {data} = await sb.from('member_applications')
-            .select('captain_name')
+            .select('full_name,captain_name')
             .eq('district', districtId)
             .eq('status','approved')
-            .not('captain_name','is',null)
-            .limit(1)
-            .single();
-        captainName = data?.captain_name || null;
+            .not('captain_name','is',null);
+        if (data && data.length) {
+            // Prefer exact captain match (full_name === captain_name)
+            const exact = data.find(m =>
+                m.full_name && m.captain_name &&
+                m.full_name.trim().toLowerCase() === m.captain_name.trim().toLowerCase()
+            );
+            captainName = exact ? exact.captain_name.trim()
+                        : (data[0].captain_name || null);
+        } else {
+            captainName = null;
+        }
     } catch(e) { captainName = null; }
+    // Refresh the preview text if the district display is already visible
+    if (captainName && document.getElementById('districtDisplayWrap').style.display !== 'none') {
+        document.getElementById('captainPreview').textContent = '👮 District Captain: ' + captainName;
+    }
 }
 
 // ── Mailing address sync ───────────────────────────────
@@ -717,6 +691,40 @@ async function submitRegistration() {
     };
 
     try {
+        // Duplicate check — fuzzy match on business name + ZIP
+        const {data: dupes} = await sb.from('business_registry')
+            .select('business_name,zip,status')
+            .eq('zip', bZip)
+            .neq('status', 'rejected');
+        if (dupes && dupes.length) {
+            const normalize = s => s.toLowerCase().replace(/[^a-z0-9]/g,'');
+            const nameNorm = normalize(bName);
+            const match = dupes.find(d => {
+                const dNorm = normalize(d.business_name || '');
+                // Flag if names share 80%+ of characters (simple overlap ratio)
+                const longer = Math.max(nameNorm.length, dNorm.length);
+                if (!longer) return false;
+                let common = 0;
+                for (const ch of nameNorm) if (dNorm.includes(ch)) common++;
+                return common / longer >= 0.8;
+            });
+            if (match) {
+                const alreadyApproved = match.status === 'approved';
+                const msg = alreadyApproved
+                    ? `"${match.business_name}" is already registered in ZIP ${bZip}. If this is your business, please contact your District Captain directly.`
+                    : `A registration for "${match.business_name}" in ZIP ${bZip} is already pending review. If this is a separate business, click Submit again to continue.`;
+                errEl.textContent = msg;
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = '🏢 Register My Business';
+                // Allow a second click to override the warning and submit anyway
+                btn.dataset.dupOverride = '1';
+                return;
+            }
+        }
+        // Clear any previous override flag
+        delete btn.dataset.dupOverride;
+
         const {error} = await sb.from('business_registry').insert(row);
         if (error) throw error;
         document.getElementById('formCard').style.display = 'none';
