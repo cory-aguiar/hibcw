@@ -7945,6 +7945,19 @@
             showToast('✅', bizNumber ? `Business approved! ID: ${bizNumber}` : 'Business approved!');
             // Notify captain dashboard
             notifyCaptainNewBusiness(id);
+            // Send approval email
+            try {
+                await sb.functions.invoke('send-approval-email', {
+                    body: {
+                        to: b.email,
+                        contact_name: b.contact_name,
+                        business_name: b.business_name,
+                        business_number: bizNumber || b.business_number
+                    }
+                });
+            } catch(e) {
+                console.warn('Approval email error:', e.message);
+            }
         } else showToast('⚠️', error.message, 'err');
     }
 
