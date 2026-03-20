@@ -500,7 +500,7 @@
         actions: [
         {
             label: '✉️ Open Welcome Letter',
-            url: 'files/template-intro-letter.html',
+            url: `files/template-intro-letter.html?name=${encodeURIComponent(bizName)}&contact=${encodeURIComponent(bizContact)}&address=${encodeURIComponent(bizAddr)}&district=${encodeURIComponent(bizDist)}&distId=${encodeURIComponent(bizDistId)}&phone=${encodeURIComponent(bizPhone)}&email=${encodeURIComponent(bizEmail)}&bizNum=${encodeURIComponent(bizNum)}&approvedAt=${encodeURIComponent(bizApprovedAt)}`,
             primary: true
         },
         {
