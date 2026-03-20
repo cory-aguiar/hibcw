@@ -7885,6 +7885,13 @@
             status:         document.getElementById('ebStatus').value,
         };
 
+        // If the district changed on an already-approved business, reassign biz#
+        const districtChanged = updates.district && updates.district !== b.district;
+        if (districtChanged && b.status === 'approved' && b.business_number) {
+            const newBizNumber = await generateBusinessNumber(updates.district);
+            if (newBizNumber) updates.business_number = newBizNumber;
+        }
+
         try {
             const {error} = await sb.from('business_registry').update(updates).eq('id', id);
             if (error) throw error;
@@ -7893,7 +7900,10 @@
             closeBizModal('editBusinessModal');
             renderRegistry();
             if (currentView === 'captains') renderCaptains();
-            showToast('✅', 'Business updated successfully.');
+            const msg = districtChanged && updates.business_number
+                ? `Business updated. New ID: ${updates.business_number}`
+                : 'Business updated successfully.';
+            showToast('✅', msg);
         } catch(e) {
             showToast('⚠️', e.message, 'err');
         } finally {
