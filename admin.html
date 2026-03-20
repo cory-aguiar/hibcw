@@ -7949,7 +7949,7 @@
             try {
                 await sb.functions.invoke('send-approval-email', {
                     body: {
-                        to: b.email,
+                        email: b.email,
                         contact_name: b.contact_name,
                         business_name: b.business_name,
                         business_number: bizNumber || b.business_number
