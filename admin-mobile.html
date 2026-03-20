@@ -644,7 +644,7 @@ body.light .strip-cell{background:#fff}
           </div>
         </div>
 
-        <div class="more-section-title admin-only">📢 District Alerts</div>
+        <div class="more-section-title admin-only">🔔 Alerts</div>
         <div class="more-card admin-only">
           <div class="more-row" onclick="showMobActiveAlerts()">
             <div class="more-ico">📢</div>
@@ -2166,10 +2166,11 @@ async function loadMobActiveAlerts() {
         <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);margin-bottom:8px">
           📤 ${esc(a.sent_by_name||'Admin')} · ${sentDate}${a.is_edited?' · <em>edited</em>':''}
         </div>
+        ${(currentRole==='admin'||currentRole==='superadmin') ? `
         <div style="display:flex;gap:6px">
           <button onclick="archiveMobActiveAlert('${a.id}')" style="flex:1;background:none;border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:6px 8px;color:var(--gold);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">📦 Archive</button>
           <button onclick="deleteMobActiveAlert('${a.id}','${esc(a.media_url||'')}')" style="flex:1;background:none;border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:6px 8px;color:var(--red);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete</button>
-        </div>
+        </div>` : ''}
       </div>`;
     }).join('');
   } catch(e) { el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load: ${esc(e.message)}</div>`; }
@@ -2181,7 +2182,7 @@ async function archiveMobActiveAlert(id) {
   else showToast('⚠️', error.message, 'err');
 }
 async function deleteMobActiveAlert(id, mediaUrl) {
-  if (!confirm('Delete this alert? It will be permanently removed from the public site.')) return;
+  if (!confirm('Delete this alert permanently? It cannot be recovered.')) return;
   if (mediaUrl) { const path = mediaUrl.split('/object/public/incident-media/')[1]; if (path) await sb.storage.from('incident-media').remove([path]); }
   const { error } = await sb.from('district_alerts').delete().eq('id', id);
   if (!error) { showToast('🗑','Alert deleted.'); loadMobActiveAlerts(); }
@@ -2236,7 +2237,7 @@ async function unarchiveMobAlert(id) {
   else showToast('⚠️', error.message, 'err');
 }
 async function deleteMobArchivedAlert(id, mediaUrl) {
-  if (!confirm('Permanently delete this archived alert? This cannot be undone.')) return;
+  if (!confirm('Delete this alert permanently? It cannot be recovered.')) return;
   if (mediaUrl) { const path = mediaUrl.split('/object/public/incident-media/')[1]; if (path) await sb.storage.from('incident-media').remove([path]); }
   const { error } = await sb.from('district_alerts').delete().eq('id', id);
   if (!error) { showToast('🗑','Alert permanently deleted.'); loadMobArchivedAlerts(); }
@@ -2278,7 +2279,7 @@ async function loadArchivedAlerts(containerId) {
 }
 
 async function deleteDistrictAlert(id) {
-  if (!confirm('Cancel and remove this alert? It will no longer appear on the public site.')) return;
+  if (!confirm('Delete this alert permanently? It cannot be recovered.')) return;
   const { data: a } = await sb.from('district_alerts').select('media_url').eq('id',id).single();
   if (a?.media_url) { const path = a.media_url.split('/object/public/incident-media/')[1]; if (path) await sb.storage.from('incident-media').remove([path]); }
   const { error } = await sb.from('district_alerts').delete().eq('id', id);
@@ -2468,10 +2469,15 @@ async function loadAdminAlertLog() {
 }
 
 async function deleteAdminAlert(id, mediaUrl) {
-  if (!confirm('Delete this alert?')) return;
+  if (!confirm('Delete this alert permanently? It cannot be recovered.')) return;
   if (mediaUrl) { const path = mediaUrl.split('/object/public/incident-media/')[1]; if (path) await sb.storage.from('incident-media').remove([path]); }
   const { error } = await sb.from('district_alerts').delete().eq('id', id);
-  if (!error) { showToast('🗑','Alert deleted.'); loadAdminAlertLog(); }
+  if (!error) {
+    showToast('🗑','Alert deleted permanently.');
+    loadAdminAlertLog();
+    if (document.getElementById('mobActiveAlertsScreen')?.style.display !== 'none') loadMobActiveAlerts();
+    if (document.getElementById('mobArchivedAlertsScreen')?.style.display !== 'none') loadMobArchivedAlerts();
+  }
   else showToast('⚠️',error.message,'err');
 }
 
