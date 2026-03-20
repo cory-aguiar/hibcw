@@ -7852,6 +7852,14 @@
         const id      = document.getElementById('ebId').value;
         const b       = registryList.find(b=>b.id===id);
         if (!b) return;
+
+        // Warn before reassigning district on an approved business (biz# will change)
+        const newDistrict = document.getElementById('ebDistrict').value || null;
+        if (newDistrict && newDistrict !== b.district && b.status === 'approved' && b.business_number) {
+            const distLabel = newDistrict.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+            if (!confirm(`Changing the district to "${distLabel}" will assign a new business number to replace ${b.business_number}. Continue?`)) return;
+        }
+
         const btn     = document.getElementById('ebSaveBtn');
         btn.disabled  = true;
         btn.textContent = 'Saving…';
