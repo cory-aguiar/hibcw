@@ -495,16 +495,16 @@
     {
         id: 'welcome',
         icon: '✉️',
-        title: 'Welcome Letter from District Captain',
-        desc: 'Open the interactive letter, fill in any remaining details, then print on HIBCW or KIAA letterhead.',
+        title: 'HIBCW Welcome Letter',
+        desc: 'Generic welcome letter explaining what HIBCW is, the difference between individual and business membership, links to the map, and contact information. Ready to print — no fill-in required.',
         actions: [
         {
-            label: '✍️ Open & Fill Letter',
-            url: `files/template-intro-letter.html?${letterParams.toString()}`,
+            label: '✉️ Open Welcome Letter',
+            url: 'files/template-intro-letter.html',
             primary: true
         },
         {
-            label: '📄 Blank PDF',
+            label: '📄 PDF Version',
             url: 'files/template-intro-letter.pdf'
         },
         ]
