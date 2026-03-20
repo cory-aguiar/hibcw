@@ -77,6 +77,13 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
 .letter-footer{padding:12px 52px;border-top:1px solid #e0e8f0;display:flex;align-items:center;justify-content:space-between;margin-top:auto}
 .lf-left{font-size:8.5px;color:#b0c0cc;line-height:1.7}
 .lf-right{text-align:right;font-family:'IBM Plex Mono',monospace;font-size:8px;color:#b0c0cc}
+
+/* ── Business info section ── */
+.biz-info-card{background:#f0f4f8;border:1px solid #d0dce8;border-radius:6px;padding:10px 14px;margin-top:10px}
+.biz-info-label{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#007a65;margin-bottom:8px}
+.biz-info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 14px}
+.biz-field-label{font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:#7a8fa6;margin-bottom:2px}
+.biz-field-value{font-size:10px;color:#1a2a3a;font-weight:500;border-bottom:1px solid #b0c0cc;padding-bottom:2px;min-height:15px}
 </style>
 </head>
 <body>
@@ -95,10 +102,13 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
 
   <!-- LETTERHEAD -->
   <div class="letterhead">
-    <div class="lh-left">
-      <div class="lh-org">A Program of KIAA</div>
-      <div class="lh-title">Hawaii Island Business<br>Crime Watch</div>
-      <div class="lh-sub">hibcw.kiaahilo.org &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422</div>
+    <div class="lh-left" style="display:flex;align-items:center;gap:14px">
+      <img src="logo-shield.svg" alt="HIBCW Shield" style="width:48px;height:48px;flex-shrink:0;">
+      <div>
+        <div class="lh-org">A Program of KIAA</div>
+        <div class="lh-title">Hawaii Island Business<br>Crime Watch</div>
+        <div class="lh-sub">hibcw.kiaahilo.org &nbsp;·&nbsp; hibcw@kiaahilo.org &nbsp;·&nbsp; (808) 961-5422</div>
+      </div>
     </div>
     <div style="text-align:right;flex-shrink:0">
       <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#b0c0cc;margin-bottom:4px">Keeping Hawaii Island</div>
@@ -147,7 +157,7 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
       <div class="cta-left">
         <div class="cta-label">View the map &amp; sign up at</div>
         <div class="cta-url">hibcw.kiaahilo.org</div>
-        <div class="cta-sub">View incidents · Join as a member or business · Completely free · Approved by your District Captain</div>
+        <div class="cta-sub">View incidents · Join as a member or business · Completely free · No approval required</div>
       </div>
       <div>
         <div class="cta-qr"><img src="HIBCW User Registration.png" alt="HIBCW User Registration QR Code" style="width:58px;height:58px;object-fit:contain;"/></div>
@@ -165,16 +175,31 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
       <div class="contact-divider"></div>
       <div class="contact-col">
         <div class="contact-col-label">View the Map</div>
-        <div class="cc-row"><span class="cc-icon">🗺️</span><span class="cc-val">hibcw.kiaahilo.org</span></div>
+        <div class="cc-row"><span class="cc-icon">🗺️</span><span class="cc-val">hibcw.kiaahilo.org/map</span></div>
         <div class="cc-row"><span class="cc-icon">📍</span><span style="color:#4a6070">All 9 districts · Open to the public</span></div>
         <div class="cc-row"><span class="cc-icon">🔓</span><span style="color:#4a6070">No login required to view</span></div>
       </div>
       <div class="contact-divider"></div>
       <div class="contact-col">
         <div class="contact-col-label">Operated By</div>
-        <div class="cc-row"><span class="cc-icon">🏢</span><span class="cc-val">KIAA — Kanoelehua Industrial Area Association</span></div>
+        <div class="cc-row"><span class="cc-icon">🏢</span><span class="cc-val">KIAA — Kona-Kohala Area Association</span></div>
         <div class="cc-row"><span class="cc-icon">🌐</span><span class="cc-val">kiaahilo.org</span></div>
         <div class="cc-row"><span class="cc-icon">📞</span><span class="cc-val">(808) 961-5422</span></div>
+      </div>
+    </div>
+
+    <!-- BUSINESS INFO SECTION -->
+    <div class="biz-info-card">
+      <div class="biz-info-label">Presented To</div>
+      <div class="biz-info-grid">
+        <div><div class="biz-field-label">Business Name</div><div class="biz-field-value" id="biz-name"></div></div>
+        <div><div class="biz-field-label">Member / Business #</div><div class="biz-field-value" id="biz-num"></div></div>
+        <div><div class="biz-field-label">District</div><div class="biz-field-value" id="biz-district"></div></div>
+        <div><div class="biz-field-label">Contact Name</div><div class="biz-field-value" id="biz-contact"></div></div>
+        <div style="grid-column:span 2"><div class="biz-field-label">Address</div><div class="biz-field-value" id="biz-address"></div></div>
+        <div><div class="biz-field-label">Phone</div><div class="biz-field-value" id="biz-phone"></div></div>
+        <div><div class="biz-field-label">Email</div><div class="biz-field-value" id="biz-email"></div></div>
+        <div><div class="biz-field-label">Date Approved</div><div class="biz-field-value" id="biz-date"></div></div>
       </div>
     </div>
 
@@ -195,5 +220,24 @@ body{background:#e8eef4;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:1
   <div class="accent-bot2"></div>
 </div>
 
+<script>
+(function() {
+  const p = new URLSearchParams(window.location.search);
+  const map = {
+    'biz-name':     p.get('name')       || p.get('business') || '',
+    'biz-num':      p.get('bizNum')     || p.get('id') || '',
+    'biz-contact':  p.get('contact')    || '',
+    'biz-district': p.get('district')   || '',
+    'biz-address':  p.get('address')    || '',
+    'biz-phone':    p.get('phone')      || '',
+    'biz-email':    p.get('email')      || '',
+    'biz-date':     p.get('approvedAt') || '',
+  };
+  Object.entries(map).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val || '—';
+  });
+})();
+</script>
 </body>
 </html>
