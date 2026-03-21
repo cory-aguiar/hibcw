@@ -9301,6 +9301,9 @@
         btn.disabled = true;
         btn.textContent = '⏳ Saving…';
 
+        const _session = await sb.auth.getSession();
+        const token = _session?.data?.session?.access_token || SUPABASE_ANON_KEY;
+
         try {
             let mediaUrl = null,
                 mediaType = null;
@@ -9334,6 +9337,23 @@
                 if (error)
                     throw error;
                 showToast('✅', 'Alert updated.');
+
+                // Send district alert email (edited alert)
+                try {
+                    const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-district-alert-email`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({
+                            district:     captainDistrict,
+                            message:      msg,
+                            alert_type:   alertType,
+                            sent_by_name: currentUserName,
+                            is_edited:    true,
+                        })
+                    });
+                    const emailResult = await emailRes.json();
+                    console.log('District alert email result:', emailResult);
+                } catch(e) { console.error('District alert email error:', e); }
             } else {
                 const {error} = await sb.from('district_alerts').insert({
                     district: captainDistrict,
@@ -9347,6 +9367,23 @@
                 if (error)
                     throw error;
                 showToast('📢', 'Alert sent to your district.');
+
+                // Send district alert email (new alert)
+                try {
+                    const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-district-alert-email`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({
+                            district:     captainDistrict,
+                            message:      msg,
+                            alert_type:   alertType,
+                            sent_by_name: currentUserName,
+                            is_edited:    false,
+                        })
+                    });
+                    const emailResult = await emailRes.json();
+                    console.log('District alert email result:', emailResult);
+                } catch(e) { console.error('District alert email error:', e); }
             }
 
             cancelAlertEdit();
@@ -9464,6 +9501,9 @@
             btn.disabled = true;
             btn.textContent = '⏳ Saving…';
         }
+        const _adminSession = await sb.auth.getSession();
+        const adminToken = _adminSession?.data?.session?.access_token || SUPABASE_ANON_KEY;
+
         try {
             let mediaUrl = null,
                 mediaType = null;
@@ -9484,6 +9524,23 @@
                 if (error)
                     throw error;
                 showToast('✅', 'Alert updated.');
+
+                // Send district alert email (edited alert)
+                try {
+                    const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-district-alert-email`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                        body: JSON.stringify({
+                            district:     district,
+                            message:      msg,
+                            alert_type:   alertType,
+                            sent_by_name: currentUserName,
+                            is_edited:    true,
+                        })
+                    });
+                    const emailResult = await emailRes.json();
+                    console.log('District alert email result:', emailResult);
+                } catch(e) { console.error('District alert email error:', e); }
             } else {
                 const {error} = await sb.from('district_alerts').insert({
                     district,
@@ -9497,6 +9554,23 @@
                 if (error)
                     throw error;
                 showToast('📢', `Alert sent to ${districtLabel(district)}.`);
+
+                // Send district alert email (new alert)
+                try {
+                    const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-district-alert-email`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                        body: JSON.stringify({
+                            district:     district,
+                            message:      msg,
+                            alert_type:   alertType,
+                            sent_by_name: currentUserName,
+                            is_edited:    false,
+                        })
+                    });
+                    const emailResult = await emailRes.json();
+                    console.log('District alert email result:', emailResult);
+                } catch(e) { console.error('District alert email error:', e); }
             }
             document.getElementById('adminAlertMsg').value = '';
             document.getElementById('adminAlertEditId').value = '';
