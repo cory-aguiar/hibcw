@@ -8823,42 +8823,6 @@
 
     /* ════════════════════════════════════════════════════
        DISTRICT ALERTS
-    async function loadDistrictAlerts() {
-        if (!sb || !captainDistrict)
-            return;
-        const el = document.getElementById('captainAlertLog');
-        if (!el)
-            return;
-        try {
-            const {data, error} = await sb
-            .from('district_alerts')
-            .select('*')
-            .eq('district', captainDistrict)
-            .order('created_at', {
-                ascending: false
-            })
-            .limit(10);
-            if (error)
-                throw error;
-            if (!data.length) {
-                el.innerHTML = `<div style="font-size:.75rem;color:var(--slate2);font-style:italic">No alerts sent yet.</div>`;
-                return;
-            }
-            el.innerHTML = data.map(a => `
-      <div data-id="${a.id}" data-msg="${a.message.replace(/"/g, '&quot;')}" data-media="${a.media_url || ''}" data-mtype="${a.media_type || ''}" style="background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.18);border-radius:6px;padding:10px 12px;margin-bottom:8px">
-        <div style="font-size:.82rem;line-height:1.5;color:var(--white);margin-bottom:5px">${esc(a.message)}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
-          <span>👤 ${
-            esc(a.sent_by_name || 'Captain')} · ${fmt(a.created_at)}</span>
-          <button onclick="deleteDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(232,65,90,.3);border-radius:3px;padding:2px 8px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s" onmouseover="this.style.background='rgba(232,65,90,.1)'" onmouseout="this.style.background='none'">✕ Cancel</button>
-        </div>
-      </div>`
-
-            ).join('');
-        } catch (e) {
-            el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load alerts — make sure the district_alerts table exists in your database.</div>`;
-        }
-    }
 
     async function loadDistrictAlerts() {
         if (!sb || !captainDistrict)
@@ -9313,9 +9277,9 @@
                 const {data: existing} = await sb.from('district_alerts').select('media_url,media_type').eq('id', editId).single();
                 // If user cleared preview, treat as remove; otherwise keep
                 const prevVisible = document.getElementById('captainAlertPreview')?.style.display !== 'none';
-                if (prevVisible && existing?.data?.media_url) {
-                    mediaUrl = existing.data.media_url;
-                    mediaType = existing.data.media_type;
+                if (prevVisible && existing?.media_url) {
+                    mediaUrl = existing.media_url;
+                    mediaType = existing.media_type;
                 }
             }
 
