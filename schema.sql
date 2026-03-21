@@ -163,30 +163,37 @@ create policy "admin insert member_emails" on public.member_emails for insert wi
 create policy "admin delete member_emails" on public.member_emails for delete using (auth.role() = 'authenticated');
 create policy "public check email"         on public.member_emails for select using (true);
 
--- ── DISTRICT ALERTS TABLE ────────────────────────────────────
+-- ── DISTRICT ALERTS TABLE ────────────────────────────
 create table public.district_alerts (
   id             uuid primary key default uuid_generate_v4(),
   created_at     timestamptz not null default now(),
   updated_at     timestamptz,
   district       text not null,
   message        text not null,
+  alert_type     text not null default 'incident',  -- see ALERT_TYPES in admin.html
   media_url      text,
   media_type     text,  -- 'image' | 'video'
   is_edited      boolean default false,
   sent_by_email  text,
-  sent_by_name   text
+  sent_by_name   text,
+  archived_at    timestamptz,
+  archived_by    text
 );
 create index district_alerts_district_idx   on public.district_alerts (district);
 create index district_alerts_created_at_idx on public.district_alerts (created_at desc);
+create index district_alerts_archived_idx   on public.district_alerts (archived_at);
 alter table public.district_alerts enable row level security;
 create policy "admin read alerts"   on public.district_alerts for select using (auth.role() = 'authenticated');
 create policy "admin insert alerts" on public.district_alerts for insert with check (auth.role() = 'authenticated');
 create policy "admin update alerts" on public.district_alerts for update using (auth.role() = 'authenticated');
 create policy "admin delete alerts" on public.district_alerts for delete using (auth.role() = 'authenticated');
 
--- ── MIGRATION: add media/edit columns if table already exists ─
--- Run these if you created district_alerts before this update:
+-- ── MIGRATION: run these if district_alerts table already exists ───
 -- alter table public.district_alerts add column if not exists media_url text;
 -- alter table public.district_alerts add column if not exists media_type text;
 -- alter table public.district_alerts add column if not exists updated_at timestamptz;
 -- alter table public.district_alerts add column if not exists is_edited boolean default false;
+-- alter table public.district_alerts add column if not exists alert_type text not null default 'incident';
+-- alter table public.district_alerts add column if not exists archived_at timestamptz;
+-- alter table public.district_alerts add column if not exists archived_by text;
+-- create index if not exists district_alerts_archived_idx on public.district_alerts (archived_at);
