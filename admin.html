@@ -2507,9 +2507,11 @@
                 <div class="nav-section admin-only">Alerts</div>
                 <button class="nav-btn admin-only" id="nav-alerts-active" onclick="showView('alerts-active')">
                     🔔 Active Alerts
+                    <span class="nav-count" id="nc-alerts-active">—</span>
                 </button>
                 <button class="nav-btn admin-only" id="nav-alerts-archived" onclick="showView('alerts-archived')">
                     📦 Archived Alerts
+                    <span class="nav-count" id="nc-alerts-archived">—</span>
                 </button>
                 <div class="nav-section">Reports</div>
                 <button class="nav-btn" id="nav-stats" onclick="showView('stats')">📊 Statistics</button>
@@ -3914,6 +3916,7 @@
           });
         loadRegistry(); // non-blocking — loads in background
         await loadRegistryBadge();
+        loadAlertBadges();
         // Populate district filter selects
         ['active', 'archived', 'all'].forEach(v => {
             const el = document.getElementById('district-' + v);
@@ -7599,6 +7602,19 @@
         } catch(e) {}
     }
 
+    async function loadAlertBadges() {
+        try {
+            const [{count: activeCount}, {count: archivedCount}] = await Promise.all([
+                sb.from('district_alerts').select('id', {count:'exact', head:true}).is('archived_at', null),
+                sb.from('district_alerts').select('id', {count:'exact', head:true}).not('archived_at', 'is', null),
+            ]);
+            const elA = document.getElementById('nc-alerts-active');
+            const elB = document.getElementById('nc-alerts-archived');
+            if (elA) elA.textContent = activeCount || '—';
+            if (elB) elB.textContent = archivedCount || '—';
+        } catch(e) {}
+    }
+
     /* ════════════════════════════════════════════════════
        BUSINESS REGISTRY
     ════════════════════════════════════════════════════ */
@@ -8901,6 +8917,7 @@
         if (!error) {
             showToast('📦', 'Alert archived — kept as record.');
             loadDistrictAlerts();
+            loadAlertBadges();
         } else {
             showToast('⚠️', error.message, 'err');
         }
@@ -9046,6 +9063,7 @@
         if (!error) {
             showToast('📦', 'Alert archived — kept as record.');
             loadActiveAlertsView();
+            loadAlertBadges();
         } else {
             showToast('⚠️', error.message, 'err');
         }
@@ -9125,6 +9143,7 @@
             showToast('↩', 'Alert restored to public feed.');
             filterArchivedAlerts();
             loadAdminAlertLog();
+            loadAlertBadges();
             if (currentView === 'alerts-active') loadActiveAlertsView();
         } else {
             showToast('⚠️', error.message, 'err');
@@ -9439,6 +9458,7 @@
         if (!error) {
             showToast('🗑', 'Alert deleted permanently.');
             loadAdminAlertLog();
+            loadAlertBadges();
             if (currentView === 'alerts-active')   loadActiveAlertsView();
             if (currentView === 'alerts-archived') filterArchivedAlerts();
         }
