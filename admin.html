@@ -8133,12 +8133,35 @@
 
     async function rejectRegistry(id) {
         if (!confirm('Reject this business registration?')) return;
+        const b = registryList.find(b=>b.id===id);
         const {error} = await sb.from('business_registry').update({status:'rejected'}).eq('id',id);
         if (!error) {
-            const b = registryList.find(b=>b.id===id);
             if (b) b.status = 'rejected';
             renderRegistry(); updateRegistryCount();
             showToast('❌','Business registration rejected.');
+            // Send denial email
+            if (b?.email) {
+                try {
+                    const session = await sb.auth.getSession();
+                    const token = session?.data?.session?.access_token || SUPABASE_ANON_KEY;
+                    const res = await fetch(`${SUPABASE_URL}/functions/v1/send-denial-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            email:         b.email,
+                            contact_name:  b.contact_name,
+                            business_name: b.business_name,
+                        })
+                    });
+                    const result = await res.json();
+                    console.log('Business denial email result:', result);
+                } catch(e) {
+                    console.error('Business denial email error:', e);
+                }
+            }
         } else showToast('⚠️',error.message,'err');
     }
 
@@ -8513,6 +8536,30 @@
             await sb.from('member_emails').delete().eq('email', app.email.toLowerCase());
             await loadMembers();
         }
+
+        // Send denial email only for pending rejections (not revocations of approved members)
+        if (app?.status === 'pending' && app?.email) {
+            try {
+                const session = await sb.auth.getSession();
+                const token = session?.data?.session?.access_token || SUPABASE_ANON_KEY;
+                const res = await fetch(`${SUPABASE_URL}/functions/v1/send-member-denial-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        email:     app.email,
+                        full_name: app.full_name,
+                    })
+                });
+                const result = await res.json();
+                console.log('Member denial email result:', result);
+            } catch(e) {
+                console.error('Member denial email error:', e);
+            }
+        }
+
         if (app)
             app.status = 'rejected';
         renderApps();
