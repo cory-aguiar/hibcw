@@ -8455,7 +8455,35 @@
             showToast('⚠️', 'Application approved but could not add to members: ' + memErr.message, 'err');
         }
 
-        // 3. Refresh both lists
+        // 3. Send approval confirmation email
+        try {
+            const session = await sb.auth.getSession();
+            const token = session?.data?.session?.access_token || SUPABASE_ANON_KEY;
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/send-member-approval-email`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    email:            app.email,
+                    full_name:        app.full_name,
+                    business_name:    app.business_name,
+                    business_address: app.business_address,
+                    business_city:    app.business_city,
+                    business_state:   app.business_state,
+                    business_zip:     app.business_zip,
+                    district:         app.district,
+                    captain_name:     approveUpdate.captain_name || app.captain_name || null,
+                })
+            });
+            const result = await res.json();
+            console.log('Member approval email result:', result);
+        } catch(e) {
+            console.error('Member approval email error:', e);
+        }
+
+        // 4. Refresh both lists
         if (app)
             app.status = 'approved';
         await loadMembers();
