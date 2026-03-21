@@ -3279,9 +3279,12 @@
 
                 <!-- ── Active Alerts view ────────────────────────── -->
                 <div class="view" id="view-alerts-active">
-                  <div style="padding:24px 24px 16px">
-                    <div class="page-title">🔔 Active Alerts</div>
-                    <div class="page-sub">All active district alerts currently visible on the public feed — archive or delete from here</div>
+                  <div style="padding:24px 24px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+                    <div>
+                      <div class="page-title">🔔 Active Alerts</div>
+                      <div class="page-sub">All active district alerts currently visible on the public feed — archive or delete from here</div>
+                    </div>
+                    <button class="btn btn-ghost superadmin-only" style="font-size:.65rem;margin-top:4px" onclick="checkAlertArchiveSetup()" title="Run if archive button isn't working">🔧 Diagnose Archive</button>
                   </div>
                   <div style="padding:0 24px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
                     <select id="activeAlertDistrictFilter" onchange="loadActiveAlertsView()" style="background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 12px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer">
@@ -8915,11 +8918,15 @@
             archived_by: currentUserEmail
         }).eq('id', id).select();
         if (error) {
-            showToast('⚠️', error.message, 'err');
-            console.error('archiveDistrictAlert error:', error);
+            console.error('[Archive] Supabase error:', error);
+            if (error.message && error.message.includes('column')) {
+                showToast('⚠️', 'DB missing columns — run migration in Supabase SQL editor. See console.', 'err');
+            } else {
+                showToast('⚠️', error.message, 'err');
+            }
         } else if (!data || data.length === 0) {
-            showToast('⚠️', 'Archive failed — no rows updated. Check Supabase RLS policy for district_alerts UPDATE.', 'err');
-            console.warn('archiveDistrictAlert: update matched 0 rows for id', id);
+            console.warn('[Archive] 0 rows updated — likely missing RLS UPDATE policy on district_alerts.');
+            showToast('⚠️', 'Archive blocked — add UPDATE policy for district_alerts in Supabase. See console.', 'err');
         } else {
             showToast('📦', 'Alert archived — kept as record.');
             loadDistrictAlerts();
@@ -8935,14 +8942,19 @@
             archived_by: currentUserEmail
         }).eq('id', id).select();
         if (error) {
-            showToast('⚠️', error.message, 'err');
-            console.error('archiveAdminAlert error:', error);
+            console.error('[Archive] Supabase error:', error);
+            if (error.message && error.message.includes('column')) {
+                showToast('⚠️', 'DB missing columns — run migration in Supabase SQL editor. See console.', 'err');
+            } else {
+                showToast('⚠️', error.message, 'err');
+            }
         } else if (!data || data.length === 0) {
-            showToast('⚠️', 'Archive failed — no rows updated. Check Supabase RLS policy for district_alerts UPDATE.', 'err');
-            console.warn('archiveAdminAlert: update matched 0 rows for id', id);
+            console.warn('[Archive] 0 rows updated — likely missing RLS UPDATE policy on district_alerts.');
+            showToast('⚠️', 'Archive blocked — add UPDATE policy for district_alerts in Supabase. See console.', 'err');
         } else {
             showToast('📦', 'Alert archived — kept as record.');
             loadAdminAlertLog();
+            loadAlertBadges();
         }
     }
 
@@ -9069,11 +9081,15 @@
             archived_by: currentUserEmail
         }).eq('id', id).select();
         if (error) {
-            showToast('⚠️', error.message, 'err');
-            console.error('archiveActiveAlert error:', error);
+            console.error('[Archive] Supabase error:', error);
+            if (error.message && error.message.includes('column')) {
+                showToast('⚠️', 'DB missing columns — run migration in Supabase SQL editor. See console.', 'err');
+            } else {
+                showToast('⚠️', error.message, 'err');
+            }
         } else if (!data || data.length === 0) {
-            showToast('⚠️', 'Archive failed — no rows updated. Check Supabase RLS policy for district_alerts UPDATE.', 'err');
-            console.warn('archiveActiveAlert: update matched 0 rows for id', id);
+            console.warn('[Archive] 0 rows updated — likely missing RLS UPDATE policy on district_alerts.');
+            showToast('⚠️', 'Archive blocked — add UPDATE policy for district_alerts in Supabase. See console.', 'err');
         } else {
             showToast('📦', 'Alert archived — kept as record.');
             loadActiveAlertsView();
@@ -9159,6 +9175,50 @@
             if (currentView === 'alerts-active') loadActiveAlertsView();
         } else {
             showToast('⚠️', error.message, 'err');
+        }
+    }
+
+    async function checkAlertArchiveSetup() {
+        if (!sb) return;
+        console.log('=== Alert Archive Setup Diagnostic ===');
+        // 1. Check if archived_at column exists by fetching one row
+        const {data: sample, error: sampleErr} = await sb
+            .from('district_alerts').select('id, archived_at, archived_by').limit(1);
+        if (sampleErr) {
+            const msg = sampleErr.message || '';
+            if (msg.includes('archived_at') || msg.includes('column')) {
+                console.error('[Diagnostic] MISSING COLUMNS — archived_at / archived_by do not exist.');
+                console.info('[Fix] Run this in Supabase SQL Editor:\n\nALTER TABLE district_alerts ADD COLUMN IF NOT EXISTS archived_at timestamptz;\nALTER TABLE district_alerts ADD COLUMN IF NOT EXISTS archived_by text;');
+                showToast('⚠️', 'Missing DB columns — check console (F12) for fix.', 'err');
+            } else {
+                console.error('[Diagnostic] Select error:', sampleErr);
+                showToast('⚠️', 'DB error: ' + sampleErr.message, 'err');
+            }
+            return;
+        }
+        console.log('[Diagnostic] Columns exist ✓. Sample row:', sample?.[0]);
+        // 2. Try a no-op update to test RLS
+        if (sample && sample.length > 0) {
+            const testId = sample[0].id;
+            const {data: updData, error: updErr} = await sb
+                .from('district_alerts')
+                .update({ archived_by: sample[0].archived_by ?? null })
+                .eq('id', testId)
+                .select('id');
+            if (updErr) {
+                console.error('[Diagnostic] UPDATE blocked by error:', updErr);
+                showToast('⚠️', 'UPDATE error: ' + updErr.message, 'err');
+            } else if (!updData || updData.length === 0) {
+                console.error('[Diagnostic] UPDATE returned 0 rows — RLS UPDATE policy is missing or blocking.');
+                console.info('[Fix] In Supabase Dashboard → Authentication → Policies → district_alerts:\nAdd a new policy: USING (auth.role() = \'authenticated\') for UPDATE.');
+                showToast('⚠️', 'RLS blocking UPDATE — check console (F12) for fix.', 'err');
+            } else {
+                console.log('[Diagnostic] UPDATE works ✓ — archive should be functional.');
+                showToast('✅', 'Archive setup looks correct. Try archiving again.', '');
+            }
+        } else {
+            console.log('[Diagnostic] No rows in district_alerts to test UPDATE against.');
+            showToast('ℹ️', 'No alerts found to test against — send one first.', '');
         }
     }
 
