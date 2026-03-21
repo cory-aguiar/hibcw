@@ -8910,31 +8910,39 @@
     async function archiveDistrictAlert(id) {
         if (!confirm('Archive this alert? It will be removed from the public feed but kept as a permanent record.'))
             return;
-        const {error} = await sb.from('district_alerts').update({
+        const {data, error} = await sb.from('district_alerts').update({
             archived_at: new Date().toISOString(),
             archived_by: currentUserEmail
-        }).eq('id', id);
-        if (!error) {
+        }).eq('id', id).select();
+        if (error) {
+            showToast('⚠️', error.message, 'err');
+            console.error('archiveDistrictAlert error:', error);
+        } else if (!data || data.length === 0) {
+            showToast('⚠️', 'Archive failed — no rows updated. Check Supabase RLS policy for district_alerts UPDATE.', 'err');
+            console.warn('archiveDistrictAlert: update matched 0 rows for id', id);
+        } else {
             showToast('📦', 'Alert archived — kept as record.');
             loadDistrictAlerts();
             loadAlertBadges();
-        } else {
-            showToast('⚠️', error.message, 'err');
         }
     }
 
     async function archiveAdminAlert(id) {
         if (!confirm('Archive this alert? It will be removed from the public feed but kept as a permanent record.'))
             return;
-        const {error} = await sb.from('district_alerts').update({
+        const {data, error} = await sb.from('district_alerts').update({
             archived_at: new Date().toISOString(),
             archived_by: currentUserEmail
-        }).eq('id', id);
-        if (!error) {
+        }).eq('id', id).select();
+        if (error) {
+            showToast('⚠️', error.message, 'err');
+            console.error('archiveAdminAlert error:', error);
+        } else if (!data || data.length === 0) {
+            showToast('⚠️', 'Archive failed — no rows updated. Check Supabase RLS policy for district_alerts UPDATE.', 'err');
+            console.warn('archiveAdminAlert: update matched 0 rows for id', id);
+        } else {
             showToast('📦', 'Alert archived — kept as record.');
             loadAdminAlertLog();
-        } else {
-            showToast('⚠️', error.message, 'err');
         }
     }
 
@@ -9056,16 +9064,20 @@
     async function archiveActiveAlert(id) {
         if (!confirm('Archive this alert? It will be removed from the public feed but kept as a permanent record.'))
             return;
-        const {error} = await sb.from('district_alerts').update({
+        const {data, error} = await sb.from('district_alerts').update({
             archived_at: new Date().toISOString(),
             archived_by: currentUserEmail
-        }).eq('id', id);
-        if (!error) {
+        }).eq('id', id).select();
+        if (error) {
+            showToast('⚠️', error.message, 'err');
+            console.error('archiveActiveAlert error:', error);
+        } else if (!data || data.length === 0) {
+            showToast('⚠️', 'Archive failed — no rows updated. Check Supabase RLS policy for district_alerts UPDATE.', 'err');
+            console.warn('archiveActiveAlert: update matched 0 rows for id', id);
+        } else {
             showToast('📦', 'Alert archived — kept as record.');
             loadActiveAlertsView();
             loadAlertBadges();
-        } else {
-            showToast('⚠️', error.message, 'err');
         }
     }
 
@@ -9436,7 +9448,7 @@
           <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);display:flex;justify-content:space-between;align-items:center">
             <span>👤 ${esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
             <div style="display:flex;gap:4px">
-              ${!a.archived_at ? `<button onclick="archiveAdminAlert('${a.id}')" style="background:none;border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;color:var(--gold);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace" title="Archive — hides from public, keeps as record">📦</button>` : ''}
+              <button onclick="archiveAdminAlert('${a.id}')" style="background:none;border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;color:var(--gold);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace" title="Archive — hides from public, keeps as record">📦</button>
               <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url || '')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:1px 7px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕</button>
             </div>
           </div>
