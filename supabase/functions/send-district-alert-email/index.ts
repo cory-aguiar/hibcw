@@ -15,6 +15,8 @@
 //   supabase secrets set SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
 const RESEND_FROM = "HIBCW Alerts <noreply@support.kiaahilo.org>";
 
 const CORS = {
@@ -95,49 +97,40 @@ Deno.serve(async (req: Request): Promise<Response> => {
     });
   }
 
-  // ── Fetch district members ────────────────────────────────────────────────
-  const membersRes = await fetch(
-    `${supabaseUrl}/rest/v1/member_applications?select=email,full_name&status=eq.approved&district=eq.${district}&email=not.is.null`,
-    {
-      headers: {
-        "apikey":        serviceRoleKey,
-        "Authorization": `Bearer ${serviceRoleKey}`,
-        "Accept":        "application/json",
-      },
-    }
-  );
+  // ── Fetch district members & admins via Supabase JS client ─────────────
+  // Using the JS client avoids PostgREST query string encoding pitfalls
+  const sbAdmin = createClient(supabaseUrl, serviceRoleKey);
 
-  if (!membersRes.ok) {
-    const err = await membersRes.text();
-    console.error("Failed to fetch members:", err);
+  const { data: membersData, error: membersError } = await sbAdmin
+    .from("member_applications")
+    .select("email, full_name")
+    .eq("status", "approved")
+    .eq("district", district)
+    .not("email", "is", null);
+
+  if (membersError) {
+    console.error("Failed to fetch members:", membersError.message);
     return new Response(JSON.stringify({ error: "Failed to fetch district members" }), {
       status: 502, headers: { ...CORS, "Content-Type": "application/json" },
     });
   }
 
-  const members: { email: string; full_name: string | null }[] = await membersRes.json();
+  const members: { email: string; full_name: string | null }[] = membersData ?? [];
 
-  // ── Fetch admins & superadmins ────────────────────────────────────────────
-  const adminsRes = await fetch(
-    `${supabaseUrl}/rest/v1/admin_roles?select=email,full_name&role=in.(admin,superadmin)&email=not.is.null`,
-    {
-      headers: {
-        "apikey":        serviceRoleKey,
-        "Authorization": `Bearer ${serviceRoleKey}`,
-        "Accept":        "application/json",
-      },
-    }
-  );
+  const { data: adminsData, error: adminsError } = await sbAdmin
+    .from("admin_roles")
+    .select("email, full_name")
+    .in("role", ["admin", "superadmin"])
+    .not("email", "is", null);
 
-  if (!adminsRes.ok) {
-    const err = await adminsRes.text();
-    console.error("Failed to fetch admins:", err);
+  if (adminsError) {
+    console.error("Failed to fetch admins:", adminsError.message);
     return new Response(JSON.stringify({ error: "Failed to fetch admins" }), {
       status: 502, headers: { ...CORS, "Content-Type": "application/json" },
     });
   }
 
-  const admins: { email: string; full_name: string | null }[] = await adminsRes.json();
+  const admins: { email: string; full_name: string | null }[] = adminsData ?? [];
 
   // ── Deduplicate recipients (admins who are also district members) ─────────
   const seen = new Set<string>();
