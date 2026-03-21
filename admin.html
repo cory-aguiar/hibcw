@@ -9409,6 +9409,7 @@
             const {data, error} = await sb
             .from('district_alerts')
             .select('*')
+            .is('archived_at', null)
             .order('created_at', {
                 ascending: false
             })
@@ -9435,7 +9436,7 @@
           <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);display:flex;justify-content:space-between;align-items:center">
             <span>👤 ${esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
             <div style="display:flex;gap:4px">
-              <button onclick="archiveAdminAlert('${a.id}')" style="background:none;border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;color:var(--gold);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace" title="Archive — hides from public, keeps as record">📦</button>
+              ${!a.archived_at ? `<button onclick="archiveAdminAlert('${a.id}')" style="background:none;border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;color:var(--gold);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace" title="Archive — hides from public, keeps as record">📦</button>` : ''}
               <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url || '')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:1px 7px;color:var(--red);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕</button>
             </div>
           </div>
