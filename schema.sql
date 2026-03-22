@@ -188,6 +188,33 @@ create policy "admin insert alerts" on public.district_alerts for insert with ch
 create policy "admin update alerts" on public.district_alerts for update using (auth.role() = 'authenticated');
 create policy "admin delete alerts" on public.district_alerts for delete using (auth.role() = 'authenticated');
 
+-- ── PUBLIC CAPTAINS VIEW ─────────────────────────────────────────
+-- Exposes only safe, non-sensitive captain fields for the public index pages.
+-- Run this in the Supabase SQL Editor if not already present.
+create or replace view public.public_captains as
+  select
+    district,
+    full_name,
+    email,
+    photo_url,
+    captain_name
+  from public.member_applications
+  where status = 'approved'
+    and captain_name is not null
+    and captain_name <> '';
+
+-- Allow anonymous/public reads on the view (no sensitive data exposed)
+grant select on public.public_captains to anon;
+grant select on public.public_captains to authenticated;
+
+-- ── MIGRATION: island-wide alerts support ────────────────────────────────
+-- Run this in the Supabase SQL Editor to enable island-wide alerts.
+-- This relaxes the district column constraint so 'island-wide' is a valid value.
+-- If you created district_alerts with NOT NULL (the default schema), run:
+--   alter table public.district_alerts alter column district drop not null;
+-- Or simply leave it — inserting 'island-wide' as the district value works
+-- even with NOT NULL since it is a valid text value.
+
 -- ── MIGRATION: run these if district_alerts table already exists ───
 -- alter table public.district_alerts add column if not exists media_url text;
 -- alter table public.district_alerts add column if not exists media_type text;
