@@ -2161,6 +2161,7 @@ function renderList(q='', filter='', target='main') {
         <span class="badge ${bc}">${inc.type}</span>
         ${ageTag(inc.occurred_at)}
       </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate);letter-spacing:.04em;margin-bottom:4px">${incidentNumber(inc)}</div>
       <div class="card-addr">📍 ${inc.address}</div>
       <div class="card-desc">${inc.description}</div>
       <div class="card-meta">
@@ -2288,6 +2289,7 @@ function openModal(id) {
   document.getElementById('mBadge').innerHTML = `<span class="badge ${bc}">${inc.type}</span>`;
   const media = inc.incident_media||[];
   document.getElementById('mBody').innerHTML = `
+    <div class="mf-row"><div class="mf-label">Incident #</div><div class="mf-val" style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--teal);letter-spacing:.05em">${incidentNumber(inc)}</div></div>
     <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)} &nbsp;${ageTag(inc.occurred_at)}</div></div>
     <div class="mf-row"><div class="mf-label">Location</div><div class="mf-val">${inc.address}${inc.lat?`<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal)">GPS ${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span> &nbsp;<a href="https://www.google.com/maps?q=${inc.lat},${inc.lng}" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--teal);text-decoration:none">🗺 Maps</a>`:''}</div></div>
     ${inc.district ? publicCaptainCardHtml(inc.district) : ''}
@@ -2476,6 +2478,7 @@ function showToast(ico, body, type='') {
 ═══════════════════════════════════════════════ */
 function fmt(iso){ return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); }
 function fmtLong(iso){ return new Date(iso).toLocaleString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'}); }
+function incidentNumber(inc){ const d=new Date(inc.created_at); const ymd=d.getFullYear().toString()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); return `INC-${ymd}-${inc.id.slice(-4).toUpperCase()}`; }
 function ageTag(iso){
   const mins=(Date.now()-new Date(iso))/60000;
   if (mins<60)   return `<span class="age-tag age-fresh">${Math.round(mins)}m ago</span>`;
