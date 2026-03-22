@@ -1995,8 +1995,8 @@
                         </div>
                     </div>
 
-                    <div class="more-section-title admin-only">🔔 Alerts</div>
-                    <div class="more-card admin-only">
+                    <div class="more-section-title">🔔 Alerts</div>
+                    <div class="more-card">
                         <div class="more-row" onclick="showMobActiveAlerts()">
                             <div class="more-ico">📢</div>
                             <div>
@@ -2307,7 +2307,8 @@
         "kau": "#ef4444",
         "south-kona": "#f59e0b",
         "north-kona": "#f97316",
-        "north-kohala": "#10b981"
+        "north-kohala": "#10b981",
+        "island-wide": "#f5a623"
     };
 
     // Maps district id → leading digit of the 5-digit business number
@@ -2324,6 +2325,7 @@
     };
 
     function districtLabel(v) {
+        if (v === 'island-wide') return '🌺 Island-Wide Alert';
         return DISTRICTS.find(d => d[0] === v)?.[1] || v;
     }
 
@@ -4393,9 +4395,11 @@
             return;
         el.innerHTML = '<div style="font-size:.78rem;color:var(--slate2);text-align:center;padding:30px 0">Loading…</div>';
         try {
-            const {data, error} = await sb.from('district_alerts').select('*').is('archived_at', null).order('created_at', {
-                ascending: false
-            });
+            const isCaptain = currentRole === 'captain';
+            let alertQuery = sb.from('district_alerts').select('*').is('archived_at', null).order('created_at', { ascending: false });
+            // Captains only see their own district's alerts
+            if (isCaptain && captainDistrict) alertQuery = alertQuery.eq('district', captainDistrict);
+            const {data, error} = await alertQuery;
             if (error)
                 throw error;
             const sub = document.getElementById('mobActiveAlertsSub');
@@ -4414,7 +4418,8 @@
                 "kau": "#ef4444",
                 "south-kona": "#f59e0b",
                 "north-kona": "#f97316",
-                "north-kohala": "#10b981"
+                "north-kohala": "#10b981",
+                "island-wide": "#f5a623"
             };
             el.innerHTML = data.map(a => {
                 const dc = DCOL[a.district] || 'var(--teal)';
@@ -4448,7 +4453,7 @@
         ${
 
 
-                (currentRole === 'admin' || currentRole === 'superadmin') ? `
+                (currentRole === 'admin' || currentRole === 'superadmin' || (currentRole === 'captain' && captainDistrict && a.district === captainDistrict)) ? `
         <div style="display:flex;gap:6px">
           <button onclick="archiveMobActiveAlert('${
 
@@ -4508,11 +4513,12 @@
         const el = document.getElementById('mobArchivedAlertsList');
         if (!el || !sb)
             return;
+        const isCaptainView = currentRole === 'captain' && captainDistrict;
         el.innerHTML = '<div style="font-size:.78rem;color:var(--slate2);text-align:center;padding:30px 0">Loading…</div>';
         try {
-            const {data, error} = await sb.from('district_alerts').select('*').not('archived_at', 'is', null).order('archived_at', {
-                ascending: false
-            });
+            let archQuery = sb.from('district_alerts').select('*').not('archived_at', 'is', null).order('archived_at', { ascending: false });
+            if (isCaptainView) archQuery = archQuery.eq('district', captainDistrict);
+            const {data, error} = await archQuery;
             if (error)
                 throw error;
             // Update subtitle in More list
@@ -4532,7 +4538,8 @@
                 "kau": "#ef4444",
                 "south-kona": "#f59e0b",
                 "north-kona": "#f97316",
-                "north-kohala": "#10b981"
+                "north-kohala": "#10b981",
+                "island-wide": "#f5a623"
             };
             el.innerHTML = data.map(a => {
                 const dc = DCOL[a.district] || 'var(--teal)';
@@ -4649,7 +4656,8 @@
                 "kau": "#ef4444",
                 "south-kona": "#f59e0b",
                 "north-kona": "#f97316",
-                "north-kohala": "#10b981"
+                "north-kohala": "#10b981",
+                "island-wide": "#f5a623"
             };
             el.innerHTML = data.map(a => {
                 const dc = DCOL[a.district] || 'var(--teal)';
@@ -5030,6 +5038,4339 @@
     function openAdminAlertModal() {
         const sel = document.getElementById('adminAlertDistrict');
         if (sel && sel.options.length <= 1) {
+            const iw = document.createElement('option');
+            iw.value = 'island-wide';
+            iw.textContent = '🌺 Island-Wide — All Districts';
+            iw.style.fontWeight = '700';
+            sel.appendChild(iw);
+            const sep = document.createElement('option');
+            sep.disabled = true;
+            sep.textContent = '──────────────';
+            sel.appendChild(sep);
+            DISTRICTS.forEach(([v, l]) => {
+                const o = document.createElement('option');
+                o.value = v;
+                o.textContent = l;
+                sel.appendChild(o);
+            });
+        }
+        document.getElementById('adminAlertMsg').value = '';
+        document.getElementById('adminAlertEditId').value = '';
+        clearAlertMedia('adminAlertMedia', 'adminAlertPreview');
+        document.getElementById('adminAlertOverlay').classList.add('open');
+        loadAdminAlertLog();
+    }
+
+    function closeAdminAlertModal() {
+        document.getElementById('adminAlertOverlay').classList.remove('open');
+    }
+
+    async function loadAdminAlertLog() {
+        const el = document.getElementById('adminAlertLogBody');
+        if (!el || !sb)
+            return;
+        try {
+            const {data, error} = await sb.from('district_alerts').select('*').order('created_at', {
+                ascending: false
+            }).limit(20);
+            if (error)
+                throw error;
+            if (!data || !data.length) {
+                el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2);font-style:italic">No alerts sent yet.</div>`;
+                return;
+            }
+            el.innerHTML = data.map(a => {
+                const dc = DISTRICT_COLORS[a.district] || 'var(--teal)';
+                const t = alertTypeMeta(a.alert_type);
+                return `<div style="padding:9px 0;border-bottom:1px solid var(--b2)">
+        <div style="display:flex;gap:5px;align-items:flex-start;margin-bottom:4px;flex-wrap:wrap">
+          ${
+
+
+                alertTypeBadge(a.alert_type)}
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap;flex-shrink:0">${esc(districtLabel(a.district))}</span>
+          <span style="font-size:.78rem;line-height:1.4;color:var(--white)">${esc(a.message)}</span>
+        </div>
+        ${
+
+
+                a.media_url ? `<div style="margin-bottom:5px;border-radius:4px;overflow:hidden;border:1px solid var(--b2);max-width:180px">
+          ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls playsinline style="width:100%;display:block;max-height:100px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:100px;object-fit:cover">`}
+        </div>` : ''}
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);display:flex;justify-content:space-between;align-items:center">
+          <span>👤 ${
+
+
+                esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
+          <div style="display:flex;gap:3px">
+            <button onclick="archiveAdminAlert('${
+
+
+                a.id}')" style="background:none;border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 6px;color:var(--gold);font-size:.58rem;cursor:pointer" title="Archive">📦</button>
+            <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url || '')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:1px 6px;color:var(--red);font-size:.58rem;cursor:pointer">✕</button>
+          </div>
+        </div>
+      </div>`
+
+
+
+
+
+
+
+
+                ;
+            }).join('');
+        } catch (e) {
+            el.innerHTML = `<div style="font-size:.68rem;color:var(--slate2)">Could not load alerts.</div>`;
+        }
+    }
+
+    async function deleteAdminAlert(id, mediaUrl) {
+        if (!confirm('Delete this alert permanently? It cannot be recovered.'))
+            return;
+        if (mediaUrl) {
+            const path = mediaUrl.split('/object/public/incident-media/')[1];
+            if (path)
+                await sb.storage.from('incident-media').remove([path]);
+        }
+        const {error} = await sb.from('district_alerts').delete().eq('id', id);
+        if (!error) {
+            showToast('🗑', 'Alert deleted permanently.');
+            loadAdminAlertLog();
+            if (document.getElementById('mobActiveAlertsScreen')?.style.display !== 'none')
+                loadMobActiveAlerts();
+            if (document.getElementById('mobArchivedAlertsScreen')?.style.display !== 'none')
+                loadMobArchivedAlerts();
+        }
+        else
+            showToast('⚠️', error.message, 'err');
+    }
+
+    async function sendAdminDistrictAlert() {
+        const district = document.getElementById('adminAlertDistrict')?.value;
+        const msg = document.getElementById('adminAlertMsg')?.value.trim();
+        const editId = document.getElementById('adminAlertEditId')?.value;
+        const file = document.getElementById('adminAlertMedia')?.files?.[0];
+        const alertType = document.getElementById('adminAlertType')?.value || 'incident';
+        if (!district) {
+            showToast('⚠️', 'Select a district first.', 'err');
+            return;
+        }
+        if (!msg) {
+            showToast('⚠️', 'Please enter a message.', 'err');
+            return;
+        }
+        const _adminSession = await sb.auth.getSession();
+        const adminToken = _adminSession?.data?.session?.access_token || SUPABASE_ANON_KEY;
+        try {
+            let mediaUrl = null,
+                mediaType = null;
+            if (file) {
+                const up = await uploadAlertMedia(file, district);
+                mediaUrl = up.url;
+                mediaType = up.type;
+            }
+            if (editId) {
+                const {error} = await sb.from('district_alerts').update({
+                    message: msg,
+                    alert_type: alertType,
+                    media_url: mediaUrl,
+                    media_type: mediaType,
+                    updated_at: new Date().toISOString(),
+                    is_edited: true
+                }).eq('id', editId);
+                if (error)
+                    throw error;
+                showToast('✅', 'Alert updated.');
+                // Send district alert email (edited)
+                try {
+                    const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-district-alert-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${adminToken}`
+                        },
+                        body: JSON.stringify({
+                            district,
+                            message: msg,
+                            alert_type: alertType,
+                            sent_by_name: currentUserName,
+                            is_edited: true
+                        })
+                    });
+                    console.log('Alert email result:', await emailRes.json());
+                } catch (e) {
+                    console.error('Alert email error:', e);
+                }
+            } else {
+                const {error} = await sb.from('district_alerts').insert({
+                    district,
+                    message: msg,
+                    alert_type: alertType,
+                    media_url: mediaUrl,
+                    media_type: mediaType,
+                    sent_by_email: currentUserEmail,
+                    sent_by_name: currentUserName
+                });
+                if (error)
+                    throw error;
+                showToast('📢', `Alert sent to ${districtLabel(district)}.`);
+                // Send district alert email (new)
+                try {
+                    const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-district-alert-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${adminToken}`
+                        },
+                        body: JSON.stringify({
+                            district,
+                            message: msg,
+                            alert_type: alertType,
+                            sent_by_name: currentUserName,
+                            is_edited: false
+                        })
+                    });
+                    console.log('Alert email result:', await emailRes.json());
+                } catch (e) {
+                    console.error('Alert email error:', e);
+                }
+            }
+            document.getElementById('adminAlertMsg').value = '';
+            document.getElementById('adminAlertEditId').value = '';
+            const typeSel = document.getElementById('adminAlertType');
+            if (typeSel)
+                typeSel.value = 'incident';
+            clearAlertMedia('adminAlertMedia', 'adminAlertPreview');
+            loadAdminAlertLog();
+        } catch (e) {
+            showToast('⚠️', e.message || 'Failed to save alert.', 'err');
+        }
+    }
+
+    /* ════════════════════════════════════════════════
+               TOAST
+            ════════════════════════════════════════════════ */
+    /* ════════════════════════════════════════════════
+               RESOURCES
+            ════════════════════════════════════════════════ */
+    const RESOURCE_FILES = [
+    {
+        category: 'District Flyers',
+        icon: '🌐',
+        title: 'District 1 — Hāmākua Flyer',
+        desc: 'Interactive HTML flyer for Hāmākua — open to print or save as PDF.',
+        file: 'files/flyer-d1-hamakua.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        district: 'hamakua',
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'District Flyers',
+        icon: '🌐',
+        title: 'District 2 — North Hilo Flyer',
+        desc: 'Interactive HTML flyer for North Hilo — open to print or save as PDF.',
+        file: 'files/flyer-d2-north-hilo.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        district: 'north-hilo',
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'District Flyers',
+        icon: '🌐',
+        title: 'District 3 — South Hilo Flyer',
+        desc: 'Interactive HTML flyer for South Hilo — open to print or save as PDF.',
+        file: 'files/flyer-d3-south-hilo.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        district: 'south-hilo',
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'District Flyers',
+        icon: '🌐',
+        title: 'District 4 — Lower Puna Flyer',
+        desc: 'Interactive HTML flyer for Lower Puna — open to print or save as PDF.',
+        file: 'files/flyer-d4-lower-puna.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        district: 'lower-puna',
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'District Flyers',
+        icon: '🌐',
+        title: 'District 5 — Upper Puna Flyer',
+        desc: 'Interactive HTML flyer for Upper Puna — open to print or save as PDF.',
+        file: 'files/flyer-d5-upper-puna.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        district: 'upper-puna',
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'District Flyers',
+        icon: '🌐',
+        title: "District 6 — Kaʻū Flyer",
+        desc: "Interactive HTML flyer for Kaʻū — open to print or save as PDF.",
+        file: 'files/flyer-d6-kau.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        district: 'kau',
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'District Flyers',
+        icon: '🌐',
+        title: 'District 7 — South Kona Flyer',
+        desc: 'Interactive HTML flyer for South Kona — open to print or save as PDF.',
+        file: 'files/flyer-d7-south-kona.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        district: 'south-kona',
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'District Flyers',
+        icon: '🌐',
+        title: 'District 8 — North Kona Flyer',
+        desc: 'Interactive HTML flyer for North Kona — open to print or save as PDF.',
+        file: 'files/flyer-d8-north-kona.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        district: 'north-kona',
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'District Flyers',
+        icon: '🌐',
+        title: 'District 9 — Kohala Flyer',
+        desc: 'Interactive HTML flyer for Kohala — open to print or save as PDF.',
+        file: 'files/flyer-d9-north-kohala.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        district: 'north-kohala',
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'General Flyers',
+        icon: '📄',
+        title: 'HIBCW General Awareness Flyer',
+        desc: 'General flyer suitable for any district.',
+        file: 'files/flyer-general.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'General Flyers',
+        icon: '📄',
+        title: 'Join HIBCW — Recruitment Flyer',
+        desc: 'Encourage businesses to apply for membership.',
+        file: 'files/flyer-recruitment.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'General Flyers',
+        icon: '📌',
+        title: 'Breakroom QR Code Flyer',
+        desc: 'Post in employee breakrooms — QR code, member benefits, and incident reporting.',
+        file: 'hibcw-breakroom-flyer.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'Forms & Templates',
+        icon: '📝',
+        title: 'Incident Report Form (Paper)',
+        desc: 'Paper form for capturing incidents offline.',
+        file: 'files/form-incident-paper.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'Forms & Templates',
+        icon: '📝',
+        title: 'Member Sign-Up Sheet',
+        desc: 'Collect member info at community events.',
+        file: 'files/form-member-signup.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'Forms & Templates',
+        icon: '✉️',
+        title: 'HIBCW Welcome Letter',
+        desc: 'Tap to open the general welcome letter — ready to print, no fill-in required.',
+        file: 'files/template-intro-letter.html',
+        roles: ['admin', 'superadmin', 'captain'],
+        openInBrowser: true
+    },
+    {
+        category: 'Forms & Templates',
+        icon: '📝',
+        title: 'HIBCW Welcome Letter — PDF',
+        desc: 'Printable PDF version of the HIBCW general welcome letter.',
+        file: 'files/template-intro-letter.pdf',
+        roles: ['admin', 'superadmin', 'captain']
+    },
+    {
+        category: 'Admin Resources',
+        icon: '🔧',
+        title: 'HIBCW Data Export Guide',
+        desc: 'Interpreting exported CSV data files.',
+        file: 'files/guide-csv-export.html',
+        roles: ['admin', 'superadmin'],
+        openInBrowser: true,
+        printable: true
+    },
+    {
+        category: 'Admin Resources',
+        icon: '🔧',
+        title: 'Supabase Database Reference',
+        desc: 'Database table structure and RLS overview.',
+        file: 'files/guide-database.html',
+        roles: ['admin', 'superadmin'],
+        openInBrowser: true,
+        printable: true
+    },
+    ];
+
+    function renderMobileResources() {
+        const el = document.getElementById('mobileResourceCards');
+        const elFiles = document.getElementById('mobileResourceFiles');
+        if (!el)
+            return;
+
+        const resources = [
+        {
+            title: 'Admin Handbook',
+            desc: 'Full admin panel guide.',
+            icon: '📋',
+            color: '#00c9a7',
+            roles: ['admin', 'superadmin'],
+            url: 'handbook-admin.html'
+        },
+        {
+            title: "District Captain's Handbook",
+            desc: 'Role guide for captains.',
+            icon: '👮',
+            color: '#f5a623',
+            roles: ['admin', 'superadmin', 'captain'],
+            url: 'handbook-captain.html'
+        },
+        {
+            title: 'Captain Quick Reference Card',
+            desc: 'One-page contacts, tasks, permissions and links.',
+            icon: '⚡',
+            color: '#a855f7',
+            roles: ['admin', 'superadmin', 'captain'],
+            url: 'captain-quickref.html',
+            btnLabel: '📖 Open Ref Card'
+        },
+        ];
+
+        const visible = resources.filter(r => r.roles.includes(currentRole));
+        if (!visible.length) {
+            el.innerHTML = '';
+        }
+        else {
+            el.innerHTML = visible.map(r => `
+      <div style="background:var(--navy2);border:1px solid ${r.color}33;border-left:3px solid ${r.color};border-radius:8px;margin:0 12px 10px;padding:14px 14px 12px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div style="width:36px;height:36px;border-radius:8px;background:${
+
+
+            r.color}18;border:1px solid ${r.color}33;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">${r.icon}</div>
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:var(--white)">${
+
+
+            r.title}</div>
+            <div style="font-size:.7rem;color:var(--slate);line-height:1.45;margin-top:1px">${r.desc}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px">
+          <button onclick="window.open('${
+
+
+
+
+
+
+
+
+            r.url}','_blank','noopener')" style="flex:1;background:${r.color};border:none;border-radius:5px;padding:7px 10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;cursor:pointer">${r.btnLabel || '📖 Open'}</button>
+        </div>
+      </div>`
+
+
+
+
+
+            ).join('');
+        }
+
+        // ── File library ──────────────────────────────
+        if (!elFiles)
+            return;
+        const isCaptain = currentRole === 'captain';
+        const visibleFiles = RESOURCE_FILES.filter(f => {
+            if (!f.roles.includes(currentRole))
+                return false;
+            if (f.district && isCaptain)
+                return f.district === captainDistrict;
+            return true;
+        });
+        if (!visibleFiles.length) {
+            elFiles.innerHTML = '';
+            return;
+        }
+
+        const categories = [...new Set(visibleFiles.map(f => f.category))];
+        const catColors = {
+            'District Flyers': '#3b82f6',
+            'General Flyers': '#00c9a7',
+            'Forms & Templates': '#f59e0b',
+            'Admin Resources': '#7a8fa6'
+        };
+
+        elFiles.innerHTML = `
+    <div style="padding:10px 12px 4px;font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2);border-top:1px solid var(--b2);margin-top:4px">📁 Downloadable Files</div>
+    ${
+
+
+        categories.map(cat => {const files = visibleFiles.filter(f => f.category === cat);const cc = catColors[cat] || 'var(--teal)';return `
+        <div style="padding:6px 12px 2px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:${
+
+
+            cc};margin-bottom:4px">${cat}</div>
+          <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;overflow:hidden">
+            ${
+
+
+            files.map((f, i) => `
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;${i < files.length - 1 ? 'border-bottom:1px solid var(--b2)' : ''}">
+              <div style="font-size:.95rem;flex-shrink:0">${f.icon}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:.78rem;font-weight:500;color:var(--white);margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${
+
+
+            esc(f.title)}</div>
+                <div style="font-size:.67rem;color:var(--slate);line-height:1.35">${esc(f.desc)}</div>
+              </div>
+              <div style="display:flex;gap:5px;flex-shrink:0">
+                <a href="${
+
+
+
+
+
+            f.file}" ${f.openInBrowser ? 'target="_blank" rel="noopener"' : 'download'} style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:5px;padding:5px 9px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);text-decoration:none;white-space:nowrap;flex-shrink:0">${f.openInBrowser ? '✍️ Fill In' : '⬇ PDF'}</a>
+                ${f.printable ? `<button onclick="printHandbook('${f.file}')" style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:5px;padding:5px 9px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);white-space:nowrap;cursor:pointer">🖨 Print</button>` : ''}
+              </div>
+            </div>`
+
+
+            ).join('')}
+          </div>
+        </div>`
+
+
+            ;}).join('')}`;
+    }
+
+    /* ════════════════════════════════════════════════
+               MOBILE GROWTH TRACKER  (Superadmin only)
+            ════════════════════════════════════════════════ */
+    const MOB_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const MOB_MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const MOB_TRACKER_COLS = [
+    {
+        key: 'active_districts',
+        label: 'Active Districts',
+        color: '#f97316'
+    },
+    {
+        key: 'members_total',
+        label: 'Members (Total)',
+        color: '#00c9a7'
+    },
+    {
+        key: 'members_new',
+        label: 'New Members',
+        color: '#3b82f6'
+    },
+    {
+        key: 'incidents',
+        label: 'Incidents',
+        color: '#e8415a'
+    },
+    {
+        key: 'incidents_archived',
+        label: 'Archived',
+        color: '#7a8fa6'
+    },
+    {
+        key: 'police_reports',
+        label: 'Police Reports',
+        color: '#f5a623'
+    },
+    {
+        key: 'alerts_sent',
+        label: 'Alerts Sent',
+        color: '#a855f7'
+    },
+    {
+        key: 'captain_logins',
+        label: 'Captain Logins',
+        color: '#10b981'
+    },
+    {
+        key: 'apps_received',
+        label: 'Apps Received',
+        color: '#f59e0b'
+    },
+    {
+        key: 'apps_approved',
+        label: 'Apps Approved',
+        color: '#22c55e'
+    },
+    {
+        key: 'apps_rejected',
+        label: 'Apps Rejected',
+        color: '#ef4444'
+    },
+    ];
+    const MOB_MS_COLORS = {
+        Launch: '#00c9a7',
+        Membership: '#3b82f6',
+        Incident: '#e8415a',
+        Alert: '#f5a623',
+        Captain: '#a855f7',
+        Media: '#10b981',
+        Emergency: '#f97316',
+        Feedback: '#7a8fa6',
+        Milestone: '#0b1524'
+    };
+
+    let mobTrackerData = {};
+    let mobMilestones = [];
+    let mobQuarterlyNotes = {};
+    let mobTrackerYear = new Date().getFullYear();
+    let mobTrackerInited = false;
+    let mobTrackerTab = 'monthly';
+    let mobEditingMonth = null;
+
+    async function initMobileTracker() {
+        if (!mobTrackerInited) {
+            await loadMobTrackerData();
+            mobTrackerInited = true;
+        }
+        renderMobTracker();
+    }
+
+    async function loadMobTrackerData() {
+        try {
+            const [{data: md}, {data: ms}, {data: qn}] = await Promise.all([
+            sb.from('tracker_monthly').select('year,month,notes').order('month'),
+            sb.from('tracker_milestones').select('*').order('created_at', {
+                ascending: false
+            }),
+            sb.from('tracker_quarterly').select('*'),
+            ]);
+            mobTrackerData = {};
+            (md || []).forEach(r => {
+                const y = r.year || mobTrackerYear;
+                if (!mobTrackerData[y])
+                    mobTrackerData[y] = {};
+                mobTrackerData[y][r.month] = r;
+            });
+            mobMilestones = ms || [];
+            (qn || []).forEach(r => {
+                mobQuarterlyNotes[`${r.year}_${r.quarter}`] = r;
+            });
+        } catch (e) {
+            console.log('Tracker tables not yet created — memory mode');
+        }
+        await computeMobLiveData();
+    }
+
+    let mobTrackerLive = {};
+
+    async function computeMobLiveData() {
+        mobTrackerLive = {};
+        try {
+            const yearStart = `${mobTrackerYear}-01-01`;
+            const yearEnd = `${mobTrackerYear}-12-31`;
+            const [
+            {data: incidents}, {data: approvedMembers}, {data: alerts}, {data: apps}, {data: adminUsers}, {data: bizRegs},
+            ] = await Promise.all([
+            sb.from('incidents').select('id,occurred_at,status,police_report').gte('occurred_at', yearStart).lte('occurred_at', yearEnd + 'T23:59:59'),
+            sb.from('member_emails').select('id,email,created_at'),
+            sb.from('district_alerts').select('id,created_at').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
+            sb.from('member_applications').select('id,email,created_at,status').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
+            sb.from('admin_users').select('id,district,role').not('role', 'is', null),
+            sb.from('business_registry').select('id,submitted_at,status').gte('submitted_at', yearStart).lte('submitted_at', yearEnd + 'T23:59:59'),
+            ]);
+            const gm = d => new Date(d).getMonth();
+            for (let m = 0; m < 12; m++)
+                mobTrackerLive[m] = {
+                    incidents: 0,
+                    incidents_archived: 0,
+                    police_reports: 0,
+                    alerts_sent: 0,
+                    apps_received: 0,
+                    apps_approved: 0,
+                    apps_rejected: 0,
+                    members_total: 0,
+                    members_new: 0,
+                    captain_logins: 0,
+                    active_districts: 0,
+                    biz_registrations: 0
+                };
+            (incidents || []).forEach(inc => {
+                const m = gm(inc.occurred_at);
+                if (m < 0 || m > 11)
+                    return;
+                mobTrackerLive[m].incidents++;
+                if (inc.status === 'archived')
+                    mobTrackerLive[m].incidents_archived++;
+                if (inc.police_report)
+                    mobTrackerLive[m].police_reports++;
+            });
+            (alerts || []).forEach(a => {
+                const m = gm(a.created_at);
+                if (m >= 0 && m <= 11)
+                    mobTrackerLive[m].alerts_sent++;
+            });
+            // Build verified email set — apps_approved only counts members still in the allowlist
+            // so deleted members don't inflate the approved count vs actual members
+            const verifiedEmailSet = new Set((approvedMembers || []).map(m => m.email?.toLowerCase()).filter(Boolean));
+            (apps || []).forEach(a => {
+                const m = gm(a.created_at);
+                if (m < 0 || m > 11)
+                    return;
+                mobTrackerLive[m].apps_received++;
+                if (a.status === 'approved' && verifiedEmailSet.has(a.email?.toLowerCase()))
+                    mobTrackerLive[m].apps_approved++;
+                if (a.status === 'rejected')
+                    mobTrackerLive[m].apps_rejected++;
+            });
+            // Business registrations by submission month
+            (bizRegs || []).forEach(b => {
+                const d = b.submitted_at || b.created_at;
+                if (!d)
+                    return;
+                const m = gm(d);
+                if (m >= 0 && m <= 11)
+                    mobTrackerLive[m].biz_registrations++;
+            });
+            // Use member_emails as source of truth so count matches the Members panel exactly
+            const allVerified = (approvedMembers || []).filter(m => m.created_at).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            const base = allVerified.filter(m => new Date(m.created_at) < new Date(yearStart)).length;
+            const nbm = Array(12).fill(0);
+            allVerified.forEach(m => {
+                const d = new Date(m.created_at);
+                if (d >= new Date(yearStart) && d <= new Date(yearEnd + 'T23:59:59'))
+                    nbm[d.getMonth()]++;
+            });
+            let run = base;
+            for (let m = 0; m < 12; m++) {
+                run += nbm[m];
+                mobTrackerLive[m].members_new = nbm[m];
+                mobTrackerLive[m].members_total = run;
+            }
+            const ad = new Set((adminUsers || []).filter(u => u.role === 'captain' && u.district).map(u => u.district));
+            for (let m = 0; m < 12; m++)
+                mobTrackerLive[m].active_districts = ad.size;
+        } catch (e) {
+            console.log('Mob live tracker error:', e.message);
+        }
+    }
+
+    function getMobMonthData(m) {
+        const live = (mobTrackerLive[m] || {});
+        const saved = (mobTrackerData[mobTrackerYear] || {})[m] || {};
+        return {
+            ...live,
+            notes: saved.notes || ''
+        };
+    }
+
+    async function saveMobMonthData(month, key, val) {
+        if (key !== 'notes')
+            return;
+        if (!mobTrackerData[mobTrackerYear])
+            mobTrackerData[mobTrackerYear] = {};
+        if (!mobTrackerData[mobTrackerYear][month])
+            mobTrackerData[mobTrackerYear][month] = {
+                year: mobTrackerYear,
+                month
+            };
+        mobTrackerData[mobTrackerYear][month].notes = val;
+        try {
+            await sb.from('tracker_monthly').upsert({
+                year: mobTrackerYear,
+                month,
+                notes: val || null
+            }, {
+                onConflict: 'year,month'
+            });
+        } catch (e) {}
+    }
+
+    function renderMobTracker() {
+        const el = document.getElementById('mobileTrackerWrap');
+        if (!el)
+            return;
+
+        const allM = Object.values(mobTrackerLive);
+        const totalMembers = Math.max(...allM.map(m => parseInt(m.members_total) || 0).concat([0]));
+        const totalIncidents = allM.reduce((s, m) => s + (parseInt(m.incidents) || 0), 0);
+        const totalAlerts = allM.reduce((s, m) => s + (parseInt(m.alerts_sent) || 0), 0);
+        const totalNew = allM.reduce((s, m) => s + (parseInt(m.members_new) || 0), 0);
+        const totalBiz = (typeof mobRegistryList !== 'undefined') ? mobRegistryList.length : 0;
+        const pendingBiz = (typeof mobRegistryList !== 'undefined') ? mobRegistryList.filter(b => b.status === 'pending').length : 0;
+
+        el.innerHTML = `
+    <!-- KPI strip -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 12px 12px">
+      <div style="background:var(--navy2);border:1px solid rgba(0,201,167,.25);border-top:2px solid #00c9a7;border-radius:7px;padding:10px 12px">
+        <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">Total Members</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#00c9a7;line-height:1">${
+
+
+
+
+
+
+
+
+
+
+
+        totalMembers}</div>
+      </div>
+      <div style="background:var(--navy2);border:1px solid rgba(232,65,90,.25);border-top:2px solid #e8415a;border-radius:7px;padding:10px 12px">
+        <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">Incidents YTD</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#e8415a;line-height:1">${
+
+
+
+
+
+
+
+
+        totalIncidents}</div>
+      </div>
+      <div style="background:var(--navy2);border:1px solid rgba(168,85,247,.25);border-top:2px solid #a855f7;border-radius:7px;padding:10px 12px">
+        <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">Alerts Sent</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#a855f7;line-height:1">${
+
+
+
+
+
+
+
+
+        totalAlerts}</div>
+      </div>
+      <div style="background:var(--navy2);border:1px solid rgba(59,130,246,.25);border-top:2px solid #3b82f6;border-radius:7px;padding:10px 12px">
+        <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">New Members</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#3b82f6;line-height:1">${
+
+
+
+
+
+
+
+
+        totalNew}</div>
+      </div>
+      <div style="background:var(--navy2);border:1px solid rgba(245,158,11,.25);border-top:2px solid #f59e0b;border-radius:7px;padding:10px 12px;grid-column:span 2">
+        <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">🏢 Business Registrations</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#f59e0b;line-height:1">${
+
+
+
+
+
+
+
+
+        totalBiz}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.54rem;color:var(--slate2);margin-top:2px">${pendingBiz} pending review</div>
+      </div>
+    </div>
+
+    <!-- Tab pills -->
+    <div style="display:flex;gap:6px;padding:0 12px 10px;overflow-x:auto">
+      ${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ['monthly', 'milestones', 'quarterly'].map(t => `
+        <button onclick="switchMobTrackerTab('${t}')" id="mobtab-${t}"
+          style="background:${mobTrackerTab === t ? 'var(--teal)' : 'var(--navy2)'};
+                 color:${mobTrackerTab === t ? '#0b1524' : 'var(--slate)'};
+                 border:1px solid ${mobTrackerTab === t ? 'transparent' : 'var(--b2)'};
+                 border-radius:20px;padding:5px 14px;font-family:'IBM Plex Mono',monospace;
+                 font-size:.6rem;cursor:pointer;white-space:nowrap;transition:all .15s">
+          ${
+
+
+
+
+
+        {monthly: '📅 Monthly',milestones: '⭐ Milestones',quarterly: '📝 Quarterly'}[t]}
+        </button>`).join('')}
+    </div>
+
+    <!-- Tab content -->
+    <div id="mobTrackerTabContent" style="padding:0 12px 12px">
+      ${
+
+
+
+
+
+
+
+
+
+
+
+        renderMobTrackerTabContent()}
+    </div>`
+
+
+        ;
+    }
+
+    function renderMobKPIs() {
+        // Just re-render the whole thing for simplicity on mobile
+        renderMobTracker();
+    }
+
+    function switchMobTrackerTab(tab) {
+        mobTrackerTab = tab;
+        renderMobTracker();
+    }
+
+    function renderMobTrackerTabContent() {
+        if (mobTrackerTab === 'monthly')
+            return renderMobMonthlyTab();
+        if (mobTrackerTab === 'milestones')
+            return renderMobMilestonesTab();
+        if (mobTrackerTab === 'quarterly')
+            return renderMobQuarterlyTab();
+        return '';
+    }
+
+    function renderMobMonthlyTab() {
+        const now = new Date();
+        const refreshBtn = `<button onclick="refreshMobTrackerLive()" style="width:100%;background:rgba(0,201,167,.08);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px">🔄 Refresh Live Data</button>`;
+        const liveNote = `<div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);margin-bottom:8px;display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block"></span> Live data — tap a month to add notes</div>`;
+        const months = MOB_MONTHS_FULL.map((m, i) => {
+            const d = getMobMonthData(i);
+            const hasData = MOB_TRACKER_COLS.some(c => d[c.key] && parseInt(d[c.key]) > 0);
+            const isOpen = mobEditingMonth === i;
+            const isFuture = i > now.getMonth() && mobTrackerYear === now.getFullYear();
+            return `
+      <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:7px;margin-bottom:6px;overflow:hidden">
+        <div onclick="toggleMobMonth(${
+
+
+            i})" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer">
+          <div>
+            <div style="font-size:.84rem;font-weight:600;color:var(--white)">${
+
+
+            m}</div>
+            ${hasData ? `<div style="font-size:.65rem;color:var(--teal);font-family:'IBM Plex Mono',monospace;margin-top:1px">
+              ${d.members_new ? `+${d.members_new} mbrs ·` : ''}
+              ${d.incidents ? `${d.incidents} inc ·` : ''}
+              ${d.alerts_sent ? `${d.alerts_sent} alerts` : ''}</div>` :
+            `<div style="font-size:.65rem;color:var(--slate2);font-family:'IBM Plex Mono',monospace;margin-top:1px">${isFuture ? 'Future month' : 'No activity yet'}</div>`}
+          </div>
+          <div style="color:var(--slate);font-size:.8rem;transition:transform .2s;transform:rotate(${
+
+
+            isOpen ? '90' : '0'}deg)">›</div>
+        </div>
+        ${
+
+
+            isOpen ? `<div style="padding:0 14px 14px;border-top:1px solid var(--b2)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+            ${
+
+
+            MOB_TRACKER_COLS.map(c => `
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:${
+
+
+            c.color};margin-bottom:3px">${c.label}</div>
+                <div style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:6px 8px;color:${d[c.key] ? c.color : 'var(--slate2)'};font-size:.82rem;text-align:center;font-weight:600">
+                  ${d[c.key] || '—'}
+                </div>
+              </div>`
+
+
+            ).join('')}
+          </div>
+          <div style="margin-top:8px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Notes (editable)</div>
+            <input type="text" value="${
+
+
+
+
+
+
+
+
+            esc(d.notes || '')}" placeholder="Add a note for this month…"
+              style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:6px 8px;color:var(--white);font-size:.82rem"
+              onchange="saveMobMonthData(${
+
+
+            i},'notes',this.value||null)">
+          </div>
+        </div>`
+
+
+            : ''}
+      </div>`
+
+
+            ;
+        }).join('');
+        return refreshBtn + liveNote + months;
+    }
+
+    async function refreshMobTrackerLive() {
+        await computeMobLiveData();
+        renderMobTracker();
+        showToast('🔄', 'Tracker refreshed from live data.');
+    }
+
+    function toggleMobMonth(i) {
+        mobEditingMonth = mobEditingMonth === i ? null : i;
+        renderMobTracker();
+    }
+
+    function renderMobMilestonesTab() {
+        const addBtn = `
+    <button onclick="openMobMilestoneSheet()" style="width:100%;background:var(--teal);border:none;border-radius:7px;padding:10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:700;cursor:pointer;margin-bottom:10px">+ Add Milestone</button>`
+
+
+        ;
+
+        if (!mobMilestones.length)
+            return addBtn + `<div style="color:var(--slate2);font-size:.78rem;text-align:center;padding:16px 0">No milestones yet</div>`;
+
+        const list = mobMilestones.map(ms => {
+            const color = MOB_MS_COLORS[ms.category] || 'var(--teal)';
+            return `<div style="background:var(--navy2);border:1px solid var(--b2);border-left:3px solid ${color};border-radius:0 7px 7px 0;padding:11px 12px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;background:${
+
+
+            color}15;color:${color};border:1px solid ${color}33;border-radius:3px;padding:1px 6px">${ms.category}</span>
+        <button onclick="deleteMobMilestone('${ms.id}')" style="background:none;border:none;color:var(--slate2);font-size:.72rem;cursor:pointer">✕</button>
+      </div>
+      <div style="font-size:.8rem;font-weight:600;color:var(--white);margin-bottom:2px">${
+
+
+            esc(ms.story || '')}</div>
+      <div style="font-size:.7rem;color:var(--slate)">${esc(ms.impact || '')}${ms.date ? ' · ' + ms.date : ''}</div>
+    </div>`
+
+
+            ;
+        }).join('');
+        return addBtn + list;
+    }
+
+    function renderMobQuarterlyTab() {
+        const quarters = [{
+            label: 'Q1',
+            months: [0, 1, 2],
+            color: '#00c9a7'
+        }, {
+            label: 'Q2',
+            months: [3, 4, 5],
+            color: '#f5a623'
+        }, {
+            label: 'Q3',
+            months: [6, 7, 8],
+            color: '#a855f7'
+        }, {
+            label: 'Q4',
+            months: [9, 10, 11],
+            color: '#f97316'
+        }];
+        return quarters.map(q => {
+            const qData = mobQuarterlyNotes[`${mobTrackerYear}_${q.label}`] || {};
+            const allM = q.months.map(i => getMobMonthData(i));
+            const totNewMem = allM.reduce((s, m) => s + (parseInt(m.members_new) || 0), 0);
+            const totInc = allM.reduce((s, m) => s + (parseInt(m.incidents) || 0), 0);
+            const totAlerts = allM.reduce((s, m) => s + (parseInt(m.alerts_sent) || 0), 0);
+            const totBizReg = allM.reduce((s, m) => s + (parseInt(m.biz_registrations) || 0), 0);
+            return `<div style="background:var(--navy2);border:1px solid var(--b2);border-top:2px solid ${q.color};border-radius:7px;padding:14px;margin-bottom:10px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:${q.color};margin-bottom:8px">${q.label} · ${MOB_MONTHS_FULL[q.months[0]]}–${MOB_MONTHS_FULL[q.months[2]]}</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#3b82f6">${
+
+
+
+
+
+            totNewMem}</div>
+          <div style="font-size:.58rem;color:var(--slate)">New Members</div>
+        </div>
+        <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#e8415a">${
+
+
+
+
+
+
+
+
+            totInc}</div>
+          <div style="font-size:.58rem;color:var(--slate)">Incidents</div>
+        </div>
+        <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#a855f7">${
+
+
+
+
+
+
+
+
+            totAlerts}</div>
+          <div style="font-size:.58rem;color:var(--slate)">Alerts</div>
+        </div>
+        <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#06b6d4">${
+
+
+
+
+
+
+
+
+            totBizReg}</div>
+          <div style="font-size:.58rem;color:var(--slate)">Biz Reg.</div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:${
+
+
+
+
+
+
+
+
+            q.color};margin-bottom:4px">Summary</div>
+      <textarea style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:56px;line-height:1.55"
+        placeholder="Write 2–3 sentences about this quarter…"
+        onchange="saveMobQuarterlyNote(${
+
+
+
+
+
+            mobTrackerYear},'${q.label}','summary',this.value)">${esc(qData.summary || '')}</textarea>
+    </div>`
+
+
+            ;
+        }).join('');
+    }
+
+    async function saveMobQuarterlyNote(year, quarter, field, val) {
+        const k = `${year}_${quarter}`;
+        if (!mobQuarterlyNotes[k])
+            mobQuarterlyNotes[k] = {
+                year,
+                quarter
+            };
+        mobQuarterlyNotes[k][field] = val;
+        try {
+            await sb.from('tracker_quarterly').upsert({
+                year,
+                quarter,
+                [field]: val || null
+            }, {
+                onConflict: 'year,quarter'
+            });
+        } catch (e) {}
+    }
+
+    function openMobMilestoneSheet() {
+        const sheet = document.createElement('div');
+        sheet.id = 'mobMsSheet';
+        sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;flex-direction:column;justify-content:flex-end';
+        sheet.innerHTML = `
+    <div style="background:var(--navy2);border-radius:14px 14px 0 0;padding:20px;max-height:85vh;overflow-y:auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white)">Add Milestone</div>
+        <button onclick="document.getElementById('mobMsSheet').remove()" style="background:none;border:none;color:var(--slate);font-size:1.2rem;cursor:pointer">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Date</div>
+          <input type="date" id="mobMsDate" value="${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        new Date().toISOString().split('T')[0]}" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.8rem"></div>
+        <div><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Category</div>
+          <select id="mobMsCat" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.8rem">
+            ${
+
+
+
+
+
+        ['Launch', 'Membership', 'Incident', 'Alert', 'Captain', 'Media', 'Emergency', 'Feedback', 'Milestone'].map(c => `<option>${c}</option>`).join('')}
+          </select></div>
+      </div>
+      <div style="margin-bottom:10px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Milestone / Story</div>
+        <textarea id="mobMsStory" rows="3" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.8rem;resize:vertical"></textarea></div>
+      <div style="margin-bottom:10px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Impact / Why it matters</div>
+        <input type="text" id="mobMsImpact" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.8rem"></div>
+      <div style="margin-bottom:16px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:6px">Use in pitch?</div>
+        <div style="display:flex;gap:8px">
+          ${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ['Yes', 'No', 'Maybe'].map(v => `<label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer"><input type="radio" name="mobMsPitch" value="${v}" ${v === 'Yes' ? 'checked' : ''}> ${v}</label>`).join('')}
+        </div></div>
+      <button onclick="saveMobMilestone()" style="width:100%;background:var(--teal);border:none;border-radius:7px;padding:12px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:700;cursor:pointer">Save Milestone</button>
+    </div>`
+
+
+
+
+
+
+
+
+        ;
+        document.body.appendChild(sheet);
+    }
+
+    async function saveMobMilestone() {
+        const ms = {
+            date: document.getElementById('mobMsDate').value,
+            category: document.getElementById('mobMsCat').value,
+            story: document.getElementById('mobMsStory').value.trim(),
+            impact: document.getElementById('mobMsImpact').value.trim() || null,
+            use_in_pitch: document.querySelector('input[name="mobMsPitch"]:checked')?.value || 'Yes',
+            created_at: new Date().toISOString(),
+        };
+        if (!ms.story) {
+            showToast('⚠️', 'Enter a milestone story first.', 'err');
+            return;
+        }
+        try {
+            const {data, error} = await sb.from('tracker_milestones').insert(ms).select().single();
+            if (error)
+                throw error;
+            mobMilestones.unshift(data || {
+                ...ms,
+                id: Date.now().toString()
+            });
+        } catch (e) {
+            mobMilestones.unshift({
+                ...ms,
+                id: Date.now().toString()
+            });
+        }
+        document.getElementById('mobMsSheet')?.remove();
+        renderMobTracker();
+        showToast('⭐', 'Milestone saved!');
+    }
+
+    async function deleteMobMilestone(id) {
+        if (!confirm('Delete this milestone?'))
+            return;
+        mobMilestones = mobMilestones.filter(m => m.id != id);
+        try {
+            await sb.from('tracker_milestones').delete().eq('id', id);
+        } catch (e) {}
+        renderMobTracker();
+    }
+
+    /* ════════════════════════════════════════════════
+               MOBILE BUSINESS REGISTRY
+            ════════════════════════════════════════════════ */
+    let mobRegistryList = [];
+
+    async function loadMobRegistry() {
+        // Populate district filter — admins/superadmins only
+        const df = document.getElementById('mobRegDistrict');
+        if (df && df.options.length === 1 && currentRole !== 'captain') {
+            const dists = [
+            ['hamakua', 'D1 — Hāmākua'], ['north-hilo', 'D2 — North Hilo'], ['south-hilo', 'D3 — South Hilo'],
+            ['lower-puna', 'D4 — Lower Puna'], ['upper-puna', 'D5 — Upper Puna'], ['kau', 'D6 — Kaʻū'],
+            ['south-kona', 'D7 — South Kona'], ['north-kona', 'D8 — North Kona'], ['north-kohala', 'D9 — Kohala'],
+            ];
+            dists.forEach(([v, l]) => {
+                const o = document.createElement('option');
+                o.value = v;
+                o.textContent = l;
+                df.appendChild(o);
+            });
+        }
+        // Hide district filter for captains
+        if (currentRole === 'captain' && df)
+            df.style.display = 'none';
+
+        document.getElementById('mobRegistryList').innerHTML = '<div style="color:var(--slate2);font-size:.78rem;padding:8px 0">Loading…</div>';
+        try {
+            let query = sb.from('business_registry').select('*').order('submitted_at', {
+                ascending: false
+            });
+            // Server-side district filter for captains
+            if (currentRole === 'captain' && captainDistrict) {
+                query = query.eq('district', captainDistrict);
+            }
+            const {data, error} = await query;
+            if (error)
+                throw error;
+            mobRegistryList = data || [];
+            const subtitle = document.getElementById('mobRegistrySubtitle');
+            if (subtitle) {
+                const pending = mobRegistryList.filter(b => b.status === 'pending').length;
+                subtitle.textContent = `${mobRegistryList.length} businesses · ${pending} pending`;
+            }
+            renderMobRegistry();
+            // Re-render districts so business counts appear on cards
+            if (currentScreen === 'districts')
+                renderDistOverview();
+        } catch (e) {
+            document.getElementById('mobRegistryList').innerHTML = `<div style="color:var(--red);font-size:.78rem">${e.message}</div>`;
+        }
+    }
+
+    function showMobRegistry() {
+        document.getElementById('mobRegistryScreen').style.display = 'block';
+        if (!mobRegistryList.length)
+            loadMobRegistry();
+        else
+            renderMobRegistry();
+    }
+
+    function closeMobRegistry() {
+        document.getElementById('mobRegistryScreen').style.display = 'none';
+    }
+
+    function mobExportRegistryCSV() {
+        const q = (document.getElementById('mobRegSearch')?.value || '').toLowerCase().trim();
+        const statF = document.getElementById('mobRegStatus')?.value || '';
+        const distF = document.getElementById('mobRegDistrict')?.value || '';
+        const DIST_LABELS = {
+            'hamakua': 'District 1 — Hāmākua',
+            'north-hilo': 'District 2 — North Hilo',
+            'south-hilo': 'District 3 — South Hilo',
+            'lower-puna': 'District 4 — Lower Puna',
+            'upper-puna': 'District 5 — Upper Puna',
+            'kau': "District 6 — Kaʻū",
+            'south-kona': 'District 7 — South Kona',
+            'north-kona': 'District 8 — North Kona',
+            'north-kohala': 'District 9 — Kohala'
+        };
+        const rows = mobRegistryList.filter(b => {
+            const matchQ = !q || (b.business_name || '').toLowerCase().includes(q) || (b.contact_name || '').toLowerCase().includes(q) || (b.city || '').toLowerCase().includes(q);
+            const matchS = !statF || b.status === statF;
+            const matchD = !distF || b.district === distF;
+            return matchQ && matchS && matchD;
+        });
+        const headers = ['Biz #', 'Business Name', 'Type', 'Status', 'District', 'Street Address', 'City', 'ZIP', 'Contact Name', 'Phone', 'Email', 'Employees', 'Website', 'Captain', 'Submitted', 'Approved', 'Packet Sent', 'Notes'];
+        const csvRows = [headers, ...rows.map(b => [
+        b.business_number || '',
+        b.business_name || '', b.business_type || '', b.status || '', DIST_LABELS[b.district] || b.district || '',
+        b.street_address || '', b.city || '', b.zip || '',
+        b.contact_name || '', b.phone ? fmtPhone(b.phone) : '', b.email || '',
+        b.employees || '', b.website || '', b.captain_name || '',
+        b.submitted_at ? new Date(b.submitted_at).toLocaleDateString() : '',
+        b.approved_at ? new Date(b.approved_at).toLocaleDateString() : '',
+        b.packet_sent_at ? new Date(b.packet_sent_at).toLocaleDateString() : '',
+        (b.notes || '').replace(/\n/g, ' ')
+        ].map(v => `"${String(v).replace(/"/g, '""')}"`))];
+        const csv = csvRows.map(r => r.join(',')).join('\n');
+        const blob = new Blob([csv], {
+            type: 'text/csv;charset=utf-8;'
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `HIBCW_BusinessRegistry_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function mobPrintRegistry() {
+        const q = (document.getElementById('mobRegSearch')?.value || '').toLowerCase().trim();
+        const statF = document.getElementById('mobRegStatus')?.value || '';
+        const distF = document.getElementById('mobRegDistrict')?.value || '';
+        const DIST_LABELS = {
+            'hamakua': 'District 1 — Hāmākua',
+            'north-hilo': 'District 2 — North Hilo',
+            'south-hilo': 'District 3 — South Hilo',
+            'lower-puna': 'District 4 — Lower Puna',
+            'upper-puna': 'District 5 — Upper Puna',
+            'kau': "District 6 — Kaʻū",
+            'south-kona': 'District 7 — South Kona',
+            'north-kona': 'District 8 — North Kona',
+            'north-kohala': 'District 9 — Kohala'
+        };
+        const rows = mobRegistryList.filter(b => {
+            const matchQ = !q || (b.business_name || '').toLowerCase().includes(q) || (b.contact_name || '').toLowerCase().includes(q) || (b.city || '').toLowerCase().includes(q);
+            const matchS = !statF || b.status === statF;
+            const matchD = !distF || b.district === distF;
+            return matchQ && matchS && matchD;
+        });
+        const sc = s => s === 'approved' ? '#00c9a7' : s === 'pending' ? '#f5a623' : '#e8415a';
+        const titleParts = [distF ? DIST_LABELS[distF] : null, statF || null].filter(Boolean);
+        const subtitle = titleParts.length ? titleParts.join(' · ') : 'All Districts · All Statuses';
+        const html = `<!DOCTYPE html><html><head><title>HIBCW Business Registry</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#0f1e2e;font-size:11px}
+    .header{display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid #00c9a7;padding-bottom:10px;margin-bottom:16px}
+    .org{font-size:9px;color:#7a8fa6;letter-spacing:.1em;text-transform:uppercase}
+    .title{font-size:16px;font-weight:700;color:#0b1524}
+    .sub{font-size:10px;color:#4a6070;margin-top:2px}
+    table{width:100%;border-collapse:collapse}
+    th{background:#0b1524;color:#eef3f8;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:6px 8px;text-align:left;font-weight:600}
+    td{padding:6px 8px;border-bottom:1px solid #dde6ee;vertical-align:top}
+    tr:nth-child(even) td{background:#f7f9fc}
+    .badge{display:inline-block;border-radius:3px;padding:1px 6px;font-size:9px;font-weight:600;text-transform:capitalize}
+    .footer{margin-top:16px;font-size:9px;color:#7a8fa6;display:flex;justify-content:space-between;border-top:1px solid #dde6ee;padding-top:8px}
+    @media print{body{padding:12px}}
+  </style></head><body>
+  <div class="header">
+    <div>
+      <div class="org">Hawaii Island Business Crime Watch · HIBCW</div>
+      <div class="title">Business Registry</div>
+      <div class="sub">${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        esc(subtitle)} · ${rows.length} business${rows.length !== 1 ? 'es' : ''}</div>
+    </div>
+    <div style="text-align:right">
+      <div class="org">Printed ${
+
+
+
+
+
+        new Date().toLocaleDateString('en-US', {month: 'long',day: 'numeric',year: 'numeric'})}</div>
+      <div class="org">CONFIDENTIAL — For authorized use only</div>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Biz #</th><th>Business</th><th>Type</th><th>District</th><th>Contact</th><th>Phone</th><th>Status</th><th>Packet</th></tr></thead>
+    <tbody>
+      ${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        rows.map((b, i) => `<tr>
+        <td style="color:#7a8fa6;width:28px">${i + 1}</td>
+        <td style="font-family:monospace;font-weight:700;white-space:nowrap">${b.business_number || '—'}</td>
+        <td><strong>${esc(b.business_name || '—')}</strong><br><span style="color:#7a8fa6">${esc(b.city || '')}${b.zip ? ' ' + b.zip : ''}</span></td>
+        <td>${esc(b.business_type || '—')}</td>
+        <td>${esc(DIST_LABELS[b.district] || b.district || '—')}</td>
+        <td>${esc(b.contact_name || '—')}</td>
+        <td style="white-space:nowrap">${b.phone ? fmtPhone(b.phone) : '—'}</td>
+        <td><span class="badge" style="background:${sc(b.status)}22;color:${sc(b.status)};border:1px solid ${sc(b.status)}55">${b.status || '—'}</span></td>
+        <td style="color:${b.packet_sent_at ? '#00c9a7' : '#7a8fa6'}">${b.packet_sent_at ? new Date(b.packet_sent_at).toLocaleDateString() : '—'}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+  <div class="footer">
+    <span>HIBCW · Hawaii Island Business Crime Watch · A Program of KIAA · kiaahilo.org</span>
+    <span>Crime Stoppers (808) 961-8300 · HPD Non-Emergency (808) 935-3311</span>
+  </div>
+  <script>window.onload=()=>window.print();<\/script>
+  </body></html>`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ;
+        const win = window.open('', '_blank', 'width=900,height=700');
+        if (!win) {
+            showToast('⚠️', 'Pop-ups blocked — please allow pop-ups.', 'err');
+            return;
+        }
+        win.document.write(html);
+        win.document.close();
+    }
+
+    function mobPrintDistrictBusinesses() {
+        const distId = _distBizId;
+        const DIST_LABELS = {
+            'hamakua': 'District 1 — Hāmākua',
+            'north-hilo': 'District 2 — North Hilo',
+            'south-hilo': 'District 3 — South Hilo',
+            'lower-puna': 'District 4 — Lower Puna',
+            'upper-puna': 'District 5 — Upper Puna',
+            'kau': "District 6 — Kaʻū",
+            'south-kona': 'District 7 — South Kona',
+            'north-kona': 'District 8 — North Kona',
+            'north-kohala': 'District 9 — Kohala'
+        };
+        const DIST_COLORS = {
+            'hamakua': '#84cc16',
+            'north-hilo': '#3b82f6',
+            'south-hilo': '#00c9a7',
+            'lower-puna': '#c084fc',
+            'upper-puna': '#a855f7',
+            'kau': '#ef4444',
+            'south-kona': '#f59e0b',
+            'north-kona': '#f97316',
+            'north-kohala': '#10b981'
+        };
+        const distLabel = DIST_LABELS[distId] || distId || 'District';
+        const distColor = DIST_COLORS[distId] || '#00c9a7';
+        // Use visible (filtered) rows from the sheet
+        const visibleIds = new Set();
+        document.querySelectorAll('.dist-biz-row').forEach(row => {
+            if (row.style.display !== 'none') {
+                const btn = row.querySelector('button[onclick*="openMobBizSheet"]');
+                const match = btn?.getAttribute('onclick')?.match(/'([^']+)'/);
+                if (match)
+                    visibleIds.add(match[1]);
+            }
+        });
+        const businesses = visibleIds.size
+        ? mobRegistryList.filter(b => visibleIds.has(b.id))
+        : mobRegistryList.filter(b => b.district === distId);
+        const sc = s => s === 'approved' ? '#00c9a7' : s === 'pending' ? '#f5a623' : '#e8415a';
+        const html = `<!DOCTYPE html><html><head><title>HIBCW ${esc(distLabel)}</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#0f1e2e;font-size:11px}
+    .header{display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid ${
+
+
+
+
+
+        distColor};padding-bottom:10px;margin-bottom:16px}
+    .org{font-size:9px;color:#7a8fa6;letter-spacing:.1em;text-transform:uppercase}
+    .title{font-size:16px;font-weight:700;color:#0b1524}
+    .sub{font-size:10px;color:#4a6070;margin-top:2px}
+    table{width:100%;border-collapse:collapse}
+    th{background:#0b1524;color:#eef3f8;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:6px 8px;text-align:left;font-weight:600}
+    td{padding:6px 8px;border-bottom:1px solid #dde6ee;vertical-align:top}
+    tr:nth-child(even) td{background:#f7f9fc}
+    .badge{display:inline-block;border-radius:3px;padding:1px 6px;font-size:9px;font-weight:600;text-transform:capitalize}
+    .footer{margin-top:16px;font-size:9px;color:#7a8fa6;display:flex;justify-content:space-between;border-top:1px solid #dde6ee;padding-top:8px}
+    @media print{body{padding:12px}}
+  </style></head><body>
+  <div class="header">
+    <div>
+      <div class="org">Hawaii Island Business Crime Watch · HIBCW</div>
+      <div class="title">${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        esc(distLabel)} — Business Roster</div>
+      <div class="sub">${businesses.length} registered business${businesses.length !== 1 ? 'es' : ''}</div>
+    </div>
+    <div style="text-align:right">
+      <div class="org">Printed ${
+
+
+
+
+
+        new Date().toLocaleDateString('en-US', {month: 'long',day: 'numeric',year: 'numeric'})}</div>
+      <div class="org">CONFIDENTIAL — For authorized use only</div>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Biz #</th><th>Business</th><th>Type</th><th>Contact</th><th>Phone</th><th>Email</th><th>Status</th><th>Packet</th></tr></thead>
+    <tbody>
+      ${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        businesses.map((b, i) => `<tr>
+        <td style="color:#7a8fa6;width:28px">${i + 1}</td>
+        <td style="font-family:monospace;font-weight:700;white-space:nowrap">${b.business_number || '—'}</td>
+        <td><strong>${esc(b.business_name || '—')}</strong><br><span style="color:#7a8fa6">${esc(b.city || '')}${b.zip ? ' ' + b.zip : ''}</span></td>
+        <td>${esc(b.business_type || '—')}</td>
+        <td>${esc(b.contact_name || '—')}</td>
+        <td style="white-space:nowrap">${b.phone ? fmtPhone(b.phone) : '—'}</td>
+        <td style="color:#0b4a3f">${esc(b.email || '—')}</td>
+        <td><span class="badge" style="background:${sc(b.status)}22;color:${sc(b.status)};border:1px solid ${sc(b.status)}55">${b.status || '—'}</span></td>
+        <td style="color:${b.packet_sent_at ? '#00c9a7' : '#7a8fa6'}">${b.packet_sent_at ? new Date(b.packet_sent_at).toLocaleDateString() : '—'}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+  <div class="footer">
+    <span>HIBCW · Hawaii Island Business Crime Watch · A Program of KIAA · kiaahilo.org</span>
+    <span>Crime Stoppers (808) 961-8300 · HPD Non-Emergency (808) 935-3311</span>
+  </div>
+  <script>window.onload=()=>window.print();<\/script>
+  </body></html>`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ;
+        const win = window.open('', '_blank', 'width=900,height=700');
+        if (!win) {
+            showToast('⚠️', 'Pop-ups blocked — please allow pop-ups.', 'err');
+            return;
+        }
+        win.document.write(html);
+        win.document.close();
+    }
+
+    function renderMobRegistry() {
+        const el = document.getElementById('mobRegistryList');
+        if (!el)
+            return;
+        const q = (document.getElementById('mobRegSearch')?.value || '').toLowerCase().trim();
+        const stat = document.getElementById('mobRegStatus')?.value || '';
+        const dist = document.getElementById('mobRegDistrict')?.value || '';
+        const DIST_COLORS = {
+            'hamakua': '#84cc16',
+            'north-hilo': '#3b82f6',
+            'south-hilo': '#00c9a7',
+            'lower-puna': '#c084fc',
+            'upper-puna': '#a855f7',
+            'kau': '#ef4444',
+            'south-kona': '#f59e0b',
+            'north-kona': '#f97316',
+            'north-kohala': '#10b981'
+        };
+        let list = mobRegistryList.filter(b => {
+            if (stat && b.status !== stat)
+                return false;
+            if (dist && b.district !== dist)
+                return false;
+            if (currentRole === 'captain' && b.district !== captainDistrict)
+                return false;
+            if (q && ![b.business_name, b.contact_name, b.city, b.business_type].filter(Boolean).join(' ').toLowerCase().includes(q))
+                return false;
+            return true;
+        });
+        if (!list.length) {
+            el.innerHTML = '<div style="color:var(--slate2);font-size:.78rem;padding:8px 0;font-style:italic">No businesses match.</div>';
+            return;
+        }
+        el.innerHTML = list.map(b => {
+            const dc = DIST_COLORS[b.district] || 'var(--teal)';
+            const sc = b.status === 'approved' ? 'var(--teal)' : b.status === 'pending' ? 'var(--gold)' : 'var(--red)';
+            return `<div onclick="openMobBizSheet('${b.id}')" style="background:var(--navy2);border:1px solid var(--b2);border-left:3px solid ${dc};border-radius:0 7px 7px 0;padding:12px 14px;margin-bottom:7px;cursor:pointer">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.84rem;font-weight:600;color:var(--white);margin-bottom:2px">${
+
+
+
+
+
+            esc(b.business_name)}</div>
+          <div style="font-size:.7rem;color:var(--slate)">${esc(b.business_type || '')}${b.city ? ' · ' + esc(b.city) : ''}</div>
+          ${b.business_number ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:700;color:var(--white);margin-top:3px;letter-spacing:.04em"># ${esc(b.business_number)}</div>` : ''}
+          ${b.packet_sent_at ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);margin-top:3px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</div>` : ''}
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;padding:2px 7px;border-radius:3px;border:1px solid;color:${
+
+
+            sc};background:${sc}18;border-color:${sc}44;white-space:nowrap;flex-shrink:0;text-transform:capitalize">${b.status}</span>
+      </div>
+    </div>`
+
+
+
+
+
+            ;
+        }).join('');
+    }
+
+    function openMobBizSheet(id) {
+        const b = mobRegistryList.find(b => b.id === id);
+        if (!b)
+            return;
+        const DIST_COLORS = {
+            'hamakua': '#84cc16',
+            'north-hilo': '#3b82f6',
+            'south-hilo': '#00c9a7',
+            'lower-puna': '#c084fc',
+            'upper-puna': '#a855f7',
+            'kau': '#ef4444',
+            'south-kona': '#f59e0b',
+            'north-kona': '#f97316',
+            'north-kohala': '#10b981'
+        };
+        const DIST_LABELS = {
+            'hamakua': 'District 1 — Hāmākua',
+            'north-hilo': 'District 2 — North Hilo',
+            'south-hilo': 'District 3 — South Hilo',
+            'lower-puna': 'District 4 — Lower Puna',
+            'upper-puna': 'District 5 — Upper Puna',
+            'kau': 'District 6 — Kaʻū',
+            'south-kona': 'District 7 — South Kona',
+            'north-kona': 'District 8 — North Kona',
+            'north-kohala': 'District 9 — Kohala'
+        };
+        const dc = DIST_COLORS[b.district] || 'var(--teal)';
+        const sc = b.status === 'approved' ? 'var(--teal)' : b.status === 'pending' ? 'var(--gold)' : 'var(--red)';
+        const canEdit = currentRole === 'admin' || currentRole === 'superadmin';
+
+        // Update title
+        document.getElementById('mobBizSheetTitle').textContent = b.business_name || 'Business Details';
+
+        // Body — all info
+        document.getElementById('mobBizSheetBody').innerHTML = `
+    ${b.business_number ? `
+    <div style="background:rgba(0,201,167,.07);border:1.5px solid rgba(0,201,167,.3);border-radius:7px;padding:9px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate)">Business #</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--teal);letter-spacing:.06em">${
+
+
+
+
+
+        esc(b.business_number)}</div>
+    </div>` : `
+    <div style="background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.25);border-radius:7px;padding:8px 14px;margin-bottom:12px;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--gold)">
+      ⚠️ No business number yet — approve to auto-assign one.
+    </div>`
+
+
+
+
+
+
+
+
+        }
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;padding:3px 8px;border-radius:3px;border:1px solid;color:${
+
+
+        dc};background:${dc}18;border-color:${dc}44">${DIST_LABELS[b.district] || b.district || '—'}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;padding:3px 8px;border-radius:3px;border:1px solid;color:${sc};background:${sc}18;border-color:${sc}44;text-transform:capitalize">${b.status}</span>
+      ${b.packet_sent_at ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;padding:3px 8px;border-radius:3px;background:rgba(0,201,167,.1);color:var(--teal)">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</span>` : ''}
+    </div>
+    <div style="font-size:.78rem;color:var(--slate);margin-bottom:14px">${
+
+
+        esc(b.business_type || '—')}</div>
+    ${[['📍 Physical', b.full_address || [b.street_address, b.city, 'HI', b.zip].filter(Boolean).join(', ')], ['📬 Mailing', b.mailing_same_as_physical || !b.mailing_address ? 'Same as physical' : b.mailing_address], ['👤 Contact', b.contact_name], ['📞 Phone', b.phone ? fmtPhone(b.phone) : null], ['✉️ Email', b.email], ['👥 Employees', b.employees], ['🌐 Website', b.website], ['👮 Captain', b.captain_name], ['📝 Notes', b.notes], ].filter(([, v]) => v).map(([l, v]) => `
+      <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--b2);font-size:.82rem">
+        <span style="color:var(--slate);flex-shrink:0;width:90px">${
+
+
+        l}</span>
+        <span style="color:var(--white);word-break:break-word">${esc(v)}</span>
+      </div>`).join('')}`;
+
+        // Footer — action buttons
+        const canEdit_ = canEdit;
+        document.getElementById('mobBizSheetActions').innerHTML = `
+    ${canEdit_ ? `
+      <button onclick="mobEditBusiness('${b.id}')" style="flex:1;background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);border-radius:6px;padding:9px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">✏️ Edit</button>
+      <button onclick="mobDeleteBusiness('${b.id}')" style="flex:1;background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:6px;padding:9px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">🗑 Delete</button>
+    ` : ''}
+    ${b.status === 'pending' && canEdit_ ? `
+      <button onclick="mobApproveReg('${b.id}')" style="flex:1;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);border-radius:6px;padding:9px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">✅ Approve</button>
+      <button onclick="mobRejectReg('${b.id}')" style="flex:1;background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.25);border-radius:6px;padding:9px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">❌ Reject</button>
+    ` : ''}
+    ${b.status === 'approved' && canEdit_ ? `
+      <button onclick="mobGeneratePacket('${b.id}')" title="${b.packet_sent_at ? 'Reprint packet' : 'Generate packet'}" style="width:100%;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:6px;padding:9px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">${b.packet_sent_at ? '🖨 Reprint Packet' : '📦 Generate Packet'}</button>
+    ` : ''}
+    <button onclick="closeMobBizSheet()" style="width:100%;background:transparent;border:1px solid var(--b2);border-radius:6px;padding:9px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">Close</button>`
+
+
+        ;
+
+        const sheet = document.getElementById('mobBizSheet');
+        sheet.style.display = 'flex';
+    }
+
+    function closeMobBizSheet() {
+        document.getElementById('mobBizSheet').style.display = 'none';
+    }
+
+    async function mobDeleteBusiness(id) {
+        const b = mobRegistryList.find(b => b.id === id);
+        if (!b || !confirm(`Permanently delete "${b.business_name}"? This cannot be undone.`))
+            return;
+        const {error} = await sb.from('business_registry').delete().eq('id', id);
+        if (!error) {
+            mobRegistryList = mobRegistryList.filter(b => b.id !== id);
+            closeMobBizSheet();
+            renderMobRegistry();
+            if (currentScreen === 'districts')
+                renderDistOverview();
+            showToast('🗑', 'Business deleted.');
+        } else
+            showToast('⚠️', error.message, 'err');
+    }
+
+    function mobEditBusiness(id) {
+        const b = mobRegistryList.find(b => b.id === id);
+        if (!b)
+            return;
+        closeMobBizSheet();
+
+        // Build edit sheet
+        const sheet = document.createElement('div');
+        sheet.id = 'mobEditBizSheet';
+        sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:700;display:flex;flex-direction:column;justify-content:flex-end';
+
+        const DIST_OPTS = [
+        ['hamakua', 'District 1 — Hāmākua'], ['north-hilo', 'District 2 — North Hilo'],
+        ['south-hilo', 'District 3 — South Hilo'], ['lower-puna', 'District 4 — Lower Puna'],
+        ['upper-puna', 'District 5 — Upper Puna'], ['kau', 'District 6 — Kaʻū'],
+        ['south-kona', 'District 7 — South Kona'], ['north-kona', 'District 8 — North Kona'],
+        ['north-kohala', 'District 9 — Kohala'],
+        ];
+
+        const fld = (label, id, val, type='text', extra='') =>
+        `<div style="margin-bottom:12px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">${label}</div>
+      <input type="${type}" id="${id}" value="${esc(val || '')}" ${extra} style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px 10px;color:var(--white);font-size:.84rem;outline:none">
+    </div>`
+
+
+        ;
+
+        sheet.innerHTML = `
+    <div style="background:var(--navy2);border-radius:14px 14px 0 0;max-height:90vh;display:flex;flex-direction:column;overflow:hidden">
+      <div style="flex-shrink:0;display:flex;justify-content:center;padding:10px 0 4px">
+        <div style="width:36px;height:4px;background:var(--b2);border-radius:2px"></div>
+      </div>
+      <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px 12px;border-bottom:1px solid var(--b2)">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white)">✏️ Edit Business</div>
+        <button onclick="document.getElementById('mobEditBizSheet').remove()" style="background:none;border:none;color:var(--slate);font-size:1.2rem;cursor:pointer">✕</button>
+      </div>
+      <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:16px 18px;min-height:0">
+        ${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        fld('Business Name', 'mebName', b.business_name)}
+        ${fld('Business Type', 'mebType', b.business_type)}
+        ${fld('Street Address (Physical)', 'mebStreet', b.street_address, 'text', 'oninput="mebSyncMailing()"')}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          ${
+
+
+        fld('City (Physical)', 'mebCity', b.city, 'text', 'oninput="mebSyncMailing()"')}
+          ${fld('ZIP (Physical)', 'mebZip', b.zip, 'text', 'oninput="mebSyncMailing()"')}
+        </div>
+        <div style="margin-bottom:12px;border-top:1px solid var(--b2);padding-top:12px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;color:var(--slate)">
+            <input type="checkbox" id="mebSameAs" ${
+
+
+
+
+
+
+
+
+        (b.mailing_same_as_physical !== false && !b.mailing_street) ? 'checked' : ''} onchange="mebToggleSameAs()" style="width:15px;height:15px;accent-color:var(--teal);cursor:pointer;flex-shrink:0">
+            Mailing same as physical address
+          </label>
+        </div>
+        <div id="mebMailingFields" style="${
+
+
+
+
+
+
+
+
+        (b.mailing_same_as_physical !== false && !b.mailing_street) ? 'display:none' : ''}">
+          ${fld('Mailing Street', 'mebMailStreet', b.mailing_street)}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            ${
+
+
+        fld('Mailing City', 'mebMailCity', b.mailing_city)}
+            ${fld('Mailing ZIP', 'mebMailZip', b.mailing_zip)}
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">District</div>
+          <select id="mebDistrict" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px 10px;color:var(--white);font-size:.84rem;outline:none">
+            <option value="">— Unassigned —</option>
+            ${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        DIST_OPTS.map(([v, l]) => `<option value="${v}" ${b.district === v ? 'selected' : ''}>${l}</option>`).join('')}
+          </select>
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Status</div>
+          <select id="mebStatus" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px 10px;color:var(--white);font-size:.84rem;outline:none">
+            <option value="pending" ${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        b.status === 'pending' ? 'selected' : ''}>Pending</option>
+            <option value="approved" ${b.status === 'approved' ? 'selected' : ''}>Approved</option>
+            <option value="rejected" ${b.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+          </select>
+        </div>
+        ${
+
+
+
+
+
+        fld('Contact Name', 'mebContact', b.contact_name)}
+        ${fld('Phone', 'mebPhone', b.phone ? fmtPhone(b.phone) : '', 'tel')}
+        ${fld('Email', 'mebEmail', b.email, 'email')}
+        ${fld('Employees', 'mebEmployees', b.employees)}
+        ${fld('Website', 'mebWebsite', b.website, 'url')}
+        <div style="margin-bottom:12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Notes</div>
+          <textarea id="mebNotes" rows="3" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px 10px;color:var(--white);font-size:.84rem;outline:none;resize:vertical;font-family:'IBM Plex Sans',sans-serif">${
+
+
+
+
+
+        esc(b.notes || '')}</textarea>
+        </div>
+      </div>
+      <div style="flex-shrink:0;padding:12px 18px;border-top:1px solid var(--b2);display:flex;gap:8px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))">
+        <button onclick="document.getElementById('mobEditBizSheet').remove()" style="flex:1;background:transparent;border:1px solid var(--b2);border-radius:6px;padding:10px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">Cancel</button>
+        <button onclick="saveMobEditBusiness('${
+
+
+
+
+
+
+
+
+
+
+
+        b.id}')" style="flex:2;background:var(--teal);border:none;border-radius:6px;padding:10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:700;cursor:pointer">Save Changes</button>
+      </div>
+    </div>`
+
+
+
+
+
+        ;
+        document.body.appendChild(sheet);
+    }
+
+    function mebSyncMailing() {
+        if (!document.getElementById('mebSameAs')?.checked)
+            return;
+        document.getElementById('mebMailStreet').value = document.getElementById('mebStreet')?.value || '';
+        document.getElementById('mebMailCity').value = document.getElementById('mebCity')?.value || '';
+        document.getElementById('mebMailZip').value = document.getElementById('mebZip')?.value || '';
+    }
+
+    function mebToggleSameAs() {
+        const same = document.getElementById('mebSameAs').checked;
+        document.getElementById('mebMailingFields').style.display = same ? 'none' : 'block';
+        if (same)
+            mebSyncMailing();
+    }
+
+    async function saveMobEditBusiness(id) {
+        const b = mobRegistryList.find(b => b.id === id);
+        if (!b)
+            return;
+
+        // Warn before reassigning district on an approved business (biz# will change)
+        const newDistrict = document.getElementById('mebDistrict')?.value || null;
+        if (newDistrict && newDistrict !== b.district && b.status === 'approved' && b.business_number) {
+            const distLabel = newDistrict.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            if (!confirm(`Changing the district to "${distLabel}" will assign a new business number to replace ${b.business_number}. Continue?`))
+                return;
+        }
+
+        const sameAs = document.getElementById('mebSameAs')?.checked;
+        const phyStreet = document.getElementById('mebStreet')?.value.trim();
+        const phyCity = document.getElementById('mebCity')?.value.trim();
+        const phyZip = document.getElementById('mebZip')?.value.trim();
+        const mailStreet = sameAs ? phyStreet : document.getElementById('mebMailStreet')?.value.trim();
+        const mailCity = sameAs ? phyCity : document.getElementById('mebMailCity')?.value.trim();
+        const mailZip = sameAs ? phyZip : document.getElementById('mebMailZip')?.value.trim();
+        const updates = {
+            business_name: document.getElementById('mebName')?.value.trim(),
+            business_type: document.getElementById('mebType')?.value.trim(),
+            street_address: phyStreet,
+            city: phyCity,
+            zip: phyZip,
+            full_address: [phyStreet, phyCity, 'HI', phyZip].filter(Boolean).join(', '),
+            mailing_street: mailStreet || null,
+            mailing_city: mailCity || null,
+            mailing_zip: mailZip || null,
+            mailing_address: mailStreet ? `${mailStreet}, ${mailCity}, HI ${mailZip}` : null,
+            mailing_same_as_physical: sameAs,
+            contact_name: document.getElementById('mebContact')?.value.trim(),
+            phone: document.getElementById('mebPhone')?.value.replace(/\D/g, ''),
+            email: document.getElementById('mebEmail')?.value.trim().toLowerCase(),
+            employees: document.getElementById('mebEmployees')?.value || null,
+            website: document.getElementById('mebWebsite')?.value.trim() || null,
+            notes: document.getElementById('mebNotes')?.value.trim() || null,
+            district: document.getElementById('mebDistrict')?.value || null,
+            status: document.getElementById('mebStatus')?.value || 'pending',
+        };
+        // If the district changed on an already-approved business, reassign biz#
+        const districtChanged = updates.district && updates.district !== b.district;
+        if (districtChanged && b.status === 'approved' && b.business_number) {
+            const newBizNumber = await generateBusinessNumber(updates.district);
+            if (newBizNumber)
+                updates.business_number = newBizNumber;
+        }
+
+        try {
+            const {error} = await sb.from('business_registry').update(updates).eq('id', id);
+            if (error)
+                throw error;
+            Object.assign(b, updates);
+            document.getElementById('mobEditBizSheet')?.remove();
+            renderMobRegistry();
+            if (currentScreen === 'districts')
+                renderDistOverview();
+            const msg = districtChanged && updates.business_number
+            ? `Business updated. New ID: ${updates.business_number}`
+            : 'Business updated.';
+            showToast('✅', msg);
+        } catch (e) {
+            showToast('⚠️', e.message, 'err');
+        }
+    }
+
+    async function mobApproveReg(id) {
+        if (!confirm('Approve this business?'))
+            return;
+        const b = mobRegistryList.find(b => b.id === id);
+        if (!b)
+            return;
+
+        // Generate business number if not already assigned
+        let bizNumber = b.business_number || null;
+        if (!bizNumber && b.district) {
+            bizNumber = await generateBusinessNumber(b.district);
+        }
+
+        const updates = {
+            status: 'approved',
+            approved_at: new Date().toISOString(),
+            approved_by: currentUserName
+        };
+        if (bizNumber)
+            updates.business_number = bizNumber;
+
+        const {error} = await sb.from('business_registry').update(updates).eq('id', id);
+        if (!error) {
+            Object.assign(b, updates);
+            closeMobBizSheet();
+            renderMobRegistry();
+            showToast('✅', bizNumber ? 'Business approved! ID: ' + bizNumber : 'Business approved!');
+            // Send approval email
+            if (b.email) {
+                try {
+                    const session = await sb.auth.getSession();
+                    const token = session?.data?.session?.access_token || SUPABASE_ANON_KEY;
+                    const res = await fetch(`${SUPABASE_URL}/functions/v1/send-approval-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            email: b.email,
+                            contact_name: b.contact_name,
+                            business_name: b.business_name,
+                            business_number: bizNumber || b.business_number,
+                        })
+                    });
+                    const result = await res.json();
+                    console.log('Business approval email result:', result);
+                } catch (e) {
+                    console.error('Business approval email error:', e);
+                }
+            }
+        } else
+            showToast('⚠️', error.message, 'err');
+    }
+
+    /* ════════════════════════════════════════════════
+               BIZ # LOOKUP
+            ════════════════════════════════════════════════ */
+    function showMobBizLookup() {
+        document.getElementById('mobBizLookupScreen').style.display = 'block';
+        setTimeout(() => document.getElementById('mobBizLookupInput')?.focus(), 120);
+    }
+
+    function closeMobBizLookup() {
+        document.getElementById('mobBizLookupScreen').style.display = 'none';
+    }
+
+    function mobBizLookupClear() {
+        document.getElementById('mobBizLookupResult').innerHTML = '';
+    }
+
+    async function mobBizLookupSearch() {
+        const raw = (document.getElementById('mobBizLookupInput')?.value || '').trim();
+        const resultEl = document.getElementById('mobBizLookupResult');
+        const btn = document.getElementById('mobBizLookupBtn');
+
+        if (!raw) {
+            resultEl.innerHTML = `<div style="color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.76rem;padding:4px 0">Please enter a 5-digit business number.</div>`;
+            return;
+        }
+        if (!/^\d{5}$/.test(raw)) {
+            resultEl.innerHTML = `<div style="color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.76rem;padding:4px 0">Business numbers are exactly 5 digits (e.g. 30001).</div>`;
+            return;
+        }
+
+        btn.textContent = '…';
+        btn.disabled = true;
+        resultEl.innerHTML = `<div style="color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.74rem">Searching ${raw}…</div>`;
+
+        try {
+            const {data, error} = await sb
+            .from('business_registry')
+            .select('*')
+            .eq('business_number', raw)
+            .maybeSingle();
+
+            if (error)
+                throw error;
+
+            if (!data) {
+                resultEl.innerHTML = `
+        <div style="background:rgba(232,65,90,.07);border:1.5px solid rgba(232,65,90,.25);border-radius:8px;padding:16px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:1.5rem">🔍</span>
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;font-weight:700;color:var(--red)">No business found</div>
+            <div style="font-size:.76rem;color:var(--slate);margin-top:3px">Number <strong style="color:var(--white)">${
+
+
+
+
+
+
+
+
+
+
+
+                esc(raw)}</strong> is not in the registry.</div>
+          </div>
+        </div>`
+
+
+
+
+
+                ;
+                return;
+            }
+
+            const b = data;
+            const DIST_COLORS = {
+                'hamakua': '#84cc16',
+                'north-hilo': '#3b82f6',
+                'south-hilo': '#00c9a7',
+                'lower-puna': '#c084fc',
+                'upper-puna': '#a855f7',
+                'kau': '#ef4444',
+                'south-kona': '#f59e0b',
+                'north-kona': '#f97316',
+                'north-kohala': '#10b981'
+            };
+            const DIST_LABELS = {
+                'hamakua': 'District 1 — Hāmākua',
+                'north-hilo': 'District 2 — North Hilo',
+                'south-hilo': 'District 3 — South Hilo',
+                'lower-puna': 'District 4 — Lower Puna',
+                'upper-puna': 'District 5 — Upper Puna',
+                'kau': 'District 6 — Kaʻū',
+                'south-kona': 'District 7 — South Kona',
+                'north-kona': 'District 8 — North Kona',
+                'north-kohala': 'District 9 — Kohala'
+            };
+            const dc = DIST_COLORS[b.district] || 'var(--teal)';
+            const dl = DIST_LABELS[b.district] || b.district || '—';
+            const sc = b.status === 'approved' ? 'var(--teal)' : b.status === 'pending' ? 'var(--gold)' : 'var(--red)';
+            const canEdit = currentRole === 'admin' || currentRole === 'superadmin';
+
+            const row = (label, val) => val ? `
+      <div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--b2);font-size:.82rem">
+        <span style="color:var(--slate);flex-shrink:0;width:96px;font-size:.76rem">${
+
+
+            label}</span>
+        <span style="color:var(--white);word-break:break-word">${esc(val)}</span>
+      </div>`
+
+
+            : '';
+
+            resultEl.innerHTML = `
+      <div style="background:var(--navy2);border:1.5px solid rgba(0,201,167,.3);border-radius:10px;overflow:hidden">
+
+        <!-- Result header -->
+        <div style="background:rgba(0,201,167,.07);border-bottom:1px solid rgba(0,201,167,.18);padding:14px 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--teal);letter-spacing:.06em">${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            esc(b.business_number)}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${
+
+
+            dc}15;color:${dc};border:1px solid ${dc}33;border-radius:3px;padding:2px 8px">${esc(dl)}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${sc}15;color:${sc};border:1px solid ${sc}33;border-radius:3px;padding:2px 8px;text-transform:capitalize">${b.status}</span>
+            </div>
+          </div>
+          <div style="font-size:.95rem;font-weight:600;color:var(--white)">${
+
+
+
+
+
+            esc(b.business_name)}</div>
+          <div style="font-size:.74rem;color:var(--slate);margin-top:2px">${esc(b.business_type || '—')}</div>
+          ${b.packet_sent_at ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal);margin-top:5px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</div>` : ''}
+        </div>
+
+        <!-- Detail rows -->
+        <div style="padding:0 16px">
+          ${
+
+
+
+
+
+
+
+
+
+
+
+            row('📍 Physical', b.full_address || [b.street_address, b.city, 'HI', b.zip].filter(Boolean).join(', '))}
+          ${row('📬 Mailing', b.mailing_same_as_physical || !b.mailing_address ? 'Same as physical' : b.mailing_address)}
+          ${row('👤 Contact', b.contact_name)}
+          ${row('📞 Phone', b.phone ? fmtPhone(b.phone) : null)}
+          ${row('✉️ Email', b.email)}
+          ${row('👥 Employees', b.employees)}
+          ${row('🌐 Website', b.website)}
+          ${row('👮 Captain', b.captain_name)}
+          ${row('📝 Notes', b.notes)}
+        </div>
+
+        <!-- Footer -->
+        <div style="padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--b2)">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
+            Submitted ${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            b.submitted_at ? new Date(b.submitted_at).toLocaleDateString() : '—'}${b.approved_at ? ' · Approved ' + new Date(b.approved_at).toLocaleDateString() : ''}
+          </div>
+          ${
+
+
+            canEdit ? `
+          <button onclick="closeMobBizLookup();loadMobRegistry();setTimeout(()=>{showMobRegistry();setTimeout(()=>{document.getElementById('mobRegSearch').value='${esc(b.business_number)}';renderMobRegistry();},200)},100)"
+            style="background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:7px 14px;color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:.66rem;cursor:pointer">
+            Open in Registry →
+          </button>`
+
+
+
+
+
+            : ''}
+        </div>
+      </div>`
+
+
+
+
+
+            ;
+
+        } catch (e) {
+            resultEl.innerHTML = `<div style="color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.76rem">Lookup failed: ${esc(e.message)}</div>`;
+        } finally {
+            btn.textContent = 'Search';
+            btn.disabled = false;
+        }
+    }
+
+    async function mobRejectReg(id) {
+        if (!confirm('Reject this registration?'))
+            return;
+        const b = mobRegistryList.find(b => b.id === id);
+        const {error} = await sb.from('business_registry').update({
+            status: 'rejected'
+        }).eq('id', id);
+        if (!error) {
+            if (b)
+                b.status = 'rejected';
+            closeMobBizSheet();
+            renderMobRegistry();
+            showToast('❌', 'Registration rejected.');
+            // Send denial email
+            if (b?.email) {
+                try {
+                    const session = await sb.auth.getSession();
+                    const token = session?.data?.session?.access_token || SUPABASE_ANON_KEY;
+                    const res = await fetch(`${SUPABASE_URL}/functions/v1/send-denial-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            email: b.email,
+                            contact_name: b.contact_name,
+                            business_name: b.business_name,
+                        })
+                    });
+                    const result = await res.json();
+                    console.log('Business denial email result:', result);
+                } catch (e) {
+                    console.error('Business denial email error:', e);
+                }
+            }
+        } else
+            showToast('⚠️', error.message, 'err');
+    }
+
+    async function mobGeneratePacket(id) {
+        const b = mobRegistryList.find(b => b.id === id);
+        if (!b)
+            return;
+        const DIST_LABELS = {
+            'hamakua': 'District 1 — Hāmākua',
+            'north-hilo': 'District 2 — North Hilo',
+            'south-hilo': 'District 3 — South Hilo',
+            'lower-puna': 'District 4 — Lower Puna',
+            'upper-puna': 'District 5 — Upper Puna',
+            'kau': 'District 6 — Kaʻū',
+            'south-kona': 'District 7 — South Kona',
+            'north-kona': 'District 8 — North Kona',
+            'north-kohala': 'District 9 — Kohala'
+        };
+        const params = new URLSearchParams({
+            id: b.id,
+            name: b.business_name || '',
+            contact: b.contact_name || '',
+            address: b.full_address || [b.street_address, b.city, 'HI', b.zip].filter(Boolean).join(', '),
+            district: DIST_LABELS[b.district] || b.district || '',
+            captain: b.captain_name || '',
+            phone: b.phone ? `(${b.phone.slice(0, 3)}) ${b.phone.slice(3, 6)}-${b.phone.slice(6)}` : '',
+            email: b.email || '',
+            type: b.business_type || '',
+            distId: b.district || '',
+            bizNum: b.business_number || '',
+            approvedAt: b.approved_at || '',
+        });
+        window.open(`packet-print.html?${params.toString()}`, '_blank', 'noopener');
+        // Only mark as sent the first time; subsequent opens are reprints
+        if (!b.packet_sent_at) {
+            const {error} = await sb.from('business_registry').update({
+                packet_sent_at: new Date().toISOString()
+            }).eq('id', id);
+            if (!error) {
+                const reg = mobRegistryList.find(r => r.id === id);
+                if (reg)
+                    reg.packet_sent_at = new Date().toISOString();
+                closeMobBizSheet();
+                renderMobRegistry();
+                showToast('📦', 'Packet generated!');
+            }
+        } else {
+            closeMobBizSheet();
+            showToast('🖨', 'Reprinting packet…');
+        }
+    }
+
+    function showToast(ico, body, type='') {
+        const t = document.getElementById('toast');
+        document.getElementById('toastIco').textContent = ico;
+        document.getElementById('toastTitle').textContent = type === 'err' ? 'Error' : 'Done';
+        document.getElementById('toastMsg').textContent = body;
+        t.classList.toggle('err-toast', type === 'err');
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), 3800);
+    }
+
+    /* ════════════════════════════════════════════════
+               HELPERS
+            ════════════════════════════════════════════════ */
+    function fmt(iso) {
+        return new Date(iso).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+    }
+    function fmtLong(iso) {
+        return new Date(iso).toLocaleString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+    }
+    function incidentNumber(inc) {
+        const d = new Date(inc.created_at);
+        const ymd = d.getFullYear().toString() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+        return `INC-${ymd}-${inc.id.slice(-4).toUpperCase()}`;
+    }
+    function esc(s) {
+        const d = document.createElement('div');
+        d.textContent = s || '';
+        return d.innerHTML;
+    }
+    function fmtPhone(p) {
+        if (!p)
+            return '';
+        const v = String(p).replace(/\D/g, '');
+        if (v.length === 10)
+            return '(' + v.slice(0, 3) + ') ' + v.slice(3, 6) + '-' + v.slice(6);
+        if (v.length === 11 && v[0] === '1')
+            return '(' + v.slice(1, 4) + ') ' + v.slice(4, 7) + '-' + v.slice(7);
+        return p;
+    }
+    function phoneMask(input) {
+        let v = input.value.replace(/\D/g, '').slice(0, 10);
+        if (v.length >= 7)
+            v = '(' + v.slice(0, 3) + ') ' + v.slice(3, 6) + '-' + v.slice(6);
+        else if (v.length >= 4)
+            v = '(' + v.slice(0, 3) + ') ' + v.slice(3);
+        else if (v.length > 0)
+            v = '(' + v;
+        input.value = v;
+    }
+    function ageTag(iso) {
+        const mins = (Date.now() - new Date(iso)) / 60000;
+        if (mins < 60)
+            return `<span class="age-tag age-fresh">${Math.round(mins)}m ago</span>`;
+        if (mins < 1440)
+            return `<span class="age-tag age-fresh">${Math.round(mins / 60)}h ago</span>`;
+        if (mins < 10080)
+            return `<span class="age-tag age-recent">${Math.round(mins / 1440)}d ago</span>`;
+        return `<span class="age-tag age-old">${Math.round(mins / 10080)}w ago</span>`;
+    }
+
+    /* ════════════════════════════════════════════════
+               AUTH INIT
+            ════════════════════════════════════════════════ */
+    (async function() {
+        if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_'))
+            return;
+        sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const {data: {session}} = await sb.auth.getSession();
+        if (session)
+            await handleAuthSession(session);
+        sb.auth.onAuthStateChange(async (_, session) => {
+            if (session && !document.getElementById('appShell').classList.contains('visible'))
+                await handleAuthSession(session);
+        });
+    })();
+
+    /* ════════════════════════════════════════════════
+               DISTRICT MEMBERS MODAL
+            ════════════════════════════════════════════════ */
+    let _distMembersId = null;
+
+    function openDistMembers(districtId) {
+        _distMembersId = districtId;
+        const distLabel = districtLabel(districtId);
+        const color = DISTRICT_COLORS[districtId] || '#00c9a7';
+        const members = memberList.filter(m => m.district === districtId);
+
+        document.getElementById('distMembersTitle').textContent = distLabel;
+        document.getElementById('distMembersTitle').style.color = color;
+        document.getElementById('distMembersCount').textContent =
+        members.length + ' registered member' + (members.length !== 1 ? 's' : '');
+        document.getElementById('distMembersSearch').value = '';
+
+        renderDistMemberRows(members);
+        document.getElementById('distMembersOverlay').classList.add('open');
+    }
+
+    function renderDistMemberRows(members) {
+        const el = document.getElementById('distMembersBody');
+        if (!members.length) {
+            el.innerHTML = `<div class="empty"><div class="empty-ico">👥</div>No members registered in this district yet.</div>`;
+            return;
+        }
+        const color = DISTRICT_COLORS[_distMembersId] || '#00c9a7';
+        el.innerHTML = members.map(m => `
+    <div style="padding:12px 14px;border-bottom:1px solid var(--b2)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div style="min-width:0;flex:1">
+          <div style="font-weight:600;font-size:.85rem;margin-bottom:1px">${
+
+
+
+
+
+
+
+
+        m.full_name ? esc(m.full_name) : '<span style="color:var(--slate2);font-style:italic">No name</span>'}</div>
+          ${m.captain_name && m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:${color};margin-bottom:4px">👮 District Captain</div>` : m.captain_name ? `<div style="font-size:.65rem;color:var(--slate);margin-bottom:4px">Captain: ${esc(m.captain_name)}</div>` : ''}
+          ${m.business_name ? `<div style="font-size:.72rem;color:var(--teal);margin-bottom:3px">🏢 ${esc(m.business_name)}</div>` : ''}
+          ${m.phone ? `<a href="tel:${m.phone}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--slate);text-decoration:none;margin-bottom:2px">📞 ${fmtPhone(m.phone)}</a>` : ''}
+          ${m.email ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--slate);word-break:break-all">✉️ ${esc(m.email)}</div>` : ''}
+        </div>
+      </div>
+    </div>`
+
+
+
+
+
+
+
+
+        ).join('');
+    }
+
+    function filterDistMembers() {
+        const q = (document.getElementById('distMembersSearch')?.value || '').toLowerCase().trim();
+        const all = memberList.filter(m => m.district === _distMembersId);
+        const filtered = q ? all.filter(m =>
+        [m.full_name, m.email, m.business_name, m.phone].filter(Boolean).join(' ').toLowerCase().includes(q)
+        ) : all;
+        renderDistMemberRows(filtered);
+    }
+
+    function closeDistMembers() {
+        document.getElementById('distMembersOverlay').classList.remove('open');
+        _distMembersId = null;
+    }
+
+    /* ── District Businesses Sheet ─────────────────────── */
+    let _distBizId = null;
+
+    function openDistBusinesses(districtId) {
+        _distBizId = districtId;
+        const DIST_LABELS = {
+            'hamakua': 'District 1 — Hāmākua',
+            'north-hilo': 'District 2 — North Hilo',
+            'south-hilo': 'District 3 — South Hilo',
+            'lower-puna': 'District 4 — Lower Puna',
+            'upper-puna': 'District 5 — Upper Puna',
+            'kau': 'District 6 — Kaʻū',
+            'south-kona': 'District 7 — South Kona',
+            'north-kona': 'District 8 — North Kona',
+            'north-kohala': 'District 9 — Kohala'
+        };
+        const DIST_COLORS = {
+            'hamakua': '#84cc16',
+            'north-hilo': '#3b82f6',
+            'south-hilo': '#00c9a7',
+            'lower-puna': '#c084fc',
+            'upper-puna': '#a855f7',
+            'kau': '#ef4444',
+            'south-kona': '#f59e0b',
+            'north-kona': '#f97316',
+            'north-kohala': '#10b981'
+        };
+        const label = DIST_LABELS[districtId] || districtId;
+        const color = DIST_COLORS[districtId] || 'var(--teal)';
+        const businesses = mobRegistryList.filter(b => b.district === districtId);
+
+        document.getElementById('distBizTitle').textContent = label;
+        document.getElementById('distBizTitle').style.color = color;
+        document.getElementById('distBizCount').textContent = `${businesses.length} registered business${businesses.length !== 1 ? 'es' : ''}`;
+        document.getElementById('distBizSearchInput').value = '';
+        document.getElementById('distBizStatusFilter').value = '';
+        renderDistBizSheetRows(businesses);
+        document.getElementById('distBizOverlay').classList.add('open');
+    }
+
+    function renderDistBizSheetRows(businesses) {
+        const el = document.getElementById('distBizBody');
+        if (!businesses.length) {
+            el.innerHTML = '<div style="color:var(--slate2);font-style:italic;font-size:.82rem;padding:12px 0;text-align:center">No businesses registered in this district yet.</div>';
+            return;
+        }
+        const DIST_COLORS = {
+            'hamakua': '#84cc16',
+            'north-hilo': '#3b82f6',
+            'south-hilo': '#00c9a7',
+            'lower-puna': '#c084fc',
+            'upper-puna': '#a855f7',
+            'kau': '#ef4444',
+            'south-kona': '#f59e0b',
+            'north-kona': '#f97316',
+            'north-kohala': '#10b981'
+        };
+        el.innerHTML = businesses.map(b => {
+            const sc = b.status === 'approved' ? 'var(--teal)' : b.status === 'pending' ? 'var(--gold)' : 'var(--red)';
+            const dc = DIST_COLORS[b.district] || 'var(--teal)';
+            return `<div class="dist-biz-row" data-name="${esc((b.business_name || '').toLowerCase())}" data-contact="${esc((b.contact_name || '').toLowerCase())}" data-status="${b.status || ''}"
+      style="background:var(--navy2);border:1px solid var(--b2);border-left:3px solid ${dc};border-radius:0 7px 7px 0;padding:10px 12px;margin-bottom:6px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.84rem;font-weight:600;color:var(--white)">${
+
+
+
+
+
+            esc(b.business_name || '—')}</div>
+          <div style="font-size:.7rem;color:var(--slate);margin-top:1px">${esc(b.business_type || '')}${b.city ? ' · ' + esc(b.city) : ''}</div>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;padding:2px 7px;border-radius:3px;border:1px solid;color:${
+
+
+            sc};background:${sc}18;border-color:${sc}44;white-space:nowrap;text-transform:capitalize;flex-shrink:0">${b.status}</span>
+      </div>
+      <div style="font-size:.72rem;color:var(--slate);margin-bottom:6px">${
+
+
+            esc(b.contact_name || '')}${b.phone ? ' · ' + fmtPhone(b.phone) : ''}</div>
+      ${b.packet_sent_at ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal);margin-bottom:6px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</div>` : ''}
+      <div style="display:flex;gap:6px" class="captain-hidden">
+        <button onclick="closeDistBiz();openMobBizSheet('${
+
+
+            b.id}')" style="flex:1;background:transparent;border:1px solid var(--b2);border-radius:5px;padding:5px 8px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">View</button>
+        ${b.status === 'approved' ? `<button onclick="closeDistBiz();mobGeneratePacket('${b.id}')" title="${b.packet_sent_at ? 'Reprint packet' : 'Generate packet'}" style="flex:1;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:5px 8px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">${b.packet_sent_at ? '🖨 Reprint' : '📦 Packet'}</button>` : ''}
+      </div>
+    </div>`
+
+
+
+
+
+            ;
+        }).join('');
+    }
+
+    function filterDistBizSheet() {
+        const q = (document.getElementById('distBizSearchInput')?.value || '').toLowerCase().trim();
+        const stat = document.getElementById('distBizStatusFilter')?.value || '';
+        document.querySelectorAll('.dist-biz-row').forEach(row => {
+            const matchQ = !q || row.dataset.name?.includes(q) || row.dataset.contact?.includes(q);
+            const matchS = !stat || row.dataset.status === stat;
+            row.style.display = matchQ && matchS ? '' : 'none';
+        });
+    }
+
+    function closeDistBiz() {
+        document.getElementById('distBizOverlay').classList.remove('open');
+        _distBizId = null;
+    }
+
+    function printDistrictRoster() {
+        if (!_distMembersId)
+            return;
+        const distLabel_ = districtLabel(_distMembersId);
+        const members = memberList.filter(m => m.district === _distMembersId);
+        const captain = members.find(m => m.captain_name)?.captain_name || '—';
+        const today = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        const rows = members.map((m, i) => `
+    <tr>
+      <td class="num">${
+
+
+        i + 1}</td>
+      <td>${esc(m.full_name || '—')}${m.captain_name && m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() ? ' <span class="cap-badge">★ Captain</span>' : ''}</td>
+      <td>${esc(m.business_name || '—')}</td>
+      <td>${esc([m.business_address, m.business_city, m.business_state, m.business_zip].filter(Boolean).join(', ') || '—')}</td>
+      <td>${m.phone ? `<a href="tel:${m.phone}" style="color:inherit;text-decoration:none">${fmtPhone(m.phone)}</a>` : '—'}</td>
+      <td>${esc(m.email || '—')}</td>
+    </tr>`
+
+
+        ).join('');
+
+        const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>HIBCW ${
+
+
+        esc(distLabel_)} — Member Roster</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'IBM Plex Sans',sans-serif;color:#0f1e2e;background:#fff;padding:36px 44px;font-size:11px}
+  .header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #0f1e2e}
+  .header-left{display:flex;align-items:center;gap:14px}
+  .shield{width:44px;height:44px;object-fit:contain}
+  .shield span{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:9px;color:#c9a84c;letter-spacing:.05em}
+  .org-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .org-sub{font-size:9px;color:#556;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+  .header-right{text-align:right}
+  .doc-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+  .doc-date{font-size:9px;color:#778;margin-top:3px;font-family:'IBM Plex Mono',monospace}
+  .district-banner{background:#f0f4f8;border-left:4px solid #0f1e2e;padding:12px 18px;margin-bottom:20px;border-radius:0 6px 6px 0;display:flex;justify-content:space-between;align-items:center}
+  .district-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:.04em}
+  .district-meta{font-size:10px;color:#445}
+  .district-meta span{font-weight:600;color:#0f1e2e}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  thead tr{background:#0f1e2e;color:#fff}
+  thead th{padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:8.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase}
+  tbody tr{border-bottom:1px solid #e2e8f0}
+  tbody tr:nth-child(even){background:#f8fafc}
+  tbody tr:last-child{border-bottom:2px solid #0f1e2e}
+  td{padding:7px 10px;vertical-align:top;line-height:1.4}
+  td.num{width:28px;text-align:center;font-family:'IBM Plex Mono',monospace;color:#889;font-size:10px}
+  .cap-badge{display:inline-block;background:#0f1e2e;color:#c9a84c;font-size:7.5px;padding:1px 5px;border-radius:3px;letter-spacing:.06em;font-family:'IBM Plex Mono',monospace;vertical-align:middle;margin-left:4px}
+  .footer{margin-top:28px;padding-top:10px;border-top:1px solid #ccc;display:flex;justify-content:space-between;font-size:9px;color:#889;font-family:'IBM Plex Mono',monospace}
+  .empty{text-align:center;padding:40px;color:#889;font-style:italic}
+  @media print{body{padding:20px 28px}@page{margin:.5in;size:letter landscape}}
+</style></head><body>
+  <div class="header">
+    <div class="header-left">
+      <img src="../logo-shield.svg" alt="HIBCW" style="width:38px;height:38px;object-fit:contain">
+      <div>
+        <div class="org-name">Hawaii Island Business Crime Watch</div>
+        <div class="org-sub">A Program of KIAA · kiaahilo.org · (808) 961-5422</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="doc-title">Member Roster</div>
+      <div class="doc-date">Generated ${
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        today}</div>
+    </div>
+  </div>
+  <div class="district-banner">
+    <div class="district-name">${
+
+
+
+
+
+
+
+
+        esc(distLabel_)}</div>
+    <div class="district-meta">District Captain: <span>${esc(captain)}</span> &nbsp;·&nbsp; Total Members: <span>${members.length}</span></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Name</th><th>Business</th><th>Address</th><th>Phone</th><th>Email</th></tr></thead>
+    <tbody>${
+
+
+
+
+
+
+
+
+        rows || '<tr><td colspan="6" class="empty">No members registered in this district yet.</td></tr>'}</tbody>
+  </table>
+  <div class="footer">
+    <span>HIBCW · Hawaii Island Business Crime Watch · CONFIDENTIAL — For authorized use only</span>
+    <span>Crime Stoppers (808) 961-8300 · HPD Non-Emergency (808) 935-3311</span>
+  </div>
+  <script>window.onload=()=>window.print();<\/script>
+</body></html>`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ;
+
+        const win = window.open('', '_blank', 'width=1000,height=700');
+        if (!win) {
+            showToast('⚠️', 'Pop-ups blocked — please allow pop-ups and try again.', 'err');
+            return;
+        }
+        win.document.write(html);
+        win.document.close();
+    }
+
+    /* ════════════════════════════════════════════════
+               MOBILE MAP VIEW
+            ════════════════════════════════════════════════ */
+    const MOB_TYPE_EMOJI = {
+        'Robbery': '🔫',
+        'Burglary': '🏠',
+        'Assault': '🤜',
+        'Drug Activity': '💊',
+        'Theft / Shoplifting': '🛍',
+        'Vandalism': '🔨',
+        'Vehicle Break-In': '🚗',
+        'Fraud / Scam': '💳',
+        'Trespassing': '🚫',
+        'Suspicious Activity': '👁',
+        'Graffiti': '🎨',
+        'Other': '📋'
+    };
+
+    const MOB_COUNCIL_TO_DISTRICT = {
+        'Council 1': {
+            id: 'hamakua',
+            label: 'D1 — Hāmākua',
+            color: '#84cc16'
+        },
+        'Council 2': {
+            id: 'north-hilo',
+            label: 'D2 — North Hilo',
+            color: '#3b82f6'
+        },
+        'Council 3': {
+            id: 'south-hilo',
+            label: 'D3 — South Hilo',
+            color: '#00c9a7'
+        },
+        'Council 4': {
+            id: 'lower-puna',
+            label: 'D4 — Lower Puna',
+            color: '#c084fc'
+        },
+        'Council 5': {
+            id: 'upper-puna',
+            label: 'D5 — Upper Puna',
+            color: '#a855f7'
+        },
+        'Council 6': {
+            id: 'kau',
+            label: 'D6 — Kaʻū',
+            color: '#ef4444'
+        },
+        'Council 7': {
+            id: 'south-kona',
+            label: 'D7 — South Kona',
+            color: '#f59e0b'
+        },
+        'Council 8': {
+            id: 'north-kona',
+            label: 'D8 — North Kona',
+            color: '#f97316'
+        },
+        'Council 9': {
+            id: 'north-kohala',
+            label: 'D9 — Kohala',
+            color: '#10b981'
+        },
+    };
+
+    const MOB_DISTRICT_GEO_FALLBACK = [
+    {
+        id: 'hamakua',
+        label: 'D1 — Hāmākua',
+        color: '#84cc16',
+        coords: [[20.27, -155.07], [20.27, -155.87], [19.90, -155.65], [19.78, -155.47], [19.73, -155.32], [19.73, -155.10], [19.87, -155.08], [20.02, -155.10], [20.15, -155.25], [20.27, -155.07]]
+    },
+    {
+        id: 'north-hilo',
+        label: 'D2 — North Hilo',
+        color: '#3b82f6',
+        coords: [[19.87, -155.08], [19.73, -155.10], [19.73, -155.18], [19.78, -155.22], [19.80, -155.12], [19.87, -155.08]]
+    },
+    {
+        id: 'south-hilo',
+        label: 'D3 — South Hilo',
+        color: '#00c9a7',
+        coords: [[19.73, -155.10], [19.73, -155.32], [19.66, -155.30], [19.60, -155.22], [19.54, -155.08], [19.58, -155.01], [19.65, -154.99], [19.70, -155.04], [19.73, -155.10]]
+    },
+    {
+        id: 'lower-puna',
+        label: 'D4 — Lower Puna',
+        color: '#c084fc',
+        coords: [[19.58, -155.01], [19.54, -155.08], [19.40, -155.13], [19.28, -155.04], [19.18, -154.85], [19.18, -154.79], [19.35, -154.82], [19.52, -154.93], [19.58, -155.01]]
+    },
+    {
+        id: 'upper-puna',
+        label: 'D5 — Upper Puna',
+        color: '#a855f7',
+        coords: [[19.73, -155.32], [19.78, -155.47], [19.56, -155.45], [19.45, -155.35], [19.40, -155.13], [19.28, -155.04], [19.35, -154.82], [19.52, -154.93], [19.58, -155.01], [19.65, -154.99], [19.70, -155.04], [19.73, -155.10], [19.73, -155.32]]
+    },
+    {
+        id: 'kau',
+        label: 'D6 — Kaʻū',
+        color: '#ef4444',
+        coords: [[19.45, -155.35], [19.40, -155.13], [19.28, -155.04], [19.18, -154.85], [19.10, -154.95], [19.02, -155.25], [18.91, -155.68], [18.95, -155.84], [19.03, -155.92], [19.18, -155.87], [19.28, -155.72], [19.45, -155.35]]
+    },
+    {
+        id: 'south-kona',
+        label: 'D7 — South Kona',
+        color: '#f59e0b',
+        coords: [[19.90, -155.65], [19.87, -155.87], [19.72, -155.98], [19.63, -155.99], [19.55, -155.93], [19.45, -155.88], [19.33, -155.80], [19.28, -155.72], [19.18, -155.87], [19.03, -155.92], [18.95, -155.84], [18.91, -155.68], [19.02, -155.25], [19.28, -155.04], [19.45, -155.35], [19.78, -155.47], [19.90, -155.65]]
+    },
+    {
+        id: 'north-kona',
+        label: 'D8 — North Kona',
+        color: '#f97316',
+        coords: [[19.90, -155.65], [19.87, -155.87], [19.72, -155.98], [19.63, -155.99], [19.55, -155.93], [19.60, -156.07], [19.73, -156.10], [19.85, -156.05], [19.90, -155.96], [19.90, -155.65]]
+    },
+    {
+        id: 'north-kohala',
+        label: 'D9 — Kohala',
+        color: '#10b981',
+        coords: [[20.27, -155.87], [20.27, -156.10], [20.10, -156.07], [20.01, -156.00], [19.94, -155.98], [19.85, -156.05], [19.73, -156.10], [19.60, -156.07], [19.55, -155.93], [19.63, -155.99], [19.72, -155.98], [19.87, -155.87], [19.90, -155.65], [20.27, -155.87]]
+    },
+    ];
+
+    let MOB_DISTRICT_GEO = JSON.parse(JSON.stringify(MOB_DISTRICT_GEO_FALLBACK));
+
+    function mobDpSimplify(pts, tol) {
+        if (pts.length <= 2)
+            return pts;
+        let dmax = 0,
+            idx = 0;
+        const [ax, ay] = pts[0],
+            [bx, by] = pts[pts.length - 1],
+            dx = bx - ax,
+            dy = by - ay,
+            len2 = dx * dx + dy * dy;
+        for (let i = 1; i < pts.length - 1; i++) {
+            const [px, py] = pts[i];
+            let d = len2 === 0 ? Math.sqrt((px - ax) ** 2 + (py - ay) ** 2) : (() => {
+                const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2));
+                return Math.sqrt((px - ax - t * dx) ** 2 + (py - ay - t * dy) ** 2);
+            })();
+            if (d > dmax) {
+                dmax = d;
+                idx = i;
+            }
+        }
+        if (dmax >= tol) {
+            const r1 = mobDpSimplify(pts.slice(0, idx + 1), tol),
+                r2 = mobDpSimplify(pts.slice(idx), tol);
+            return r1.slice(0, -1).concat(r2);
+        }
+        return [pts[0], pts[pts.length - 1]];
+    }
+
+    (async function loadMobOfficialDistricts() {
+        const GIS_URL = 'https://hub.arcgis.com/api/v3/datasets/893e0ad0b7d04ebbbd49daa31f474b8e_10/downloads/data?format=geojson&spatialRefId=4326&where=1%3D1';
+        try {
+            const resp = await fetch(GIS_URL, {
+                cache: 'no-cache'
+            });
+            if (!resp.ok)
+                throw new Error('HTTP ' + resp.status);
+            const gj = await resp.json();
+            const loaded = [];
+            for (const feat of gj.features) {
+                if (!feat.geometry)
+                    continue;
+                const info = MOB_COUNCIL_TO_DISTRICT[feat.properties?.distname];
+                if (!info)
+                    continue;
+                const rings = feat.geometry.type === 'Polygon' ? [feat.geometry.coordinates[0]] : feat.geometry.type === 'MultiPolygon' ? feat.geometry.coordinates.map(p => p[0]) : [];
+                let best = [];
+                for (const ring of rings) {
+                    const pts = ring.map(([lng, lat]) => [lat, lng]);
+                    if (pts.length > best.length)
+                        best = pts;
+                }
+                if (best.length < 3)
+                    continue;
+                const coords = mobDpSimplify(best, 0.0003);
+                loaded.push({
+                    ...info,
+                    coords: coords.length >= 3 ? coords : best
+                });
+            }
+            if (loaded.length >= 6)
+                MOB_DISTRICT_GEO = loaded;
+        } catch (e) {}
+    })();
+
+    let mobMap = null;
+    let mobClusterGroup = null;
+    let mobHeatLayer = null;
+    let mobMapMarkers = {};
+    let mobClusterOn = true;
+    let mobHeatOn = false;
+    let mobStreetLayer = null;
+    let mobSatLayer = null;
+    let mobDistrictLayers = [];
+    let mobDistrictsOn = false;
+
+    function initMobMap() {
+        if (mobMap) {
+            setTimeout(() => mobMap.invalidateSize(), 80);
+            return;
+        }
+        mobStreetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+            maxZoom: 19
+        });
+        mobSatLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '© Esri',
+            maxZoom: 19
+        });
+        mobMap = L.map('mobMap', {
+            center: [19.7024, -155.0824],
+            zoom: 11,
+            zoomControl: true
+        });
+        mobStreetLayer.addTo(mobMap);
+        mobClusterGroup = L.markerClusterGroup({
+            maxClusterRadius: 50,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            spiderfyOnMaxZoom: true
+        });
+        mobClusterGroup.addTo(mobMap);
+        setTimeout(() => mobMap.invalidateSize(), 120);
+    }
+
+    function mobMakeMarker(type, color) {
+        const c = color === 'red' ? '#e8415a' : color === 'gold' ? '#f5a623' : '#00c9a7';
+        const emoji = MOB_TYPE_EMOJI[type] || '📍';
+        return L.divIcon({
+            className: '',
+            html: `<div class="mob-adm-marker" style="background:${c}"><div class="mob-adm-marker-inner">${emoji}</div></div>`,
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
+    }
+
+    function mobRefreshMarkers() {
+        if (!mobMap)
+            return;
+        mobClusterGroup.clearLayers();
+        Object.values(mobMapMarkers).forEach(m => mobMap.removeLayer(m));
+        mobMapMarkers = {};
+        const active = allIncidents.filter(i => i.status === 'active' && i.lat && i.lng);
+        active.forEach(inc => {
+            const tc = inc.type_color === 'red' ? '#e8415a' : inc.type_color === 'gold' ? '#f5a623' : '#00c9a7';
+            const m = L.marker([inc.lat, inc.lng], {
+                icon: mobMakeMarker(inc.type, inc.type_color)
+            });
+            m.bindPopup(`
+      <div class="mob-pu-type" style="color:${tc}">${inc.type.toUpperCase()}</div>
+      <div class="mob-pu-addr">📍 ${esc(inc.address)}</div>
+      <div class="mob-pu-time">${fmt(inc.occurred_at)}</div>
+      <button class="mob-pu-btn" onclick="openDetail('${inc.id}')">View Details</button>
+    `
+
+
+            );
+            m.on('click', () => mobHlCard(inc.id));
+            mobMapMarkers[inc.id] = m;
+            if (mobClusterOn)
+                mobClusterGroup.addLayer(m);
+            else
+                m.addTo(mobMap);
+        });
+        if (mobHeatOn) {
+            mobToggleHeat();
+            mobToggleHeat();
+        }
+        mobRenderSheet(active);
+    }
+
+    function mobRenderSheet(incidents) {
+        const el = document.getElementById('mobMapList');
+        const countEl = document.getElementById('mobMapCount');
+        if (!el)
+            return;
+        const pinned = incidents.filter(i => i.lat && i.lng);
+        if (countEl)
+            countEl.textContent = pinned.length + ' pinned';
+        if (!pinned.length) {
+            el.innerHTML = '<div class="mob-map-empty">No active incidents with GPS pins yet.</div>';
+            return;
+        }
+        el.innerHTML = pinned.map(inc => {
+            const bc = inc.type_color === 'red' ? 'b-red' : inc.type_color === 'gold' ? 'b-gold' : 'b-teal';
+            const emoji = MOB_TYPE_EMOJI[inc.type] || '📍';
+            const dc = DISTRICT_COLORS[inc.district] || 'var(--teal)';
+            return `<div class="mob-map-inc" id="mobmapc-${inc.id}" onclick="mobCardClick('${inc.id}')">
+      <div class="mob-map-inc-row">
+        <span class="badge ${
+
+
+            bc}">${emoji} ${esc(inc.type)}</span>
+        <span class="mob-map-inc-time">${fmt(inc.occurred_at)}</span>
+      </div>
+      <div class="mob-map-inc-addr">${
+
+
+            esc(inc.address)}</div>
+      ${inc.district ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:${dc};margin-top:2px">${districtLabel(inc.district)}</div>` : ''}
+    </div>`
+
+
+            ;
+        }).join('');
+    }
+
+    function mobCardClick(id) {
+        const inc = allIncidents.find(i => i.id === id);
+        if (!inc || !inc.lat)
+            return;
+        mobMap.flyTo([inc.lat, inc.lng], 16, {
+            duration: 0.7
+        });
+        mobMapMarkers[id]?.openPopup();
+        mobHlCard(id);
+    }
+
+    function mobHlCard(id) {
+        document.querySelectorAll('.mob-map-inc').forEach(c => c.classList.remove('hl'));
+        const c = document.getElementById('mobmapc-' + id);
+        if (c) {
+            c.classList.add('hl');
+            c.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
+    }
+
+    function mobSetLayer(t) {
+        if (!mobMap)
+            return;
+        if (t === 'street') {
+            mobMap.addLayer(mobStreetLayer);
+            mobMap.removeLayer(mobSatLayer);
+        }
+        else {
+            mobMap.addLayer(mobSatLayer);
+            mobMap.removeLayer(mobStreetLayer);
+        }
+        document.getElementById('mmb-street').classList.toggle('on', t === 'street');
+        document.getElementById('mmb-sat').classList.toggle('on', t === 'sat');
+    }
+
+    function mobToggleCluster() {
+        if (!mobMap)
+            return;
+        mobClusterOn = !mobClusterOn;
+        document.getElementById('mmb-cluster').classList.toggle('on', mobClusterOn);
+        Object.values(mobMapMarkers).forEach(m => {
+            mobClusterGroup.removeLayer(m);
+            mobMap.removeLayer(m);
+            if (mobClusterOn)
+                mobClusterGroup.addLayer(m);
+            else
+                m.addTo(mobMap);
+        });
+    }
+
+    function mobToggleHeat() {
+        if (!mobMap)
+            return;
+        mobHeatOn = !mobHeatOn;
+        document.getElementById('mmb-heat').classList.toggle('on', mobHeatOn);
+        if (mobHeatOn) {
+            const pts = allIncidents.filter(i => i.lat && i.status === 'active').map(i => [i.lat, i.lng, 1]);
+            if (mobHeatLayer)
+                mobMap.removeLayer(mobHeatLayer);
+            mobHeatLayer = L.heatLayer(pts, {
+                radius: 30,
+                blur: 22,
+                maxZoom: 16,
+                gradient: {
+                    0.3: '#002266',
+                    0.6: '#C8960C',
+                    0.85: '#e8415a',
+                    1.0: '#ffffff'
+                }
+            });
+            mobHeatLayer.addTo(mobMap);
+        } else {
+            if (mobHeatLayer) {
+                mobMap.removeLayer(mobHeatLayer);
+                mobHeatLayer = null;
+            }
+        }
+    }
+
+    function mobToggleDistricts(btn) {
+        if (!mobMap)
+            return;
+        mobDistrictsOn = !mobDistrictsOn;
+        btn.classList.toggle('on', mobDistrictsOn);
+        btn.textContent = mobDistrictsOn ? 'DIST ON' : 'DISTRICTS';
+        if (mobDistrictsOn) {
+            mobDistrictLayers = MOB_DISTRICT_GEO.map(d => {
+                const poly = L.polygon(d.coords, {
+                    color: d.color,
+                    weight: 2,
+                    opacity: 0.8,
+                    fillColor: d.color,
+                    fillOpacity: 0.12,
+                    interactive: true
+                });
+                poly.bindTooltip('<strong>' + d.label + '</strong>', {
+                    permanent: true,
+                    direction: 'center',
+                    className: 'district-label'
+                });
+                poly.addTo(mobMap);
+                return poly;
+            });
+        } else {
+            mobDistrictLayers.forEach(l => mobMap.removeLayer(l));
+            mobDistrictLayers = [];
+        }
+    }
+    </script>
+
+    <!-- ═══ Active Alerts full-screen overlay (body-level) ═══════════════ -->
+    <div id="mobActiveAlertsScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:600;overflow-y:auto;padding-bottom:80px">
+        <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+            <button onclick="closeMobActiveAlerts()" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.35);border-radius:6px;color:var(--teal);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;padding:7px 14px;white-space:nowrap">← Back</button>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">📢 Active Alerts</div>
+            <button onclick="loadMobActiveAlerts()" style="background:none;border:none;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer">🔄</button>
+        </div>
+        <div style="padding:10px 12px 4px;font-size:.68rem;color:var(--slate2)">Currently visible on the public feed.</div>
+        <div id="mobActiveAlertsList" style="padding:10px 12px 12px">
+            <div style="font-size:.78rem;color:var(--slate2);font-style:italic;text-align:center;padding:30px 0">Loading…</div>
+        </div>
+    </div>
+
+    <!-- ═══ Archived Alerts full-screen overlay (body-level) ════════════ -->
+    <div id="mobArchivedAlertsScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:600;overflow-y:auto;padding-bottom:80px">
+        <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+            <button onclick="closeMobArchivedAlerts()" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.35);border-radius:6px;color:var(--teal);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;padding:7px 14px;white-space:nowrap">← Back</button>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">📦 Archived Alerts</div>
+            <button onclick="loadMobArchivedAlerts()" style="background:none;border:none;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer">🔄</button>
+        </div>
+        <div style="padding:10px 12px 4px;font-size:.68rem;color:var(--slate2)">Removed from the public feed — kept permanently as a record.</div>
+        <div id="mobArchivedAlertsList" style="padding:10px 12px 12px">
+            <div style="font-size:.78rem;color:var(--slate2);font-style:italic;text-align:center;padding:30px 0">Loading…</div>
+        </div>
+    </div>
+
+    <!-- Registry screen — body level so position:fixed works correctly -->
+    <div id="mobRegistryScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:600;overflow-y:auto;padding-bottom:80px">
+        <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+            <button onclick="closeMobRegistry()" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.35);border-radius:6px;color:var(--teal);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;padding:7px 14px;white-space:nowrap;flex-shrink:0">← Back</button>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">Business Registry</div>
+            <button onclick="mobExportRegistryCSV()" style="background:none;border:1px solid var(--b2);border-radius:5px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer;padding:4px 8px" title="Export CSV">⬇ CSV</button>
+            <button onclick="mobPrintRegistry()" style="background:none;border:1px solid var(--b2);border-radius:5px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer;padding:4px 8px" title="Print">🖨</button>
+            <button onclick="loadMobRegistry()" style="background:none;border:none;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer">🔄</button>
+        </div>
+        <div style="padding:10px 12px">
+            <input class="srch" id="mobRegSearch" placeholder="🔍 Search businesses…" oninput="renderMobRegistry()" style="width:100%;margin-bottom:8px">
+            <div style="display:flex;gap:6px;margin-bottom:10px">
+                <select id="mobRegStatus" onchange="renderMobRegistry()" style="flex:1;background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 10px;color:var(--white);font-size:.78rem">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <select id="mobRegDistrict" onchange="renderMobRegistry()" style="flex:1;background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 10px;color:var(--white);font-size:.78rem">
+                    <option value="">All Districts</option>
+                </select>
+            </div>
+        </div>
+        <div id="mobRegistryList" style="padding:0 12px 12px"></div>
+    </div>
+
+    <!-- Biz # Lookup screen — body level so position:fixed works correctly -->
+    <div id="mobBizLookupScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:600;overflow-y:auto;padding-bottom:80px">
+        <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+            <button onclick="closeMobBizLookup()" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.35);border-radius:6px;color:var(--teal);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;padding:7px 14px;white-space:nowrap;flex-shrink:0">← Back</button>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">🔎 Biz # Lookup</div>
+        </div>
+        <div style="padding:16px 14px 0">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:8px">Enter 5-Digit Business Number</div>
+            <div style="display:flex;gap:8px;margin-bottom:6px">
+                <input id="mobBizLookupInput" type="tel" inputmode="numeric" maxlength="5" placeholder="e.g. 30001" oninput="this.value=this.value.replace(/[^0-9]/g,'');mobBizLookupClear()" onkeydown="if(event.key==='Enter')mobBizLookupSearch()" style="flex:1;background:var(--navy2);border:1.5px solid var(--b2);border-radius:7px;padding:11px 14px;color:var(--white);font-family:'IBM Plex Mono',monospace;font-size:1.2rem;letter-spacing:.15em;outline:none">
+                <button id="mobBizLookupBtn" onclick="mobBizLookupSearch()" style="background:var(--teal);border:none;border-radius:7px;padding:11px 18px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap">Search</button>
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">First digit = district (1–9) · Last 4 digits = sequence</div>
+        </div>
+        <div id="mobBizLookupResult" style="padding:14px"></div>
+        <div style="margin:0 14px 20px;background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:12px 14px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:10px">District Prefix Guide</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">1</span>
+                    <span style="color:var(--slate)">D1 — Hāmākua</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">2</span>
+                    <span style="color:var(--slate)">D2 — North Hilo</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">3</span>
+                    <span style="color:var(--slate)">D3 — South Hilo</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">4</span>
+                    <span style="color:var(--slate)">D4 — Lower Puna</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">5</span>
+                    <span style="color:var(--slate)">D5 — Upper Puna</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">6</span>
+                    <span style="color:var(--slate)">D6 — Kaʻū</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">7</span>
+                    <span style="color:var(--slate)">D7 — South Kona</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">8</span>
+                    <span style="color:var(--slate)">D8 — North Kona</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">9</span>
+                    <span style="color:var(--slate)">D9 — Kohala</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>${(currentRole === 'admin' || currentRole === 'superadmin') ? `` : ''}
+        </div>` : ''}
+      </div>`
+
+
+                ;
+            }).join('');
+        } catch (e) {
+            el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load: ${esc(e.message)}</div>`;
+        }
+    }
+    async function archiveMobActiveAlert(id) {
+        if (!confirm('Archive this alert? It will be removed from the public feed but kept as a record.'))
+            return;
+        const {error} = await sb.from('district_alerts').update({
+            archived_at: new Date().toISOString(),
+            archived_by: currentUserEmail
+        }).eq('id', id);
+        if (!error) {
+            showToast('📦', 'Alert archived.');
+            loadMobActiveAlerts();
+            loadMobArchivedAlerts();
+        }
+        else
+            showToast('⚠️', error.message, 'err');
+    }
+    async function deleteMobActiveAlert(id, mediaUrl) {
+        if (!confirm('Delete this alert permanently? It cannot be recovered.'))
+            return;
+        if (mediaUrl) {
+            const path = mediaUrl.split('/object/public/incident-media/')[1];
+            if (path)
+                await sb.storage.from('incident-media').remove([path]);
+        }
+        const {error} = await sb.from('district_alerts').delete().eq('id', id);
+        if (!error) {
+            showToast('🗑', 'Alert deleted.');
+            loadMobActiveAlerts();
+        }
+        else
+            showToast('⚠️', error.message, 'err');
+    }
+
+    function showMobArchivedAlerts() {
+        document.getElementById('mobArchivedAlertsScreen').style.display = 'block';
+        loadMobArchivedAlerts();
+    }
+    function closeMobArchivedAlerts() {
+        document.getElementById('mobArchivedAlertsScreen').style.display = 'none';
+    }
+    async function loadMobArchivedAlerts() {
+        const el = document.getElementById('mobArchivedAlertsList');
+        if (!el || !sb)
+            return;
+        el.innerHTML = '<div style="font-size:.78rem;color:var(--slate2);text-align:center;padding:30px 0">Loading…</div>';
+        try {
+            const {data, error} = await sb.from('district_alerts').select('*').not('archived_at', 'is', null).order('archived_at', {
+                ascending: false
+            });
+            if (error)
+                throw error;
+            // Update subtitle in More list
+            const sub = document.getElementById('mobArchivedAlertsSub');
+            if (sub)
+                sub.textContent = data.length ? `${data.length} archived alert${data.length === 1 ? '' : 's'}` : 'No archived alerts yet';
+            if (!data || !data.length) {
+                el.innerHTML = '<div style="font-size:.78rem;color:var(--slate2);font-style:italic;text-align:center;padding:40px 0">No archived district alerts yet.</div>';
+                return;
+            }
+            const DCOL = {
+                "hamakua": "#84cc16",
+                "north-hilo": "#3b82f6",
+                "south-hilo": "#00c9a7",
+                "lower-puna": "#c084fc",
+                "upper-puna": "#a855f7",
+                "kau": "#ef4444",
+                "south-kona": "#f59e0b",
+                "north-kona": "#f97316",
+                "north-kohala": "#10b981",
+                "island-wide": "#f5a623"
+            };
+            el.innerHTML = data.map(a => {
+                const dc = DCOL[a.district] || 'var(--teal)';
+                const archivedDate = new Date(a.archived_at).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+                const sentDate = new Date(a.created_at).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+                return `<div style="background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.2);border-left:3px solid var(--gold);border-radius:8px;padding:12px 13px;margin-bottom:10px">
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+          ${
+
+
+                alertTypeBadge(a.alert_type)}
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:1px 5px;white-space:nowrap">📦 ARCHIVED</span>
+        </div>
+        <div style="font-size:.82rem;line-height:1.55;color:var(--white);margin-bottom:6px">${
+
+
+
+
+
+                esc(a.message)}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);display:flex;flex-direction:column;gap:2px;margin-bottom:8px">
+          <span>📤 ${
+
+
+                esc(a.sent_by_name || 'Captain')} · ${sentDate}</span>
+          <span>📦 Archived by ${esc(a.archived_by || 'Admin')} · ${archivedDate}</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="unarchiveMobAlert('${
+
+
+
+
+
+                a.id}')" style="flex:1;background:none;border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:6px 8px;color:var(--teal);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">↩ Restore</button>
+          <button onclick="deleteMobArchivedAlert('${a.id}','${esc(a.media_url || '')}')" style="flex:1;background:none;border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:6px 8px;color:var(--red);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete</button>
+        </div>
+      </div>`
+
+
+
+
+
+                ;
+            }).join('');
+        } catch (e) {
+            el.innerHTML = `<div style="font-size:.72rem;color:var(--slate2)">Could not load: ${esc(e.message)}</div>`;
+        }
+    }
+    async function unarchiveMobAlert(id) {
+        const {error} = await sb.from('district_alerts').update({
+            archived_at: null,
+            archived_by: null
+        }).eq('id', id);
+        if (!error) {
+            showToast('↩', 'Alert restored to public feed.');
+            loadMobArchivedAlerts();
+            loadAdminAlertLog();
+        }
+        else
+            showToast('⚠️', error.message, 'err');
+    }
+    async function deleteMobArchivedAlert(id, mediaUrl) {
+        if (!confirm('Delete this alert permanently? It cannot be recovered.'))
+            return;
+        if (mediaUrl) {
+            const path = mediaUrl.split('/object/public/incident-media/')[1];
+            if (path)
+                await sb.storage.from('incident-media').remove([path]);
+        }
+        const {error} = await sb.from('district_alerts').delete().eq('id', id);
+        if (!error) {
+            showToast('🗑', 'Alert permanently deleted.');
+            loadMobArchivedAlerts();
+        }
+        else
+            showToast('⚠️', error.message, 'err');
+    }
+
+    async function loadArchivedAlerts(containerId) {
+        const el = document.getElementById(containerId);
+        if (!el || !sb)
+            return;
+        el.innerHTML = '<div style="font-size:.7rem;color:var(--slate2);padding:6px 0">Loading…</div>';
+        try {
+            const {data, error} = await sb.from('district_alerts').select('*').not('archived_at', 'is', null).order('archived_at', {
+                ascending: false
+            }).limit(50);
+            if (error)
+                throw error;
+            if (!data || !data.length) {
+                el.innerHTML = '<div style="font-size:.7rem;color:var(--slate2);font-style:italic">No archived alerts yet.</div>';
+                return;
+            }
+            const DCOL = {
+                "hamakua": "#84cc16",
+                "north-hilo": "#3b82f6",
+                "south-hilo": "#00c9a7",
+                "lower-puna": "#c084fc",
+                "upper-puna": "#a855f7",
+                "kau": "#ef4444",
+                "south-kona": "#f59e0b",
+                "north-kona": "#f97316",
+                "north-kohala": "#10b981",
+                "island-wide": "#f5a623"
+            };
+            el.innerHTML = data.map(a => {
+                const dc = DCOL[a.district] || 'var(--teal)';
+                const t = alertTypeMeta(a.alert_type);
+                const archivedDate = new Date(a.archived_at).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+                const sentDate = new Date(a.created_at).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+                return `<div style="background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.2);border-left:3px solid var(--gold);border-radius:6px;padding:9px 11px;margin-bottom:8px">
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px">
+          ${
+
+
+                alertTypeBadge(a.alert_type)}
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:1px 5px;white-space:nowrap">📦 ARCHIVED</span>
+        </div>
+        <div style="font-size:.78rem;line-height:1.5;color:var(--white);margin-bottom:5px">${
+
+
+
+
+
+                esc(a.message)}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);display:flex;flex-direction:column;gap:1px;margin-bottom:6px">
+          <span>📤 ${
+
+
+                esc(a.sent_by_name || 'Captain')} · ${sentDate}</span>
+          <span>📦 Archived by ${esc(a.archived_by || 'Admin')} · ${archivedDate}</span>
+        </div>
+        <div style="display:flex;gap:5px">
+          <button onclick="unarchiveAlert('${
+
+
+
+
+
+                a.id}')" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 7px;color:var(--teal);font-size:.58rem;cursor:pointer">↩ Restore</button>
+          <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url || '')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:2px 7px;color:var(--red);font-size:.58rem;cursor:pointer">✕ Delete</button>
+        </div>
+      </div>`
+
+
+
+
+
+                ;
+            }).join('');
+        } catch (e) {
+            el.innerHTML = `<div style="font-size:.68rem;color:var(--slate2)">Could not load: ${esc(e.message)}</div>`;
+        }
+    }
+
+    async function deleteDistrictAlert(id) {
+        if (!confirm('Delete this alert permanently? It cannot be recovered.'))
+            return;
+        const {data: a} = await sb.from('district_alerts').select('media_url').eq('id', id).single();
+        if (a?.media_url) {
+            const path = a.media_url.split('/object/public/incident-media/')[1];
+            if (path)
+                await sb.storage.from('incident-media').remove([path]);
+        }
+        const {error} = await sb.from('district_alerts').delete().eq('id', id);
+        if (!error) {
+            showToast('🗑', 'Alert cancelled.');
+            loadDistrictAlerts();
+        }
+        else
+            showToast('⚠️', error.message, 'err');
+    }
+
+    function previewAlertMedia(input, previewId) {
+        const file = input.files?.[0];
+        const prev = document.getElementById(previewId);
+        const clearBtn = document.getElementById(input.id.replace('Media', 'ClearMedia'));
+        if (!file || !prev)
+            return;
+        const url = URL.createObjectURL(file);
+        prev.style.display = 'block';
+        prev.innerHTML = file.type.startsWith('video/')
+        ? `<video src="${url}" controls playsinline style="width:100%;display:block;max-height:200px"></video>`
+        : `<img src="${url}" style="width:100%;display:block;max-height:200px;object-fit:cover">`;
+        if (clearBtn)
+            clearBtn.style.display = 'inline-flex';
+    }
+
+    function clearAlertMedia(inputId, previewId) {
+        const input = document.getElementById(inputId);
+        const prev = document.getElementById(previewId);
+        const clearBtn = document.getElementById(inputId.replace('Media', 'ClearMedia'));
+        if (input)
+            input.value = '';
+        if (prev) {
+            prev.innerHTML = '';
+            prev.style.display = 'none';
+        }
+        if (clearBtn)
+            clearBtn.style.display = 'none';
+    }
+
+    async function uploadAlertMedia(file, district) {
+        const ext = file.name.split('.').pop();
+        const path = `district-alerts/${district}-${Date.now()}.${ext}`;
+        const {error} = await sb.storage.from('incident-media').upload(path, file, {
+            contentType: file.type,
+            upsert: false
+        });
+        if (error)
+            throw error;
+        const {data: urlData} = sb.storage.from('incident-media').getPublicUrl(path);
+        return {
+            url: urlData.publicUrl,
+            type: file.type.startsWith('video/') ? 'video' : 'image'
+        };
+    }
+
+    function startAlertEditById(btn) {
+        const card = btn.closest('[data-id]');
+        const id = card?.dataset.id || '';
+        const message = card?.dataset.msg || '';
+        const mediaUrl = card?.dataset.media || '';
+        const mediaType = card?.dataset.mtype || '';
+        startAlertEdit(id, message, mediaUrl, mediaType);
+    }
+
+    function startAlertEdit(id, message, mediaUrl, mediaType) {
+        document.getElementById('alertEditId').value = id;
+        document.getElementById('captainAlertMsg').value = message;
+        document.getElementById('alertComposerLabel').textContent = '✏️ Edit Alert';
+        document.getElementById('alertSendBtn').textContent = '💾 Save';
+        document.getElementById('alertCancelEditBtn').style.display = 'inline-flex';
+        const prev = document.getElementById('captainAlertPreview');
+        if (mediaUrl && prev) {
+            const isVideo = /\.(mp4|mov|webm|ogg)$/i.test(mediaUrl);
+            prev.style.display = 'block';
+            prev.innerHTML = isVideo
+            ? `<video src="${esc(mediaUrl)}" controls playsinline style="width:100%;display:block;max-height:180px"></video>`
+            : `<img src="${esc(mediaUrl)}" style="width:100%;display:block;max-height:180px;object-fit:cover">`;
+            document.getElementById('captainAlertClearMedia').style.display = 'inline-flex';
+        }
+        document.getElementById('captainAlertMsg').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+        document.getElementById('captainAlertMsg').focus();
+    }
+
+    function cancelAlertEdit() {
+        document.getElementById('alertEditId').value = '';
+        document.getElementById('captainAlertMsg').value = '';
+        const typeSel = document.getElementById('captainAlertType');
+        if (typeSel)
+            typeSel.value = 'incident';
+        document.getElementById('alertComposerLabel').textContent = '📢 Send District Alert';
+        document.getElementById('alertSendBtn').textContent = '📤 Send';
+        document.getElementById('alertCancelEditBtn').style.display = 'none';
+        clearAlertMedia('captainAlertMedia', 'captainAlertPreview');
+    }
+
+    /* ── Alert Types ─────────────────────────────────────── */
+    const ALERT_TYPES = [
+    {
+        value: 'emergency',
+        label: 'EMERGENCY',
+        icon: '⛔',
+        color: '#ff2d2d',
+        tier: 1,
+        desc: 'Active threat / imminent danger'
+    },
+    {
+        value: 'bolo',
+        label: 'BOLO',
+        icon: '👁',
+        color: '#f97316',
+        tier: 1,
+        desc: 'Be on the lookout — suspect or vehicle'
+    },
+    {
+        value: 'amber',
+        label: 'AMBER / MISSING',
+        icon: '🟡',
+        color: '#f5a623',
+        tier: 1,
+        desc: 'Missing child or vulnerable adult'
+    },
+    {
+        value: 'incident',
+        label: 'INCIDENT ALERT',
+        icon: '🚨',
+        color: '#e8415a',
+        tier: 2,
+        desc: 'Crime in progress or just occurred'
+    },
+    {
+        value: 'pattern',
+        label: 'PATTERN ALERT',
+        icon: '🔁',
+        color: '#c084fc',
+        tier: 2,
+        desc: 'Repeat behavior across multiple businesses'
+    },
+    {
+        value: 'scam',
+        label: 'SCAM ALERT',
+        icon: '💳',
+        color: '#3b82f6',
+        tier: 2,
+        desc: 'Fraud, counterfeit, or con artist activity'
+    },
+    {
+        value: 'trespass',
+        label: 'TRESPASS ALERT',
+        icon: '🚫',
+        color: '#a855f7',
+        tier: 2,
+        desc: 'Known trespasser — notify neighboring businesses'
+    },
+    {
+        value: 'welfare',
+        label: 'WELFARE CHECK',
+        icon: '🫶',
+        color: '#7a8fa6',
+        tier: 3,
+        desc: 'Suspicious or concerning person, no clear crime'
+    },
+    {
+        value: 'allclear',
+        label: 'ALL CLEAR',
+        icon: '✅',
+        color: '#00c9a7',
+        tier: 3,
+        desc: 'Follow-up / situation resolved'
+    },
+    {
+        value: 'info',
+        label: 'INFO / ADVISORY',
+        icon: '📋',
+        color: '#4a6070',
+        tier: 4,
+        desc: 'General awareness, no immediate threat'
+    },
+    ];
+    function alertTypeMeta(val) {
+        return ALERT_TYPES.find(t => t.value === val) || ALERT_TYPES.find(t => t.value === 'incident');
+    }
+    function alertTypePicker(selectId, defaultVal='incident') {
+        return `<select id="${selectId}" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b2);border-radius:5px;padding:8px 10px;color:var(--white);font-size:.75rem;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer">
+    ${ALERT_TYPES.map(t => `<option value="${t.value}" ${t.value === defaultVal ? 'selected' : ''} style="background:#111e30">${t.icon} ${t.label} — ${t.desc}</option>`).join('')}
+  </select>`
+
+
+        ;
+    }
+    function alertTypeBadge(val) {
+        const t = alertTypeMeta(val);
+        return `<span style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;background:${t.color}18;color:${t.color};border:1px solid ${t.color}44;border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0">${t.icon} ${t.label}</span>`;
+    }
+
+    async function sendDistrictAlert() {
+        const msg = document.getElementById('captainAlertMsg')?.value.trim();
+        const editId = document.getElementById('alertEditId')?.value;
+        const file = document.getElementById('captainAlertMedia')?.files?.[0];
+        const alertType = document.getElementById('captainAlertType')?.value || 'incident';
+        if (!msg) {
+            showToast('⚠️', 'Please enter a message.', 'err');
+            return;
+        }
+        if (!captainDistrict)
+            return;
+        const btn = document.getElementById('alertSendBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳…';
+        const _session = await sb.auth.getSession();
+        const token = _session?.data?.session?.access_token || SUPABASE_ANON_KEY;
+        try {
+            let mediaUrl = null,
+                mediaType = null;
+            if (editId && !file) {
+                const {data: existing} = await sb.from('district_alerts').select('media_url,media_type').eq('id', editId).single();
+                const prevVisible = document.getElementById('captainAlertPreview')?.style.display !== 'none';
+                if (prevVisible && existing?.media_url) {
+                    mediaUrl = existing.media_url;
+                    mediaType = existing.media_type;
+                }
+            }
+            if (file) {
+                const up = await uploadAlertMedia(file, captainDistrict);
+                mediaUrl = up.url;
+                mediaType = up.type;
+            }
+            if (editId) {
+                const {error} = await sb.from('district_alerts').update({
+                    message: msg,
+                    alert_type: alertType,
+                    media_url: mediaUrl,
+                    media_type: mediaType,
+                    updated_at: new Date().toISOString(),
+                    is_edited: true
+                }).eq('id', editId);
+                if (error)
+                    throw error;
+                showToast('✅', 'Alert updated.');
+                // Send district alert email (edited)
+                try {
+                    const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-district-alert-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            district: captainDistrict,
+                            message: msg,
+                            alert_type: alertType,
+                            sent_by_name: currentUserName,
+                            is_edited: true
+                        })
+                    });
+                    console.log('Alert email result:', await emailRes.json());
+                } catch (e) {
+                    console.error('Alert email error:', e);
+                }
+            } else {
+                const {error} = await sb.from('district_alerts').insert({
+                    district: captainDistrict,
+                    message: msg,
+                    alert_type: alertType,
+                    media_url: mediaUrl,
+                    media_type: mediaType,
+                    sent_by_email: currentUserEmail,
+                    sent_by_name: currentUserName
+                });
+                if (error)
+                    throw error;
+                showToast('📢', 'Alert sent to your district.');
+                // Send district alert email (new)
+                try {
+                    const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-district-alert-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            district: captainDistrict,
+                            message: msg,
+                            alert_type: alertType,
+                            sent_by_name: currentUserName,
+                            is_edited: false
+                        })
+                    });
+                    console.log('Alert email result:', await emailRes.json());
+                } catch (e) {
+                    console.error('Alert email error:', e);
+                }
+            }
+            cancelAlertEdit();
+            loadDistrictAlerts();
+        } catch (e) {
+            showToast('⚠️', e.message || 'Failed to save alert.', 'err');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = document.getElementById('alertEditId')?.value ? '💾 Save' : '📤 Send';
+        }
+    }
+
+    function openAdminAlertModal() {
+        const sel = document.getElementById('adminAlertDistrict');
+        if (sel && sel.options.length <= 1) {
+            const iw = document.createElement('option');
+            iw.value = 'island-wide';
+            iw.textContent = '🌺 Island-Wide — All Districts';
+            iw.style.fontWeight = '700';
+            sel.appendChild(iw);
+            const sep = document.createElement('option');
+            sep.disabled = true;
+            sep.textContent = '──────────────';
+            sel.appendChild(sep);
             DISTRICTS.forEach(([v, l]) => {
                 const o = document.createElement('option');
                 o.value = v;
