@@ -859,7 +859,7 @@ body.light .logo-img{filter:none}
           <div class="fld">
             <label>Your Email (optional)</label>
             <input type="email" id="fEmail" placeholder="e.g. name@email.com" oninput="checkMemberEmail(this.value)">
-            <div class="fld-verify-hint" id="emailHint">KIAA members will receive a verified badge on their report.</div>
+            <div class="fld-verify-hint" id="emailHint">HIBCW members will receive a verified badge on their report.</div>
           </div>
           <div class="fld">
             <label>Police Report # (if filed)</label>
@@ -1592,7 +1592,7 @@ async function checkMemberEmail(val) {
 
   clearTimeout(memberCheckTimer);
   if (!email || !email.includes('@')) {
-    hint.textContent = 'KIAA members will receive a verified badge on their report.';
+    hint.textContent = 'HIBCW members will receive a verified badge on their report.';
     hint.className = 'fld-verify-hint';
     return;
   }
@@ -1610,11 +1610,11 @@ async function checkMemberEmail(val) {
       .maybeSingle();
     if (!error && data) {
       verifiedEmail = email;
-      hint.textContent = '✅ Verified KIAA Member — your report will show a member badge.';
+      hint.textContent = '✅ Verified HIBCW Member — your report will show a member badge.';
       hint.className = 'fld-verify-hint ok';
     } else {
       verifiedEmail = null;
-      hint.textContent = 'Email not found in KIAA member list — report will be submitted anonymously.';
+      hint.textContent = 'Email not found in HIBCW member list — report will be submitted anonymously.';
       hint.className = 'fld-verify-hint no';
     }
   }, 600);
@@ -1736,7 +1736,7 @@ function resetForm() {
   document.querySelectorAll('.type-btn').forEach(b=>b.className='type-btn');
   document.getElementById('fRecurring').checked = false;
   verifiedEmail = null;
-  document.getElementById('emailHint').textContent = 'KIAA members will receive a verified badge on their report.';
+  document.getElementById('emailHint').textContent = 'HIBCW members will receive a verified badge on their report.';
   document.getElementById('emailHint').className = 'fld-verify-hint';
   ['fAddr','fDesc','fName','fEmail','fPolice','sSuspectRace','sSuspectClothing','sSuspectOther','sVehicleMake','sVehicleModel','sVehicleColor','sVehicleYear','sVehiclePlate','sVehicleNotes'].forEach(id=>document.getElementById(id).value='');
   ['sSuspectHeight','sSuspectBuild','sSuspectAge','sSuspectGender'].forEach(id=>document.getElementById(id).selectedIndex=0);
@@ -1902,7 +1902,7 @@ function renderList(q='', filter='') {
         ${inc.police_report?`<span class="meta-tag">📋 ${inc.police_report}</span>`:''}
         ${inc.lat?`<span class="meta-tag">📍 Pinned</span>`:''}
         ${inc.is_recurring?`<span class="recurring-flag">🔁 Recurring</span>`:''}
-        ${inc.is_verified_member?`<span class="verified-badge">✅ KIAA Member</span>`:''}
+        ${inc.is_verified_member?`<span class="verified-badge">✅ HIBCW Member</span>`:''}
       </div>`;
     d.onclick=()=>{ openModal(inc.id); hlCard(inc.id); if(inc.lat) map.flyTo([inc.lat,inc.lng],16,{duration:.8}); };
     el.appendChild(d);
@@ -1958,7 +1958,7 @@ function openModal(id) {
     ${inc.district ? publicCaptainCardHtml(inc.district) : ''}
     <div class="mf-row"><div class="mf-label">Description</div><div class="mf-val">${inc.description}</div></div>
     ${inc.is_recurring?`<div class="mf-row"><span class="recurring-flag">🔁 Reported as Recurring Incident</span></div>`:''}
-    ${inc.is_verified_member?`<div class="mf-row"><span class="verified-badge" style="font-size:.72rem;padding:3px 10px">✅ Submitted by a Verified KIAA Member</span></div>`:''}
+    ${inc.is_verified_member?`<div class="mf-row"><span class="verified-badge" style="font-size:.72rem;padding:3px 10px">✅ Submitted by a Verified HIBCW Member</span></div>`:''}
     ${inc.police_report?`<div class="mf-row"><div class="mf-label">Police Report #</div><div class="mf-val">${inc.police_report}</div></div>`:''}
     ${(inc.suspect_height||inc.suspect_build||inc.suspect_age||inc.suspect_gender||inc.suspect_race||inc.suspect_clothing||inc.suspect_other)?`
     <div class="mf-row" style="background:rgba(232,65,90,.05);border:1px solid rgba(232,65,90,.15);border-radius:5px;padding:10px 12px;">
