@@ -2118,7 +2118,12 @@ function renderCaptainList() {
     el.innerHTML = `<div style="padding:16px;text-align:center;font-size:.78rem;color:var(--slate2);font-style:italic">No captain info available yet.</div>`;
     return;
   }
-  const sorted = [...captainData].sort((a,b)=>(a.district||'').localeCompare(b.district||''));
+  const distNum = id => {
+    const d = DISTRICT_GEO.find(d=>d.id===id);
+    const m = (d?.label||'').match(/District\s+(\d+)/i);
+    return m ? parseInt(m[1]) : 99;
+  };
+  const sorted = [...captainData].sort((a,b)=>distNum(a.district)-distNum(b.district));
   el.innerHTML = sorted.map(c => {
     const d = DISTRICT_GEO.find(d=>d.id===c.district);
     const color = d?.color || '#00c9a7';
