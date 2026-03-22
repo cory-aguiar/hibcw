@@ -2334,10 +2334,7 @@
     <!-- BUSINESS DETAIL SHEET (root level so position:fixed works correctly) -->
     <div id="mobBizSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:900;flex-direction:column;justify-content:flex-end">
         <div style="background:var(--navy2);border-radius:14px 14px 0 0;max-height:88vh;display:flex;flex-direction:column;overflow:hidden">
-            <div style="flex-shrink:0;display:flex;justify-content:center;padding:10px 0 4px">
-                <div style="width:36px;height:4px;background:var(--b2);border-radius:2px"></div>
-            </div>
-            <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 18px 12px;border-bottom:1px solid var(--b2)">
+            <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--b2)">
                 <button onclick="closeMobBizSheet()" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.35);border-radius:6px;color:var(--teal);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;padding:7px 14px;white-space:nowrap;flex-shrink:0">← Back</button>
                 <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="mobBizSheetTitle">Business Details</div>
             </div>
@@ -8298,7 +8295,55 @@
         'Other': '📋'
     };
 
-    const MOB_DISTRICT_GEO = [
+    const MOB_COUNCIL_TO_DISTRICT = {
+        'Council 1': {
+            id: 'hamakua',
+            label: 'D1 — Hāmākua',
+            color: '#84cc16'
+        },
+        'Council 2': {
+            id: 'north-hilo',
+            label: 'D2 — North Hilo',
+            color: '#3b82f6'
+        },
+        'Council 3': {
+            id: 'south-hilo',
+            label: 'D3 — South Hilo',
+            color: '#00c9a7'
+        },
+        'Council 4': {
+            id: 'lower-puna',
+            label: 'D4 — Lower Puna',
+            color: '#c084fc'
+        },
+        'Council 5': {
+            id: 'upper-puna',
+            label: 'D5 — Upper Puna',
+            color: '#a855f7'
+        },
+        'Council 6': {
+            id: 'kau',
+            label: 'D6 — Kaʻū',
+            color: '#ef4444'
+        },
+        'Council 7': {
+            id: 'south-kona',
+            label: 'D7 — South Kona',
+            color: '#f59e0b'
+        },
+        'Council 8': {
+            id: 'north-kona',
+            label: 'D8 — North Kona',
+            color: '#f97316'
+        },
+        'Council 9': {
+            id: 'north-kohala',
+            label: 'D9 — Kohala',
+            color: '#10b981'
+        },
+    };
+
+    const MOB_DISTRICT_GEO_FALLBACK = [
     {
         id: 'hamakua',
         label: 'D1 — Hāmākua',
@@ -8309,7 +8354,7 @@
         id: 'north-hilo',
         label: 'D2 — North Hilo',
         color: '#3b82f6',
-        coords: [[19.87, -155.08], [19.73, -155.10], [19.76, -155.17], [19.80, -155.13], [19.87, -155.08]]
+        coords: [[19.87, -155.08], [19.73, -155.10], [19.73, -155.18], [19.78, -155.22], [19.80, -155.12], [19.87, -155.08]]
     },
     {
         id: 'south-hilo',
@@ -8339,7 +8384,7 @@
         id: 'south-kona',
         label: 'D7 — South Kona',
         color: '#f59e0b',
-        coords: [[19.78, -155.47], [19.90, -155.65], [19.55, -155.93], [19.45, -155.88], [19.33, -155.80], [19.28, -155.72], [19.18, -155.87], [19.03, -155.92], [18.95, -155.84], [18.91, -155.68], [19.02, -155.25], [19.28, -155.04], [19.45, -155.35], [19.78, -155.47]]
+        coords: [[19.90, -155.65], [19.87, -155.87], [19.72, -155.98], [19.63, -155.99], [19.55, -155.93], [19.45, -155.88], [19.33, -155.80], [19.28, -155.72], [19.18, -155.87], [19.03, -155.92], [18.95, -155.84], [18.91, -155.68], [19.02, -155.25], [19.28, -155.04], [19.45, -155.35], [19.78, -155.47], [19.90, -155.65]]
     },
     {
         id: 'north-kona',
@@ -8352,8 +8397,75 @@
         label: 'D9 — Kohala',
         color: '#10b981',
         coords: [[20.27, -155.87], [20.27, -156.10], [20.10, -156.07], [20.01, -156.00], [19.94, -155.98], [19.85, -156.05], [19.73, -156.10], [19.60, -156.07], [19.55, -155.93], [19.63, -155.99], [19.72, -155.98], [19.87, -155.87], [19.90, -155.65], [20.27, -155.87]]
-    }
+    },
     ];
+
+    let MOB_DISTRICT_GEO = JSON.parse(JSON.stringify(MOB_DISTRICT_GEO_FALLBACK));
+
+    function mobDpSimplify(pts, tol) {
+        if (pts.length <= 2)
+            return pts;
+        let dmax = 0,
+            idx = 0;
+        const [ax, ay] = pts[0],
+            [bx, by] = pts[pts.length - 1],
+            dx = bx - ax,
+            dy = by - ay,
+            len2 = dx * dx + dy * dy;
+        for (let i = 1; i < pts.length - 1; i++) {
+            const [px, py] = pts[i];
+            let d = len2 === 0 ? Math.sqrt((px - ax) ** 2 + (py - ay) ** 2) : (() => {
+                const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2));
+                return Math.sqrt((px - ax - t * dx) ** 2 + (py - ay - t * dy) ** 2);
+            })();
+            if (d > dmax) {
+                dmax = d;
+                idx = i;
+            }
+        }
+        if (dmax >= tol) {
+            const r1 = mobDpSimplify(pts.slice(0, idx + 1), tol),
+                r2 = mobDpSimplify(pts.slice(idx), tol);
+            return r1.slice(0, -1).concat(r2);
+        }
+        return [pts[0], pts[pts.length - 1]];
+    }
+
+    (async function loadMobOfficialDistricts() {
+        const GIS_URL = 'https://hub.arcgis.com/api/v3/datasets/893e0ad0b7d04ebbbd49daa31f474b8e_10/downloads/data?format=geojson&spatialRefId=4326&where=1%3D1';
+        try {
+            const resp = await fetch(GIS_URL, {
+                cache: 'no-cache'
+            });
+            if (!resp.ok)
+                throw new Error('HTTP ' + resp.status);
+            const gj = await resp.json();
+            const loaded = [];
+            for (const feat of gj.features) {
+                if (!feat.geometry)
+                    continue;
+                const info = MOB_COUNCIL_TO_DISTRICT[feat.properties?.distname];
+                if (!info)
+                    continue;
+                const rings = feat.geometry.type === 'Polygon' ? [feat.geometry.coordinates[0]] : feat.geometry.type === 'MultiPolygon' ? feat.geometry.coordinates.map(p => p[0]) : [];
+                let best = [];
+                for (const ring of rings) {
+                    const pts = ring.map(([lng, lat]) => [lat, lng]);
+                    if (pts.length > best.length)
+                        best = pts;
+                }
+                if (best.length < 3)
+                    continue;
+                const coords = mobDpSimplify(best, 0.0003);
+                loaded.push({
+                    ...info,
+                    coords: coords.length >= 3 ? coords : best
+                });
+            }
+            if (loaded.length >= 6)
+                MOB_DISTRICT_GEO = loaded;
+        } catch (e) {}
+    })();
 
     let mobMap = null;
     let mobClusterGroup = null;
