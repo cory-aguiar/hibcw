@@ -4538,11 +4538,16 @@
        DETAIL MODAL
     ════════════════════════════════════════════════════ */
     function captainCardHtml(districtId) {
-        const captain = memberList.find(m =>
-        m.district === districtId &&
-        m.captain_name && m.full_name &&
-        m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()
+        // Priority 1: exact name match (true captain record)
+        // Priority 2: any member with a captain_name set for this district
+        let captain = memberList.find(m =>
+            m.district === districtId &&
+            m.captain_name && m.full_name &&
+            m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase()
         );
+        if (!captain) {
+            captain = memberList.find(m => m.district === districtId && m.captain_name && m.captain_name.trim());
+        }
         if (!captain)
             return '';
 
