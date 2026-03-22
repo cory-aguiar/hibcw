@@ -4385,7 +4385,7 @@
         return `
     <tr id="row-${inc.id}" style="${archived ? 'opacity:.65' : ''}">
       ${showCb ? `<td><input type="checkbox" class="row-cb" data-id="${inc.id}" onchange="toggleRow('${inc.id}',this.checked)" ${selectedIds.has(inc.id) ? 'checked' : ''}></td>` : ''}
-      <td class="td-type"><span class="badge ${bc}">${inc.type}</span>${inc.is_recurring ? '<br><span class="recurring-flag" style="margin-top:3px">🔁 Recurring</span>' : ''} ${inc.is_verified_member ? '<br><span class="verified-badge" style="margin-top:3px">✅ Member</span>' : ''}</td>
+      <td class="td-type"><span class="badge ${bc}">${inc.type}</span>${inc.is_recurring ? '<br><span class="recurring-flag" style="margin-top:3px">🔁 Recurring</span>' : ''} ${inc.is_verified_member ? '<br><span class="verified-badge" style="margin-top:3px">✅ Member</span>' : ''}<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--slate);letter-spacing:.03em">${incidentNumber(inc)}</span></td>
       <td class="td-time">${fmt(inc.occurred_at)}<br>${ageTag(inc.occurred_at)}</td>
       <td class="td-addr" title="${esc(inc.address)}">${esc(inc.address)}${inc.district ? `<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:${DISTRICT_GEO.find(d => d.id === inc.district)?.color || '#00c9a7'};letter-spacing:.03em">${DISTRICT_GEO.find(d => d.id === inc.district)?.label || inc.district}</span>` : ''}</td>
       <td class="td-desc" title="${esc(inc.description)}"><div class="td-desc-inner">${esc(inc.description)}</div></td>
@@ -4578,6 +4578,7 @@
         document.getElementById('mBadge').innerHTML = `<span class="badge ${bc}">${inc.type}</span>`;
         const media = inc.incident_media || [];
         document.getElementById('mBody').innerHTML = `
+    <div class="mf-row"><div class="mf-label">Incident #</div><div class="mf-val" style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--teal);letter-spacing:.05em">${incidentNumber(inc)}</div></div>
     <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)} &nbsp;${ageTag(inc.occurred_at)}</div></div>
     ${inc.district ? `<div class="mf-row"><div class="mf-label">District</div><div class="mf-val"><span class="teal-badge">${DISTRICT_GEO.find(d => d.id === inc.district)?.label || inc.district}</span></div></div>` : ''}
     ${inc.district ? captainCardHtml(inc.district) : ''}
@@ -8642,6 +8643,11 @@
             hour: 'numeric',
             minute: '2-digit'
         });
+    }
+    function incidentNumber(inc) {
+        const d = new Date(inc.created_at);
+        const ymd = d.getFullYear().toString() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+        return `INC-${ymd}-${inc.id.slice(-4).toUpperCase()}`;
     }
     function esc(s) {
         const d = document.createElement('div');
