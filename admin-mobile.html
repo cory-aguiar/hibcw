@@ -2015,80 +2015,6 @@
                         </div>
                     </div>
 
-                    <!-- Registry screen (slides in) -->
-                    <div id="mobRegistryScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:500;overflow-y:auto;padding-bottom:80px">
-                        <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
-                            <button onclick="closeMobRegistry()" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.35);border-radius:6px;color:var(--teal);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;padding:7px 14px;white-space:nowrap;flex-shrink:0">← Back</button>
-                            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">Business Registry</div>
-                            <button onclick="mobExportRegistryCSV()" style="background:none;border:1px solid var(--b2);border-radius:5px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer;padding:4px 8px" title="Export CSV">⬇ CSV</button>
-                            <button onclick="mobPrintRegistry()" style="background:none;border:1px solid var(--b2);border-radius:5px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer;padding:4px 8px" title="Print">🖨</button>
-                            <button onclick="loadMobRegistry()" style="background:none;border:none;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer">🔄</button>
-                        </div>
-                        <div style="padding:10px 12px">
-                            <input class="srch" id="mobRegSearch" placeholder="🔍 Search businesses…" oninput="renderMobRegistry()" style="width:100%;margin-bottom:8px">
-                            <div style="display:flex;gap:6px;margin-bottom:10px">
-                                <select id="mobRegStatus" onchange="renderMobRegistry()" style="flex:1;background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 10px;color:var(--white);font-size:.78rem">
-                                    <option value="">All Statuses</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="approved">Approved</option>
-                                    <option value="rejected">Rejected</option>
-                                </select>
-                                <select id="mobRegDistrict" onchange="renderMobRegistry()" style="flex:1;background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 10px;color:var(--white);font-size:.78rem">
-                                    <option value="">All Districts</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="mobRegistryList" style="padding:0 12px 12px"></div>
-                    </div>
-
-                    <!-- Biz # Lookup slide-in screen -->
-                    <div id="mobBizLookupScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:500;overflow-y:auto;padding-bottom:80px">
-                        <!-- Header -->
-                        <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
-                            <button onclick="closeMobBizLookup()" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.35);border-radius:6px;color:var(--teal);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;padding:7px 14px;white-space:nowrap;flex-shrink:0">← Back</button>
-                            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">🔎 Biz # Lookup</div>
-                        </div>
-
-                        <!-- Search input -->
-                        <div style="padding:16px 14px 0">
-                            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:8px">Enter 5-Digit Business Number</div>
-                            <div style="display:flex;gap:8px;margin-bottom:6px">
-                                <input id="mobBizLookupInput" type="tel" inputmode="numeric" maxlength="5" placeholder="e.g. 30001" oninput="this.value=this.value.replace(/[^0-9]/g,'');mobBizLookupClear()" onkeydown="if(event.key==='Enter')mobBizLookupSearch()" style="flex:1;background:var(--navy2);border:1.5px solid var(--b2);border-radius:7px;padding:11px 14px;color:var(--white);font-family:'IBM Plex Mono',monospace;font-size:1.2rem;letter-spacing:.15em;outline:none">
-                                <button id="mobBizLookupBtn" onclick="mobBizLookupSearch()" style="background:var(--teal);border:none;border-radius:7px;padding:11px 18px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap">
-                                                                                                                Search
-                                                                                                              </button>
-                            </div>
-                            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">First digit = district (1–9) · Last 4 digits = sequence</div>
-                        </div>
-
-                        <!-- Result -->
-                        <div id="mobBizLookupResult" style="padding:14px"></div>
-
-                        <!-- Format guide -->
-                        <div style="margin:0 14px 20px;background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:12px 14px">
-                            <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:10px">District Prefix Guide</div>
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-
-
-
-                                                                                                              ${[['1','Hāmākua'],['2','North Hilo'],['3','South Hilo'],['4','Lower Puna'],['5','Upper Puna'],['6','Kaʻū'],['7','South Kona'],['8','North Kona'],['9','Kohala']].map(([d,n])=>`
-                                                                                                              
-                                                                                                
-                                                                
-                                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
-                                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">${d}</span>
-                                    <span style="color:var(--slate)">D${d} — ${n}</span>
-                                </div>
-
-
-                                                                                                `).join('')}
-                                                                                                            
-                                                                                            
-                                                            
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Business detail sheet -->
                     <div class="more-section-title">📚 Resources</div>
                     <div id="mobileResourceCards"></div>
@@ -8726,6 +8652,90 @@
         <div style="padding:10px 12px 4px;font-size:.68rem;color:var(--slate2)">Removed from the public feed — kept permanently as a record.</div>
         <div id="mobArchivedAlertsList" style="padding:10px 12px 12px">
             <div style="font-size:.78rem;color:var(--slate2);font-style:italic;text-align:center;padding:30px 0">Loading…</div>
+        </div>
+    </div>
+
+    <!-- Registry screen — body level so position:fixed works correctly -->
+    <div id="mobRegistryScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:600;overflow-y:auto;padding-bottom:80px">
+        <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+            <button onclick="closeMobRegistry()" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.35);border-radius:6px;color:var(--teal);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;padding:7px 14px;white-space:nowrap;flex-shrink:0">← Back</button>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">Business Registry</div>
+            <button onclick="mobExportRegistryCSV()" style="background:none;border:1px solid var(--b2);border-radius:5px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer;padding:4px 8px" title="Export CSV">⬇ CSV</button>
+            <button onclick="mobPrintRegistry()" style="background:none;border:1px solid var(--b2);border-radius:5px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer;padding:4px 8px" title="Print">🖨</button>
+            <button onclick="loadMobRegistry()" style="background:none;border:none;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.6rem;cursor:pointer">🔄</button>
+        </div>
+        <div style="padding:10px 12px">
+            <input class="srch" id="mobRegSearch" placeholder="🔍 Search businesses…" oninput="renderMobRegistry()" style="width:100%;margin-bottom:8px">
+            <div style="display:flex;gap:6px;margin-bottom:10px">
+                <select id="mobRegStatus" onchange="renderMobRegistry()" style="flex:1;background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 10px;color:var(--white);font-size:.78rem">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <select id="mobRegDistrict" onchange="renderMobRegistry()" style="flex:1;background:var(--navy2);border:1px solid var(--b2);border-radius:5px;padding:7px 10px;color:var(--white);font-size:.78rem">
+                    <option value="">All Districts</option>
+                </select>
+            </div>
+        </div>
+        <div id="mobRegistryList" style="padding:0 12px 12px"></div>
+    </div>
+
+    <!-- Biz # Lookup screen — body level so position:fixed works correctly -->
+    <div id="mobBizLookupScreen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:600;overflow-y:auto;padding-bottom:80px">
+        <div style="background:var(--navy2);border-bottom:1px solid var(--b2);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+            <button onclick="closeMobBizLookup()" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.35);border-radius:6px;color:var(--teal);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;padding:7px 14px;white-space:nowrap;flex-shrink:0">← Back</button>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1">🔎 Biz # Lookup</div>
+        </div>
+        <div style="padding:16px 14px 0">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:8px">Enter 5-Digit Business Number</div>
+            <div style="display:flex;gap:8px;margin-bottom:6px">
+                <input id="mobBizLookupInput" type="tel" inputmode="numeric" maxlength="5" placeholder="e.g. 30001" oninput="this.value=this.value.replace(/[^0-9]/g,'');mobBizLookupClear()" onkeydown="if(event.key==='Enter')mobBizLookupSearch()" style="flex:1;background:var(--navy2);border:1.5px solid var(--b2);border-radius:7px;padding:11px 14px;color:var(--white);font-family:'IBM Plex Mono',monospace;font-size:1.2rem;letter-spacing:.15em;outline:none">
+                <button id="mobBizLookupBtn" onclick="mobBizLookupSearch()" style="background:var(--teal);border:none;border-radius:7px;padding:11px 18px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap">Search</button>
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">First digit = district (1–9) · Last 4 digits = sequence</div>
+        </div>
+        <div id="mobBizLookupResult" style="padding:14px"></div>
+        <div style="margin:0 14px 20px;background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:12px 14px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:10px">District Prefix Guide</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">1</span>
+                    <span style="color:var(--slate)">D1 — Hāmākua</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">2</span>
+                    <span style="color:var(--slate)">D2 — North Hilo</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">3</span>
+                    <span style="color:var(--slate)">D3 — South Hilo</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">4</span>
+                    <span style="color:var(--slate)">D4 — Lower Puna</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">5</span>
+                    <span style="color:var(--slate)">D5 — Upper Puna</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">6</span>
+                    <span style="color:var(--slate)">D6 — Kaʻū</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">7</span>
+                    <span style="color:var(--slate)">D7 — South Kona</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">8</span>
+                    <span style="color:var(--slate)">D8 — North Kona</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">9</span>
+                    <span style="color:var(--slate)">D9 — Kohala</span>
+                </div>
+            </div>
         </div>
     </div>
 
