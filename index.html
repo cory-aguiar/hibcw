@@ -1799,11 +1799,16 @@ function renderCaptainGrid(highlightDistrict) {
     return;
   }
 
-  // Sort: highlighted district first, then alphabetically
+  // Sort: highlighted district first, then by district number
+  const distNum = id => {
+    const d = DISTRICT_GEO.find(d => d.id === id);
+    const m = (d?.label || '').match(/District\s+(\d+)/i);
+    return m ? parseInt(m[1]) : 99;
+  };
   const sorted = [...captainData].sort((a, b) => {
     if (a.district === highlightDistrict) return -1;
     if (b.district === highlightDistrict) return 1;
-    return (a.district || '').localeCompare(b.district || '');
+    return distNum(a.district) - distNum(b.district);
   });
 
   const districtLabel = (id) => {
