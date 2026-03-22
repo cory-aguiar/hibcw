@@ -509,18 +509,18 @@ a.nav-btn{text-decoration:none;color:inherit}
 .inc-card:active{background:rgba(255,255,255,.06);transform:scale(.99)}
 .inc-card.hl{border-left-color:var(--teal);background:rgba(0,201,167,.05)}
 .card-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
-.badge{padding:3px 9px;border-radius:3px;font-size:.65rem;font-weight:600;font-family:'Rajdhani',sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.badge{padding:3px 9px;border-radius:3px;font-size:.72rem;font-weight:600;font-family:'Rajdhani',sans-serif;letter-spacing:.06em;text-transform:uppercase}
 .b-red{background:rgba(232,65,90,.15);color:var(--red);border:1px solid rgba(232,65,90,.3)}
 .b-gold{background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
 .b-teal{background:rgba(0,201,167,.12);color:var(--teal);border:1px solid rgba(0,201,167,.25)}
-.card-time{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate)}
-.card-addr{font-size:.76rem;color:var(--slate);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-desc{font-size:.78rem;color:var(--slate);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-time{font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--slate)}
+.card-addr{font-size:.82rem;color:var(--slate);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-desc{font-size:.84rem;color:var(--slate);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
-.meta-tag{font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2)}
-.recurring-flag{font-family:'IBM Plex Mono',monospace;font-size:.56rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 6px}
-.verified-badge{font-family:'IBM Plex Mono',monospace;font-size:.56rem;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 6px}
-.age-tag{font-family:'IBM Plex Mono',monospace;font-size:.56rem;border-radius:3px;padding:1px 5px}
+.meta-tag{font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--slate2)}
+.recurring-flag{font-family:'IBM Plex Mono',monospace;font-size:.64rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 6px}
+.verified-badge{font-family:'IBM Plex Mono',monospace;font-size:.64rem;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 6px}
+.age-tag{font-family:'IBM Plex Mono',monospace;font-size:.65rem;border-radius:3px;padding:1px 5px}
 .age-fresh{background:rgba(0,201,167,.12);color:var(--teal);border:1px solid rgba(0,201,167,.2)}
 .age-recent{background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.2)}
 .age-old{background:rgba(255,255,255,.04);color:var(--slate);border:1px solid var(--border2)}
@@ -998,10 +998,10 @@ body.light .alert-feed-msg{color:var(--white)}
 .mf-row:last-child{border-bottom:none}
 .mf-label{
   font-family:'IBM Plex Mono',monospace;
-  font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;
+  font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--slate);margin-bottom:4px;
 }
-.mf-val{font-size:.84rem;color:var(--white);line-height:1.5}
+.mf-val{font-size:.88rem;color:var(--white);line-height:1.6}
 .tag{background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.2);border-radius:3px;padding:1px 6px;font-size:.65rem;font-family:'IBM Plex Mono',monospace}
 .modal-media{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
 .modal-media-item{
@@ -2096,9 +2096,18 @@ let captainData = [];
 async function loadCaptains() {
   if (!sb) return;
   try {
-    const {data,error} = await sb.from('member_applications').select('full_name, email, photo_url, district, captain_name').eq('status','approved').not('captain_name','is',null);
+    // Use the public_captains view — readable by anon users, no RLS block.
+    const {data,error} = await sb.from('public_captains').select('full_name, email, photo_url, district, captain_name');
     if (error||!data) return;
-    captainData = data.filter(m => m.captain_name && m.full_name && m.captain_name.trim().toLowerCase()===m.full_name.trim().toLowerCase());
+    // Priority 1: exact name match (true captain record)
+    // Priority 2: any approved member with a captain_name set for that district
+    const byDistrict = {};
+    data.forEach(m => {
+      if (!m.district || !m.captain_name) return;
+      const isExact = m.full_name && m.captain_name.trim().toLowerCase()===m.full_name.trim().toLowerCase();
+      if (isExact || !byDistrict[m.district]) byDistrict[m.district] = m;
+    });
+    captainData = Object.values(byDistrict);
     renderCaptainList();
   } catch(e){}
 }
@@ -2161,7 +2170,7 @@ function renderList(q='', filter='', target='main') {
         <span class="badge ${bc}">${inc.type}</span>
         ${ageTag(inc.occurred_at)}
       </div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate);letter-spacing:.04em;margin-bottom:4px">${incidentNumber(inc)}</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--slate);letter-spacing:.04em;margin-bottom:4px">${incidentNumber(inc)}</div>
       <div class="card-addr">📍 ${inc.address}</div>
       <div class="card-desc">${inc.description}</div>
       <div class="card-meta">
