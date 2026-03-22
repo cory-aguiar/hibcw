@@ -8662,6 +8662,17 @@
         const ymd = d.getFullYear().toString() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
         return `INC-${ymd}-${inc.id.slice(-4).toUpperCase()}`;
     }
+    function alertNumber(a) {
+        const d = new Date(a.created_at);
+        const ymd = d.getFullYear().toString() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+        const DIST_PREFIX = {
+            'hamakua':'D1','north-hilo':'D2','south-hilo':'D3','lower-puna':'D4',
+            'upper-puna':'D5','kau':'D6','south-kona':'D7','north-kona':'D8',
+            'north-kohala':'D9','island-wide':'DIW'
+        };
+        const prefix = DIST_PREFIX[a.district] || 'D0';
+        return `ALT-${prefix}-${ymd}-${a.id.slice(-4).toUpperCase()}`;
+    }
     function esc(s) {
         const d = document.createElement('div');
         d.textContent = s || '';
@@ -8896,6 +8907,7 @@
             ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:180px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:180px;object-fit:cover">`}
           </div>` : ''}
         <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);letter-spacing:.04em">${alertNumber(a)}</span>
           <span>👤 ${esc(a.sent_by_name || 'Captain')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
           <div style="display:flex;gap:6px">
             <button data-alert-id="${a.id}" onclick="startAlertEditById(this)" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 8px;color:var(--teal);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✏️ Edit</button>
@@ -9007,7 +9019,8 @@
                   </div>
                   <div style="font-size:.8rem;line-height:1.5;color:var(--white);margin-bottom:5px">${esc(a.message)}</div>
                   <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);display:flex;flex-direction:column;gap:2px">
-                    <span>📤 Sent by ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);letter-spacing:.04em">${alertNumber(a)}</span>
+                  <span>📤 Sent by ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
                     <span>📦 Archived by ${esc(a.archived_by||'Admin')} · ${archivedDate}</span>
                   </div>
                   <div style="display:flex;gap:6px;margin-top:7px">
@@ -9088,7 +9101,7 @@
                     ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:200px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:200px;object-fit:cover">`}
                   </div>` : ''}
                   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
-                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">📤 ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">📤 ${esc(a.sent_by_name||'Captain')} · ${sentDate} &nbsp;<span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);letter-spacing:.04em;opacity:.75">${alertNumber(a)}</span></span>
                     ${(isAdminUser || (isCaptain && captainDistrict && a.district === captainDistrict)) ? `
                     <div style="display:flex;gap:6px">
                       <button onclick="archiveActiveAlert('${a.id}')" style="background:none;border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:2px 8px;color:var(--gold);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace" title="Archive — removes from public feed, keeps as record">📦 Archive</button>
@@ -9188,7 +9201,8 @@
                     ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:200px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:200px;object-fit:cover">`}
                   </div>` : ''}
                   <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);display:flex;flex-direction:column;gap:2px">
-                    <span>📤 Sent by ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);letter-spacing:.04em">${alertNumber(a)}</span>
+                  <span>📤 Sent by ${esc(a.sent_by_name||'Captain')} · ${sentDate}</span>
                     <span>📦 Archived by ${esc(a.archived_by||'Admin')} · ${archivedDate}</span>
                   </div>
                   <div style="display:flex;gap:6px;margin-top:7px">
@@ -9554,6 +9568,7 @@
             ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:120px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:120px;object-fit:cover">`}
           </div>` : ''}
           <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);letter-spacing:.04em">${alertNumber(a)}</span>
             <span>👤 ${esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
             <div style="display:flex;gap:4px">
               <button onclick="archiveAdminAlert('${a.id}')" style="background:none;border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;color:var(--gold);font-size:.6rem;cursor:pointer;font-family:'IBM Plex Mono',monospace" title="Archive — hides from public, keeps as record">📦</button>
