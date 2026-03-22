@@ -265,7 +265,22 @@ body.light .hb-cover-sub { color: var(--slate); }
       <li><a href="#s5">5. Member Management</a></li>
       <li><a href="#s6">6. Application Management</a></li>
       <li><a href="#s7">7. Districts &amp; Captains</a></li>
-      <li><a href="#s8">8. District Alerts</a></li>
+      <li><a href="#s8">8. District Alerts</a>
+        <ul class="hb-toc-sub">
+          <li><a href="#s8">8.1 Alert Types</a></li>
+          <li><a href="#s8">8.2 Who Can Send Alerts</a></li>
+          <li><a href="#s8">8.3 Sending an Alert</a></li>
+          <li><a href="#s8">8.4 Attaching Media</a></li>
+          <li><a href="#s8">8.5 Editing an Alert</a></li>
+          <li><a href="#s8">8.6 Archiving an Alert</a></li>
+          <li><a href="#s8">8.7 Deleting an Alert</a></li>
+          <li><a href="#s8">8.8 Active Alerts View (All Roles)</a></li>
+          <li><a href="#s8">8.9 Archived Alerts View (All Roles)</a></li>
+          <li><a href="#s8">8.10 Email Notifications</a></li>
+          <li><a href="#s8">8.11 Where Alerts Appear Publicly</a></li>
+          <li><a href="#s8">8.12 Diagnose Archive Tool</a></li>
+        </ul>
+      </li>
       <li><a href="#s9">9. Map View</a></li>
       <li><a href="#s10">10. Statistics</a></li>
       <li><a href="#s11">11. Manage Admins (Superadmin Only)</a></li>
@@ -491,12 +506,12 @@ body.light .hb-cover-sub { color: var(--slate); }
   <!-- SECTION 8 -->
   <div class="hb-section" id="s8">
     <div class="hb-h1"><span class="hb-num">8.</span> District Alerts</div>
-    <p class="hb-p">District alerts allow admins and captains to send typed, categorized messages directly to the community. Alerts appear on the public-facing website and mobile app within seconds of being sent, with a colored type badge, a map pop-up banner, and 911 / HPD non-emergency call buttons for viewer safety.</p>
+    <p class="hb-p">District alerts allow admins and captains to send typed, categorized messages directly to the community. Alerts appear on the public-facing website and mobile app within seconds of being sent, with a colored type badge, a map pop-up banner, and 911 / HPD non-emergency call buttons for viewer safety. Every new or edited alert also triggers an automatic email to all verified members in the target district.</p>
     <div class="hb-callout danger"><div class="hb-callout-label">🚫 No Advertising Policy</div><p>District alerts may only be used to communicate safety-relevant information directly related to community crime awareness. Alerts may <strong>not</strong> be used to promote businesses, products, services, events, or any commercial interest — even if the sender has a legitimate relationship with the subject. Any alert used for advertising or promotional purposes will be removed and may result in loss of platform access.</p></div>
 
     <div class="hb-h2">8.1 Alert Types</div>
     <p class="hb-p">Every alert must have a type selected before sending. The type controls the color coding, icon, and priority displayed to the public. Choose the type that most accurately describes the situation.</p>
-    <table class="hb-table">
+    <div class="hb-table-wrap"><table class="hb-table">
       <thead><tr><th>Type</th><th>Tier</th><th>Use When</th></tr></thead>
       <tbody>
         <tr><td>⛔ <strong>EMERGENCY</strong></td><td style="color:#ff2d2d">🔴 Critical</td><td>Active threat or imminent danger — triggers prominent 911 call buttons on the public site</td></tr>
@@ -510,42 +525,96 @@ body.light .hb-cover-sub { color: var(--slate); }
         <tr><td>✅ <strong>ALL CLEAR</strong></td><td style="color:#00c9a7">🟢 Low</td><td>Follow-up to a prior alert — suspect apprehended, situation resolved, false alarm confirmed</td></tr>
         <tr><td>📋 <strong>INFO / ADVISORY</strong></td><td style="color:#4a6070">⚪ Info</td><td>General awareness — law enforcement advisories, holiday crime trends, community notices</td></tr>
       </tbody>
-    </table>
+    </table></div>
     <div class="hb-callout tip"><div class="hb-callout-label">💡 Tip</div><p>Critical tier alerts (EMERGENCY, BOLO, AMBER) automatically display prominent "Call 911" and "HPD Non-Emergency (808) 935-2100" tap-to-call buttons on the public site alongside the alert. All other alert types show a quieter safety reminder line. You do not need to add these numbers to your message manually.</p></div>
 
-    <div class="hb-h2">8.2 Sending an Alert</div>
+    <div class="hb-h2">8.2 Who Can Send Alerts</div>
+    <p class="hb-p">Alert sending works differently depending on your role.</p>
+    <div class="hb-table-wrap"><table class="hb-table">
+      <thead><tr><th>Role</th><th>Can Send To</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td><strong>District Captain</strong></td><td>Their assigned district only</td><td>Alert composer in the Districts screen, below the Recent Alerts log</td></tr>
+        <tr><td><strong>Admin</strong></td><td>Any single district <em>or</em> island-wide</td><td>"📢 Send District Alert" button in the Districts toolbar — opens a modal with a district selector including the 🌺 Island-Wide option</td></tr>
+        <tr><td><strong>Superadmin</strong></td><td>Any single district <em>or</em> island-wide</td><td>Same modal as Admin, plus access to the Diagnose Archive tool</td></tr>
+      </tbody>
+    </table></div>
+    <div class="hb-callout info"><div class="hb-callout-label">🌺 Island-Wide Alerts</div><p>Admins and Superadmins can send an island-wide alert by selecting <strong>🌺 Island-Wide — All Districts</strong> at the top of the district dropdown. Island-wide alerts appear on the public feed for all visitors regardless of district, and the email notification goes to every verified member across all 9 districts. Use this for major island-wide threats, broad scam campaigns, or emergency advisories that are not district-specific. Captains cannot send island-wide alerts.</p></div>
+
+    <div class="hb-h2">8.3 Sending an Alert</div>
+    <div class="hb-h3">Captains — from the Districts screen</div>
     <ol class="hb-ol">
-      <li>Click the "📢 Send District Alert" button in the Districts toolbar</li>
-      <li>Select the target district from the dropdown</li>
-      <li>Select the <strong>Alert Type</strong> that best describes the situation</li>
-      <li>Type your message</li>
-      <li>Optionally attach a photo or video using the 📎 Attach File button</li>
-      <li>Click "📤 Send Alert"</li>
+      <li>Go to the <strong>Districts</strong> screen and find your district's alert composer</li>
+      <li>Select the <strong>Alert Type</strong> from the dropdown</li>
+      <li>Type your message in the text area</li>
+      <li>Optionally attach a photo or video — click 📎 Attach File, select the file, and a preview will appear</li>
+      <li>Click <strong>📤 Send Alert</strong></li>
     </ol>
+    <div class="hb-h3">Admins &amp; Superadmins — from the Districts toolbar</div>
+    <ol class="hb-ol">
+      <li>Click the <strong>📢 Send District Alert</strong> button in the Districts toolbar</li>
+      <li>Select the <strong>target district</strong> from the dropdown — choose <strong>🌺 Island-Wide — All Districts</strong> at the top for an island-wide alert, or select a specific district</li>
+      <li>Select the <strong>Alert Type</strong></li>
+      <li>Type your message</li>
+      <li>Optionally attach a photo or video</li>
+      <li>Click <strong>📤 Send Alert</strong></li>
+    </ol>
+    <p class="hb-p">After sending, the alert appears instantly on the public site and an email notification is dispatched to all verified members in the target district — or all members island-wide if Island-Wide was selected. The alert log updates immediately.</p>
 
-    <div class="hb-h2">8.3 Editing an Alert</div>
-    <p class="hb-p">In the alert log, click the "✏️ Edit" button on any alert to load its content back into the composer. You can update the message, type, or media and click "💾 Save Changes". Edited alerts show an "edited" tag publicly.</p>
+    <div class="hb-h2">8.4 Attaching Media</div>
+    <p class="hb-p">Photos and videos can be attached to any alert. This is particularly useful for BOLO alerts (attach a suspect photo), SCAM alerts (attach an image of fraudulent currency or a skimmer device), or PATTERN alerts (attach security camera stills). Supported formats are standard image files (JPG, PNG, HEIC) and video files (MP4, MOV). A preview appears in the composer before you send.</p>
+    <div class="hb-callout warn"><div class="hb-callout-label">⚠️ Media &amp; Privacy</div><p>Do not attach images that clearly identify private individuals without their consent, or images obtained from private surveillance systems you do not control. Stick to business-owned cameras and publicly visible areas.</p></div>
 
-    <div class="hb-h2">8.4 Archiving an Alert</div>
+    <div class="hb-h2">8.5 Editing an Alert</div>
+    <p class="hb-p">In the Recent Alerts log, click the <strong>✏️ Edit</strong> button on any alert to load its content back into the composer. You can update the message, alert type, or media attachment. Click <strong>💾 Save Changes</strong> to publish the update.</p>
+    <ul class="hb-ul">
+      <li>Edited alerts display an <em>"edited"</em> tag publicly so viewers know the content was updated</li>
+      <li>Editing an alert triggers a new email notification to district members with the updated content</li>
+      <li>To remove attached media from an edited alert, click <strong>✕ Remove</strong> in the preview before saving</li>
+    </ul>
+
+    <div class="hb-h2">8.6 Archiving an Alert</div>
     <p class="hb-p">Archiving removes an alert from the public feed immediately but <strong>keeps it permanently in the database as a record</strong>. Use archiving — not deletion — to preserve proof of activity, document incidents for reporting, or remove resolved alerts while retaining the history.</p>
     <ol class="hb-ol">
-      <li>Find the alert in the "📋 Recent Alerts" log</li>
-      <li>Click the "📦 Archive" button</li>
+      <li>Find the alert in the Recent Alerts log</li>
+      <li>Click the <strong>📦 Archive</strong> button</li>
       <li>Confirm when prompted — the alert is immediately removed from the public site</li>
     </ol>
-    <p class="hb-p">To view archived alerts, scroll to the "📦 Archived Alerts" section and click "Load". Each archived record shows who sent it, when it was sent, who archived it, and when — a complete audit trail. Archived alerts can be restored to the public feed using the "↩ Restore" button, or permanently deleted with "✕ Delete Permanently".</p>
-    <div class="hb-callout tip"><div class="hb-callout-label">📋 Proof of Concept</div><p>Archived alerts serve as a permanent activity log — useful for grant reporting, law enforcement briefings, community meetings, and demonstrating HIBCW's value to stakeholders. Archive alerts rather than deleting them whenever possible.</p></div>
+    <p class="hb-p">Each archived record shows who sent it, when it was sent, who archived it, and when — a complete audit trail. Archived alerts can be <strong>↩ Restored</strong> to the public feed or permanently deleted from the Archived Alerts section.</p>
+    <div class="hb-callout tip"><div class="hb-callout-label">📋 Proof of Activity</div><p>Archived alerts serve as a permanent activity log — useful for grant reporting, law enforcement briefings, community meetings, and demonstrating HIBCW's value to stakeholders. Archive alerts rather than deleting them whenever possible.</p></div>
 
-    <div class="hb-h2">8.5 Deleting an Alert</div>
-    <p class="hb-p">Click the "✕" button on any alert to permanently remove it. If the alert had media attached, the media file is also deleted from storage. <strong>Prefer archiving over deletion</strong> to preserve the activity record.</p>
+    <div class="hb-h2">8.7 Deleting an Alert</div>
+    <p class="hb-p">Click the <strong>✕</strong> button on any alert to permanently remove it from the database. If the alert had media attached, the media file is also deleted from storage. <strong>This action cannot be undone.</strong> Prefer archiving over deletion to preserve the activity record.</p>
 
-    <div class="hb-h2">8.6 Where Alerts Appear Publicly</div>
+    <div class="hb-h2">8.8 Active Alerts View</div>
+    <p class="hb-p">The <strong>Active Alerts</strong> screen (left navigation → Alerts section) shows a full-page view of all currently live alerts. It is available to all roles.</p>
     <ul class="hb-ul">
-      <li>A slide-up banner on the map page (desktop and mobile) for alerts from the last 48 hours — includes the alert type icon, district, message, and safety call buttons</li>
-      <li>The "📢 Alerts" tab in the side panel (desktop) or the Alerts screen (mobile) — full feed with type badge, district badge, and safety reminders on every card</li>
-      <li>Alerts are real-time — visitors see new alerts without refreshing</li>
-      <li>Archived alerts are automatically hidden from the public feed</li>
+      <li><strong>Admins &amp; Superadmins</strong> — see all active alerts across every district, with district and type filter dropdowns. Can archive or delete any alert.</li>
+      <li><strong>District Captains</strong> — see only their own district's active alerts. The district filter is locked to their district automatically. Can archive alerts in their district — delete is not available to captains.</li>
+      <li>Each alert card shows the type badge, district badge, message, any attached media, sender name, and timestamp</li>
     </ul>
+
+    <div class="hb-h2">8.9 Archived Alerts View</div>
+    <p class="hb-p">The <strong>Archived Alerts</strong> screen shows the historical record of alerts that have been archived. It is available to all roles.</p>
+    <ul class="hb-ul">
+      <li><strong>Admins &amp; Superadmins</strong> — see all archived alerts across every district, filterable by district and type. Can restore or permanently delete any archived alert.</li>
+      <li><strong>District Captains</strong> — see only their own district's archived alerts. The district filter is locked automatically. Captains can view the archive history but cannot restore or delete — those actions are admin only.</li>
+      <li>Each record includes the original message, media, alert type, who sent it and when, and who archived it and when — a complete audit trail</li>
+    </ul>
+
+    <div class="hb-h2">8.10 Email Notifications</div>
+    <p class="hb-p">Every time an alert is sent or edited, an automatic email is dispatched to all verified members in the target district. The email includes the alert type, message, and sender name. Members do not need to be logged in or have the app open to receive these notifications — they arrive in their inbox immediately.</p>
+    <div class="hb-callout tip"><div class="hb-callout-label">💡 Member Emails</div><p>Email notifications go to addresses in the <code>member_emails</code> table for the target district. If a member isn't receiving alerts, verify their email is in that table via Supabase → Table Editor → member_emails.</p></div>
+
+    <div class="hb-h2">8.11 Where Alerts Appear Publicly</div>
+    <ul class="hb-ul">
+      <li><strong>Slide-up banner</strong> — appears automatically on the public map page for alerts from the last 48 hours, with the type icon, district, message, and safety call buttons. Visitors can dismiss it once per session.</li>
+      <li><strong>Alerts tab / screen</strong> — the "📢 Alerts" tab in the desktop side panel and the Alerts screen on mobile show the full active alert feed, with type badge, district badge, and safety reminders on every card</li>
+      <li><strong>Real-time</strong> — alerts appear instantly without the visitor needing to refresh</li>
+      <li><strong>Archived alerts</strong> are automatically hidden from the public feed</li>
+    </ul>
+
+    <div class="hb-h2">8.12 Diagnose Archive Tool <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.08em;background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;margin-left:6px">Superadmin Only</span></div>
+    <p class="hb-p">If the archive button on alerts stops working, Superadmins can run the <strong>🔧 Diagnose Archive</strong> tool found in the Districts screen toolbar. It checks that the required database columns and indexes are in place and reports any issues. Run this if archiving produces an error or silently fails.</p>
   </div>
 
   <!-- SECTION 9 -->
@@ -607,7 +676,8 @@ body.light .hb-cover-sub { color: var(--slate); }
           <tr><td>Approve, reject, revoke, and delete applications</td><td></td></tr>
           <tr><td>Assign and reassign district captains</td><td></td></tr>
           <tr><td>Upload captain photos for any district</td><td></td></tr>
-          <tr><td>Send, edit, archive, restore, and delete district alerts for any district</td><td></td></tr>
+          <tr><td>Send, edit, archive, restore, and delete district alerts for any district or island-wide</td><td></td></tr>
+          <tr><td>View Active and Archived Alerts across all districts</td><td></td></tr>
           <tr><td>View full statistics and district breakdown</td><td></td></tr>
           <tr><td>Use the map view with all overlays</td><td></td></tr>
           <tr><td>Print the captain directory and district rosters</td><td></td></tr>
