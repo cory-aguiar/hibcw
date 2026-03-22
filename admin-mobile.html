@@ -844,7 +844,7 @@
     .badge {
         padding: 2px 8px;
         border-radius: 3px;
-        font-size: .62rem;
+        font-size: .72rem;
         font-weight: 600;
         font-family: 'Rajdhani', sans-serif;
         letter-spacing: .06em;
@@ -877,7 +877,7 @@
 
     .age-tag {
         font-family: 'IBM Plex Mono', monospace;
-        font-size: .55rem;
+        font-size: .65rem;
         border-radius: 3px;
         padding: 1px 5px
     }
@@ -908,7 +908,7 @@
         border: 1px solid rgba(0, 201, 167, .3);
         border-radius: 3px;
         padding: 1px 6px;
-        font-size: .58rem;
+        font-size: .64rem;
         color: var(--teal);
         font-family: 'IBM Plex Mono', monospace
     }
@@ -921,7 +921,7 @@
         border: 1px solid rgba(245, 166, 35, .25);
         border-radius: 3px;
         padding: 1px 6px;
-        font-size: .58rem;
+        font-size: .64rem;
         color: var(--gold);
         font-family: 'IBM Plex Mono', monospace
     }/* Buttons */
@@ -1002,7 +1002,7 @@
     }
 
     .inc-title {
-        font-size: .85rem;
+        font-size: .92rem;
         font-weight: 600;
         margin-bottom: 3px;
         white-space: nowrap;
@@ -1011,7 +1011,7 @@
     }
 
     .inc-addr {
-        font-size: .72rem;
+        font-size: .78rem;
         color: var(--slate);
         overflow: hidden;
         margin-bottom: 4px
@@ -1040,7 +1040,7 @@
 
     .inc-time {
         font-family: 'IBM Plex Mono', monospace;
-        font-size: .58rem;
+        font-size: .64rem;
         color: var(--slate2);
         white-space: nowrap
     }/* ── SCREEN: STATS ── */
@@ -1380,7 +1380,7 @@
 
     .mf-label {
         font-family: 'IBM Plex Mono', monospace;
-        font-size: .55rem;
+        font-size: .64rem;
         letter-spacing: .1em;
         text-transform: uppercase;
         color: var(--slate);
@@ -1388,7 +1388,7 @@
     }
 
     .mf-val {
-        font-size: .82rem;
+        font-size: .88rem;
         color: var(--white);
         line-height: 1.6
     }
@@ -2645,7 +2645,7 @@
 
 
         esc(inc.type)}</div>
-        <div style=\"font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate);letter-spacing:.04em;margin-bottom:2px\">${incidentNumber(inc)}</div>
+        <div style=\"font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--slate);letter-spacing:.04em;margin-bottom:2px\">${incidentNumber(inc)}</div>
         <div class="inc-addr"><span class="addr-line">${esc(inc.address)}</span>${inc.district ? `<span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:${DISTRICT_COLORS[inc.district] || 'var(--teal)'};letter-spacing:.03em;margin-top:1px">${districtLabel(inc.district)}</span>` : ''}</div>
         <div class="inc-meta">
           <span class="badge ${
@@ -2699,7 +2699,10 @@
         const captainHtml = (() => {
             if (!inc.district)
                 return '';
-            const cm = memberList.find(m => m.district === inc.district && m.captain_name && m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase());
+            // Priority 1: exact name match (true captain record)
+            // Priority 2: any member with a captain_name set for this district
+            let cm = memberList.find(m => m.district === inc.district && m.captain_name && m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase());
+            if (!cm) cm = memberList.find(m => m.district === inc.district && m.captain_name && m.captain_name.trim());
             if (!cm)
                 return '';
             const dc = DISTRICT_COLORS[inc.district] || '#00c9a7';
@@ -3778,6 +3781,11 @@
             if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() && !distCaptainMap[m.district])
                 distCaptainMap[m.district] = m;
         });
+        // Fallback: use any member with a captain_name if no exact match found
+        memberList.forEach(m => {
+            if (m.district && m.captain_name && m.captain_name.trim() && !distCaptainMap[m.district])
+                distCaptainMap[m.district] = m;
+        });
 
         let entries = DISTRICTS.map(([v, fullLabel]) => {
             const c = distCaptainMap[v];
@@ -3848,6 +3856,11 @@
             if (!m.district || !m.captain_name)
                 return;
             if (m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() && !distCaptainMap[m.district])
+                distCaptainMap[m.district] = m;
+        });
+        // Fallback: use any member with a captain_name if no exact match found
+        memberList.forEach(m => {
+            if (m.district && m.captain_name && m.captain_name.trim() && !distCaptainMap[m.district])
                 distCaptainMap[m.district] = m;
         });
         const distCaptainNameFallback = {};
