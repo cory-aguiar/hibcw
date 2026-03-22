@@ -2999,6 +2999,13 @@
                     id: m.id
                 };
             });
+            // Also include approved captains who may not be in member_emails yet
+            (apps || []).forEach(a => {
+                if (a.captain_name && a.captain_name.trim() &&
+                    !memberList.find(m => m.email && a.email && m.email.toLowerCase() === a.email.toLowerCase())) {
+                    memberList.push({ ...a, app_id: a.id });
+                }
+            });
             renderMembers();
             renderDistricts();
             updateMoreStrip();
