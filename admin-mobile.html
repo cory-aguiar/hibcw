@@ -1703,7 +1703,9 @@
                 <div class="hd-live">
                     <span class="hd-dot" id="realtimeDot"></span>
 
-                                        LIVE
+
+                                                            LIVE
+                                                        
                                     
                 </div>
                 <button class="theme-btn" id="themeToggleBtn" onclick="toggleTheme()">🌙</button>
@@ -1721,7 +1723,9 @@
                     <div style="padding:4px 0 12px">
                         <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;letter-spacing:.05em">
 
-                                                        Welcome, 
+
+                                                                                    Welcome, 
+                                                                                    
                                                         
                             <span id="captainDashName">Captain</span>
                         </div>
@@ -1747,8 +1751,10 @@
                             <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;padding:5px 9px;cursor:pointer;font-size:.68rem;color:var(--slate);flex:1;justify-content:center">
 
 
-                                                                              📎 Photo/Video
-                                                                              
+
+                                                                                                              📎 Photo/Video
+                                                                                                              
+                                                                                                
                                                                 
                                 <input type="file" id="captainAlertMedia" accept="image/*,video/*" style="display:none" onchange="previewAlertMedia(this,'captainAlertPreview')">
                             </label>
@@ -2049,8 +2055,8 @@
                             <div style="display:flex;gap:8px;margin-bottom:6px">
                                 <input id="mobBizLookupInput" type="tel" inputmode="numeric" maxlength="5" placeholder="e.g. 30001" oninput="this.value=this.value.replace(/[^0-9]/g,'');mobBizLookupClear()" onkeydown="if(event.key==='Enter')mobBizLookupSearch()" style="flex:1;background:var(--navy2);border:1.5px solid var(--b2);border-radius:7px;padding:11px 14px;color:var(--white);font-family:'IBM Plex Mono',monospace;font-size:1.2rem;letter-spacing:.15em;outline:none">
                                 <button id="mobBizLookupBtn" onclick="mobBizLookupSearch()" style="background:var(--teal);border:none;border-radius:7px;padding:11px 18px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap">
-                                                                                Search
-                                                                              </button>
+                                                                                                                Search
+                                                                                                              </button>
                             </div>
                             <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--slate2)">First digit = district (1–9) · Last 4 digits = sequence</div>
                         </div>
@@ -2064,16 +2070,20 @@
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
 
 
-                                                                              ${[['1','Hāmākua'],['2','North Hilo'],['3','South Hilo'],['4','Lower Puna'],['5','Upper Puna'],['6','Kaʻū'],['7','South Kona'],['8','North Kona'],['9','Kohala']].map(([d,n])=>`
-                                                                              
+
+                                                                                                              ${[['1','Hāmākua'],['2','North Hilo'],['3','South Hilo'],['4','Lower Puna'],['5','Upper Puna'],['6','Kaʻū'],['7','South Kona'],['8','North Kona'],['9','Kohala']].map(([d,n])=>`
+                                                                                                              
+                                                                                                
                                                                 
                                 <div style="display:flex;align-items:center;gap:7px;font-size:.72rem">
                                     <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 7px;min-width:22px;text-align:center">${d}</span>
                                     <span style="color:var(--slate)">D${d} — ${n}</span>
                                 </div>
 
-                                                                `).join('')}
-                                                                            
+
+                                                                                                `).join('')}
+                                                                                                            
+                                                                                            
                                                             
                             </div>
                         </div>
@@ -2105,13 +2115,17 @@
                     <div style="padding:8px 16px 4px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.54rem;color:var(--slate2);line-height:1.8">
 
 
-                                                          HIBCW Admin · Public Beta
+
+                                                                                  HIBCW Admin · Public Beta
+                                                                        
                                                 
                         <br>
 
 
-                                                          Hawaii Island Business Crime Watch · A Program of KIAA
-                                                        
+
+                                                                                  Hawaii Island Business Crime Watch · A Program of KIAA
+                                                                                
+                                                                    
                                             
                     </div>
                     <div style="height:8px"></div>
@@ -2208,8 +2222,10 @@
                         <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:4px;padding:6px 10px;cursor:pointer;font-size:.72rem;color:var(--slate);flex:1;justify-content:center">
 
 
-                                                                    📎 Attach File
-                                                                    
+
+                                                                                                📎 Attach File
+                                                                                                
+                                                                                    
                                                         
                             <input type="file" id="adminAlertMedia" accept="image/*,video/*" style="display:none" onchange="previewAlertMedia(this,'adminAlertPreview')">
                         </label>
@@ -2321,9 +2337,9 @@
             <div style="flex-shrink:0;display:flex;justify-content:center;padding:10px 0 4px">
                 <div style="width:36px;height:4px;background:var(--b2);border-radius:2px"></div>
             </div>
-            <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px 12px;border-bottom:1px solid var(--b2)">
-                <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white)" id="mobBizSheetTitle">Business Details</div>
-                <button onclick="closeMobBizSheet()" style="background:none;border:none;color:var(--slate);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
+            <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 18px 12px;border-bottom:1px solid var(--b2)">
+                <button onclick="closeMobBizSheet()" style="background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.35);border-radius:6px;color:var(--teal);font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;padding:7px 14px;white-space:nowrap;flex-shrink:0">← Back</button>
+                <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="mobBizSheetTitle">Business Details</div>
             </div>
             <div id="mobBizSheetBody" style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:16px 18px;min-height:0"></div>
             <div id="mobBizSheetActions" style="flex-shrink:0;padding:12px 18px;border-top:1px solid var(--b2);display:flex;gap:8px;flex-wrap:wrap;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))"></div>
@@ -2332,8 +2348,8 @@
 
     <script>
     /* ════════════════════════════════════════════════
-           STATE
-        ════════════════════════════════════════════════ */
+               STATE
+            ════════════════════════════════════════════════ */
     let sb,
         allIncidents = [],
         memberList = [],
@@ -2346,8 +2362,8 @@
     let toastTimer;
 
     /* ════════════════════════════════════════════════
-           DISTRICT DATA
-        ════════════════════════════════════════════════ */
+               DISTRICT DATA
+            ════════════════════════════════════════════════ */
     const DISTRICTS = [
     ["hamakua", "District 1 - Hāmākua"],
     ["north-hilo", "District 2 - North Hilo"],
@@ -2416,8 +2432,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           LOGIN
-        ════════════════════════════════════════════════ */
+               LOGIN
+            ════════════════════════════════════════════════ */
     function showLoginForm() {
         document.getElementById('loginFormWrap').style.display = '';
         document.getElementById('forgotWrap').style.display = 'none';
@@ -2506,8 +2522,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           ROLE UI
-        ════════════════════════════════════════════════ */
+               ROLE UI
+            ════════════════════════════════════════════════ */
     function applyRoleUI() {
         const isAdmin = currentRole === 'admin' || currentRole === 'superadmin';
         const isCaptain = currentRole === 'captain';
@@ -2545,8 +2561,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           INIT / LOAD
-        ════════════════════════════════════════════════ */
+               INIT / LOAD
+            ════════════════════════════════════════════════ */
     async function initApp() {
         if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_')) {
             showToast('⚙️', 'Configure Supabase in config.js', 'err');
@@ -2636,8 +2652,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           NAVIGATION
-        ════════════════════════════════════════════════ */
+               NAVIGATION
+            ════════════════════════════════════════════════ */
     function showScreen(name) {
         currentScreen = name;
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -2666,8 +2682,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           INCIDENTS
-        ════════════════════════════════════════════════ */
+               INCIDENTS
+            ════════════════════════════════════════════════ */
     function filterIncidents() {
         const q = (document.getElementById('incSearch')?.value || '').toLowerCase().trim();
         const tf = document.getElementById('incTypeFlt')?.value || '';
@@ -2704,10 +2720,12 @@
       <div class="inc-card-body">
         <div class="inc-title">${
 
+
         esc(inc.type)}</div>
         <div class="inc-addr"><span class="addr-line">${esc(inc.address)}</span>${inc.district ? `<span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:${DISTRICT_COLORS[inc.district] || 'var(--teal)'};letter-spacing:.03em;margin-top:1px">${districtLabel(inc.district)}</span>` : ''}</div>
         <div class="inc-meta">
           <span class="badge ${
+
 
         bc[inc.type_color] || 'b-teal'}">${esc(inc.type)}</span>
           ${inc.is_recurring ? '<span class="recurring-flag">🔁 Recurring</span>' : ''}
@@ -2722,9 +2740,13 @@
 
 
 
+
+
+
         fmt(inc.occurred_at)}</div>
         ${ageTag(inc.occurred_at)}
         ${
+
 
         inc.incident_media?.length ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--gold)">📎 ${inc.incident_media.length}</span>` : ''}
       </div>
@@ -2732,12 +2754,14 @@
 
 
 
+
+
         ).join('');
     }
 
     /* ════════════════════════════════════════════════
-           DETAIL MODAL
-        ════════════════════════════════════════════════ */
+               DETAIL MODAL
+            ════════════════════════════════════════════════ */
     function openDetail(id) {
         const inc = allIncidents.find(i => i.id === id);
         if (!inc)
@@ -2764,9 +2788,11 @@
       <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
         ${
 
+
             avatar}
         <div>
           <div style="font-weight:600;font-size:.82rem">${
+
 
             esc(cm.full_name)}</div>
           ${cm.phone ? `<a href="tel:${cm.phone}" style="font-size:.72rem;color:var(--slate);text-decoration:none">📞 ${fmtPhone(cm.phone)}</a>` : ''}
@@ -2774,6 +2800,9 @@
         </div>
       </div>
     </div>`
+
+
+
 
 
 
@@ -2802,6 +2831,9 @@
 
 
 
+
+
+
         inc.suspect_gender ? `<span><span style="color:var(--slate)">Gender:</span> ${esc(inc.suspect_gender)}</span>` : ''}
         ${inc.suspect_age ? `<span><span style="color:var(--slate)">Age:</span> ${esc(inc.suspect_age)}</span>` : ''}
         ${inc.suspect_height ? `<span><span style="color:var(--slate)">Height:</span> ${esc(inc.suspect_height)}</span>` : ''}
@@ -2812,12 +2844,16 @@
       </div>
     </div>`
 
+
         : ''}
     ${(inc.vehicle_make || inc.vehicle_model || inc.vehicle_color || inc.vehicle_plate) ? `
     <div class="mf-row" style="background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.15);border-radius:6px;padding:10px 12px">
       <div class="mf-label" style="color:var(--gold)">Vehicle Description</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:.75rem;margin-top:6px">
         ${
+
+
+
 
 
 
@@ -2832,6 +2868,7 @@
       </div>
     </div>`
 
+
         : ''}
     ${media.length ? `<div class="mf-row"><div class="mf-label">Media (${media.length})</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${media.map(m => `
@@ -2845,14 +2882,19 @@
 
 
 
+
+
         id}"><div style="font-size:.75rem;color:var(--slate2)">Loading…</div></div>
       <div class="note-form">
         <input class="note-input" type="text" id="noteInput-${
+
 
         id}" placeholder="Add a note…" onkeydown="if(event.key==='Enter')addNote('${id}')">
         <button class="note-submit" onclick="addNote('${id}')">Add</button>
       </div>
     </div>`
+
+
 
 
 
@@ -2864,6 +2906,7 @@
     ${currentRole !== 'captain' ? `<button class="btn btn-red" onclick="deleteOne('${id}');closeDetail()">🗑 Delete</button>` : ''}
     <button class="btn btn-ghost" onclick="closeDetail()">Close</button>`
 
+
         ;
 
         document.getElementById('detailOverlay').classList.add('open');
@@ -2874,8 +2917,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           INCIDENT ACTIONS
-        ════════════════════════════════════════════════ */
+               INCIDENT ACTIONS
+            ════════════════════════════════════════════════ */
     async function archiveOne(id) {
         if (!confirm('Archive this incident?'))
             return;
@@ -2929,8 +2972,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           STATS
-        ════════════════════════════════════════════════ */
+               STATS
+            ════════════════════════════════════════════════ */
     function renderStats() {
         const active = allIncidents.filter(i => i.status === 'active');
         const archived = allIncidents.filter(i => i.status === 'archived');
@@ -2961,10 +3004,12 @@
     <div class="type-row">
       <div class="type-label">${
 
+
         esc(t)}</div>
       <div class="type-bar-wrap"><div class="type-bar" style="width:${(count / max * 100).toFixed(1)}%;background:${colors[color] || '#00c9a7'}"></div></div>
       <div class="type-cnt">${count}</div>
     </div>`
+
 
         ).join('') || '<div style="padding:12px;color:var(--slate2);font-size:.78rem">No active incidents.</div>';
 
@@ -2980,10 +3025,12 @@
     <div class="type-row">
       <div class="type-label" style="color:${
 
+
         DISTRICT_COLORS[v] || 'var(--teal)'}">${l}</div>
       <div class="type-bar-wrap"><div class="type-bar" style="width:${count ? ((count / dmax * 100).toFixed(1)) : '0'}%;background:${DISTRICT_COLORS[v] || 'var(--teal)'}"></div></div>
       <div class="type-cnt">${count}</div>
     </div>`
+
 
         ).join('');
     }
@@ -2997,8 +3044,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           MEMBERS
-        ════════════════════════════════════════════════ */
+               MEMBERS
+            ════════════════════════════════════════════════ */
     async function loadMembers() {
         if (!sb)
             return;
@@ -3066,10 +3113,12 @@
     <div class="mem-card">
       <div class="mem-name">${
 
+
             m.full_name ? esc(m.full_name) : '<span style="color:var(--slate2);font-style:italic">No name</span>'}${isCaptain ? ' <span style="font-family:\'IBM Plex Mono\',monospace;font-size:.52rem;background:rgba(0,201,167,.15);color:var(--teal);border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:1px 5px;vertical-align:middle">👮 Captain</span>' : ''}</div>
       <div class="mem-email-row">${esc(m.email)}</div>
       <div class="mem-detail">
         ${
+
 
             m.business_name ? `🏢 ${esc(m.business_name)}<br>` : ''}
         ${m.phone ? `📞 ${fmtPhone(m.phone)}<br>` : ''}
@@ -3081,9 +3130,13 @@
 
 
 
+
+
             m.id}')">Remove</button>
       </div>
     </div>`
+
+
 
 
 
@@ -3130,8 +3183,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           APPLICATIONS
-        ════════════════════════════════════════════════ */
+               APPLICATIONS
+            ════════════════════════════════════════════════ */
     async function loadApplications() {
         if (!sb)
             return;
@@ -3181,14 +3234,17 @@
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px">
         <div class="app-name">${
 
+
         esc(a.full_name)}</div>
         <span class="badge ${a.status === 'pending' ? 'b-gold' : a.status === 'approved' ? 'b-teal' : 'b-red'}" style="flex-shrink:0">${statusLabel[a.status] || a.status}</span>
       </div>
       <div class="app-biz">🏢 ${
 
+
         esc(a.business_name)}</div>
       <div class="app-info">
         ${
+
 
         a.business_address ? `📍 <span>${esc(a.business_address)}</span><br>` : ''}
         ✉️ <span>${esc(a.email)}</span><br>
@@ -3197,10 +3253,12 @@
       </div>
       ${
 
+
         a.notes ? `<div style="font-size:.72rem;color:var(--slate2);font-style:italic;margin-top:6px;padding-top:6px;border-top:1px solid var(--b2)">"${esc(a.notes)}"</div>` : ''}
       <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);margin-top:6px">${fmt(a.created_at)}</div>
       <div class="app-actions-row">
         ${
+
 
         (currentRole !== 'captain' || a.district === captainDistrict) ? `
           ${a.status === 'pending' ? `
@@ -3212,6 +3270,8 @@
         <button class="btn btn-ghost captain-hidden" onclick="deleteApp('${a.id}')">Delete</button>
       </div>
     </div>`
+
+
 
 
 
@@ -3404,8 +3464,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           DISTRICTS
-        ════════════════════════════════════════════════ */
+               DISTRICTS
+            ════════════════════════════════════════════════ */
     let currentDistTab = 'overview';
 
     function switchDistTab(tab) {
@@ -3534,12 +3594,15 @@
           <div style="flex:1;height:5px;background:var(--b2);border-radius:3px;overflow:hidden">
             <div style="height:100%;border-radius:3px;background:${
 
+
             typeColors[tcm[t]] || '#00c9a7'};width:${(c / mx * 100).toFixed(1)}%"></div>
           </div>
           <div style="font-family:IBM Plex Mono,monospace;font-size:.6rem;color:var(--slate);width:18px;text-align:right">${
 
+
             c}</div>
         </div>`
+
 
             ).join('')
             : `<div style="font-size:.68rem;color:var(--slate2);font-style:italic">No active incidents</div>`;
@@ -3556,10 +3619,13 @@
 
 
 
+
+
             color}12;border-bottom:1px solid ${color}22;padding:10px 14px;display:flex;align-items:center;gap:10px">
         <div style="width:30px;height:30px;border-radius:7px;background:${color}22;border:1px solid ${color}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:800;font-size:.85rem;color:${color};flex-shrink:0">${num}</div>
         <div style="flex:1;min-width:0">
           <div style="font-family:Rajdhani,sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.03em;color:${
+
 
             color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(fullLabel)}</div>
           ${isMine ? `<div style="font-family:IBM Plex Mono,monospace;font-size:.5rem;letter-spacing:.1em;color:${color};opacity:.8">★ YOUR DISTRICT</div>` : ''}
@@ -3581,19 +3647,29 @@
 
 
 
+
+
+
+
+
+
             avatar}
           <div style="flex:1;min-width:0">
             ${
+
 
             hasCaptain ? `
               <div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:700;margin-bottom:2px">👮 ${esc(captain)}</div>
               ${
 
+
             cm?.business_name ? `<div style="font-size:.7rem;color:var(--teal);margin-bottom:4px">🏢 ${esc(cm.business_name)}</div>` : ''}
               ${
 
+
             cm?.phone ? `<a href="tel:${cm.phone}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--slate);text-decoration:none;margin-bottom:2px">📞 ${fmtPhone(cm.phone)}</a>` : ''}
               ${
+
 
             cm?.email ? `<a href="mailto:${esc(cm.email)}" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);text-decoration:none;word-break:break-all">✉️ ${esc(cm.email)}</a>` : ''}
               ${!cm?.phone && !cm?.email ? `<div style="font-size:.68rem;color:var(--slate2);font-style:italic">No contact info</div>` : ''}
@@ -3610,6 +3686,10 @@
 
 
 
+
+
+
+
             color}22;padding-top:12px;margin-bottom:12px">
           <div style="font-family:IBM Plex Mono,monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:${color};margin-bottom:8px">📊 District Stats</div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
@@ -3618,11 +3698,15 @@
 
 
 
+
+
             color}">${memCount}</div>
               <div style="font-size:.5rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Member${memCount !== 1 ? 's' : ''}</div>
             </div>
             <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
               <div style="font-family:IBM Plex Mono,monospace;font-size:.95rem;font-weight:700;color:var(--gold)">${
+
+
 
 
 
@@ -3636,11 +3720,17 @@
 
 
 
+
+
+
             incWeek}</div>
               <div style="font-size:.5rem;color:var(--slate2);text-transform:uppercase;letter-spacing:.06em;margin-top:1px">Week</div>
             </div>
             <div style="background:var(--navy3);border-radius:6px;padding:6px 4px;text-align:center">
               <div style="font-family:IBM Plex Mono,monospace;font-size:.95rem;font-weight:700;color:var(--white)">${
+
+
+
 
 
 
@@ -3665,11 +3755,20 @@
 
 
 
+
+
+
+
+
+
             lastActive ? 'var(--white)' : 'var(--slate2)'}">${lastActive ? lastActive.toLocaleDateString('en-US', {month: 'short',day: 'numeric',year: 'numeric'}) : 'None'}</span>
           </div>
 
           <!-- Type breakdown bars -->
           ${
+
+
+
 
 
 
@@ -3691,10 +3790,16 @@
 
 
 
+
+
+
+
+
             color}33;color:${color}" onclick="openDistMembers('${v}')">
               👥 Members (${memCount})
             </button>
             <button class="btn btn-ghost" style="flex:1;font-size:.72rem;border-color:rgba(0,201,167,.3);color:var(--teal)" onclick="openDistBusinesses('${
+
 
             v}')">
               🏢 Businesses (${mobRegistryList.filter(b => b.district === v).length})
@@ -3704,16 +3809,23 @@
 
 
 
+
+
             (currentRole === 'admin' || currentRole === 'superadmin') ? `
           <button class="btn btn-ghost" style="width:100%;font-size:.72rem;border-color:rgba(245,158,11,.3);color:var(--gold)" onclick="openSetCaptainModal('${v}')">
             👮 Set Captain
           </button>`
+
 
             : ''}
         </div>
 
       </div>
     </div>`
+
+
+
+
 
 
 
@@ -3771,9 +3883,11 @@
     <div style="padding:12px 14px;border-bottom:1px solid var(--b2);display:flex;gap:12px;align-items:center">
       <div style="width:28px;height:28px;border-radius:6px;background:${
 
+
         color}22;border:1px solid ${color}55;display:flex;align-items:center;justify-content:center;font-family:Rajdhani,sans-serif;font-weight:800;font-size:.78rem;color:${color};flex-shrink:0">${num}</div>
       <div style="flex:1;min-width:0">
         <div style="font-family:Rajdhani,sans-serif;font-size:.8rem;font-weight:700;color:${
+
 
         color};margin-bottom:2px">${esc(fullLabel)}</div>
         ${c ? `
@@ -3784,6 +3898,8 @@
         ` : `<div style="font-size:.72rem;color:var(--slate2);font-style:italic">No captain assigned</div>`}
       </div>
     </div>`
+
+
 
 
 
@@ -3831,6 +3947,7 @@
       <td>${esc(biz)}</td>
       <td>${esc(addr)}</td>
     </tr>`
+
 
             ;
         }).join('');
@@ -3928,11 +4045,43 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         now}</div>
   </div>
   <table>
     <thead><tr><th>District</th><th>Captain</th><th>Phone</th><th>Email</th><th>Business</th><th>Address</th></tr></thead>
     <tbody>${
+
+
+
 
 
 
@@ -3948,10 +4097,16 @@
 
 
 
+
+
+
         now} · ${DISTRICTS.length} districts</span>
   </div>
   <script>window.onload=()=>{window.print();}<\/script>
 </body></html>`
+
+
+
 
 
 
@@ -3969,8 +4124,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           NOTES
-        ════════════════════════════════════════════════ */
+               NOTES
+            ════════════════════════════════════════════════ */
     async function loadNotes(incidentId) {
         const el = document.getElementById(`notesList-${incidentId}`);
         if (!el)
@@ -3991,6 +4146,7 @@
       <div class="note-meta"><span>👤 ${esc(n.author)} — ${fmt(n.created_at)}</span><button class="note-del" onclick="deleteNote('${n.id}','${incidentId}')">🗑</button></div>
       <div class="note-text">${esc(n.note)}</div>
     </div>`
+
 
         ).join('');
     }
@@ -4024,8 +4180,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           CSV EXPORT
-        ════════════════════════════════════════════════ */
+               CSV EXPORT
+            ════════════════════════════════════════════════ */
     function exportCSV(view) {
         let rows = allIncidents;
         if (view === 'active')
@@ -4041,8 +4197,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           THEME
-        ════════════════════════════════════════════════ */
+               THEME
+            ════════════════════════════════════════════════ */
     function toggleTheme() {
         const isLight = document.body.classList.toggle('light');
         localStorage.setItem('hibcw-admin-theme', isLight ? 'light' : 'dark');
@@ -4072,8 +4228,8 @@
     })();
 
     /* ════════════════════════════════════════════════
-           LOGOUT
-        ════════════════════════════════════════════════ */
+               LOGOUT
+            ════════════════════════════════════════════════ */
     async function logout() {
         if (!confirm('Sign out?'))
             return;
@@ -4083,8 +4239,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           CAPTAIN DASHBOARD
-        ════════════════════════════════════════════════ */
+               CAPTAIN DASHBOARD
+            ════════════════════════════════════════════════ */
     function renderCaptainDashboard() {
         if (!captainDistrict)
             return;
@@ -4110,6 +4266,7 @@
         <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:${accent ? color : 'var(--white)'}">${val}</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-top:2px">${lbl}</div>
       </div>`
+
 
             ;
             statsEl.innerHTML =
@@ -4137,6 +4294,7 @@
           <div style="flex:1;min-width:0">
             <div style="font-size:.82rem;font-weight:500">${
 
+
                 esc(inc.type)}</div>
             <div style="font-size:.68rem;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(inc.address)}</div>
           </div>
@@ -4145,10 +4303,14 @@
 
 
 
+
+
                 ageTag(inc.occurred_at)}
             ${inc.status === 'archived' ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--slate2)">archived</div>` : ''}
           </div>
         </div>`
+
+
 
 
 
@@ -4160,8 +4322,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           DISTRICT ALERTS
-        ════════════════════════════════════════════════ */
+               DISTRICT ALERTS
+            ════════════════════════════════════════════════ */
     async function loadDistrictAlerts() {
         if (!sb || !captainDistrict)
             return;
@@ -4185,23 +4347,28 @@
         <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;flex-wrap:wrap">
           ${
 
+
                 alertTypeBadge(a.alert_type)}
           <span style="font-size:.8rem;line-height:1.5;color:var(--white);flex:1">${esc(a.message)}</span>
         </div>
         ${
 
+
                 a.media_url ? `
           <div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2)">
             ${
+
 
                 a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls playsinline style="width:100%;display:block;max-height:200px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:200px;object-fit:cover">`}
           </div>` : ''}
         <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2)">
           <span>👤 ${
 
+
                 esc(a.sent_by_name || 'Captain')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
           <div style="display:flex;gap:5px">
             <button data-alert-id="${
+
 
                 a.id}" onclick="startAlertEditById(this)" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 7px;color:var(--teal);font-size:.58rem;cursor:pointer">✏️</button>
             <button onclick="archiveDistrictAlert('${a.id}')" style="background:none;border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:2px 7px;color:var(--gold);font-size:.58rem;cursor:pointer" title="Archive">📦</button>
@@ -4209,6 +4376,9 @@
           </div>
         </div>
       </div>`
+
+
+
 
 
 
@@ -4315,28 +4485,34 @@
         <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
           ${
 
+
                 alertTypeBadge(a.alert_type)}
           <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
         </div>
         <div style="font-size:.82rem;line-height:1.55;color:var(--white);margin-bottom:6px">${
+
 
                 esc(a.message)}</div>
         ${a.media_url ? `<div style="margin-bottom:8px;border-radius:5px;overflow:hidden;border:1px solid var(--b2);max-width:100%">${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls style="width:100%;display:block;max-height:180px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:180px;object-fit:cover">`}</div>` : ''}
         <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);margin-bottom:8px">
           📤 ${
 
+
                 esc(a.sent_by_name || 'Admin')} · ${sentDate}${a.is_edited ? ' · <em>edited</em>' : ''}
         </div>
         ${
+
 
                 (currentRole === 'admin' || currentRole === 'superadmin') ? `
         <div style="display:flex;gap:6px">
           <button onclick="archiveMobActiveAlert('${
 
+
                 a.id}')" style="flex:1;background:none;border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:6px 8px;color:var(--gold);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">📦 Archive</button>
           <button onclick="deleteMobActiveAlert('${a.id}','${esc(a.media_url || '')}')" style="flex:1;background:none;border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:6px 8px;color:var(--red);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete</button>
         </div>` : ''}
       </div>`
+
 
                 ;
             }).join('');
@@ -4433,6 +4609,7 @@
         <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
           ${
 
+
                 alertTypeBadge(a.alert_type)}
           <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
           <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:1px 5px;white-space:nowrap">📦 ARCHIVED</span>
@@ -4441,9 +4618,12 @@
 
 
 
+
+
                 esc(a.message)}</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);display:flex;flex-direction:column;gap:2px;margin-bottom:8px">
           <span>📤 ${
+
 
                 esc(a.sent_by_name || 'Captain')} · ${sentDate}</span>
           <span>📦 Archived by ${esc(a.archived_by || 'Admin')} · ${archivedDate}</span>
@@ -4453,10 +4633,14 @@
 
 
 
+
+
                 a.id}')" style="flex:1;background:none;border:1px solid rgba(0,201,167,.3);border-radius:5px;padding:6px 8px;color:var(--teal);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">↩ Restore</button>
           <button onclick="deleteMobArchivedAlert('${a.id}','${esc(a.media_url || '')}')" style="flex:1;background:none;border:1px solid rgba(232,65,90,.25);border-radius:5px;padding:6px 8px;color:var(--red);font-size:.65rem;cursor:pointer;font-family:'IBM Plex Mono',monospace">✕ Delete</button>
         </div>
       </div>`
+
+
 
 
 
@@ -4543,6 +4727,7 @@
         <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px">
           ${
 
+
                 alertTypeBadge(a.alert_type)}
           <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap">${esc(districtLabel(a.district))}</span>
           <span style="font-family:'IBM Plex Mono',monospace;font-size:.53rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:3px;padding:1px 5px;white-space:nowrap">📦 ARCHIVED</span>
@@ -4551,9 +4736,12 @@
 
 
 
+
+
                 esc(a.message)}</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);display:flex;flex-direction:column;gap:1px;margin-bottom:6px">
           <span>📤 ${
+
 
                 esc(a.sent_by_name || 'Captain')} · ${sentDate}</span>
           <span>📦 Archived by ${esc(a.archived_by || 'Admin')} · ${archivedDate}</span>
@@ -4563,10 +4751,14 @@
 
 
 
+
+
                 a.id}')" style="background:none;border:1px solid rgba(0,201,167,.3);border-radius:3px;padding:2px 7px;color:var(--teal);font-size:.58rem;cursor:pointer">↩ Restore</button>
           <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url || '')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:2px 7px;color:var(--red);font-size:.58rem;cursor:pointer">✕ Delete</button>
         </div>
       </div>`
+
+
 
 
 
@@ -4774,6 +4966,7 @@
     ${ALERT_TYPES.map(t => `<option value="${t.value}" ${t.value === defaultVal ? 'selected' : ''} style="background:#111e30">${t.icon} ${t.label} — ${t.desc}</option>`).join('')}
   </select>`
 
+
         ;
     }
     function alertTypeBadge(val) {
@@ -4931,11 +5124,13 @@
         <div style="display:flex;gap:5px;align-items:flex-start;margin-bottom:4px;flex-wrap:wrap">
           ${
 
+
                 alertTypeBadge(a.alert_type)}
           <span style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;background:${dc}18;color:${dc};border:1px solid ${dc}44;border-radius:3px;padding:1px 5px;white-space:nowrap;flex-shrink:0">${esc(districtLabel(a.district))}</span>
           <span style="font-size:.78rem;line-height:1.4;color:var(--white)">${esc(a.message)}</span>
         </div>
         ${
+
 
                 a.media_url ? `<div style="margin-bottom:5px;border-radius:4px;overflow:hidden;border:1px solid var(--b2);max-width:180px">
           ${a.media_type === 'video' ? `<video src="${esc(a.media_url)}" controls playsinline style="width:100%;display:block;max-height:100px"></video>` : `<img src="${esc(a.media_url)}" style="width:100%;display:block;max-height:100px;object-fit:cover">`}
@@ -4943,15 +5138,20 @@
         <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--slate2);display:flex;justify-content:space-between;align-items:center">
           <span>👤 ${
 
+
                 esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
           <div style="display:flex;gap:3px">
             <button onclick="archiveAdminAlert('${
+
 
                 a.id}')" style="background:none;border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 6px;color:var(--gold);font-size:.58rem;cursor:pointer" title="Archive">📦</button>
             <button onclick="deleteAdminAlert('${a.id}','${esc(a.media_url || '')}')" style="background:none;border:1px solid rgba(232,65,90,.25);border-radius:3px;padding:1px 6px;color:var(--red);font-size:.58rem;cursor:pointer">✕</button>
           </div>
         </div>
       </div>`
+
+
+
 
 
 
@@ -5088,11 +5288,11 @@
     }
 
     /* ════════════════════════════════════════════════
-           TOAST
-        ════════════════════════════════════════════════ */
+               TOAST
+            ════════════════════════════════════════════════ */
     /* ════════════════════════════════════════════════
-           RESOURCES
-        ════════════════════════════════════════════════ */
+               RESOURCES
+            ════════════════════════════════════════════════ */
     const RESOURCE_FILES = [
     {
         category: 'District Flyers',
@@ -5326,9 +5526,11 @@
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
           <div style="width:36px;height:36px;border-radius:8px;background:${
 
+
             r.color}18;border:1px solid ${r.color}33;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">${r.icon}</div>
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:var(--white)">${
+
 
             r.title}</div>
             <div style="font-size:.7rem;color:var(--slate);line-height:1.45;margin-top:1px">${r.desc}</div>
@@ -5341,9 +5543,14 @@
 
 
 
+
+
+
             r.url}','_blank','noopener')" style="flex:1;background:${r.color};border:none;border-radius:5px;padding:7px 10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;cursor:pointer">${r.btnLabel || '📖 Open'}</button>
         </div>
       </div>`
+
+
 
 
 
@@ -5378,19 +5585,23 @@
     <div style="padding:10px 12px 4px;font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2);border-top:1px solid var(--b2);margin-top:4px">📁 Downloadable Files</div>
     ${
 
+
         categories.map(cat => {const files = visibleFiles.filter(f => f.category === cat);const cc = catColors[cat] || 'var(--teal)';return `
         <div style="padding:6px 12px 2px">
           <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:${
 
+
             cc};margin-bottom:4px">${cat}</div>
           <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:8px;overflow:hidden">
             ${
+
 
             files.map((f, i) => `
             <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;${i < files.length - 1 ? 'border-bottom:1px solid var(--b2)' : ''}">
               <div style="font-size:.95rem;flex-shrink:0">${f.icon}</div>
               <div style="flex:1;min-width:0">
                 <div style="font-size:.78rem;font-weight:500;color:var(--white);margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${
+
 
             esc(f.title)}</div>
                 <div style="font-size:.67rem;color:var(--slate);line-height:1.35">${esc(f.desc)}</div>
@@ -5400,21 +5611,25 @@
 
 
 
+
+
             f.file}" ${f.openInBrowser ? 'target="_blank" rel="noopener"' : 'download'} style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:5px;padding:5px 9px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);text-decoration:none;white-space:nowrap;flex-shrink:0">${f.openInBrowser ? '✍️ Fill In' : '⬇ PDF'}</a>
                 ${f.printable ? `<button onclick="printHandbook('${f.file}')" style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:5px;padding:5px 9px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);white-space:nowrap;cursor:pointer">🖨 Print</button>` : ''}
               </div>
             </div>`
 
+
             ).join('')}
           </div>
         </div>`
+
 
             ;}).join('')}`;
     }
 
     /* ════════════════════════════════════════════════
-           MOBILE GROWTH TRACKER  (Superadmin only)
-        ════════════════════════════════════════════════ */
+               MOBILE GROWTH TRACKER  (Superadmin only)
+            ════════════════════════════════════════════════ */
     const MOB_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const MOB_MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const MOB_TRACKER_COLS = [
@@ -5678,11 +5893,18 @@
 
 
 
+
+
+
+
         totalMembers}</div>
       </div>
       <div style="background:var(--navy2);border:1px solid rgba(232,65,90,.25);border-top:2px solid #e8415a;border-radius:7px;padding:10px 12px">
         <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">Incidents YTD</div>
         <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#e8415a;line-height:1">${
+
+
+
 
 
 
@@ -5698,6 +5920,9 @@
 
 
 
+
+
+
         totalAlerts}</div>
       </div>
       <div style="background:var(--navy2);border:1px solid rgba(59,130,246,.25);border-top:2px solid #3b82f6;border-radius:7px;padding:10px 12px">
@@ -5708,11 +5933,17 @@
 
 
 
+
+
+
         totalNew}</div>
       </div>
       <div style="background:var(--navy2);border:1px solid rgba(245,158,11,.25);border-top:2px solid #f59e0b;border-radius:7px;padding:10px 12px;grid-column:span 2">
         <div style="font-size:.62rem;color:var(--slate);margin-bottom:2px">🏢 Business Registrations</div>
         <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#f59e0b;line-height:1">${
+
+
+
 
 
 
@@ -5735,6 +5966,11 @@
 
 
 
+
+
+
+
+
         ['monthly', 'milestones', 'quarterly'].map(t => `
         <button onclick="switchMobTrackerTab('${t}')" id="mobtab-${t}"
           style="background:${mobTrackerTab === t ? 'var(--teal)' : 'var(--navy2)'};
@@ -5743,6 +5979,8 @@
                  border-radius:20px;padding:5px 14px;font-family:'IBM Plex Mono',monospace;
                  font-size:.6rem;cursor:pointer;white-space:nowrap;transition:all .15s">
           ${
+
+
 
 
 
@@ -5760,8 +5998,13 @@
 
 
 
+
+
+
+
         renderMobTrackerTabContent()}
     </div>`
+
 
         ;
     }
@@ -5799,9 +6042,11 @@
       <div style="background:var(--navy2);border:1px solid var(--b2);border-radius:7px;margin-bottom:6px;overflow:hidden">
         <div onclick="toggleMobMonth(${
 
+
             i})" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer">
           <div>
             <div style="font-size:.84rem;font-weight:600;color:var(--white)">${
+
 
             m}</div>
             ${hasData ? `<div style="font-size:.65rem;color:var(--teal);font-family:'IBM Plex Mono',monospace;margin-top:1px">
@@ -5812,23 +6057,28 @@
           </div>
           <div style="color:var(--slate);font-size:.8rem;transition:transform .2s;transform:rotate(${
 
+
             isOpen ? '90' : '0'}deg)">›</div>
         </div>
         ${
+
 
             isOpen ? `<div style="padding:0 14px 14px;border-top:1px solid var(--b2)">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
             ${
 
+
             MOB_TRACKER_COLS.map(c => `
               <div>
                 <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:${
+
 
             c.color};margin-bottom:3px">${c.label}</div>
                 <div style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:6px 8px;color:${d[c.key] ? c.color : 'var(--slate2)'};font-size:.82rem;text-align:center;font-weight:600">
                   ${d[c.key] || '—'}
                 </div>
               </div>`
+
 
             ).join('')}
           </div>
@@ -5840,16 +6090,22 @@
 
 
 
+
+
+
             esc(d.notes || '')}" placeholder="Add a note for this month…"
               style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:4px;padding:6px 8px;color:var(--white);font-size:.82rem"
               onchange="saveMobMonthData(${
+
 
             i},'notes',this.value||null)">
           </div>
         </div>`
 
+
             : ''}
       </div>`
+
 
             ;
         }).join('');
@@ -5871,6 +6127,7 @@
         const addBtn = `
     <button onclick="openMobMilestoneSheet()" style="width:100%;background:var(--teal);border:none;border-radius:7px;padding:10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:700;cursor:pointer;margin-bottom:10px">+ Add Milestone</button>`
 
+
         ;
 
         if (!mobMilestones.length)
@@ -5882,14 +6139,17 @@
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
         <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;background:${
 
+
             color}15;color:${color};border:1px solid ${color}33;border-radius:3px;padding:1px 6px">${ms.category}</span>
         <button onclick="deleteMobMilestone('${ms.id}')" style="background:none;border:none;color:var(--slate2);font-size:.72rem;cursor:pointer">✕</button>
       </div>
       <div style="font-size:.8rem;font-weight:600;color:var(--white);margin-bottom:2px">${
 
+
             esc(ms.story || '')}</div>
       <div style="font-size:.7rem;color:var(--slate)">${esc(ms.impact || '')}${ms.date ? ' · ' + ms.date : ''}</div>
     </div>`
+
 
             ;
         }).join('');
@@ -5929,11 +6189,16 @@
 
 
 
+
+
             totNewMem}</div>
           <div style="font-size:.58rem;color:var(--slate)">New Members</div>
         </div>
         <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
           <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#e8415a">${
+
+
+
 
 
 
@@ -5949,11 +6214,17 @@
 
 
 
+
+
+
             totAlerts}</div>
           <div style="font-size:.58rem;color:var(--slate)">Alerts</div>
         </div>
         <div style="flex:1;background:var(--navy3);border-radius:5px;padding:7px;text-align:center">
           <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#06b6d4">${
+
+
+
 
 
 
@@ -5969,6 +6240,9 @@
 
 
 
+
+
+
             q.color};margin-bottom:4px">Summary</div>
       <textarea style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.78rem;font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:56px;line-height:1.55"
         placeholder="Write 2–3 sentences about this quarter…"
@@ -5976,8 +6250,11 @@
 
 
 
+
+
             mobTrackerYear},'${q.label}','summary',this.value)">${esc(qData.summary || '')}</textarea>
     </div>`
+
 
             ;
         }).join('');
@@ -6028,10 +6305,19 @@
 
 
 
+
+
+
+
+
+
+
         new Date().toISOString().split('T')[0]}" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.8rem"></div>
         <div><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;color:var(--slate);margin-bottom:3px">Category</div>
           <select id="mobMsCat" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px;color:var(--white);font-size:.8rem">
             ${
+
+
 
 
 
@@ -6060,10 +6346,21 @@
 
 
 
+
+
+
+
+
+
+
+
         ['Yes', 'No', 'Maybe'].map(v => `<label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer"><input type="radio" name="mobMsPitch" value="${v}" ${v === 'Yes' ? 'checked' : ''}> ${v}</label>`).join('')}
         </div></div>
       <button onclick="saveMobMilestone()" style="width:100%;background:var(--teal);border:none;border-radius:7px;padding:12px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:700;cursor:pointer">Save Milestone</button>
     </div>`
+
+
+
 
 
 
@@ -6116,8 +6413,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           MOBILE BUSINESS REGISTRY
-        ════════════════════════════════════════════════ */
+               MOBILE BUSINESS REGISTRY
+            ════════════════════════════════════════════════ */
     let mobRegistryList = [];
 
     async function loadMobRegistry() {
@@ -6303,10 +6600,30 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         esc(subtitle)} · ${rows.length} business${rows.length !== 1 ? 'es' : ''}</div>
     </div>
     <div style="text-align:right">
       <div class="org">Printed ${
+
+
 
 
 
@@ -6318,6 +6635,12 @@
     <thead><tr><th>#</th><th>Biz #</th><th>Business</th><th>Type</th><th>District</th><th>Contact</th><th>Phone</th><th>Status</th><th>Packet</th></tr></thead>
     <tbody>
       ${
+
+
+
+
+
+
 
 
 
@@ -6348,6 +6671,14 @@
   </div>
   <script>window.onload=()=>window.print();<\/script>
   </body></html>`
+
+
+
+
+
+
+
+
 
 
 
@@ -6420,6 +6751,8 @@
 
 
 
+
+
         distColor};padding-bottom:10px;margin-bottom:16px}
     .org{font-size:9px;color:#7a8fa6;letter-spacing:.1em;text-transform:uppercase}
     .title{font-size:16px;font-weight:700;color:#0b1524}
@@ -6463,11 +6796,27 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         esc(distLabel)} — Business Roster</div>
       <div class="sub">${businesses.length} registered business${businesses.length !== 1 ? 'es' : ''}</div>
     </div>
     <div style="text-align:right">
       <div class="org">Printed ${
+
+
 
 
 
@@ -6479,6 +6828,12 @@
     <thead><tr><th>#</th><th>Biz #</th><th>Business</th><th>Type</th><th>Contact</th><th>Phone</th><th>Email</th><th>Status</th><th>Packet</th></tr></thead>
     <tbody>
       ${
+
+
+
+
+
+
 
 
 
@@ -6509,6 +6864,14 @@
   </div>
   <script>window.onload=()=>window.print();<\/script>
   </body></html>`
+
+
+
+
+
+
+
+
 
 
 
@@ -6577,6 +6940,8 @@
 
 
 
+
+
             esc(b.business_name)}</div>
           <div style="font-size:.7rem;color:var(--slate)">${esc(b.business_type || '')}${b.city ? ' · ' + esc(b.city) : ''}</div>
           ${b.business_number ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:700;color:var(--white);margin-top:3px;letter-spacing:.04em"># ${esc(b.business_number)}</div>` : ''}
@@ -6584,9 +6949,12 @@
         </div>
         <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;padding:2px 7px;border-radius:3px;border:1px solid;color:${
 
+
             sc};background:${sc}18;border-color:${sc}44;white-space:nowrap;flex-shrink:0;text-transform:capitalize">${b.status}</span>
       </div>
     </div>`
+
+
 
 
 
@@ -6636,6 +7004,8 @@
 
 
 
+
+
         esc(b.business_number)}</div>
     </div>` : `
     <div style="background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.25);border-radius:7px;padding:8px 14px;margin-bottom:12px;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--gold)">
@@ -6646,9 +7016,13 @@
 
 
 
+
+
+
         }
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;padding:3px 8px;border-radius:3px;border:1px solid;color:${
+
 
         dc};background:${dc}18;border-color:${dc}44">${DIST_LABELS[b.district] || b.district || '—'}</span>
       <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;padding:3px 8px;border-radius:3px;border:1px solid;color:${sc};background:${sc}18;border-color:${sc}44;text-transform:capitalize">${b.status}</span>
@@ -6656,10 +7030,12 @@
     </div>
     <div style="font-size:.78rem;color:var(--slate);margin-bottom:14px">${
 
+
         esc(b.business_type || '—')}</div>
     ${[['📍 Physical', b.full_address || [b.street_address, b.city, 'HI', b.zip].filter(Boolean).join(', ')], ['📬 Mailing', b.mailing_same_as_physical || !b.mailing_address ? 'Same as physical' : b.mailing_address], ['👤 Contact', b.contact_name], ['📞 Phone', b.phone ? fmtPhone(b.phone) : null], ['✉️ Email', b.email], ['👥 Employees', b.employees], ['🌐 Website', b.website], ['👮 Captain', b.captain_name], ['📝 Notes', b.notes], ].filter(([, v]) => v).map(([l, v]) => `
       <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--b2);font-size:.82rem">
         <span style="color:var(--slate);flex-shrink:0;width:90px">${
+
 
         l}</span>
         <span style="color:var(--white);word-break:break-word">${esc(v)}</span>
@@ -6680,6 +7056,7 @@
       <button onclick="mobGeneratePacket('${b.id}')" title="${b.packet_sent_at ? 'Reprint packet' : 'Generate packet'}" style="width:100%;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:6px;padding:9px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">${b.packet_sent_at ? '🖨 Reprint Packet' : '📦 Generate Packet'}</button>
     ` : ''}
     <button onclick="closeMobBizSheet()" style="width:100%;background:transparent;border:1px solid var(--b2);border-radius:6px;padding:9px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.68rem;cursor:pointer">Close</button>`
+
 
         ;
 
@@ -6732,6 +7109,7 @@
       <input type="${type}" id="${id}" value="${esc(val || '')}" ${extra} style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px 10px;color:var(--white);font-size:.84rem;outline:none">
     </div>`
 
+
         ;
 
         sheet.innerHTML = `
@@ -6762,11 +7140,21 @@
 
 
 
+
+
+
+
+
+
+
+
+
         fld('Business Name', 'mebName', b.business_name)}
         ${fld('Business Type', 'mebType', b.business_type)}
         ${fld('Street Address (Physical)', 'mebStreet', b.street_address, 'text', 'oninput="mebSyncMailing()"')}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           ${
+
 
         fld('City (Physical)', 'mebCity', b.city, 'text', 'oninput="mebSyncMailing()"')}
           ${fld('ZIP (Physical)', 'mebZip', b.zip, 'text', 'oninput="mebSyncMailing()"')}
@@ -6774,6 +7162,9 @@
         <div style="margin-bottom:12px;border-top:1px solid var(--b2);padding-top:12px">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;color:var(--slate)">
             <input type="checkbox" id="mebSameAs" ${
+
+
+
 
 
 
@@ -6789,10 +7180,14 @@
 
 
 
+
+
+
         (b.mailing_same_as_physical !== false && !b.mailing_street) ? 'display:none' : ''}">
           ${fld('Mailing Street', 'mebMailStreet', b.mailing_street)}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
             ${
+
 
         fld('Mailing City', 'mebMailCity', b.mailing_city)}
             ${fld('Mailing ZIP', 'mebMailZip', b.mailing_zip)}
@@ -6803,6 +7198,12 @@
           <select id="mebDistrict" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px 10px;color:var(--white);font-size:.84rem;outline:none">
             <option value="">— Unassigned —</option>
             ${
+
+
+
+
+
+
 
 
 
@@ -6830,12 +7231,19 @@
 
 
 
+
+
+
+
+
         b.status === 'pending' ? 'selected' : ''}>Pending</option>
             <option value="approved" ${b.status === 'approved' ? 'selected' : ''}>Approved</option>
             <option value="rejected" ${b.status === 'rejected' ? 'selected' : ''}>Rejected</option>
           </select>
         </div>
         ${
+
+
 
 
 
@@ -6847,6 +7255,8 @@
         <div style="margin-bottom:12px">
           <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:4px">Notes</div>
           <textarea id="mebNotes" rows="3" style="width:100%;background:var(--navy3);border:1px solid var(--b2);border-radius:5px;padding:8px 10px;color:var(--white);font-size:.84rem;outline:none;resize:vertical;font-family:'IBM Plex Sans',sans-serif">${
+
+
 
 
 
@@ -6863,9 +7273,15 @@
 
 
 
+
+
+
+
         b.id}')" style="flex:2;background:var(--teal);border:none;border-radius:6px;padding:10px;color:#0b1524;font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:700;cursor:pointer">Save Changes</button>
       </div>
     </div>`
+
+
 
 
 
@@ -7011,8 +7427,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           BIZ # LOOKUP
-        ════════════════════════════════════════════════ */
+               BIZ # LOOKUP
+            ════════════════════════════════════════════════ */
     function showMobBizLookup() {
         document.getElementById('mobBizLookupScreen').style.display = 'block';
         setTimeout(() => document.getElementById('mobBizLookupInput')?.focus(), 120);
@@ -7068,9 +7484,15 @@
 
 
 
+
+
+
+
                 esc(raw)}</strong> is not in the registry.</div>
           </div>
         </div>`
+
+
 
 
 
@@ -7110,9 +7532,11 @@
       <div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--b2);font-size:.82rem">
         <span style="color:var(--slate);flex-shrink:0;width:96px;font-size:.76rem">${
 
+
             label}</span>
         <span style="color:var(--white);word-break:break-word">${esc(val)}</span>
       </div>`
+
 
             : '';
 
@@ -7132,15 +7556,23 @@
 
 
 
+
+
+
+
+
             esc(b.business_number)}</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap">
               <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${
+
 
             dc}15;color:${dc};border:1px solid ${dc}33;border-radius:3px;padding:2px 8px">${esc(dl)}</span>
               <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;background:${sc}15;color:${sc};border:1px solid ${sc}33;border-radius:3px;padding:2px 8px;text-transform:capitalize">${b.status}</span>
             </div>
           </div>
           <div style="font-size:.95rem;font-weight:600;color:var(--white)">${
+
+
 
 
 
@@ -7152,6 +7584,10 @@
         <!-- Detail rows -->
         <div style="padding:0 16px">
           ${
+
+
+
+
 
 
 
@@ -7183,9 +7619,15 @@
 
 
 
+
+
+
+
+
             b.submitted_at ? new Date(b.submitted_at).toLocaleDateString() : '—'}${b.approved_at ? ' · Approved ' + new Date(b.approved_at).toLocaleDateString() : ''}
           </div>
           ${
+
 
             canEdit ? `
           <button onclick="closeMobBizLookup();loadMobRegistry();setTimeout(()=>{showMobRegistry();setTimeout(()=>{document.getElementById('mobRegSearch').value='${esc(b.business_number)}';renderMobRegistry();},200)},100)"
@@ -7195,9 +7637,13 @@
 
 
 
+
+
             : ''}
         </div>
       </div>`
+
+
 
 
 
@@ -7312,8 +7758,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           HELPERS
-        ════════════════════════════════════════════════ */
+               HELPERS
+            ════════════════════════════════════════════════ */
     function fmt(iso) {
         return new Date(iso).toLocaleString('en-US', {
             month: 'short',
@@ -7370,8 +7816,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           AUTH INIT
-        ════════════════════════════════════════════════ */
+               AUTH INIT
+            ════════════════════════════════════════════════ */
     (async function() {
         if (typeof SUPABASE_URL === 'undefined' || SUPABASE_URL.includes('YOUR_'))
             return;
@@ -7386,8 +7832,8 @@
     })();
 
     /* ════════════════════════════════════════════════
-           DISTRICT MEMBERS MODAL
-        ════════════════════════════════════════════════ */
+               DISTRICT MEMBERS MODAL
+            ════════════════════════════════════════════════ */
     let _distMembersId = null;
 
     function openDistMembers(districtId) {
@@ -7423,6 +7869,9 @@
 
 
 
+
+
+
         m.full_name ? esc(m.full_name) : '<span style="color:var(--slate2);font-style:italic">No name</span>'}</div>
           ${m.captain_name && m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:${color};margin-bottom:4px">👮 District Captain</div>` : m.captain_name ? `<div style="font-size:.65rem;color:var(--slate);margin-bottom:4px">Captain: ${esc(m.captain_name)}</div>` : ''}
           ${m.business_name ? `<div style="font-size:.72rem;color:var(--teal);margin-bottom:3px">🏢 ${esc(m.business_name)}</div>` : ''}
@@ -7431,6 +7880,9 @@
         </div>
       </div>
     </div>`
+
+
+
 
 
 
@@ -7521,24 +7973,31 @@
 
 
 
+
+
             esc(b.business_name || '—')}</div>
           <div style="font-size:.7rem;color:var(--slate);margin-top:1px">${esc(b.business_type || '')}${b.city ? ' · ' + esc(b.city) : ''}</div>
         </div>
         <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;padding:2px 7px;border-radius:3px;border:1px solid;color:${
 
+
             sc};background:${sc}18;border-color:${sc}44;white-space:nowrap;text-transform:capitalize;flex-shrink:0">${b.status}</span>
       </div>
       <div style="font-size:.72rem;color:var(--slate);margin-bottom:6px">${
+
 
             esc(b.contact_name || '')}${b.phone ? ' · ' + fmtPhone(b.phone) : ''}</div>
       ${b.packet_sent_at ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal);margin-bottom:6px">📦 Packet sent ${new Date(b.packet_sent_at).toLocaleDateString()}</div>` : ''}
       <div style="display:flex;gap:6px" class="captain-hidden">
         <button onclick="closeDistBiz();openMobBizSheet('${
 
+
             b.id}')" style="flex:1;background:transparent;border:1px solid var(--b2);border-radius:5px;padding:5px 8px;color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">View</button>
         ${b.status === 'approved' ? `<button onclick="closeDistBiz();mobGeneratePacket('${b.id}')" title="${b.packet_sent_at ? 'Reprint packet' : 'Generate packet'}" style="flex:1;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:5px 8px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:.62rem;cursor:pointer">${b.packet_sent_at ? '🖨 Reprint' : '📦 Packet'}</button>` : ''}
       </div>
     </div>`
+
+
 
 
 
@@ -7577,6 +8036,7 @@
     <tr>
       <td class="num">${
 
+
         i + 1}</td>
       <td>${esc(m.full_name || '—')}${m.captain_name && m.full_name && m.captain_name.trim().toLowerCase() === m.full_name.trim().toLowerCase() ? ' <span class="cap-badge">★ Captain</span>' : ''}</td>
       <td>${esc(m.business_name || '—')}</td>
@@ -7585,11 +8045,13 @@
       <td>${esc(m.email || '—')}</td>
     </tr>`
 
+
         ).join('');
 
         const html = `<!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <title>HIBCW ${
+
 
         esc(distLabel_)} — Member Roster</title>
 <style>
@@ -7712,11 +8174,54 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         today}</div>
     </div>
   </div>
   <div class="district-banner">
     <div class="district-name">${
+
+
+
 
 
 
@@ -7728,6 +8233,9 @@
   <table>
     <thead><tr><th>#</th><th>Name</th><th>Business</th><th>Address</th><th>Phone</th><th>Email</th></tr></thead>
     <tbody>${
+
+
+
 
 
 
@@ -7754,6 +8262,13 @@
 
 
 
+
+
+
+
+
+
+
         ;
 
         const win = window.open('', '_blank', 'width=1000,height=700');
@@ -7766,8 +8281,8 @@
     }
 
     /* ════════════════════════════════════════════════
-           MOBILE MAP VIEW
-        ════════════════════════════════════════════════ */
+               MOBILE MAP VIEW
+            ════════════════════════════════════════════════ */
     const MOB_TYPE_EMOJI = {
         'Robbery': '🔫',
         'Burglary': '🏠',
@@ -7794,7 +8309,7 @@
         id: 'north-hilo',
         label: 'D2 — North Hilo',
         color: '#3b82f6',
-        coords: [[19.87, -155.08], [19.73, -155.10], [19.73, -155.18], [19.78, -155.22], [19.80, -155.12], [19.87, -155.08]]
+        coords: [[19.87, -155.08], [19.73, -155.10], [19.76, -155.17], [19.80, -155.13], [19.87, -155.08]]
     },
     {
         id: 'south-hilo',
@@ -7824,7 +8339,7 @@
         id: 'south-kona',
         label: 'D7 — South Kona',
         color: '#f59e0b',
-        coords: [[19.90, -155.65], [19.87, -155.87], [19.72, -155.98], [19.63, -155.99], [19.55, -155.93], [19.45, -155.88], [19.33, -155.80], [19.28, -155.72], [19.18, -155.87], [19.03, -155.92], [18.95, -155.84], [18.91, -155.68], [19.02, -155.25], [19.28, -155.04], [19.45, -155.35], [19.78, -155.47], [19.90, -155.65]]
+        coords: [[19.78, -155.47], [19.90, -155.65], [19.55, -155.93], [19.45, -155.88], [19.33, -155.80], [19.28, -155.72], [19.18, -155.87], [19.03, -155.92], [18.95, -155.84], [18.91, -155.68], [19.02, -155.25], [19.28, -155.04], [19.45, -155.35], [19.78, -155.47]]
     },
     {
         id: 'north-kona',
@@ -7911,6 +8426,7 @@
       <button class="mob-pu-btn" onclick="openDetail('${inc.id}')">View Details</button>
     `
 
+
             );
             m.on('click', () => mobHlCard(inc.id));
             mobMapMarkers[inc.id] = m;
@@ -7946,14 +8462,17 @@
       <div class="mob-map-inc-row">
         <span class="badge ${
 
+
             bc}">${emoji} ${esc(inc.type)}</span>
         <span class="mob-map-inc-time">${fmt(inc.occurred_at)}</span>
       </div>
       <div class="mob-map-inc-addr">${
 
+
             esc(inc.address)}</div>
       ${inc.district ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:${dc};margin-top:2px">${districtLabel(inc.district)}</div>` : ''}
     </div>`
+
 
             ;
         }).join('');
