@@ -4,7 +4,7 @@
 // Supabase Dashboard → Your Project → Settings → API
 // ─────────────────────────────────────────────────────────────
 const SUPABASE_URL      = "https://pyiwxjdzztqdnaljkwsc.supabase.co";       // e.g. https://abcdefgh.supabase.co
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5aXd4amR6enRxZG5hbGprd3NjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNjA4NzUsImV4cCI6MjA4ODczNjg3NX0.-4PiNOu9iIGkUed4SSWGOmaL8sPNnr2IVzRYygKmo6U";  // starts with eyJ...
+const SUPABASE_ANON_KEY = "sb_publishable_jCfqmvs2XV0hgF0CNnlqfw_UEkQhStD";  // starts with eyJ...
 
 // ─────────────────────────────────────────────────────────────
 // Email — approval emails are sent via the Supabase Edge Function
