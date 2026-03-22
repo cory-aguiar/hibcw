@@ -4313,6 +4313,7 @@
 
 
                 esc(a.sent_by_name || 'Captain')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);letter-spacing:.04em;margin-bottom:4px">${alertNumber(a)}</div>
           <div style="display:flex;gap:5px">
             <button data-alert-id="${
 
@@ -4449,6 +4450,7 @@
 
 
                 esc(a.sent_by_name || 'Admin')} · ${sentDate}${a.is_edited ? ' · <em>edited</em>' : ''}
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);letter-spacing:.04em;margin-top:2px">${alertNumber(a)}</div>
         </div>
         ${
 
@@ -4578,6 +4580,7 @@
 
 
                 esc(a.sent_by_name || 'Captain')} · ${sentDate}</span>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);letter-spacing:.04em;margin:2px 0">${alertNumber(a)}</div>
           <span>📦 Archived by ${esc(a.archived_by || 'Admin')} · ${archivedDate}</span>
         </div>
         <div style="display:flex;gap:6px">
@@ -4697,6 +4700,7 @@
 
 
                 esc(a.sent_by_name || 'Captain')} · ${sentDate}</span>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);letter-spacing:.04em;margin:2px 0">${alertNumber(a)}</div>
           <span>📦 Archived by ${esc(a.archived_by || 'Admin')} · ${archivedDate}</span>
         </div>
         <div style="display:flex;gap:5px">
@@ -5102,6 +5106,7 @@
 
 
                 esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);letter-spacing:.04em;margin-bottom:4px">${alertNumber(a)}</div>
           <div style="display:flex;gap:3px">
             <button onclick="archiveAdminAlert('${
 
@@ -7745,6 +7750,17 @@
         const d = new Date(inc.created_at);
         const ymd = d.getFullYear().toString() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
         return `INC-${ymd}-${inc.id.slice(-4).toUpperCase()}`;
+    }
+    function alertNumber(a) {
+        const d = new Date(a.created_at);
+        const ymd = d.getFullYear().toString() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+        const DIST_PREFIX = {
+            'hamakua':'D1','north-hilo':'D2','south-hilo':'D3','lower-puna':'D4',
+            'upper-puna':'D5','kau':'D6','south-kona':'D7','north-kona':'D8',
+            'north-kohala':'D9','island-wide':'DIW'
+        };
+        const prefix = DIST_PREFIX[a.district] || 'D0';
+        return `ALT-${prefix}-${ymd}-${a.id.slice(-4).toUpperCase()}`;
     }
     function esc(s) {
         const d = document.createElement('div');
@@ -8902,6 +8918,7 @@
 
 
                 esc(a.sent_by_name || 'Captain')} · ${sentDate}</span>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);letter-spacing:.04em;margin:2px 0">${alertNumber(a)}</div>
           <span>📦 Archived by ${esc(a.archived_by || 'Admin')} · ${archivedDate}</span>
         </div>
         <div style="display:flex;gap:6px">
@@ -9021,6 +9038,7 @@
 
 
                 esc(a.sent_by_name || 'Captain')} · ${sentDate}</span>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);letter-spacing:.04em;margin:2px 0">${alertNumber(a)}</div>
           <span>📦 Archived by ${esc(a.archived_by || 'Admin')} · ${archivedDate}</span>
         </div>
         <div style="display:flex;gap:5px">
@@ -9426,6 +9444,7 @@
 
 
                 esc(a.sent_by_name || 'Admin')} · ${fmt(a.created_at)}${a.is_edited ? ' · <em>edited</em>' : ''}</span>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate2);letter-spacing:.04em;margin-bottom:4px">${alertNumber(a)}</div>
           <div style="display:flex;gap:3px">
             <button onclick="archiveAdminAlert('${
 
@@ -12069,6 +12088,17 @@
         const d = new Date(inc.created_at);
         const ymd = d.getFullYear().toString() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
         return `INC-${ymd}-${inc.id.slice(-4).toUpperCase()}`;
+    }
+    function alertNumber(a) {
+        const d = new Date(a.created_at);
+        const ymd = d.getFullYear().toString() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+        const DIST_PREFIX = {
+            'hamakua':'D1','north-hilo':'D2','south-hilo':'D3','lower-puna':'D4',
+            'upper-puna':'D5','kau':'D6','south-kona':'D7','north-kona':'D8',
+            'north-kohala':'D9','island-wide':'DIW'
+        };
+        const prefix = DIST_PREFIX[a.district] || 'D0';
+        return `ALT-${prefix}-${ymd}-${a.id.slice(-4).toUpperCase()}`;
     }
     function esc(s) {
         const d = document.createElement('div');
