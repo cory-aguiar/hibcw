@@ -2645,6 +2645,7 @@
 
 
         esc(inc.type)}</div>
+        <div style=\"font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:var(--slate);letter-spacing:.04em;margin-bottom:2px\">${incidentNumber(inc)}</div>
         <div class="inc-addr"><span class="addr-line">${esc(inc.address)}</span>${inc.district ? `<span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:${DISTRICT_COLORS[inc.district] || 'var(--teal)'};letter-spacing:.03em;margin-top:1px">${districtLabel(inc.district)}</span>` : ''}</div>
         <div class="inc-meta">
           <span class="badge ${
@@ -2735,6 +2736,7 @@
         })();
 
         document.getElementById('detailBody').innerHTML = `
+    <div class="mf-row"><div class="mf-label">Incident #</div><div class="mf-val" style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--teal);letter-spacing:.05em">${incidentNumber(inc)}</div></div>
     <div class="mf-row"><div class="mf-label">Date &amp; Time</div><div class="mf-val">${fmtLong(inc.occurred_at)} &nbsp;${ageTag(inc.occurred_at)}</div></div>
     ${inc.district ? `<div class="mf-row"><div class="mf-label">District</div><div class="mf-val">${esc(districtLabel(inc.district))}</div></div>` : ''}
     ${captainHtml}
@@ -7701,6 +7703,11 @@
             hour: 'numeric',
             minute: '2-digit'
         });
+    }
+    function incidentNumber(inc) {
+        const d = new Date(inc.created_at);
+        const ymd = d.getFullYear().toString() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+        return `INC-${ymd}-${inc.id.slice(-4).toUpperCase()}`;
     }
     function esc(s) {
         const d = document.createElement('div');
