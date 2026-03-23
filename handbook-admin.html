@@ -279,6 +279,7 @@ body.light .hb-cover-sub { color: var(--slate); }
           <li><a href="#s8">8.10 Email Notifications</a></li>
           <li><a href="#s8">8.11 Where Alerts Appear Publicly</a></li>
           <li><a href="#s8">8.12 Diagnose Archive Tool</a></li>
+          <li><a href="#s8">8.13 Alert Reference Numbers</a></li>
         </ul>
       </li>
       <li><a href="#s9">9. Map View</a></li>
@@ -607,11 +608,24 @@ body.light .hb-cover-sub { color: var(--slate); }
 
     <div class="hb-h2">8.11 Where Alerts Appear Publicly</div>
     <ul class="hb-ul">
-      <li><strong>Slide-up banner</strong> — appears automatically on the public map page for alerts from the last 48 hours, with the type icon, district, message, and safety call buttons. Visitors can dismiss it once per session.</li>
-      <li><strong>Alerts tab / screen</strong> — the "📢 Alerts" tab in the desktop side panel and the Alerts screen on mobile show the full active alert feed, with type badge, district badge, and safety reminders on every card</li>
+      <li><strong>Slide-up banner</strong> — appears automatically on the public map page for alerts from the last 48 hours, with the type icon, district, message, and safety call buttons. Visitors can dismiss it once per session. The alert reference number appears in the banner meta line.</li>
+      <li><strong>Alerts tab / screen</strong> — the "📢 Alerts" tab in the desktop side panel and the Alerts screen on mobile show the full active alert feed, with type badge, district badge, alert reference number, and safety reminders on every card</li>
       <li><strong>Real-time</strong> — alerts appear instantly without the visitor needing to refresh</li>
       <li><strong>Archived alerts</strong> are automatically hidden from the public feed</li>
     </ul>
+
+    <div class="hb-h2">8.13 Alert Reference Numbers</div>
+    <p class="hb-p">Every district alert is automatically assigned a unique reference number in the format <code>ALT-D3-20260322-4A1B</code>. The number is derived from the district, the date the alert was sent, and the last 4 characters of the alert's database ID — no setup required, and all existing alerts get a number automatically.</p>
+    <div class="hb-table-wrap"><table class="hb-table">
+      <thead><tr><th>Part</th><th>Example</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>ALT</code></td><td>ALT</td><td>Identifies this as an alert (vs. <code>INC</code> for incidents)</td></tr>
+        <tr><td>District prefix</td><td>D3</td><td>D1–D9 for each district; <code>DIW</code> for island-wide alerts</td></tr>
+        <tr><td>Date</td><td>20260322</td><td>Date the alert was sent (YYYYMMDD)</td></tr>
+        <tr><td>Suffix</td><td>4A1B</td><td>Last 4 characters of the alert's unique database ID</td></tr>
+      </tbody>
+    </table></div>
+    <p class="hb-p">Alert numbers appear in the admin panel (Recent Alerts log, Active Alerts view, Archived Alerts view) and on the public-facing site (alert feed cards and the slide-up banner). Use them when referencing a specific alert in communications with law enforcement, in grant reports, or when coordinating across districts.</p>
 
     <div class="hb-h2">8.12 Diagnose Archive Tool <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.08em;background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;margin-left:6px">Superadmin Only</span></div>
     <p class="hb-p">If the archive button on alerts stops working, Superadmins can run the <strong>🔧 Diagnose Archive</strong> tool found in the Districts screen toolbar. It checks that the required database columns and indexes are in place and reports any issues. Run this if archiving produces an error or silently fails.</p>
