@@ -2492,6 +2492,7 @@ function showToast(ico, body, type='') {
 ═══════════════════════════════════════════════ */
 function fmt(iso){ return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); }
 function fmtLong(iso){ return new Date(iso).toLocaleString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'}); }
+function alertNumber(a){ const d=new Date(a.created_at); const ymd=d.getFullYear().toString()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); const DIST_PREFIX={'hamakua':'D1','north-hilo':'D2','south-hilo':'D3','lower-puna':'D4','upper-puna':'D5','kau':'D6','south-kona':'D7','north-kona':'D8','north-kohala':'D9','island-wide':'DIW'}; const prefix=DIST_PREFIX[a.district]||'D0'; return `ALT-${prefix}-${ymd}-${a.id.slice(-4).toUpperCase()}`; }
 function incidentNumber(inc){ const d=new Date(inc.created_at); const ymd=d.getFullYear().toString()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); return `INC-${ymd}-${inc.id.slice(-4).toUpperCase()}`; }
 function ageTag(iso){
   const mins=(Date.now()-new Date(iso))/60000;
@@ -2706,7 +2707,7 @@ function renderAlertFeed(alerts) {
       </div>
       <div class="alert-feed-msg">${escHtml(a.message)}</div>
       ${mediaHtml}
-      <div class="alert-feed-meta">👤 ${escHtml(a.sent_by_name||'HIBCW')} · ${date}${a.is_edited?' · <em>edited</em>':''}</div>
+      <div class="alert-feed-meta">👤 ${escHtml(a.sent_by_name||'HIBCW')} · ${date}${a.is_edited?' · <em>edited</em>':''} &nbsp;<span style="opacity:.7;letter-spacing:.04em">${alertNumber(a)}</span></div>
       ${isCritical2 ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
         <a href="tel:911" style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,45,45,.12);border:1px solid rgba(255,45,45,.3);border-radius:4px;padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:#ff6b6b;text-decoration:none">🚨 Call 911</a>
         <a href="tel:8089352100" style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.25);border-radius:4px;padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--teal);text-decoration:none">📞 HPD Non-Emergency</a>
@@ -2733,7 +2734,7 @@ function showLatestAlertBanner(alerts) {
   document.getElementById('alertBannerDistrict').textContent = label;
   document.getElementById('alertBannerDistrict').style.color = tm3.color;
   document.getElementById('alertBannerMsg').textContent = recent.message;
-  document.getElementById('alertBannerMeta').textContent = '👤 ' + (recent.sent_by_name||'HIBCW') + ' · ' + date;
+  document.getElementById('alertBannerMeta').textContent = '👤 ' + (recent.sent_by_name||'HIBCW') + ' · ' + date + '  ' + alertNumber(recent);
 
   // Show media if present
   let mediaEl = document.getElementById('alertBannerMedia');
