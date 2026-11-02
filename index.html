@@ -1603,11 +1603,8 @@ async function checkMemberEmail(val) {
   // Debounce — wait 600ms after user stops typing
   memberCheckTimer = setTimeout(async () => {
     if (!sb) return;
-    const {data, error} = await sb
-      .from('member_emails')
-      .select('email')
-      .eq('email', email)
-      .maybeSingle();
+    // Yes/no check — the member list itself is not readable by the public
+    const {data, error} = await sb.rpc('hibcw_is_member_email', { p_email: email });
     if (!error && data) {
       verifiedEmail = email;
       hint.textContent = '✅ Verified KIAA Member — your report will show a member badge.';

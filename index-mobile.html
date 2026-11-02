@@ -1919,7 +1919,8 @@ async function checkMemberEmail(val) {
   hint.textContent = 'Checking…';
   memberCheckTimer = setTimeout(async () => {
     if (!sb) return;
-    const {data, error} = await sb.from('member_emails').select('email').eq('email', email).maybeSingle();
+    // Yes/no check — the member list itself is not readable by the public
+    const {data, error} = await sb.rpc('hibcw_is_member_email', { p_email: email });
     if (!error && data) {
       verifiedEmail = email;
       hint.textContent = '✅ Verified KIAA Member — report will show a member badge.';

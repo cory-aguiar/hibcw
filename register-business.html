@@ -582,11 +582,9 @@ function onManualDistrictSelect(val) {
 async function lookupCaptain(districtId) {
     try {
         // Captain is an approved member whose full_name matches captain_name (same logic as admin)
-        const {data} = await sb.from('member_applications')
+        const {data} = await sb.from('public_captains')
             .select('full_name,captain_name')
-            .eq('district', districtId)
-            .eq('status','approved')
-            .not('captain_name','is',null);
+            .eq('district', districtId);
         if (data && data.length) {
             // Prefer exact captain match (full_name === captain_name)
             const exact = data.find(m =>

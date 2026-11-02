@@ -5739,30 +5739,24 @@
         btn.textContent = '⏳ Sending…';
 
         try {
-            // Step 1 — Create the Supabase Auth user (signUp with random temp password)
-            // If the user already exists this will fail gracefully — we just update the role record
-            const tempPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + 'A1!';
-            const {data: signUpData} = await sb.auth.signUp({
-                email,
-                password: tempPassword
-            });
-            const userId = signUpData?.user?.id || null;
-
-            // Step 2 — Upsert role record in admin_roles
-            const roleRecord = {
-                email,
-                role,
-                district: role === 'captain' ? district : null,
-                full_name: null,
-                ...(userId ? {
-                    user_id: userId
-                } : {})
-            };
-            const {error: roleErr} = await sb.from('admin_roles').upsert(roleRecord, {
-                onConflict: 'email'
+            // Step 1 — Create/update the role record (superadmin-only database function).
+            // If this person already has a login, the function links it automatically.
+            const {error: roleErr} = await sb.rpc('hibcw_upsert_role', {
+                p_email: email,
+                p_role: role,
+                p_district: role === 'captain' ? district : null
             });
             if (roleErr)
                 throw roleErr;
+
+            // Step 2 — Create the Supabase Auth user (signUp with random temp password).
+            // If the user already exists this fails harmlessly. New logins are linked
+            // to the role record by a database trigger.
+            const tempPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + 'A1!';
+            await sb.auth.signUp({
+                email,
+                password: tempPassword
+            });
 
             // Step 3 — Send password reset email (acts as the invite / set-password link)
             const {error: resetErr} = await sb.auth.resetPasswordForEmail(email, {

@@ -737,11 +737,9 @@
 
       // Query approved applications in this district that have a captain_name set
       const { data } = await sb
-        .from('member_applications')
+        .from('public_captains')
         .select('captain_name')
         .eq('district', districtValue)
-        .eq('status', 'approved')
-        .not('captain_name', 'is', null)
         .limit(1)
         .single();
 
@@ -801,11 +799,9 @@
         let captainName = captainCache[district] || null;
         if (captainName === undefined) {
           const { data } = await sb
-            .from('member_applications')
+            .from('public_captains')
             .select('captain_name')
             .eq('district', district)
-            .eq('status', 'approved')
-            .not('captain_name', 'is', null)
             .limit(1)
             .single();
           captainName = data?.captain_name?.trim() || null;
