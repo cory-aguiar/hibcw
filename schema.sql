@@ -557,3 +557,23 @@ create policy hibcw_media_delete on storage.objects
   for delete to authenticated
   using (bucket_id = 'incident-media' and public.hibcw_is_staff());
 
+
+-- ── 7. Member badge (set by the database, not the browser) ──────────
+create or replace function public.hibcw_set_member_badge()
+returns trigger
+language plpgsql security definer set search_path = public
+as $$
+begin
+  if not public.hibcw_is_staff() then
+    new.reporter_email     := nullif(lower(trim(new.reporter_email)), '');
+    new.is_verified_member := new.reporter_email is not null
+                              and public.hibcw_is_member_email(new.reporter_email);
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists hibcw_set_member_badge on public.incidents;
+create trigger hibcw_set_member_badge
+  before insert on public.incidents
+  for each row execute function public.hibcw_set_member_badge();

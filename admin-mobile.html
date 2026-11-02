@@ -5724,7 +5724,7 @@
             sb.from('member_emails').select('id,email,created_at'),
             sb.from('district_alerts').select('id,created_at').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
             sb.from('member_applications').select('id,email,created_at,status').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
-            sb.from('admin_users').select('id,district,role').not('role', 'is', null),
+            sb.from('admin_roles').select('id,district,role').not('role', 'is', null),
             sb.from('business_registry').select('id,submitted_at,status').gte('submitted_at', yearStart).lte('submitted_at', yearEnd + 'T23:59:59'),
             ]);
             const gm = d => new Date(d).getMonth();
@@ -10062,7 +10062,7 @@
             sb.from('member_emails').select('id,email,created_at'),
             sb.from('district_alerts').select('id,created_at').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
             sb.from('member_applications').select('id,email,created_at,status').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
-            sb.from('admin_users').select('id,district,role').not('role', 'is', null),
+            sb.from('admin_roles').select('id,district,role').not('role', 'is', null),
             sb.from('business_registry').select('id,submitted_at,status').gte('submitted_at', yearStart).lte('submitted_at', yearEnd + 'T23:59:59'),
             ]);
             const gm = d => new Date(d).getMonth();

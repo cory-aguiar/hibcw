@@ -5739,31 +5739,26 @@
         btn.textContent = '⏳ Sending…';
 
         try {
-            // Step 1 — Create/update the role record (superadmin-only database function).
-            // If this person already has a login, the function links it automatically.
-            const {error: roleErr} = await sb.rpc('hibcw_upsert_role', {
-                p_email: email,
-                p_role: role,
-                p_district: role === 'captain' ? district : null
+            // Superadmin-only server function (supabase/functions/invite-staff):
+            // creates/updates the role record and emails a set-password link.
+            // Accounts are never created from the browser, so public sign-ups can stay off.
+            const {data: sess} = await sb.auth.getSession();
+            const token = sess?.session?.access_token;
+            if (!token)
+                throw new Error('Your session expired — please sign in again.');
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/invite-staff`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    email,
+                    role,
+                    district: role === 'captain' ? district : null,
+                    redirectTo: window.location.origin + window.location.pathname
+                })
             });
-            if (roleErr)
-                throw roleErr;
-
-            // Step 2 — Create the Supabase Auth user (signUp with random temp password).
-            // If the user already exists this fails harmlessly. New logins are linked
-            // to the role record by a database trigger.
-            const tempPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + 'A1!';
-            await sb.auth.signUp({
-                email,
-                password: tempPassword
-            });
-
-            // Step 3 — Send password reset email (acts as the invite / set-password link)
-            const {error: resetErr} = await sb.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.href
-            });
-            if (resetErr)
-                throw resetErr;
+            const result = await res.json().catch(() => ({}));
+            if (!res.ok)
+                throw new Error(result.error || `Server error (${res.status})`);
 
             const roleLabel = role === 'superadmin' ? 'Superadmin' : role === 'captain' ? 'District Captain' : 'Admin';
             showToast('✅', `Invite sent to ${email} as ${roleLabel}. They'll receive a set-password email.`);
@@ -7210,7 +7205,7 @@
                 sb.from('member_emails').select('id,email,created_at'),
                 sb.from('district_alerts').select('id,created_at').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
                 sb.from('member_applications').select('id,email,created_at,status').gte('created_at', yearStart).lte('created_at', yearEnd + 'T23:59:59'),
-                sb.from('admin_users').select('id,district,role').not('role','is',null),
+                sb.from('admin_roles').select('id,district,role').not('role','is',null),
                 sb.from('business_registry').select('id,submitted_at,status').gte('submitted_at', yearStart).lte('submitted_at', yearEnd + 'T23:59:59'),
             ]);
 
