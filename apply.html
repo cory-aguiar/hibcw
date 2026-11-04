@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIBCW — Become a Member</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -24,8 +23,8 @@
         --slate: #7a8fa6;
         --slate2: #4a6070;
         --white: #eef3f8;
-        --border: rgba(0, 201, 167, .15);
-        --b2: rgba(255, 255, 255, .07);
+        --border: rgba(var(--teal-rgb), .15);
+        --b2: rgba(var(--tint-rgb),.07);
     }/* ── Light mode ───────────────────────────────────────────── */
 
     body.light {
@@ -38,7 +37,7 @@
         --slate: #4a5f72;
         --slate2: #7a95a8;
         --white: #0f1e2e;
-        --border: rgba(0, 122, 101, .2);
+        --border: rgba(var(--teal-rgb), .2);
         --b2: rgba(0, 0, 0, .1);
     }
 
@@ -49,7 +48,7 @@
 
     body.light header {
         background: linear-gradient(90deg, #dce8f5, #eaf1f8) !important;
-        border-bottom-color: rgba(0, 122, 101, .2) !important
+        border-bottom-color: rgba(var(--teal-rgb), .2) !important
     }
 
     body.light .back-btn {
@@ -58,8 +57,8 @@
     }
 
     body.light .back-btn:hover {
-        border-color: #007a65;
-        color: #007a65
+        border-color: var(--teal);
+        color: var(--teal)
     }
 
     body.light .benefit {
@@ -88,7 +87,7 @@
     }
 
     body.light .fld input:focus, body.light .fld textarea:focus {
-        border-color: #007a65 !important
+        border-color: var(--teal) !important
     }
 
     body.light .fld input::placeholder, body.light .fld textarea::placeholder {
@@ -96,8 +95,8 @@
     }
 
     body.light .disc {
-        background: rgba(0, 122, 101, .06);
-        border-color: rgba(0, 122, 101, .2)
+        background: rgba(var(--teal-rgb), .06);
+        border-color: rgba(var(--teal-rgb), .2)
     }
 
     body.light .page-footer {
@@ -117,12 +116,12 @@
 
     html, body {
         min-height: 100%;
-        font-family: 'IBM Plex Sans', sans-serif;
+        font-family: var(--font-body);
         background: var(--navy);
         color: var(--white)
     }/* ── Header ── */
     header {
-        background: linear-gradient(90deg, #0b1524, #111e30);
+        background: linear-gradient(90deg, var(--navy), var(--navy2));
         border-bottom: 1px solid var(--border);
         padding: 0 24px;
         height: 54px;
@@ -140,19 +139,18 @@
     
 
     .logo-name {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1rem;
+        font-family: var(--font-body);
+        font-size: 1.1875rem;
         font-weight: 700;
-        letter-spacing: .08em
+        letter-spacing: .01em
     }
 
     .logo-sub {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .55rem;
+        font-family: var(--font-body);
+        font-size: 0.875rem;
         color: var(--teal);
-        letter-spacing: .12em;
-        text-transform: uppercase
-    }
+        letter-spacing: .01em;
+        }
 
     .back-btn {
         background: none;
@@ -160,7 +158,7 @@
         border-radius: 4px;
         padding: 5px 13px;
         color: var(--slate);
-        font-size: .75rem;
+        font-size: 1rem;
         cursor: pointer;
         text-decoration: none;
         transition: all .2s;
@@ -187,15 +185,15 @@
     
 
     .page-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 2rem;
+        font-family: var(--font-body);
+        font-size: 2.2rem;
         font-weight: 700;
-        letter-spacing: .05em;
+        letter-spacing: .01em;
         margin-bottom: 10px
     }
 
     .page-sub {
-        font-size: .88rem;
+        font-size: 1.0625rem;
         color: var(--slate);
         line-height: 1.7;
         max-width: 480px;
@@ -217,21 +215,21 @@
     }
 
     .benefit-icon {
-        font-size: 1.4rem;
+        font-size: 1.54rem;
         margin-bottom: 8px
     }
 
     .benefit-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: .82rem;
+        font-family: var(--font-body);
+        font-size: 1.0625rem;
         font-weight: 700;
-        letter-spacing: .06em;
+        letter-spacing: .01em;
         color: var(--white);
         margin-bottom: 4px
     }
 
     .benefit-desc {
-        font-size: .72rem;
+        font-size: 0.9375rem;
         color: var(--slate);
         line-height: 1.5
     }/* ── Form card ── */
@@ -243,10 +241,10 @@
     }
 
     .form-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1.1rem;
+        font-family: var(--font-body);
+        font-size: 1.265rem;
         font-weight: 700;
-        letter-spacing: .06em;
+        letter-spacing: .01em;
         margin-bottom: 24px;
         padding-bottom: 14px;
         border-bottom: 1px solid var(--b2);
@@ -261,25 +259,25 @@
 
     .fld label {
         display: block;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .58rem;
-        letter-spacing: .1em;
-        text-transform: uppercase;
+        font-family: var(--font-body);
+        font-size: 0.875rem;
+        letter-spacing: .01em;
+        
         color: var(--slate);
         margin-bottom: 6px;
     }
 
     .fld input, .fld textarea {
         width: 100%;
-        background: rgba(255, 255, 255, .04);
+        background: rgba(var(--tint-rgb),.04);
         border: 1px solid var(--b2);
         border-radius: 5px;
         padding: 10px 13px;
         color: var(--white);
-        font-size: .88rem;
+        font-size: 1.0625rem;
         outline: none;
         transition: border-color .2s;
-        font-family: 'IBM Plex Sans', sans-serif;
+        font-family: var(--font-body);
     }
 
     .fld input:focus, .fld textarea:focus {
@@ -300,8 +298,8 @@
     }
 
     select option {
-        background: #1a2b45;
-        color: #c8d8e8
+        background: var(--navy3);
+        color: var(--white)
     }
 
     .fld-row {
@@ -320,13 +318,13 @@
         border: none;
         border-radius: 6px;
         cursor: pointer;
-        background: linear-gradient(135deg, var(--teal), #00a589);
-        color: #0b1524;
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1rem;
+        background: linear-gradient(135deg, var(--teal), var(--teal2));
+        color:var(--on-accent);
+        font-family: var(--font-body);
+        font-size: 1.1875rem;
         font-weight: 700;
-        letter-spacing: .1em;
-        text-transform: uppercase;
+        letter-spacing: .01em;
+        
         transition: filter .2s;
         margin-top: 8px;
     }
@@ -341,12 +339,12 @@
         filter: none
     }/* ── Disclaimer ── */
     .disc {
-        background: rgba(0, 201, 167, .05);
-        border: 1px solid rgba(0, 201, 167, .15);
+        background: rgba(var(--teal-rgb), .05);
+        border: 1px solid rgba(var(--teal-rgb), .15);
         border-radius: 6px;
         padding: 12px 14px;
         margin-bottom: 20px;
-        font-size: .75rem;
+        font-size: 1rem;
         color: var(--slate);
         line-height: 1.6;
     }/* ── Success state ── */
@@ -357,20 +355,20 @@
     }
 
     .success-icon {
-        font-size: 3rem;
+        font-size: 3.3rem;
         margin-bottom: 16px
     }
 
     .success-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1.6rem;
+        font-family: var(--font-body);
+        font-size: 1.76rem;
         font-weight: 700;
         color: var(--teal);
         margin-bottom: 10px
     }
 
     .success-msg {
-        font-size: .88rem;
+        font-size: 1.0625rem;
         color: var(--slate);
         line-height: 1.7;
         max-width: 400px;
@@ -379,7 +377,7 @@
     .page-footer {
         text-align: center;
         padding: 20px 24px;
-        font-size: .72rem;
+        font-size: 0.9375rem;
         color: var(--slate2);
         border-top: 1px solid var(--b2);
         margin-top: 40px;
@@ -412,6 +410,7 @@
         }
     }
     </style>
+<link rel="stylesheet" href="hibcw-theme.css">
 </head>
 <body>
 
@@ -424,7 +423,7 @@
             </div>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
-            <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
+            <button id="themeToggle" onclick="toggleTheme()" title="Switch between light and dark mode" aria-label="Switch between light and dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:1.125rem;color:var(--slate);transition:all .2s">🌙</button>
             <a href="index.html" class="back-btn">← Back to Map</a>
         </div>
     </header>
@@ -537,9 +536,9 @@
                 <label>
                     Business District 
                     <span class="req">*</span>
-                    <span id="aDistrictAutoLabel" style="display:none;font-weight:300;text-transform:none;letter-spacing:0;font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;color:#00c9a7;margin-left:6px">✓ auto-detected</span>
+                    <span id="aDistrictAutoLabel" style="display:none;font-weight:300;text-transform:none;letter-spacing:0;font-family:var(--font-body);font-size:1rem;color:var(--teal);margin-left:6px">✓ auto-detected</span>
                 </label>
-                <select id="aDistrict" onchange="onApplyDistrictManualChange(this.value)" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:10px 13px;color:var(--white);font-size:.88rem;outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;-webkit-appearance:none">
+                <select id="aDistrict" onchange="onApplyDistrictManualChange(this.value)" style="width:100%;background:rgba(var(--tint-rgb),.04);border:1px solid rgba(var(--tint-rgb),.07);border-radius:5px;padding:10px 13px;color:var(--white);font-size:1.0625rem;outline:none;transition:border-color .2s;font-family:var(--font-body);-webkit-appearance:none">
                     <option value="">— Select your district…</option>
                     <option value="hamakua">District 1 - Hāmākua</option>
                     <option value="north-hilo">District 2 - North Hilo</option>
@@ -552,8 +551,8 @@
                     <option value="north-kohala">District 9 - North Kohala</option>
                 </select>
                 <!-- Captain preview shown after district selection -->
-                <div id="captainPreview" style="display:none;margin-top:8px;padding:9px 12px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.25);border-radius:5px;font-size:.78rem;color:rgba(238,243,248,.85);line-height:1.5">
-                  👮 Your district captain is <strong id="captainPreviewName" style="color:#00c9a7"></strong>
+                <div id="captainPreview" style="display:none;margin-top:8px;padding:9px 12px;background:rgba(var(--teal-rgb),.08);border:1px solid rgba(var(--teal-rgb),.25);border-radius:5px;font-size:1rem;color:rgba(var(--ink-rgb),.85);line-height:1.5">
+                  👮 Your district captain is <strong id="captainPreviewName" style="color:var(--teal)"></strong>
                 </div>
             </div>
 
@@ -578,7 +577,7 @@
                 </div>
             <a href="https://instagram.com/hibcw" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(225,48,108,.08);border:1px solid rgba(225,48,108,.25);border-radius:7px;padding:9px 16px;text-decoration:none;margin-bottom:16px;transition:all .15s" onmouseover="this.style.background='rgba(225,48,108,.15)';this.style.borderColor='rgba(225,48,108,.5)'" onmouseout="this.style.background='rgba(225,48,108,.08)';this.style.borderColor='rgba(225,48,108,.25)'">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-              <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:#e1306c;font-weight:600">Follow us @hibcw</span>
+              <span style="font-family:var(--font-body);font-size:0.9375rem;color:#e1306c;font-weight:600">Follow us @hibcw</span>
             </a>
             <a href="index.html" class="submit-btn" style="display:inline-block;width:auto;padding:12px 32px;text-decoration:none">
                   ← Return to Map
@@ -680,7 +679,7 @@
         const sel = document.getElementById('aDistrict');
         if (!districtId || !sel) return;
         sel.value = districtId;
-        sel.style.borderColor = 'rgba(0,201,167,.5)';
+        sel.style.borderColor = 'rgba(var(--teal-rgb),.5)';
         document.getElementById('aDistrictAutoLabel').style.display = 'inline';
         applyAutoDetected = true;
         lookupDistrictCaptain(districtId);
@@ -843,16 +842,21 @@
     function toggleTheme() {
         const isLight = document.body.classList.toggle('light');
         localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
-        document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+        document.getElementById('themeToggle').textContent = isLight ? '🌙' : '☀️';
     }
     (function initTheme() {
         const saved = localStorage.getItem('hibcw-theme');
-        if (saved === 'light') {
+        if (saved !== 'dark') {
             document.body.classList.add('light');
             document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.getElementById('themeToggle');
                 if (btn)
-                    btn.textContent = '☀️';
+                    btn.textContent = '🌙';
+            });
+        } else {
+            document.addEventListener('DOMContentLoaded', () => {
+                const btn = document.getElementById('themeToggle');
+                if (btn) btn.textContent = '☀️';
             });
         }
     })();

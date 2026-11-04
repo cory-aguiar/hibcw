@@ -4,74 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIBCW — Register Your Business</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    :root{--navy:#0b1524;--navy2:#111e30;--navy3:#18293f;--teal:#00c9a7;--gold:#f5a623;--red:#e8415a;--slate:#7a8fa6;--slate2:#4a6070;--white:#eef3f8;--border:rgba(0,201,167,.15);--b2:rgba(255,255,255,.07)}
-    body.light{--navy:#f0f4f8;--navy2:#ffffff;--navy3:#e8eef5;--teal:#007a65;--gold:#b87c0a;--red:#c0273d;--slate:#4a5f72;--slate2:#7a95a8;--white:#0f1e2e;--border:rgba(0,122,101,.2);--b2:rgba(0,0,0,.1);background:#f0f4f8;color:#0f1e2e}
-    body.light header{background:linear-gradient(90deg,#dce8f5,#eaf1f8)!important;border-bottom-color:rgba(0,122,101,.2)!important}
-    body.light .back-btn{border-color:rgba(0,0,0,.15);color:#4a5f72}
-    body.light .back-btn:hover{border-color:#007a65;color:#007a65}
-    body.light .benefit{background:#fff;border-color:rgba(0,0,0,.1)}
-    body.light .benefit-title{color:#0f1e2e}
-    body.light .form-card{background:#fff;border-color:rgba(0,0,0,.1)}
-    body.light .form-title{border-bottom-color:rgba(0,0,0,.1);color:#0f1e2e}
-    body.light .fld input,body.light .fld textarea{background:rgba(0,0,0,.04)!important;border-color:rgba(0,0,0,.15)!important;color:#0f1e2e!important}
-    body.light .fld input:focus,body.light .fld textarea:focus{border-color:#007a65!important}
-    body.light .fld input::placeholder,body.light .fld textarea::placeholder{color:#7a95a8!important}
-    body.light .disc{background:rgba(0,122,101,.06);border-color:rgba(0,122,101,.2)}
-    body.light .page-footer{border-top-color:rgba(0,0,0,.1)}
-    body.light select{background:#fff!important;color:#0f1e2e!important;border-color:rgba(0,0,0,.15)!important}
-    body.light .captain-preview{background:rgba(0,122,101,.06);border-color:rgba(0,122,101,.25)}
-    html,body{min-height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--white)}
-    header{background:linear-gradient(90deg,#0b1524,#111e30);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between}
+    :root{--navy:#0b1524;--navy2:#111e30;--navy3:#18293f;--teal:#00c9a7;--gold:#f5a623;--red:#e8415a;--slate:#7a8fa6;--slate2:#4a6070;--white:#eef3f8;--border:rgba(var(--teal-rgb),.15);--b2:rgba(var(--tint-rgb),.07)}
+    body.light{--navy:#f0f4f8;--navy2:#ffffff;--navy3:#e8eef5;--teal:#007a65;--gold:#b87c0a;--red:#c0273d;--slate:#4a5f72;--slate2:#7a95a8;--white:#0f1e2e;--border:rgba(var(--teal-rgb),.2);--b2:rgba(0,0,0,.1);background:#f0f4f8;color:#0f1e2e}
+    html,body{min-height:100%;font-family:var(--font-body);background:var(--navy);color:var(--white)}
+    header{background:linear-gradient(90deg,var(--navy),var(--navy2));border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between}
     .hd-left{display:flex;align-items:center;gap:10px}
     
-    .logo-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.08em}
-    .logo-sub{font-family:'IBM Plex Mono',monospace;font-size:.55rem;color:var(--teal);letter-spacing:.12em;text-transform:uppercase}
-    .back-btn{background:none;border:1px solid var(--b2);border-radius:4px;padding:5px 13px;color:var(--slate);font-size:.75rem;cursor:pointer;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:5px}
+    .logo-name{font-family:var(--font-body);font-size:1.1875rem;font-weight:700;letter-spacing:.01em}
+    .logo-sub{font-family:var(--font-body);font-size:0.875rem;color:var(--teal);letter-spacing:.01em;}
+    .back-btn{background:none;border:1px solid var(--b2);border-radius:4px;padding:5px 13px;color:var(--slate);font-size:1rem;cursor:pointer;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:5px}
     .back-btn:hover{border-color:var(--teal);color:var(--teal)}
     .page{max-width:640px;margin:0 auto;padding:40px 24px 60px}
     .page-hero{text-align:center;margin-bottom:40px}
     
-    .page-title{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;letter-spacing:.05em;margin-bottom:10px}
-    .page-sub{font-size:.88rem;color:var(--slate);line-height:1.7;max-width:480px;margin:0 auto}
+    .page-title{font-family:var(--font-body);font-size:2.2rem;font-weight:700;letter-spacing:.01em;margin-bottom:10px}
+    .page-sub{font-size:1.0625rem;color:var(--slate);line-height:1.7;max-width:480px;margin:0 auto}
     .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:36px}
     .benefit{background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:16px 14px;text-align:center}
-    .benefit-icon{font-size:1.4rem;margin-bottom:8px}
-    .benefit-title{font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.06em;color:var(--white);margin-bottom:4px}
-    .benefit-desc{font-size:.72rem;color:var(--slate);line-height:1.5}
+    .benefit-icon{font-size:1.54rem;margin-bottom:8px}
+    .benefit-title{font-family:var(--font-body);font-size:1.0625rem;font-weight:700;letter-spacing:.01em;color:var(--white);margin-bottom:4px}
+    .benefit-desc{font-size:0.9375rem;color:var(--slate);line-height:1.5}
     .form-card{background:var(--navy2);border:1px solid var(--b2);border-radius:12px;padding:32px}
-    .form-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.06em;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:8px}
-    .sec-label{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:24px 0 16px;padding-bottom:6px;border-bottom:1px solid rgba(0,201,167,.15)}
+    .form-title{font-family:var(--font-body);font-size:1.265rem;font-weight:700;letter-spacing:.01em;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:8px}
+    .sec-label{font-family:var(--font-body);font-size:0.875rem;letter-spacing:.01em;color:var(--teal);margin:24px 0 16px;padding-bottom:6px;border-bottom:1px solid rgba(var(--teal-rgb),.15)}
     .fld{margin-bottom:18px}
-    .fld label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:6px}
-    .fld input,.fld textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:5px;padding:10px 13px;color:var(--white);font-size:.88rem;outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif}
+    .fld label{display:block;font-family:var(--font-body);font-size:0.875rem;letter-spacing:.01em;color:var(--slate);margin-bottom:6px}
+    .fld input,.fld textarea{width:100%;background:rgba(var(--tint-rgb),.04);border:1px solid var(--b2);border-radius:5px;padding:10px 13px;color:var(--white);font-size:1.0625rem;outline:none;transition:border-color .2s;font-family:var(--font-body)}
     .fld input:focus,.fld textarea:focus{border-color:var(--teal)}
     .fld input.err,.fld textarea.err{border-color:var(--red)}
     .fld input::placeholder,.fld textarea::placeholder{color:var(--slate2)}
     .fld textarea{resize:vertical;min-height:80px}
     .fld-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .req{color:var(--red);margin-left:2px}
-    select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:5px;padding:10px 13px;color:var(--white);font-size:.88rem;outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif;-webkit-appearance:none}
+    select{width:100%;background:rgba(var(--tint-rgb),.04);border:1px solid var(--b2);border-radius:5px;padding:10px 13px;color:var(--white);font-size:1.0625rem;outline:none;transition:border-color .2s;font-family:var(--font-body);-webkit-appearance:none}
     select:focus{border-color:var(--teal)}
-    select option{background:#1a2b45;color:#c8d8e8}
-    .submit-btn{width:100%;padding:13px;border:none;border-radius:6px;cursor:pointer;background:linear-gradient(135deg,var(--teal),#00a589);color:#0b1524;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:filter .2s;margin-top:8px}
+    select option{background:var(--navy3);color:var(--white)}
+    .submit-btn{width:100%;padding:13px;border:none;border-radius:6px;cursor:pointer;background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--on-accent);font-family:var(--font-body);font-size:1.1875rem;font-weight:700;letter-spacing:.01em;transition:filter .2s;margin-top:8px}
     .submit-btn:hover{filter:brightness(1.1)}
     .submit-btn:disabled{opacity:.5;cursor:not-allowed;filter:none}
-    .disc{background:rgba(0,201,167,.05);border:1px solid rgba(0,201,167,.15);border-radius:6px;padding:12px 14px;margin-bottom:20px;font-size:.75rem;color:var(--slate);line-height:1.6}
-    .captain-preview{display:none;background:rgba(0,201,167,.07);border:1px solid rgba(0,201,167,.2);border-radius:6px;padding:10px 14px;margin-top:8px;font-size:.8rem;color:var(--teal)}
+    .disc{background:rgba(var(--teal-rgb),.05);border:1px solid rgba(var(--teal-rgb),.15);border-radius:6px;padding:12px 14px;margin-bottom:20px;font-size:1rem;color:var(--slate);line-height:1.6}
+    .captain-preview{display:none;background:rgba(var(--teal-rgb),.07);border:1px solid rgba(var(--teal-rgb),.2);border-radius:6px;padding:10px 14px;margin-top:8px;font-size:1rem;color:var(--teal)}
     .success-box{text-align:center;padding:40px 0;display:none}
-    .success-icon{font-size:3rem;margin-bottom:16px}
-    .success-title{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:var(--teal);margin-bottom:10px}
-    .success-msg{font-size:.88rem;color:var(--slate);line-height:1.7;max-width:400px;margin:0 auto 24px}
-    .page-footer{text-align:center;padding:20px 24px;font-size:.72rem;color:var(--slate2);border-top:1px solid var(--b2);margin-top:40px}
+    .success-icon{font-size:3.3rem;margin-bottom:16px}
+    .success-title{font-family:var(--font-body);font-size:1.76rem;font-weight:700;color:var(--teal);margin-bottom:10px}
+    .success-msg{font-size:1.0625rem;color:var(--slate);line-height:1.7;max-width:400px;margin:0 auto 24px}
+    .page-footer{text-align:center;padding:20px 24px;font-size:0.9375rem;color:var(--slate2);border-top:1px solid var(--b2);margin-top:40px}
     .page-footer a{color:var(--slate);text-decoration:none}
     .page-footer a:hover{color:var(--teal)}
     @media(max-width:600px){.benefits{grid-template-columns:1fr}.fld-row{grid-template-columns:1fr}.form-card{padding:20px}.page{padding:24px 16px 40px}}
     </style>
+<link rel="stylesheet" href="hibcw-theme.css">
 </head>
 <body>
 
@@ -84,7 +70,7 @@
         </div>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-        <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
+        <button id="themeToggle" onclick="toggleTheme()" title="Switch between light and dark mode" aria-label="Switch between light and dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:1.125rem;color:var(--slate);transition:all .2s">🌙</button>
         <a href="index.html" class="back-btn">← Back to Map</a>
     </div>
 </header>
@@ -200,15 +186,15 @@
         <!-- District display -->
         <div class="fld" id="districtDisplayWrap" style="display:none">
             <label>District (Auto-Detected) ✓</label>
-            <div id="districtDisplay" style="background:rgba(0,201,167,.08);border:1.5px solid rgba(0,201,167,.4);border-radius:5px;padding:11px 13px;font-size:.9rem;font-weight:600;color:var(--teal);display:flex;align-items:center;gap:8px">
-                <span style="font-size:1.1rem">📍</span><span id="districtDisplayText">Detecting…</span>
+            <div id="districtDisplay" style="background:rgba(var(--teal-rgb),.08);border:1.5px solid rgba(var(--teal-rgb),.4);border-radius:5px;padding:11px 13px;font-size:1.125rem;font-weight:600;color:var(--teal);display:flex;align-items:center;gap:8px">
+                <span style="font-size:1.265rem">📍</span><span id="districtDisplayText">Detecting…</span>
             </div>
-            <div id="captainPreview" style="font-size:.76rem;color:var(--slate);margin-top:6px;padding-left:2px"></div>
+            <div id="captainPreview" style="font-size:1rem;color:var(--slate);margin-top:6px;padding-left:2px"></div>
         </div>
 
         <!-- Fallback: manual district select (shown if geocoding fails) -->
         <div class="fld" id="districtFallbackWrap" style="display:none">
-            <label>District <span class="req">*</span> <span style="font-weight:300;text-transform:none;letter-spacing:0;font-family:'IBM Plex Sans',sans-serif;color:var(--slate)">(please select your district)</span></label>
+            <label>District <span class="req">*</span> <span style="font-weight:300;text-transform:none;letter-spacing:0;font-family:var(--font-body);color:var(--slate)">(please select your district)</span></label>
             <select id="bDistrictFallback" onchange="onManualDistrictSelect(this.value)">
                 <option value="">Select your district…</option>
                 <option value="hamakua">District 1 — Hāmākua</option>
@@ -227,7 +213,7 @@
         <div class="sec-label" style="margin-top:28px">Mailing Address</div>
 
         <div class="fld" style="margin-bottom:14px">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:.82rem;font-family:'IBM Plex Sans',sans-serif;color:var(--slate)">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:1.0625rem;font-family:var(--font-body);color:var(--slate)">
                 <input type="checkbox" id="sameAsPhysical" checked onchange="toggleSameAsPhysical()" style="width:15px;height:15px;accent-color:var(--teal);cursor:pointer;flex-shrink:0">
                 Same as physical address
             </label>
@@ -277,7 +263,7 @@
             <textarea id="bNotes" placeholder="Anything else you'd like your District Captain to know…"></textarea>
         </div>
 
-        <div id="errMsg" style="display:none;background:rgba(232,65,90,.1);border:1px solid rgba(232,65,90,.3);border-radius:5px;padding:10px 14px;font-size:.8rem;color:var(--red);margin-bottom:14px"></div>
+        <div id="errMsg" style="display:none;background:rgba(var(--red-rgb),.1);border:1px solid rgba(var(--red-rgb),.3);border-radius:5px;padding:10px 14px;font-size:1rem;color:var(--red);margin-bottom:14px"></div>
 
         <button class="submit-btn" id="submitBtn" onclick="submitRegistration()">🏢 Register My Business</button>
     </div>
@@ -290,80 +276,80 @@
 
         <a href="https://instagram.com/hibcw" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(225,48,108,.08);border:1px solid rgba(225,48,108,.25);border-radius:7px;padding:9px 16px;text-decoration:none;margin-bottom:28px;transition:all .15s" onmouseover="this.style.background='rgba(225,48,108,.15)';this.style.borderColor='rgba(225,48,108,.5)'" onmouseout="this.style.background='rgba(225,48,108,.08)';this.style.borderColor='rgba(225,48,108,.25)'">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:#e1306c;font-weight:600">Follow us @hibcw</span>
+          <span style="font-family:var(--font-body);font-size:0.9375rem;color:#e1306c;font-weight:600">Follow us @hibcw</span>
         </a>
 
         <!-- What's in the packet -->
         <div style="text-align:left;background:var(--navy2);border:1px solid var(--b2);border-radius:12px;overflow:hidden;margin-bottom:16px;">
             <div style="padding:18px 22px 14px;border-bottom:1px solid var(--b2);">
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:5px;">What to expect</div>
-                <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);">Your Member Packet</div>
-                <div style="font-size:.8rem;color:var(--slate);margin-top:4px;line-height:1.6;">Once approved, your packet will be mailed to your business containing:</div>
+                <div style="font-family:var(--font-body);font-size:0.875rem;letter-spacing:.01em;color:var(--teal);margin-bottom:5px;">What to expect</div>
+                <div style="font-family:var(--font-body);font-size:1.265rem;font-weight:700;color:var(--white);">Your Member Packet</div>
+                <div style="font-size:1rem;color:var(--slate);margin-top:4px;line-height:1.6;">Once approved, your packet will be mailed to your business containing:</div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;">
                 <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);border-right:1px solid var(--b2);">
-                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">✉️</span>
-                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Welcome Letter</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">From your District Captain</div></div>
+                    <span style="font-size:1.1875rem;flex-shrink:0;margin-top:1px;">✉️</span>
+                    <div><div style="font-size:1.0625rem;font-weight:500;color:var(--white);margin-bottom:2px;">Welcome Letter</div><div style="font-size:0.9375rem;color:var(--slate);line-height:1.4;">From your District Captain</div></div>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);">
-                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">🏅</span>
-                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Membership Certificate</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">Personalized for your business</div></div>
+                    <span style="font-size:1.1875rem;flex-shrink:0;margin-top:1px;">🏅</span>
+                    <div><div style="font-size:1.0625rem;font-weight:500;color:var(--white);margin-bottom:2px;">Membership Certificate</div><div style="font-size:0.9375rem;color:var(--slate);line-height:1.4;">Personalized for your business</div></div>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);border-right:1px solid var(--b2);">
-                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">📍</span>
-                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">District Flyer</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">Color-coded for your district</div></div>
+                    <span style="font-size:1.1875rem;flex-shrink:0;margin-top:1px;">📍</span>
+                    <div><div style="font-size:1.0625rem;font-weight:500;color:var(--white);margin-bottom:2px;">District Flyer</div><div style="font-size:0.9375rem;color:var(--slate);line-height:1.4;">Color-coded for your district</div></div>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);">
-                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">📋</span>
-                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Program Overview</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">How HIBCW works and how to use it</div></div>
+                    <span style="font-size:1.1875rem;flex-shrink:0;margin-top:1px;">📋</span>
+                    <div><div style="font-size:1.0625rem;font-weight:500;color:var(--white);margin-bottom:2px;">Program Overview</div><div style="font-size:0.9375rem;color:var(--slate);line-height:1.4;">How HIBCW works and how to use it</div></div>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);border-right:1px solid var(--b2);">
-                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">🚨</span>
-                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Incident Reporting Guide</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">Step-by-step how to submit a report</div></div>
+                    <span style="font-size:1.1875rem;flex-shrink:0;margin-top:1px;">🚨</span>
+                    <div><div style="font-size:1.0625rem;font-weight:500;color:var(--white);margin-bottom:2px;">Incident Reporting Guide</div><div style="font-size:0.9375rem;color:var(--slate);line-height:1.4;">Step-by-step how to submit a report</div></div>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-bottom:1px solid var(--b2);">
-                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">⚡</span>
-                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Quick Reference Guide</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">What to report, when to call 911</div></div>
+                    <span style="font-size:1.1875rem;flex-shrink:0;margin-top:1px;">⚡</span>
+                    <div><div style="font-size:1.0625rem;font-weight:500;color:var(--white);margin-bottom:2px;">Quick Reference Guide</div><div style="font-size:0.9375rem;color:var(--slate);line-height:1.4;">What to report, when to call 911</div></div>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;border-right:1px solid var(--b2);">
-                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">📇</span>
-                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Emergency Contact Card</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">Wallet-size with your Captain's contact</div></div>
+                    <span style="font-size:1.1875rem;flex-shrink:0;margin-top:1px;">📇</span>
+                    <div><div style="font-size:1.0625rem;font-weight:500;color:var(--white);margin-bottom:2px;">Emergency Contact Card</div><div style="font-size:0.9375rem;color:var(--slate);line-height:1.4;">Wallet-size with your Captain's contact</div></div>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 22px;">
-                    <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">📌</span>
-                    <div><div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:2px;">Breakroom QR Flyer</div><div style="font-size:.72rem;color:var(--slate);line-height:1.4;">For staff to post and scan — see below</div></div>
+                    <span style="font-size:1.1875rem;flex-shrink:0;margin-top:1px;">📌</span>
+                    <div><div style="font-size:1.0625rem;font-weight:500;color:var(--white);margin-bottom:2px;">Breakroom QR Flyer</div><div style="font-size:0.9375rem;color:var(--slate);line-height:1.4;">For staff to post and scan — see below</div></div>
                 </div>
             </div>
         </div>
 
         <!-- Staff / Reporting Members -->
-        <div style="text-align:left;background:var(--navy2);border:1px solid rgba(245,166,35,.2);border-radius:12px;overflow:hidden;margin-bottom:24px;">
+        <div style="text-align:left;background:var(--navy2);border:1px solid rgba(var(--gold-rgb),.2);border-radius:12px;overflow:hidden;margin-bottom:24px;">
             <div style="padding:18px 22px 14px;border-bottom:1px solid var(--b2);">
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">For your staff</div>
-                <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);">Encourage Your Team to Register</div>
-                <div style="font-size:.8rem;color:var(--slate);margin-top:4px;line-height:1.6;">Your business is registered — but your employees can each sign up individually as reporting members. The breakroom flyer in your packet makes this easy.</div>
+                <div style="font-family:var(--font-body);font-size:0.875rem;letter-spacing:.01em;color:var(--gold);margin-bottom:5px;">For your staff</div>
+                <div style="font-family:var(--font-body);font-size:1.265rem;font-weight:700;color:var(--white);">Encourage Your Team to Register</div>
+                <div style="font-size:1rem;color:var(--slate);margin-top:4px;line-height:1.6;">Your business is registered — but your employees can each sign up individually as reporting members. The breakroom flyer in your packet makes this easy.</div>
             </div>
             <div style="padding:16px 22px 6px;">
                 <div style="display:flex;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--b2);">
-                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;">🏢</div>
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(var(--teal-rgb),.12);border:1px solid rgba(var(--teal-rgb),.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.0625rem;">🏢</div>
                     <div>
-                        <div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:3px;">Registered Business <span style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;background:rgba(0,201,167,.1);color:var(--teal);border:1px solid rgba(0,201,167,.25);border-radius:3px;padding:1px 6px;vertical-align:middle;">That's you</span></div>
-                        <div style="font-size:.78rem;color:var(--slate);line-height:1.6;">Your business is on record with KIAA and connected to your District Captain. You receive the Member Packet. Your business name and contact info is kept within the admin system — it is <span style="color:var(--white);">not displayed publicly</span>.</div>
+                        <div style="font-size:1.0625rem;font-weight:500;color:var(--white);margin-bottom:3px;">Registered Business <span style="font-family:var(--font-body);font-size:0.875rem;background:rgba(var(--teal-rgb),.1);color:var(--teal);border:1px solid rgba(var(--teal-rgb),.25);border-radius:3px;padding:1px 6px;vertical-align:middle;">That's you</span></div>
+                        <div style="font-size:1rem;color:var(--slate);line-height:1.6;">Your business is on record with KIAA and connected to your District Captain. You receive the Member Packet. Your business name and contact info is kept within the admin system — it is <span style="color:var(--white);">not displayed publicly</span>.</div>
                     </div>
                 </div>
                 <div style="display:flex;gap:12px;margin-bottom:16px;">
-                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;">✅</div>
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(var(--gold-rgb),.1);border:1px solid rgba(var(--gold-rgb),.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.0625rem;">✅</div>
                     <div>
-                        <div style="font-size:.82rem;font-weight:500;color:var(--white);margin-bottom:3px;">Reporting Member <span style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 6px;vertical-align:middle;">Staff signup</span></div>
-                        <div style="font-size:.78rem;color:var(--slate);line-height:1.6;">Individual employees who sign up via the QR code in your breakroom. They do <span style="color:var(--white);">not</span> receive a packet — that belongs to the business. Their name is collected for verification but is <span style="color:var(--white);">never shown publicly</span>. Once approved, they earn a <span style="color:var(--teal);">✅ verified badge</span> on any incident reports they submit.</div>
+                        <div style="font-size:1.0625rem;font-weight:500;color:var(--white);margin-bottom:3px;">Reporting Member <span style="font-family:var(--font-body);font-size:0.875rem;background:rgba(var(--gold-rgb),.1);color:var(--gold);border:1px solid rgba(var(--gold-rgb),.25);border-radius:3px;padding:1px 6px;vertical-align:middle;">Staff signup</span></div>
+                        <div style="font-size:1rem;color:var(--slate);line-height:1.6;">Individual employees who sign up via the QR code in your breakroom. They do <span style="color:var(--white);">not</span> receive a packet — that belongs to the business. Their name is collected for verification but is <span style="color:var(--white);">never shown publicly</span>. Once approved, they earn a <span style="color:var(--teal);">✅ verified badge</span> on any incident reports they submit.</div>
                     </div>
                 </div>
             </div>
             <div style="padding:0 22px 18px;">
-                <a href="apply.html" style="display:flex;align-items:center;justify-content:center;width:100%;padding:11px;border-radius:6px;cursor:pointer;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;box-sizing:border-box;">
+                <a href="apply.html" style="display:flex;align-items:center;justify-content:center;width:100%;padding:11px;border-radius:6px;cursor:pointer;background:rgba(var(--gold-rgb),.1);border:1px solid rgba(var(--gold-rgb),.3);color:var(--gold);font-family:var(--font-body);font-size:1.125rem;font-weight:700;letter-spacing:.01em;text-decoration:none;box-sizing:border-box;">
                     Share the Member Signup Link with Your Staff →
                 </a>
-                <div style="text-align:center;font-size:.7rem;color:var(--slate2);margin-top:8px;">No cost · Takes 2 minutes</div>
+                <div style="text-align:center;font-size:0.9375rem;color:var(--slate2);margin-top:8px;">No cost · Takes 2 minutes</div>
             </div>
         </div>
 
@@ -397,11 +383,11 @@ const DISTRICTS = [
 
 // ── Theme ──────────────────────────────────────────────
 const saved = localStorage.getItem('hibcw-theme');
-if (saved === 'light') { document.body.classList.add('light'); document.getElementById('themeToggle').textContent = '☀️'; }
+if (saved !== 'dark') { document.body.classList.add('light'); document.getElementById('themeToggle').textContent = '🌙'; } else { document.getElementById('themeToggle').textContent = '☀️'; }
 function toggleTheme() {
     const light = document.body.classList.toggle('light');
     localStorage.setItem('hibcw-theme', light ? 'light' : 'dark');
-    document.getElementById('themeToggle').textContent = light ? '☀️' : '🌙';
+    document.getElementById('themeToggle').textContent = light ? '🌙' : '☀️';
 }
 
 // ── Phone mask ─────────────────────────────────────────

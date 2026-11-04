@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Use — HIBCW</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
     * {
         margin: 0;
@@ -22,8 +21,8 @@
         --slate: #7a8fa6;
         --slate2: #4a6070;
         --white: #eef3f8;
-        --border: rgba(0, 201, 167, .15);
-        --b2: rgba(255, 255, 255, .07);
+        --border: rgba(var(--teal-rgb), .15);
+        --b2: rgba(var(--tint-rgb),.07);
     }/* ── Light mode ── */
 
     body.light {
@@ -36,13 +35,13 @@
         --slate: #4a5f72;
         --slate2: #7a95a8;
         --white: #0f1e2e;
-        --border: rgba(0, 122, 101, .2);
+        --border: rgba(var(--teal-rgb), .2);
         --b2: rgba(0, 0, 0, .1);
     }
 
     body.light header {
         background: linear-gradient(90deg, #dce8f5, #eaf1f8) !important;
-        border-bottom-color: rgba(0, 122, 101, .2) !important
+        border-bottom-color: rgba(var(--teal-rgb), .2) !important
     }
 
     body.light .back-btn {
@@ -51,8 +50,8 @@
     }
 
     body.light .back-btn:hover {
-        border-color: #007a65;
-        color: #007a65
+        border-color: var(--teal);
+        color: var(--teal)
     }
 
     body.light .doc-card {
@@ -66,13 +65,13 @@
 
     html, body {
         min-height: 100%;
-        font-family: 'IBM Plex Sans', sans-serif;
+        font-family: var(--font-body);
         background: var(--navy);
         color: var(--white)
     }
 
     header {
-        background: linear-gradient(90deg, #0b1524, #111e30);
+        background: linear-gradient(90deg, var(--navy), var(--navy2));
         border-bottom: 1px solid var(--border);
         padding: 0 24px;
         height: 54px;
@@ -90,19 +89,18 @@
     
 
     .logo-name {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1rem;
+        font-family: var(--font-body);
+        font-size: 1.1875rem;
         font-weight: 700;
-        letter-spacing: .08em
+        letter-spacing: .01em
     }
 
     .logo-sub {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .55rem;
+        font-family: var(--font-body);
+        font-size: 0.875rem;
         color: var(--teal);
-        letter-spacing: .12em;
-        text-transform: uppercase
-    }
+        letter-spacing: .01em;
+        }
 
     .hd-right {
         display: flex;
@@ -116,7 +114,7 @@
         border-radius: 4px;
         padding: 5px 13px;
         color: var(--slate);
-        font-size: .75rem;
+        font-size: 1rem;
         cursor: pointer;
         text-decoration: none;
         transition: all .2s;
@@ -144,30 +142,30 @@
 
     .page-badge {
         display: inline-block;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: .6rem;
-        letter-spacing: .12em;
-        text-transform: uppercase;
+        font-family: var(--font-body);
+        font-size: 0.875rem;
+        letter-spacing: .01em;
+        
         color: var(--teal);
-        background: rgba(0, 201, 167, .1);
-        border: 1px solid rgba(0, 201, 167, .2);
+        background: rgba(var(--teal-rgb), .1);
+        border: 1px solid rgba(var(--teal-rgb), .2);
         border-radius: 4px;
         padding: 3px 10px;
         margin-bottom: 14px;
     }
 
     .page-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 2rem;
+        font-family: var(--font-body);
+        font-size: 2.2rem;
         font-weight: 700;
-        letter-spacing: .04em;
+        letter-spacing: .01em;
         margin-bottom: 8px
     }
 
     .page-meta {
-        font-size: .78rem;
+        font-size: 1rem;
         color: var(--slate);
-        font-family: 'IBM Plex Mono', monospace
+        font-family: var(--font-body)
     }
 
     .doc-card {
@@ -186,11 +184,11 @@
     }
 
     .doc-section h2 {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 1rem;
+        font-family: var(--font-body);
+        font-size: 1.1875rem;
         font-weight: 700;
-        letter-spacing: .06em;
-        text-transform: uppercase;
+        letter-spacing: .01em;
+        
         color: var(--teal);
         margin-bottom: 10px;
         padding-bottom: 8px;
@@ -198,7 +196,7 @@
     }
 
     .doc-section p {
-        font-size: .88rem;
+        font-size: 1.0625rem;
         line-height: 1.75;
         color: var(--slate);
         margin-bottom: 10px
@@ -214,7 +212,7 @@
     }
 
     .doc-section ul li {
-        font-size: .88rem;
+        font-size: 1.0625rem;
         line-height: 1.75;
         color: var(--slate);
         margin-bottom: 4px
@@ -225,12 +223,12 @@
     }
 
     .doc-section .alert {
-        background: rgba(232, 65, 90, .08);
-        border: 1px solid rgba(232, 65, 90, .25);
+        background: rgba(var(--red-rgb), .08);
+        border: 1px solid rgba(var(--red-rgb), .25);
         border-radius: 6px;
         padding: 12px 16px;
         margin: 10px 0;
-        font-size: .85rem;
+        font-size: 1.0625rem;
         font-weight: 600;
         color: var(--red);
     }
@@ -247,11 +245,11 @@
     .page-footer {
         text-align: center;
         padding: 20px 24px;
-        font-size: .72rem;
+        font-size: 0.9375rem;
         color: var(--slate2);
         border-top: 1px solid var(--b2);
         margin-top: 40px;
-        font-family: 'IBM Plex Mono', monospace;
+        font-family: var(--font-body);
     }
 
     .page-footer a {
@@ -273,18 +271,19 @@
         }
     }
     </style>
+<link rel="stylesheet" href="hibcw-theme.css">
 </head>
 <body>
     <header>
         <div class="hd-left">
             <img src="logo-shield.svg" alt="HIBCW Shield" style="width:32px;height:32px;flex-shrink:0;object-fit:contain">
             <div>
-                <div class="logo-name">Hawaii Island Business Crime Watch</div>
-                <div class="logo-sub">A Program of KIAA · kiaahilo.org</div>
+                <div class="logo-name">HIBCW</div>
+                <div class="logo-sub">Hawaii Island Business Crime Watch</div>
             </div>
         </div>
         <div class="hd-right">
-            <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.95rem;color:var(--slate);transition:all .2s">🌙</button>
+            <button id="themeToggle" onclick="toggleTheme()" title="Switch between light and dark mode" aria-label="Switch between light and dark mode" style="background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:1.125rem;color:var(--slate);transition:all .2s">🌙</button>
             <a href="index.html" class="back-btn">← Back to Map</a>
         </div>
     </header>
@@ -459,16 +458,21 @@
     function toggleTheme() {
         const isLight = document.body.classList.toggle('light');
         localStorage.setItem('hibcw-theme', isLight ? 'light' : 'dark');
-        document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+        document.getElementById('themeToggle').textContent = isLight ? '🌙' : '☀️';
     }
     (function initTheme() {
         const saved = localStorage.getItem('hibcw-theme');
-        if (saved === 'light') {
+        if (saved !== 'dark') {
             document.body.classList.add('light');
             document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.getElementById('themeToggle');
                 if (btn)
-                    btn.textContent = '☀️';
+                    btn.textContent = '🌙';
+            });
+        } else {
+            document.addEventListener('DOMContentLoaded', () => {
+                const btn = document.getElementById('themeToggle');
+                if (btn) btn.textContent = '☀️';
             });
         }
     })();
