@@ -5,7 +5,8 @@ Response to test-group feedback ("too dark", "text too small"), plus a more mode
 ## The look
 - **A map app.** The island map fills the screen. On desktop, the Report / Incidents / Alerts panel floats over it as a card, like Apple or Google Maps.
 - **Colors from Hilo:** basalt `#16302B` (text), rain mist `#EEF3F1` (background), shield teal `#0B7A68` (brand/buttons), lehua red `#C42F3A` (911, serious), koa gold `#A86A12` (moderate).
-- **Light by default.** Dark mode ("basalt") is still in the toggle and remembers each visitor's choice.
+- **Light by default.** Dark mode (police navy `#08121F` / `#0F1D33`) is still in the toggle and remembers each visitor's choice.
+- The shield logo sits flat, with no drop shadow.
 - **Type:** Public Sans everywhere, self-hosted in `fonts/`. Rajdhani is used only for the HIBCW wordmark.
 - **Readable:** text is 14px or larger, form fields are 16px (so iPhones don't zoom in), and tap targets are at least 44px.
 

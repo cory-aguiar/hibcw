@@ -5,6 +5,7 @@
    Direction: a modern map app. The live island map fills the screen
    and the report/incident panel floats over it as a card.
    Palette from Hilo: basalt, rain mist, shield teal, lehua red, koa gold.
+   Dark mode uses police navy.
    Type: Public Sans (U.S. Web Design System face), self-hosted.
    Rajdhani is kept only for the HIBCW wordmark, to match the shield.
 
@@ -68,18 +69,18 @@ body.light{
   --shadow-2:0 2px 6px rgba(22,48,43,.06),0 12px 32px rgba(22,48,43,.12);
   background:var(--navy); color:var(--white); color-scheme:light;
 }
-/* Dark — basalt, opt-in from the toggle */
+/* Dark — police navy, opt-in from the toggle */
 body:not(.light){
-  --navy:#0b1613; --navy2:#13231f; --navy3:#1b302b;
+  --navy:#08121f; --navy2:#0f1d33; --navy3:#172a47;
   --teal:#43d1b5; --teal2:#2fb89d; --teal-rgb:67,209,181;
   --gold:#f2b64e; --gold-rgb:242,182,78;
   --red:#ff7b86;  --red-rgb:255,123,134;
-  --white:#eef5f2; --ink-rgb:238,245,242;
-  --slate:#bccdc7; --slate2:#97aca5;
-  --tint-rgb:255,255,255; --bg-rgb:19,35,31;
+  --white:#eef3fa; --ink-rgb:238,243,250;
+  --slate:#bfcbdc; --slate2:#98a8bf;
+  --tint-rgb:255,255,255; --bg-rgb:15,29,51;
   --border:rgba(67,209,181,.32); --border2:rgba(255,255,255,.13); --b2:rgba(255,255,255,.13);
-  --field-bg:#0e1b18; --field-border:rgba(255,255,255,.24);
-  --on-accent:#08201b;
+  --field-bg:#0a1628; --field-border:rgba(255,255,255,.24);
+  --on-accent:#06201a;
   --shadow-1:0 1px 2px rgba(0,0,0,.4);
   --shadow-2:0 2px 6px rgba(0,0,0,.3),0 14px 36px rgba(0,0,0,.45);
   background:var(--navy); color:var(--white); color-scheme:dark;
@@ -359,3 +360,6 @@ header:has(.hd-left) #themeToggle{padding:8px 10px!important;font-size:0!importa
 .benefit-desc{font-size:.9375rem!important;color:var(--slate)!important;line-height:1.5;margin:0!important}
 .benefits{display:grid!important;grid-template-columns:1fr!important;align-content:start}
 .benefit{align-content:start}
+
+/* The shield logo sits flat — no drop shadow */
+img[src*="logo-shield"]{filter:none!important}
