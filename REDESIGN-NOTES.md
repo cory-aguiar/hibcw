@@ -42,3 +42,9 @@ Upload the whole folder as before, including `hibcw-theme.css` and `fonts/`. The
 - Handbooks and the quick reference open in light mode, with larger on-screen text. Printed layouts were checked: every one-page piece still prints on one page.
 - PDFs regenerated: handbook-admin, handbook-captain, captain-quickref, all nine district flyers, and the intro letter.
 - "Hilo Police Department" corrected to Hawaiʻi Police Department, and hawaiipolice.com to hawaiipolice.gov, everywhere (map pages, quick reference, paper incident form).
+
+### Flyers (Nov 6)
+- All 9 district flyers, the general and recruitment flyers, and the breakroom flyer now use the new palette: police navy header, shield teal (#0B7A68) on white, darker gray text, Public Sans headings, minimum 9px print text. Each still prints on one letter page.
+- Fixed: a broken CSS comment in the recruitment flyer had collapsed the "What you get as a member" section into a plain list; it's a 3-column grid again.
+- District flyers keep their district colors. Text is about 25% larger, filling space that used to be empty, and colored text on white uses each district's darker shade so it's readable on paper.
+- District flyer PDFs regenerated.
