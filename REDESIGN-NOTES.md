@@ -26,7 +26,12 @@ Response to test-group feedback ("too dark", "text too small"), plus a more mode
 
 ## Not changed
 - Supabase calls, form logic and the database. The only new script is three lines at the end of index.html that move the glossary sheet to the top level of the page.
-- Admin pages, flyers, handbooks and print packets.
+- admin-mobile.html, flyers, handbooks and print packets.
+
+## Admin (admin.html), added Nov 6
+- Same look as the public site: Public Sans, light by default (dark is police navy), larger text (13px minimum), line icons in the sidebar, rounded buttons and cards.
+- Styles live in `hibcw-admin-theme.css`, loaded last by admin.html. Each staff member's light/dark choice is remembered.
+- Printouts (registry lists, captain directory) are unchanged.
 
 ## Deploy
 Upload the whole folder as before, including `hibcw-theme.css` and `fonts/`. The Vercel build is unchanged.
