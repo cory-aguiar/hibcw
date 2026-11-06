@@ -25,16 +25,20 @@ Response to test-group feedback ("too dark", "text too small"), plus a more mode
 - Pages updated: index.html, index-mobile.html, apply.html, register-business.html, privacy.html, terms.html
 
 ## Not changed
-- Supabase calls, form logic and the database. The only new script is three lines at the end of index.html that move the glossary sheet to the top level of the page.
-- admin-mobile.html, flyers, handbooks and print packets.
-
-## Admin (admin.html), added Nov 6
-- Same look as the public site: Public Sans, light by default (dark is police navy), larger text (13px minimum), line icons in the sidebar, rounded buttons and cards.
-- Styles live in `hibcw-admin-theme.css`, loaded last by admin.html. Each staff member's light/dark choice is remembered.
-- Printouts (registry lists, captain directory) are unchanged.
+- Supabase calls, form logic and the database.
 
 ## Deploy
 Upload the whole folder as before, including `hibcw-theme.css` and `fonts/`. The Vercel build is unchanged.
 
 ## Please check before launch
 - HPD non-emergency number confirmed: (808) 935-3311, now used everywhere.
+
+### Phone admin and captain view (admin-mobile.html)
+- Same look, styles in `hibcw-admin-mobile-theme.css`. Line icons in the bottom bar, larger labels, light by default.
+- Fixed: about 4,300 lines of old duplicated code had been pasted after the end of the page (it showed up as stray text). Removed; the file is now half the size.
+
+### Handbooks, quick reference, flyers, forms and packets
+- `hibcw-docs-theme.css` plus a font swap (IBM Plex → Public Sans). Rajdhani stays only for display wordmarks on printed pieces.
+- Handbooks and the quick reference open in light mode, with larger on-screen text. Printed layouts were checked: every one-page piece still prints on one page.
+- PDFs regenerated: handbook-admin, handbook-captain, captain-quickref, all nine district flyers, and the intro letter.
+- "Hilo Police Department" corrected to Hawaiʻi Police Department, and hawaiipolice.com to hawaiipolice.gov, everywhere (map pages, quick reference, paper incident form).

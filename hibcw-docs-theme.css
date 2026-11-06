@@ -1,0 +1,35 @@
+/* ════════════════════════════════════════════════════════════════════
+   HIBCW Docs Theme — handbooks, quick reference, flyer and packets.
+   Matches the v3 redesign (Nov 2026): Public Sans for text, Rajdhani
+   only for the HIBCW wordmark, shield-teal palette. On-screen pages
+   default to light; dark mode is police navy. Print layouts unchanged.
+   ════════════════════════════════════════════════════════════════════ */
+@font-face{font-family:'Public Sans';font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/public-sans-latin-wght-normal.woff2) format('woff2-variations');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Public Sans';font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/public-sans-latin-ext-wght-normal.woff2) format('woff2-variations');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
+@font-face{font-family:'Public Sans';font-style:italic;font-weight:100 900;font-display:swap;src:url(fonts/public-sans-latin-wght-italic.woff2) format('woff2-variations')}
+@font-face{font-family:'Rajdhani';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/rajdhani-latin-700-normal.woff2) format('woff2')}
+:root{--font-body:'Public Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--font-brand:'Rajdhani','Public Sans',sans-serif}
+
+/* Type: IBM Plex was swapped for Public Sans in each page's own CSS.
+   Rajdhani stays only for display wordmarks on printed pieces. */
+body{font-family:var(--font-body)}
+img[src*="logo-shield"]{filter:none!important}
+
+/* Color tokens for pages that use the shared admin token names */
+body.hb.light,body.hb.light{
+  --navy:#eef3f1;--navy2:#ffffff;--navy3:#e3ebe8;
+  --teal:#0b7a68;--gold:#8f5b0c;--red:#c42f3a;--green:#1f8a4c;
+  --slate:#3f5550;--slate2:#566c66;--white:#16302b;
+  --border:rgba(11,122,104,.30);--b2:#d5e0dc;
+  --text:#16302b;--text-dim:#3f5550;--hover-bg:rgba(22,48,43,.035);
+  background:#eef3f1!important;color:#16302b!important}
+body.hb:not(.light){
+  --navy:#08121f;--navy2:#0f1d33;--navy3:#172a47;
+  --teal:#43d1b5;--gold:#f2b64e;--red:#ff7b86;--green:#4cd38a;
+  --slate:#bfcbdc;--slate2:#98a8bf;--white:#eef3fa;
+  --border:rgba(67,209,181,.32);--b2:rgba(255,255,255,.13);
+  --text:rgba(238,243,250,.92);--text-dim:#bfcbdc;--hover-bg:rgba(255,255,255,.035);
+  background:#08121f!important}
+body.hb.light .hb-cover{background:#ffffff!important;border-color:#d5e0dc!important}
+body.hb.light .hb-toc{background:#ffffff!important;border-color:#d5e0dc!important}
+body.hb .hb-cover-title,body.hb h1,body.hb h2{font-weight:800!important;letter-spacing:-.01em!important}

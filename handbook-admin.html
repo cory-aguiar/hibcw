@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HIBCW Admin Handbook</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --navy:  #0b1524;
@@ -24,7 +23,7 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--navy);color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:.9rem;line-height:1.7}
+body{background:var(--navy);color:var(--white);font-family:'Public Sans',system-ui,sans-serif;font-size:.9rem;line-height:1.7}
 
 /* ── Layout ── */
 .hb-wrap{max-width:860px;margin:0 auto;padding:0 24px 80px}
@@ -40,40 +39,40 @@ body{background:var(--navy);color:var(--white);font-family:'IBM Plex Sans',sans-
   border-radius:50%;background:radial-gradient(circle,rgba(0,201,167,.08),transparent 70%);
   pointer-events:none;
 }
-.hb-cover-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
-.hb-cover-title{font-family:'Rajdhani',sans-serif;font-size:2.4rem;font-weight:700;letter-spacing:.02em;color:var(--white);line-height:1.1;margin-bottom:8px}
-.hb-cover-sub{font-size:.85rem;color:var(--slate);margin-bottom:20px}
-.hb-cover-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--gold)}
+.hb-cover-eyebrow{font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;letter-spacing:.04em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.hb-cover-title{font-family:'Public Sans',system-ui,sans-serif;font-size:2.4rem;font-weight:700;letter-spacing:.02em;color:var(--white);line-height:1.1;margin-bottom:8px}
+.hb-cover-sub{font-size:.875rem;color:var(--slate);margin-bottom:20px}
+.hb-cover-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:4px 10px;font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;color:var(--gold)}
 
 /* ── TOC ── */
 .hb-toc{background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:24px 28px;margin-bottom:40px}
-.hb-toc-title{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+.hb-toc-title{font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;letter-spacing:.04em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
 .hb-toc ol{padding-left:0;list-style:none;counter-reset:toc-main}
 .hb-toc > ol > li{counter-increment:toc-main;margin-bottom:4px}
-.hb-toc a{color:var(--slate);text-decoration:none;font-size:.82rem;transition:color .15s}
+.hb-toc a{color:var(--slate);text-decoration:none;font-size:.875rem;transition:color .15s}
 .hb-toc a:hover{color:var(--teal)}
 .hb-toc-sub{padding-left:20px;list-style:none;margin-top:3px}
 .hb-toc-sub li{margin-bottom:2px}
-.hb-toc-sub a{font-size:.76rem;color:var(--slate2)}
+.hb-toc-sub a{font-size:.875rem;color:var(--slate2)}
 .hb-toc-sub a:hover{color:var(--teal)}
 
 /* ── Sections ── */
 .hb-section{margin-bottom:48px}
 .hb-h1{
-  font-family:'Rajdhani',sans-serif;font-size:1.55rem;font-weight:700;letter-spacing:.03em;
+  font-family:'Public Sans',system-ui,sans-serif;font-size:1.55rem;font-weight:700;letter-spacing:.03em;
   color:var(--white);padding-bottom:10px;margin-bottom:18px;
   border-bottom:2px solid var(--teal);
 }
-.hb-h1 .hb-num{font-family:'IBM Plex Mono',monospace;font-size:.9rem;color:var(--teal);margin-right:8px}
-.hb-h2{font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:600;color:var(--teal);margin:24px 0 10px}
-.hb-h3{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin:18px 0 8px}
+.hb-h1 .hb-num{font-family:'Public Sans',system-ui,sans-serif;font-size:.9rem;color:var(--teal);margin-right:8px}
+.hb-h2{font-family:'Public Sans',system-ui,sans-serif;font-size:1.15rem;font-weight:600;color:var(--teal);margin:24px 0 10px}
+.hb-h3{font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;letter-spacing:.04em;text-transform:uppercase;color:var(--slate);margin:18px 0 8px}
 .hb-p{color:var(--text);margin-bottom:12px}
 .hb-ul{padding-left:0;list-style:none;margin-bottom:12px}
-.hb-ul li{padding:4px 0 4px 18px;color:var(--text);font-size:.86rem;position:relative}
+.hb-ul li{padding:4px 0 4px 18px;color:var(--text);font-size:.875rem;position:relative}
 .hb-ul li::before{content:'›';position:absolute;left:0;color:var(--teal);font-weight:700}
 .hb-ol{padding-left:0;list-style:none;counter-reset:hb-num;margin-bottom:12px}
-.hb-ol li{counter-increment:hb-num;padding:5px 0 5px 32px;color:var(--text);font-size:.86rem;position:relative}
-.hb-ol li::before{content:counter(hb-num);position:absolute;left:0;top:5px;width:22px;height:22px;background:rgba(0,201,167,.15);border:1px solid rgba(0,201,167,.3);border-radius:50%;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:600}
+.hb-ol li{counter-increment:hb-num;padding:5px 0 5px 32px;color:var(--text);font-size:.875rem;position:relative}
+.hb-ol li::before{content:counter(hb-num);position:absolute;left:0;top:5px;width:22px;height:22px;background:rgba(0,201,167,.15);border:1px solid rgba(0,201,167,.3);border-radius:50%;font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;color:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:600}
 
 /* ── Callout boxes ── */
 .hb-callout{border-radius:7px;padding:14px 16px;margin:16px 0;border-left:3px solid var(--teal)}
@@ -81,27 +80,27 @@ body{background:var(--navy);color:var(--white);font-family:'IBM Plex Sans',sans-
 .hb-callout.warn{background:rgba(245,166,35,.06);border-color:var(--gold)}
 .hb-callout.danger{background:rgba(232,65,90,.06);border-color:var(--red)}
 .hb-callout.info{background:rgba(59,130,246,.06);border-color:#3b82f6}
-.hb-callout-label{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:6px}
+.hb-callout-label{font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;letter-spacing:.04em;text-transform:uppercase;font-weight:600;margin-bottom:6px}
 .hb-callout.tip .hb-callout-label{color:var(--teal)}
 .hb-callout.warn .hb-callout-label{color:var(--gold)}
 .hb-callout.danger .hb-callout-label{color:var(--red)}
 .hb-callout.info .hb-callout-label{color:#3b82f6}
-.hb-callout p{font-size:.84rem;color:var(--text);margin:0}
+.hb-callout p{font-size:.875rem;color:var(--text);margin:0}
 
 /* ── Step boxes ── */
 .hb-steps{display:flex;flex-direction:column;gap:8px;margin:12px 0}
 .hb-step{display:flex;gap:14px;background:var(--navy2);border:1px solid var(--b2);border-radius:7px;padding:14px}
-.hb-step-num{width:28px;height:28px;border-radius:50%;background:rgba(0,201,167,.15);border:1px solid rgba(0,201,167,.35);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:700;color:var(--teal);flex-shrink:0;margin-top:1px}
+.hb-step-num{width:28px;height:28px;border-radius:50%;background:rgba(0,201,167,.15);border:1px solid rgba(0,201,167,.35);display:flex;align-items:center;justify-content:center;font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;font-weight:700;color:var(--teal);flex-shrink:0;margin-top:1px}
 .hb-step-body{flex:1}
-.hb-step-title{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:var(--white);margin-bottom:5px}
+.hb-step-title{font-family:'Public Sans',system-ui,sans-serif;font-size:.95rem;font-weight:700;color:var(--white);margin-bottom:5px}
 .hb-step-body ul{list-style:none;padding:0;margin:0}
-.hb-step-body ul li{font-size:.82rem;color:var(--text-dim);padding:2px 0 2px 14px;position:relative}
+.hb-step-body ul li{font-size:.875rem;color:var(--text-dim);padding:2px 0 2px 14px;position:relative}
 .hb-step-body ul li::before{content:'·';position:absolute;left:0;color:var(--teal)}
 
 /* ── Permission tables ── */
 .hb-table-wrap{overflow-x:auto;margin:16px 0}
-.hb-table{width:100%;border-collapse:collapse;font-size:.82rem}
-.hb-table th{background:var(--navy3);padding:10px 14px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);border-bottom:2px solid var(--border)}
+.hb-table{width:100%;border-collapse:collapse;font-size:.875rem}
+.hb-table th{background:var(--navy3);padding:10px 14px;text-align:left;font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;letter-spacing:.04em;text-transform:uppercase;color:var(--teal);border-bottom:2px solid var(--border)}
 .hb-table th.col-no{color:var(--red)}
 .hb-table td{padding:9px 14px;border-bottom:1px solid var(--b2);vertical-align:top;color:var(--text)}
 .hb-table tr:last-child td{border-bottom:none}
@@ -110,8 +109,8 @@ body{background:var(--navy);color:var(--white);font-family:'IBM Plex Sans',sans-
 .hb-table .no{color:var(--red)}
 
 /* ── Role comparison table ── */
-.hb-role-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:16px 0}
-.hb-role-table th{padding:10px 14px;text-align:left;border-bottom:2px solid var(--b2);font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase}
+.hb-role-table{width:100%;border-collapse:collapse;font-size:.875rem;margin:16px 0}
+.hb-role-table th{padding:10px 14px;text-align:left;border-bottom:2px solid var(--b2);font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;letter-spacing:.04em;text-transform:uppercase}
 .hb-role-table th:first-child{color:var(--slate)}
 .hb-role-table th.admin-col{color:var(--teal)}
 .hb-role-table th.super-col{color:var(--gold)}
@@ -122,7 +121,7 @@ body{background:var(--navy);color:var(--white);font-family:'IBM Plex Sans',sans-
 
 /* ── Footer ── */
 .hb-footer{background:var(--navy2);border:1px solid var(--b2);border-radius:8px;padding:24px;text-align:center;margin-top:48px}
-.hb-footer p{font-size:.78rem;color:var(--slate);line-height:1.9}
+.hb-footer p{font-size:.875rem;color:var(--slate);line-height:1.9}
 .hb-footer strong{color:var(--teal)}
 
 /* ── Print ── */
@@ -183,15 +182,15 @@ body.light .hb-ol li::before { background:rgba(0,122,101,.12); border-color:rgba
   gap:12px;
 }
 .hb-toolbar-brand {
-  font-family:'IBM Plex Mono',monospace;
-  font-size:.6rem; letter-spacing:.14em; text-transform:uppercase;
+  font-family:'Public Sans',system-ui,sans-serif;
+  font-size:.8125rem; letter-spacing:.04em; text-transform:uppercase;
   color:var(--teal); white-space:nowrap;
 }
 .hb-toolbar-actions { display:flex; gap:8px; align-items:center; }
 .hb-btn {
   display:inline-flex; align-items:center; gap:5px;
   border-radius:5px; padding:6px 12px; cursor:pointer;
-  font-family:'IBM Plex Mono',monospace; font-size:.62rem; font-weight:600;
+  font-family:'Public Sans',system-ui,sans-serif; font-size:.8125rem; font-weight:600;
   letter-spacing:.04em; transition:all .15s; white-space:nowrap;
   text-decoration:none;
 }
@@ -218,8 +217,9 @@ body.light .hb-step-title { color: var(--white); }
 body.light .hb-cover-sub { color: var(--slate); }
 
 </style>
+<link rel="stylesheet" href="hibcw-docs-theme.css">
 </head>
-<body>
+<body class="hb">
   <!-- TOOLBAR -->
   <div class="hb-toolbar">
     <div class="hb-toolbar-brand">HIBCW · Handbook</div>
@@ -412,7 +412,7 @@ body.light .hb-cover-sub { color: var(--slate); }
     </ul>
     <p class="hb-p">Notes are visible to all admin and captain users and are never shown on the public site.</p>
     <div class="hb-h2" id="s4-6">4.6 Exporting Incidents to CSV</div>
-    <p class="hb-p">Each incident view has an "⬇ Export CSV" button in the toolbar. The export includes all visible rows (after any active filters) with full incident, suspect, vehicle, and GPS fields. Files are named automatically, e.g., <code style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--teal)">HIBCW_active_2026-03-14.csv</code>.</p>
+    <p class="hb-p">Each incident view has an "⬇ Export CSV" button in the toolbar. The export includes all visible rows (after any active filters) with full incident, suspect, vehicle, and GPS fields. Files are named automatically, e.g., <code style="font-family:'Public Sans',system-ui,sans-serif;font-size:.875rem;color:var(--teal)">HIBCW_active_2026-03-14.csv</code>.</p>
   </div>
 
   <!-- SECTION 5 -->
@@ -627,7 +627,7 @@ body.light .hb-cover-sub { color: var(--slate); }
     </table></div>
     <p class="hb-p">Alert numbers appear in the admin panel (Recent Alerts log, Active Alerts view, Archived Alerts view) and on the public-facing site (alert feed cards and the slide-up banner). Use them when referencing a specific alert in communications with law enforcement, in grant reports, or when coordinating across districts.</p>
 
-    <div class="hb-h2">8.12 Diagnose Archive Tool <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.08em;background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;margin-left:6px">Superadmin Only</span></div>
+    <div class="hb-h2">8.12 Diagnose Archive Tool <span style="font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;letter-spacing:.04em;background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.25);border-radius:3px;padding:1px 7px;margin-left:6px">Superadmin Only</span></div>
     <p class="hb-p">If the archive button on alerts stops working, Superadmins can run the <strong>🔧 Diagnose Archive</strong> tool found in the Districts screen toolbar. It checks that the required database columns and indexes are in place and reports any issues. Run this if archiving produces an error or silently fails.</p>
   </div>
 
@@ -660,7 +660,7 @@ body.light .hb-cover-sub { color: var(--slate); }
 
   <!-- SECTION 11 -->
   <div class="hb-section" id="s11">
-    <div class="hb-h1"><span class="hb-num">11.</span> Manage Admins <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--gold);font-weight:400;margin-left:6px">Superadmin Only</span></div>
+    <div class="hb-h1"><span class="hb-num">11.</span> Manage Admins <span style="font-family:'Public Sans',system-ui,sans-serif;font-size:.8125rem;color:var(--gold);font-weight:400;margin-left:6px">Superadmin Only</span></div>
     <p class="hb-p">The Manage Admins screen is only accessible to Superadmins. It allows you to view all current admin and captain accounts, invite new users, and modify or remove existing accounts.</p>
     <div class="hb-h2">11.2 Inviting a New Admin or Captain</div>
     <div class="hb-steps">
@@ -750,7 +750,7 @@ body.light .hb-cover-sub { color: var(--slate); }
 <script>
 (function(){
   var saved = localStorage.getItem('hb-theme');
-  if (saved === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '🌙 Dark Mode'; }
+  if (saved !== 'dark') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '🌙 Dark Mode'; }
 })();
 function toggleLight() {
   var isLight = document.body.classList.toggle('light');

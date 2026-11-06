@@ -1,12 +1,11 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>HIBCW Member Sign-Up Sheet</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 @page{size:letter;margin:0}
-body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;color:#1a2a3a;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+body{background:#e8edf2;font-family:'Public Sans',system-ui,sans-serif;font-size:10px;color:#1a2a3a;print-color-adjust:exact;-webkit-print-color-adjust:exact}
 .toolbar{background:#0b1524;padding:8px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.toolbar-brand{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#00c9a7}
-.t-btn{padding:5px 11px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;border:none}
+.toolbar-brand{font-family:'Public Sans',system-ui,sans-serif;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#00c9a7}
+.t-btn{padding:5px 11px;border-radius:4px;font-family:'Public Sans',system-ui,sans-serif;font-size:.6rem;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;border:none}
 .t-ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
 .t-teal{background:#00c9a7;color:#0b1524}
 .page{width:816px;height:1056px;background:#fff;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
@@ -20,7 +19,7 @@ body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;co
 .hdr{background:linear-gradient(90deg,#0b1524,#111e30);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,201,167,.2)}
 .hdr-left{display:flex;align-items:center;gap:12px}
 .hdr-logo{width:38px;height:38px;object-fit:contain;flex-shrink:0}
-.hdr-org{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:#00c9a7;margin-bottom:2px}
+.hdr-org{font-family:'Public Sans',system-ui,sans-serif;font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:#00c9a7;margin-bottom:2px}
 .hdr-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.04em;line-height:1}
 .hdr-right{text-align:right}
 .hdr-date-row{display:flex;align-items:center;gap:6px}
@@ -31,13 +30,13 @@ body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;co
 /* Intro strip */
 .intro{background:#00c9a7;padding:8px 32px;display:flex;align-items:center;justify-content:space-between}
 .intro-text{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:#0b1524}
-.intro-sub{font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(11,21,36,.65)}
+.intro-sub{font-family:'Public Sans',system-ui,sans-serif;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(11,21,36,.65)}
 
 /* Body */
 .body{padding:10px 32px 0;flex:1;display:flex;flex-direction:column;gap:8px}
 
 .sec{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.sec-num{width:18px;height:18px;border-radius:50%;background:#0b1524;color:#00c9a7;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-num{width:18px;height:18px;border-radius:50%;background:#0b1524;color:#00c9a7;font-family:'Public Sans',system-ui,sans-serif;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sec-title{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:#0b1524;letter-spacing:.04em}
 .sec-line{flex:1;height:1px;background:rgba(0,201,167,.25)}
 
@@ -45,7 +44,7 @@ body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;co
 .fld{display:flex;flex-direction:column;gap:2px;flex:1}
 .fld.w2{flex:2}
 .fld.w3{flex:3}
-.fld-lbl{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:#7a8fa6}
+.fld-lbl{font-family:'Public Sans',system-ui,sans-serif;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:#7a8fa6}
 .fld-line{border-bottom:1.5px solid #c8d8e8;height:17px;width:100%}
 
 /* Business type checkboxes */
@@ -59,7 +58,7 @@ body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;co
 .dist-item{display:flex;align-items:center;gap:6px;padding:5px 8px;border:1px solid #d0dce8;border-radius:4px;background:#f8fbff}
 .dist-circle{width:14px;height:14px;border-radius:50%;border:1.5px solid #c8d8e8;flex-shrink:0}
 .dist-lbl{font-size:9px;color:#2a3a4a}
-.dist-num{font-family:'IBM Plex Mono',monospace;font-size:7px;color:#7a8fa6;margin-right:2px}
+.dist-num{font-family:'Public Sans',system-ui,sans-serif;font-size:7px;color:#7a8fa6;margin-right:2px}
 
 /* Employee count */
 .emp-grid{display:flex;gap:6px;margin-bottom:7px}
@@ -73,26 +72,27 @@ body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;co
 /* Signature row */
 .sig-row{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:end;margin-bottom:4px}
 .sig-fld{display:flex;flex-direction:column;gap:2px}
-.sig-lbl{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:#7a8fa6}
+.sig-lbl{font-family:'Public Sans',system-ui,sans-serif;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:#7a8fa6}
 .sig-line{border-bottom:1.5px solid #0b1524;height:20px;width:100%}
 .sig-divider{font-size:8px;color:#b0c0cc;text-align:center;padding-bottom:4px}
 
 /* Office use banner */
 .office-use{background:#f0f4f8;border:1px solid #d0dce8;border-radius:5px;padding:7px 12px}
-.office-title{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:#7a8fa6;margin-bottom:5px}
+.office-title{font-family:'Public Sans',system-ui,sans-serif;font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:#7a8fa6;margin-bottom:5px}
 .office-row{display:flex;gap:10px}
 .office-fld{display:flex;flex-direction:column;gap:2px;flex:1}
-.office-lbl{font-family:'IBM Plex Mono',monospace;font-size:6.5px;letter-spacing:.1em;text-transform:uppercase;color:#a0b0c0}
+.office-lbl{font-family:'Public Sans',system-ui,sans-serif;font-size:6.5px;letter-spacing:.1em;text-transform:uppercase;color:#a0b0c0}
 .office-line{border-bottom:1px solid #c8d8e8;height:14px;width:100%}
 
 /* Footer */
 .ftr{background:#f5f8fa;border-top:1px solid #e0e8f0;padding:7px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ftr-left{font-size:7.5px;color:#7a8fa6;line-height:1.7}
 .ftr-left strong{color:#0b1524}
-.ftr-right{font-family:'IBM Plex Mono',monospace;font-size:7px;color:#b0c0cc;text-align:right;line-height:1.6}
+.ftr-right{font-family:'Public Sans',system-ui,sans-serif;font-size:7px;color:#b0c0cc;text-align:right;line-height:1.6}
 
 @media print{.toolbar{display:none!important}.page{margin:0;width:100%}}
-</style></head><body>
+</style><link rel="stylesheet" href="../hibcw-docs-theme.css">
+</head><body>
 
 <div class="toolbar">
   <div class="toolbar-brand">HIBCW · Member Sign-Up Sheet</div>
@@ -165,7 +165,7 @@ body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;co
   <div>
     <div class="sec">
       <div class="sec-num">2</div>
-      <div class="sec-title">Business Type <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:400;color:#7a8fa6">(check one)</span></div>
+      <div class="sec-title">Business Type <span style="font-family:'Public Sans',system-ui,sans-serif;font-size:8px;font-weight:400;color:#7a8fa6">(check one)</span></div>
       <div class="sec-line"></div>
     </div>
     <div class="type-grid">
@@ -181,7 +181,7 @@ body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;co
       <div class="type-item"><div class="type-box"></div><div class="type-lbl">Other: ____________</div></div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px">
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:#7a8fa6;white-space:nowrap">No. of Employees</div>
+      <div style="font-family:'Public Sans',system-ui,sans-serif;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:#7a8fa6;white-space:nowrap">No. of Employees</div>
       <div class="emp-grid">
         <div class="emp-item"><div class="type-box"></div><span style="font-size:9px">1–5</span></div>
         <div class="emp-item"><div class="type-box"></div><span style="font-size:9px">6–15</span></div>
@@ -196,7 +196,7 @@ body{background:#e8edf2;font-family:'IBM Plex Sans',sans-serif;font-size:10px;co
   <div>
     <div class="sec">
       <div class="sec-num">3</div>
-      <div class="sec-title">District <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:400;color:#7a8fa6">(check the district where your business is located)</span></div>
+      <div class="sec-title">District <span style="font-family:'Public Sans',system-ui,sans-serif;font-size:8px;font-weight:400;color:#7a8fa6">(check the district where your business is located)</span></div>
       <div class="sec-line"></div>
     </div>
     <div class="dist-grid">

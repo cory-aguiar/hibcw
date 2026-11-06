@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIBCW Member Packet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
     * {
         margin: 0;
@@ -13,7 +12,7 @@
     }
 
     body {
-        font-family: 'IBM Plex Sans', sans-serif;
+        font-family: 'Public Sans',system-ui,sans-serif;
         background: #f0f4f8;
         color: #1a2a3a;
         min-height: 100vh
@@ -43,7 +42,7 @@
     }
 
     .logo-sub {
-        font-family: 'IBM Plex Mono', monospace;
+        font-family: 'Public Sans',system-ui,sans-serif;
         font-size: .55rem;
         color: #00c9a7;
         letter-spacing: .12em;
@@ -59,7 +58,7 @@
     .btn {
         padding: 7px 16px;
         border-radius: 5px;
-        font-family: 'IBM Plex Mono', monospace;
+        font-family: 'Public Sans',system-ui,sans-serif;
         font-size: .68rem;
         cursor: pointer;
         transition: all .15s;
@@ -124,7 +123,7 @@
     }
 
     .biz-district {
-        font-family: 'IBM Plex Mono', monospace;
+        font-family: 'Public Sans',system-ui,sans-serif;
         font-size: .7rem;
         padding: 3px 10px;
         border-radius: 3px;
@@ -224,7 +223,7 @@
     .item-btn {
         padding: 5px 12px;
         border-radius: 4px;
-        font-family: 'IBM Plex Mono', monospace;
+        font-family: 'Public Sans',system-ui,sans-serif;
         font-size: .62rem;
         cursor: pointer;
         transition: all .15s;
@@ -275,7 +274,7 @@
     }
 
     .progress-label {
-        font-family: 'IBM Plex Mono', monospace;
+        font-family: 'Public Sans',system-ui,sans-serif;
         font-size: .65rem;
         color: #7a8fa6;
         margin-top: 5px;
@@ -303,7 +302,7 @@
         border: 1px solid #d0dce8;
         border-radius: 5px;
         padding: 10px;
-        font-family: 'IBM Plex Sans', sans-serif;
+        font-family: 'Public Sans',system-ui,sans-serif;
         font-size: .84rem;
         color: #1a2a3a;
         resize: vertical;
@@ -331,6 +330,7 @@
         }
     }
     </style>
+<link rel="stylesheet" href="hibcw-docs-theme.css">
 </head>
 <body>
 
@@ -365,15 +365,15 @@
                 <div id="bizDistrictBadge" class="biz-district"></div>
             </div>
             <div style="text-align:right">
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6;margin-bottom:4px">Packet Generated</div>
+                <div style="font-family:'Public Sans',system-ui,sans-serif;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#7a8fa6;margin-bottom:4px">Packet Generated</div>
                 <div id="packetDate" style="font-size:.84rem;color:#1a2a3a;font-weight:600"></div>
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#7a8fa6;margin-top:2px">
+                <div style="font-family:'Public Sans',system-ui,sans-serif;font-size:.6rem;color:#7a8fa6;margin-top:2px">
                     Captain: 
                     <span id="bizCaptain">—</span>
                 </div>
                 <div id="bizNumWrap" style="display:none;margin-top:6px;background:#f0fdf9;border:1.5px solid #00c9a7;border-radius:4px;padding:4px 10px;text-align:center">
-                    <div style="font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:#7a8fa6">Business #</div>
-                    <div id="bizNumDisplay" style="font-family:'IBM Plex Mono',monospace;font-size:1.1rem;font-weight:700;color:#00c9a7;letter-spacing:.06em"></div>
+                    <div style="font-family:'Public Sans',system-ui,sans-serif;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:#7a8fa6">Business #</div>
+                    <div id="bizNumDisplay" style="font-family:'Public Sans',system-ui,sans-serif;font-size:1.1rem;font-weight:700;color:#00c9a7;letter-spacing:.06em"></div>
                 </div>
             </div>
         </div>
@@ -394,7 +394,7 @@
 
                       📋 Packet Assembly Checklist
                       
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:400;color:#7a8fa6;margin-left:8px">Check each item as you print and assemble</span>
+                <span style="font-family:'Public Sans',system-ui,sans-serif;font-size:.65rem;font-weight:400;color:#7a8fa6;margin-left:8px">Check each item as you print and assemble</span>
             </div>
             <div id="checklistItems"></div>
         </div>
@@ -405,7 +405,7 @@
             <textarea id="packetNotes" placeholder="Add notes about this packet (e.g. hand-delivered by Captain on 3/15, mailed to PO Box, business closed — will retry)…"></textarea>
         </div>
 
-        <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:#b0c0cc;margin-top:8px">
+        <div style="text-align:center;font-family:'Public Sans',system-ui,sans-serif;font-size:.65rem;color:#b0c0cc;margin-top:8px">
             HIBCW · Hawaii Island Business Crime Watch · A Program of KIAA · kiaahilo.org
           </div>
 
@@ -623,7 +623,7 @@
         item.actions.map(a => a.url ? `<a href="${a.url}" target="_blank" rel="noopener" class="item-btn ${a.primary ? 'item-btn-primary' : 'item-btn-ghost'}">${a.label}</a>` : `<span class="item-btn item-btn-ghost" style="opacity:.5;cursor:default">${a.label}</span>`).join('')}
         </div>
       </div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#b0c0cc;flex-shrink:0;margin-top:2px">${
+      <div style="font-family:'Public Sans',system-ui,sans-serif;font-size:.6rem;color:#b0c0cc;flex-shrink:0;margin-top:2px">${
 
         i + 1}/${packetItems.length}</div>
     </div>`

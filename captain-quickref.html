@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HIBCW Captain Quick Reference Card</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --navy:    #0b1524;
@@ -25,7 +24,7 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--navy);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;line-height:1.6}
+body{background:var(--navy);color:var(--text);font-family:'Public Sans',system-ui,sans-serif;font-size:.82rem;line-height:1.6}
 
 /* ── Light mode ── */
 body.light {
@@ -70,14 +69,14 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
   justify-content:space-between; gap:12px;
 }
 .qr-toolbar-brand {
-  font-family:'IBM Plex Mono',monospace; font-size:.58rem;
+  font-family:'Public Sans',system-ui,sans-serif; font-size:.58rem;
   letter-spacing:.16em; text-transform:uppercase; color:var(--teal);
 }
 .toolbar-actions{ display:flex; gap:8px; align-items:center; }
 .hb-btn {
   display:inline-flex; align-items:center; gap:5px;
   border-radius:5px; padding:6px 12px; cursor:pointer;
-  font-family:'IBM Plex Mono',monospace; font-size:.62rem; font-weight:600;
+  font-family:'Public Sans',system-ui,sans-serif; font-size:.62rem; font-weight:600;
   letter-spacing:.04em; transition:all .15s; white-space:nowrap;
   text-decoration:none; border:none;
 }
@@ -100,12 +99,12 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
 }
 .qr-header-left{}
 .qr-header-title {
-  font-family:'Rajdhani',sans-serif; font-size:1.3rem; font-weight:700;
+  font-family:'Public Sans',system-ui,sans-serif; font-size:1.3rem; font-weight:700;
   letter-spacing:.03em; color:var(--white); margin-bottom:2px;
 }
 .qr-header-sub { font-size:.72rem; color:var(--slate); }
 .qr-badge {
-  font-family:'IBM Plex Mono',monospace; font-size:.58rem;
+  font-family:'Public Sans',system-ui,sans-serif; font-size:.58rem;
   background:rgba(245,166,35,.12); border:1px solid rgba(245,166,35,.3);
   border-radius:4px; padding:3px 9px; color:var(--gold); white-space:nowrap;
 }
@@ -121,7 +120,7 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
   border-radius:8px; padding:14px;
 }
 .card-title {
-  font-family:'IBM Plex Mono',monospace; font-size:.58rem;
+  font-family:'Public Sans',system-ui,sans-serif; font-size:.58rem;
   letter-spacing:.12em; text-transform:uppercase; color:var(--slate);
   margin-bottom:10px; display:flex; align-items:center; gap:5px;
 }
@@ -136,7 +135,7 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
 .contact-name{ font-weight:600; font-size:.8rem; color:var(--white); }
 .contact-sub { font-size:.7rem; color:var(--slate); margin-top:1px; }
 .contact-num {
-  font-family:'IBM Plex Mono',monospace; font-size:.72rem;
+  font-family:'Public Sans',system-ui,sans-serif; font-size:.72rem;
   background:rgba(0,201,167,.1); color:var(--teal);
   border-radius:4px; padding:2px 8px; white-space:nowrap;
 }
@@ -151,7 +150,7 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
   width:20px; height:20px; border-radius:50%;
   background:rgba(0,201,167,.15); border:1px solid rgba(0,201,167,.35);
   display:flex; align-items:center; justify-content:center;
-  font-family:'IBM Plex Mono',monospace; font-size:.6rem;
+  font-family:'Public Sans',system-ui,sans-serif; font-size:.6rem;
   font-weight:700; color:var(--teal); flex-shrink:0; margin-top:1px;
 }
 .step-text{ font-size:.78rem; line-height:1.5; color:var(--text); }
@@ -170,7 +169,7 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
 .link-row:last-child{ border-bottom:none; }
 .link-label{ font-size:.78rem; color:var(--text); }
 .url-text {
-  font-family:'IBM Plex Mono',monospace; font-size:.68rem;
+  font-family:'Public Sans',system-ui,sans-serif; font-size:.68rem;
   color:var(--teal); background:rgba(0,201,167,.08);
   border-radius:3px; padding:1px 6px; white-space:nowrap;
 }
@@ -187,7 +186,7 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
 .status-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:4px; }
 .status-block{}
 .tag {
-  display:inline-block; font-family:'IBM Plex Mono',monospace;
+  display:inline-block; font-family:'Public Sans',system-ui,sans-serif;
   font-size:.58rem; padding:2px 8px; border-radius:3px;
   border:1px solid; font-weight:600; margin-bottom:5px;
 }
@@ -201,11 +200,11 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
 .dist-item{ display:flex; align-items:center; gap:7px; padding:4px 0; }
 .dist-dot{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 .dist-name{ font-size:.74rem; color:var(--text); }
-.dist-num{ font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:var(--slate); margin-left:auto; }
+.dist-num{ font-family:'Public Sans',system-ui,sans-serif; font-size:.62rem; color:var(--slate); margin-left:auto; }
 
 /* ── Footer ── */
 .qr-footer {
-  text-align:center; font-family:'IBM Plex Mono',monospace;
+  text-align:center; font-family:'Public Sans',system-ui,sans-serif;
   font-size:.58rem; color:var(--slate2); padding-top:10px;
   border-top:1px solid var(--b2); margin-top:4px; line-height:1.8;
 }
@@ -227,8 +226,9 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
   .alert-tip{ background:#f0f8ff !important; }
 }
 </style>
+<link rel="stylesheet" href="hibcw-docs-theme.css">
 </head>
-<body>
+<body class="hb">
 
 <!-- TOOLBAR -->
 <div class="qr-toolbar">
@@ -262,7 +262,7 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
         <span class="contact-num">911</span>
       </div>
       <div class="contact-row">
-        <div><div class="contact-name">HPD Non-Emergency</div><div class="contact-sub">Hilo Police Department</div></div>
+        <div><div class="contact-name">HPD Non-Emergency</div><div class="contact-sub">Hawaiʻi Police Department</div></div>
         <span class="contact-num">(808) 935-3311</span>
       </div>
       <div class="contact-row">
@@ -338,7 +338,7 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
       <div class="link-row"><span class="link-label">Public map &amp; incident report</span><span class="url-text">hibcw.kiaahilo.org</span></div>
       <div class="link-row"><span class="link-label">Join HIBCW (application form)</span><span class="url-text">hibcw.kiaahilo.org/apply.html</span></div>
       <div class="link-row"><span class="link-label">KIAA</span><span class="url-text">kiaahilo.org</span></div>
-      <div class="link-row"><span class="link-label">HPD online report</span><span class="url-text">hawaiipolice.com</span></div>
+      <div class="link-row"><span class="link-label">HPD online report</span><span class="url-text">hawaiipolice.gov</span></div>
       <div class="link-row"><span class="link-label">Hawaii Crime Stoppers</span><span class="url-text">hawaiicrimestoppers.net</span></div>
       <div class="link-row"><span class="link-label">Hawaii County Civil Defense</span><span class="url-text">hawaiicounty.gov/cd</span></div>
     </div>
@@ -411,8 +411,8 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
         <div class="card-title" style="margin-bottom:6px"><span class="card-title-icon">🆘</span> Need admin help?</div>
         <div style="font-size:.76rem;color:var(--text-dim);line-height:1.6">
           Deleting records · Editing member profiles · Fixing data errors · Inviting new captains<br>
-          <strong style="color:var(--white)">Email:</strong> <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--teal)">hibcw@kiaahilo.org</span> &nbsp;·&nbsp;
-          <strong style="color:var(--white)">Phone:</strong> <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--teal)">(808) 961-5422</span>
+          <strong style="color:var(--white)">Email:</strong> <span style="font-family:'Public Sans',system-ui,sans-serif;font-size:.7rem;color:var(--teal)">hibcw@kiaahilo.org</span> &nbsp;·&nbsp;
+          <strong style="color:var(--white)">Phone:</strong> <span style="font-family:'Public Sans',system-ui,sans-serif;font-size:.7rem;color:var(--teal)">(808) 961-5422</span>
         </div>
       </div>
     </div>
@@ -429,7 +429,7 @@ body.light .hb-btn-ghost:hover{ border-color:var(--teal); color:var(--teal); bac
 <script>
 (function(){
   var saved = localStorage.getItem('hb-theme');
-  if (saved === 'light') {
+  if (saved !== 'dark') {
     document.body.classList.add('light');
     document.getElementById('themeBtn').textContent = '🌙 Dark Mode';
   }
