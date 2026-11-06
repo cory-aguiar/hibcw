@@ -51,7 +51,7 @@ Upload the whole folder as before, including `hibcw-theme.css` and `fonts/`. The
 
 ## Search and link previews (Nov 6)
 - Public pages (map, Join, Register, Privacy, Terms) have search descriptions, a canonical address, and link-preview tags using `og-image.jpg`.
-- Site icons: `logo-shield.svg`, `favicon-32.png`, `apple-touch-icon.png`, `icon-512.png`.
+- Site icons: `logo-shield.svg`, `favicon-32.png`, `apple-touch-icon.png` (180), `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, plus `manifest.webmanifest` so the site can be added to a phone home screen.
 - Admin, captain, handbook, packet and `files/` pages are marked "noindex"; `vercel.json` also sends a noindex header for them and for PDFs.
 - `vercel.json` redirects requests for repo-only files (schema.sql, supabase/, notes, build script) to the home page so they aren't publicly readable.
 - `robots.txt` and `sitemap.xml` list the public pages. Submit the sitemap in Google Search Console during launch week.
