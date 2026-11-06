@@ -128,7 +128,8 @@ body.light #themeToggle{--i:var(--i-moon)}
 body:not(.light) #themeToggle{--i:var(--i-sun)}
 
 /* Notice strip */
-.disclaimer-bar{background:var(--navy3)!important;color:var(--slate)!important;font-style:normal!important;font-size:.875rem!important;border:none!important;padding:7px 20px!important;gap:8px}
+.disclaimer-bar{background:#fbeccb!important;color:#6b4508!important;font-weight:600;font-style:normal!important;font-size:.875rem!important;border:none!important;border-bottom:1px solid #ecd29a!important;padding:7px 20px!important;gap:8px}
+body:not(.light) .disclaimer-bar{background:#3a2c10!important;color:#f6c869!important;border-bottom-color:#5a4318!important}
 .disclaimer-bar::before{content:'';width:16px;height:16px;flex-shrink:0;background:currentColor;-webkit-mask:var(--i-info) center/contain no-repeat;mask:var(--i-info) center/contain no-repeat}
 
 /* Stats strip: labelled numbers on the left, one-tap phone numbers on the right */
