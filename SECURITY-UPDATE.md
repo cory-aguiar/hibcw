@@ -55,12 +55,33 @@ A room full of people on the same venue Wi-Fi counts as one connection. Loosen t
 ```sql
 update private.hibcw_rate_settings set per_ip_max = 60, per_ip_day_max = 300
  where bucket in ('report','apply','register');
+update private.hibcw_rate_settings set per_ip_max = 300, per_ip_day_max = 1500
+ where bucket = 'member_check';
 ```
 Afterward, put them back:
 ```sql
 update private.hibcw_rate_settings set per_ip_max = 6, per_ip_day_max = 30 where bucket = 'report';
 update private.hibcw_rate_settings set per_ip_max = 5, per_ip_day_max = 10 where bucket in ('apply','register');
+update private.hibcw_rate_settings set per_ip_max = 30, per_ip_day_max = 150 where bucket = 'member_check';
 ```
+(The `member_check` lines only work after the privacy update below is installed.)
+
+## Privacy update (Nov 6)
+File: `supabase/migrations/20261106_hibcw_privacy.sql`. Run it **after** the rate-limit SQL above.
+
+**Install order matters:** upload the new `index.html` and `index-mobile.html` to GitHub first, wait for Vercel to finish deploying (about a minute), then run the SQL. The old pages ask for the reporter's name and email, which the public can no longer read, so the map would show an error until the new pages are live.
+
+What it fixes:
+- **Reporter name and email** were readable by anyone through the public database key. Now only signed-in staff can read them.
+- **District Captains list** was showing every approved member's name, email and photo (every application carries its captain's name). Now it shows one captain per district.
+- **Member email check** on the report form is rate-limited, so nobody can test a list of addresses.
+
+Page changes in the same update:
+- Photos (JPEG/PNG/WebP) have GPS and camera details removed before upload.
+- The map and search no longer request or search reporter names.
+- `privacy.html` and `terms.html` rewritten (dated Nov 6, 2026).
+
+Check after installing: open the live map on your phone with location tagging on, submit a test report with a photo, and confirm it shows up. Then sign in to the admin and confirm you can still see the reporter's name and email. Also confirm a new report appears on another open map without a refresh (live updates).
 
 ## Also worth checking
 - `invite-staff` is called by admin.html, but its code isn't in this repo, so I couldn't check it. Make sure it also confirms the caller is a superadmin.

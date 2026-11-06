@@ -1785,6 +1785,25 @@ function removeFile(i) {
 /* ═══════════════════════════════════════════════
    MEMBER EMAIL CHECK
 ═══════════════════════════════════════════════ */
+/* Privacy: re-encode photos before upload so hidden metadata (GPS location,
+   camera serial, etc.) is not published. Falls back to the original file
+   if the browser can't decode it (e.g. some HEIC photos). */
+async function hibcwCleanImage(file) {
+  try {
+    if (!/^image\/(jpeg|png|webp)$/i.test(file.type)) return file;
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const max = 3000, s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const type = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+    const blob = await new Promise(r => c.toBlob(r, type, 0.9));
+    if (!blob) return file;
+    const name = file.name.replace(/\.[^.]+$/, '') + (type === 'image/png' ? '.png' : '.jpg');
+    return new File([blob], name, { type });
+  } catch (e) { return file; }
+}
+
 async function checkMemberEmail(val) {
   const hint = document.getElementById('emailHint');
   const email = val.trim().toLowerCase();
@@ -1804,9 +1823,13 @@ async function checkMemberEmail(val) {
       verifiedEmail = email;
       hint.textContent = '✅ Verified KIAA Member — report will show a member badge.';
       hint.className = 'fld-verify-hint ok';
+    } else if (error) {
+      verifiedEmail = null;
+      hint.textContent = 'Couldn’t check membership right now. You can still send your report.';
+      hint.className = 'fld-verify-hint';
     } else {
       verifiedEmail = null;
-      hint.textContent = 'Email not found — report will be submitted anonymously.';
+      hint.textContent = 'Not found in the KIAA member list. Your report won’t show a member badge.';
       hint.className = 'fld-verify-hint no';
     }
   }, 600);
@@ -1961,7 +1984,7 @@ function addMarker(inc) {
 ═══════════════════════════════════════════════ */
 async function loadIncidents() {
   if (!sb) return;
-  const {data, error} = await sb.from('incidents').select('*,incident_media(*)').eq('status','active').order('occurred_at',{ascending:false});
+  const {data, error} = await sb.from('incidents').select('id,created_at,type,type_color,occurred_at,address,description,police_report,suspect_height,suspect_build,suspect_age,suspect_gender,suspect_race,suspect_clothing,suspect_other,vehicle_make,vehicle_model,vehicle_color,vehicle_year,vehicle_plate,vehicle_notes,lat,lng,status,is_recurring,is_verified_member,district,incident_media(*)').eq('status','active').order('occurred_at',{ascending:false});
   if (error) { console.error(error); return; }
   incidents = data || [];
   incidents.forEach(addMarker);
@@ -2030,7 +2053,7 @@ function renderList(q='', filter='', target='main') {
   const elId = target==='sheet' ? 'sheetListEl' : 'mainListEl';
   const el = document.getElementById(elId);
   let rows = incidents.filter(i => {
-    const mq = !q || [i.type,i.address,i.description,i.reporter_name||''].join(' ').toLowerCase().includes(q.toLowerCase());
+    const mq = !q || [i.type,i.address,i.description].join(' ').toLowerCase().includes(q.toLowerCase());
     const mf = !filter || i.type===filter;
     return mq && mf;
   });
@@ -2281,7 +2304,7 @@ async function submitReport() {
       lat:      pendingPin?.lat??null,
       lng:      pendingPin?.lng??null,
       district: pendingPin?.district??null,
-    }).select().single();
+    }).select('id,created_at').single();
     if (incErr) throw incErr;
 
     if (mediaFiles.length > 0) {
@@ -2291,12 +2314,13 @@ async function submitReport() {
         const m=mediaFiles[i];
         lbl.textContent=`Uploading file ${i+1} of ${mediaFiles.length}…`;
         fill.style.width=`${Math.round(i/mediaFiles.length*100)}%`;
-        const ext=m.file.name.split('.').pop();
+        const up=m.type==='image'?await hibcwCleanImage(m.file):m.file;
+        const ext=up.name.split('.').pop();
         const path=`${inc.id}/${Date.now()}_${i}.${ext}`;
-        const {error:storErr}=await sb.storage.from('incident-media').upload(path,m.file,{contentType:m.file.type});
+        const {error:storErr}=await sb.storage.from('incident-media').upload(path,up,{contentType:up.type});
         if (storErr) throw storErr;
         const {data:urlData}=sb.storage.from('incident-media').getPublicUrl(path);
-        await sb.from('incident_media').insert({incident_id:inc.id,file_path:path,file_name:m.file.name,file_type:m.type,mime_type:m.file.type,file_size:m.file.size,public_url:urlData.publicUrl});
+        await sb.from('incident_media').insert({incident_id:inc.id,file_path:path,file_name:up.name,file_type:m.type,mime_type:up.type,file_size:up.size,public_url:urlData.publicUrl});
       }
       fill.style.width='100%'; lbl.textContent='Upload complete ✓';
       setTimeout(()=>prog.classList.remove('show'),1400);
@@ -2508,7 +2532,7 @@ function toggleDistrictOverlay(mapObj, btn) {
   await loadDistrictAlerts();
 
   sb.channel('incidents').on('postgres_changes',{event:'INSERT',schema:'public',table:'incidents'}, async p => {
-    const {data} = await sb.from('incidents').select('*,incident_media(*)').eq('id',p.new.id).single();
+    const {data} = await sb.from('incidents').select('id,created_at,type,type_color,occurred_at,address,description,police_report,suspect_height,suspect_build,suspect_age,suspect_gender,suspect_race,suspect_clothing,suspect_other,vehicle_make,vehicle_model,vehicle_color,vehicle_year,vehicle_plate,vehicle_notes,lat,lng,status,is_recurring,is_verified_member,district,incident_media(*)').eq('id',p.new.id).single();
     if (data && !incidents.find(i=>i.id===data.id)) {
       incidents.unshift(data);
       addMarker(data);
