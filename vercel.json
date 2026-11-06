@@ -1,4 +1,17 @@
 {
   "buildCommand": "node build-config.js",
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "headers": [
+    { "source": "/(admin|admin-mobile|handbook-admin|handbook-captain|captain-quickref|hibcw-breakroom-flyer|packet-print|packet-certificate|packet-window-badge)(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
+    { "source": "/files/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
+    { "source": "/(.*)\\.pdf", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] }
+  ],
+  "redirects": [
+    { "source": "/supabase/:path*", "destination": "/", "permanent": false },
+    { "source": "/schema.sql", "destination": "/", "permanent": false },
+    { "source": "/SECURITY-UPDATE.md", "destination": "/", "permanent": false },
+    { "source": "/REDESIGN-NOTES.md", "destination": "/", "permanent": false },
+    { "source": "/build-config.js", "destination": "/", "permanent": false },
+    { "source": "/vercel.json", "destination": "/", "permanent": false }
+  ]
 }

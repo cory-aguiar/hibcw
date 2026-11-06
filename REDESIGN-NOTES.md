@@ -48,3 +48,10 @@ Upload the whole folder as before, including `hibcw-theme.css` and `fonts/`. The
 - Fixed: a broken CSS comment in the recruitment flyer had collapsed the "What you get as a member" section into a plain list; it's a 3-column grid again.
 - District flyers keep their district colors. Text is about 25% larger, filling space that used to be empty, and colored text on white uses each district's darker shade so it's readable on paper.
 - District flyer PDFs regenerated.
+
+## Search and link previews (Nov 6)
+- Public pages (map, Join, Register, Privacy, Terms) have search descriptions, a canonical address, and link-preview tags using `og-image.jpg`.
+- Site icons: `logo-shield.svg`, `favicon-32.png`, `apple-touch-icon.png`, `icon-512.png`.
+- Admin, captain, handbook, packet and `files/` pages are marked "noindex"; `vercel.json` also sends a noindex header for them and for PDFs.
+- `vercel.json` redirects requests for repo-only files (schema.sql, supabase/, notes, build script) to the home page so they aren't publicly readable.
+- `robots.txt` and `sitemap.xml` list the public pages. Submit the sitemap in Google Search Console during launch week.
