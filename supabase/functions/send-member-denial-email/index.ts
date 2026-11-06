@@ -9,8 +9,11 @@
 //
 // Deploy:
 //   supabase functions deploy send-member-denial-email --no-verify-jwt
+//   (caller must be signed-in staff — checked in code via _shared/require-staff.ts)
 //   supabase secrets set RESEND_API_KEY=re_YOUR_KEY_HERE
 // ─────────────────────────────────────────────────────────────────────────────
+
+import { requireStaff } from "../_shared/require-staff.ts";
 
 const RESEND_FROM = "HIBCW <noreply@support.kiaahilo.org>";
 
@@ -31,6 +34,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
       status: 405, headers: { ...CORS, "Content-Type": "application/json" },
     });
   }
+  // Only signed-in HIBCW staff may trigger emails (see _shared/require-staff.ts)
+  const access = await requireStaff(req, CORS);
+  if (access.denied) return access.denied;
+
 
   let body: {
     email: string;

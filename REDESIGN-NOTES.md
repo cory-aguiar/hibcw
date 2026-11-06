@@ -32,4 +32,4 @@ Response to test-group feedback ("too dark", "text too small"), plus a more mode
 Upload the whole folder as before, including `hibcw-theme.css` and `fonts/`. The Vercel build is unchanged.
 
 ## Please check before launch
-- HPD non-emergency number: the stats strip says **(808) 935-3311**, but the district-alert banners (index.html and index-mobile.html) say **(808) 935-2100**.
+- HPD non-emergency number confirmed: (808) 935-3311, now used everywhere.

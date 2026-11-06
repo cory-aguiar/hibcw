@@ -11,11 +11,13 @@
 //
 // Deploy:
 //   supabase functions deploy send-district-alert-email --no-verify-jwt
+//   (caller must be signed-in staff — checked in code via _shared/require-staff.ts)
 //   supabase secrets set RESEND_API_KEY=re_YOUR_KEY_HERE
 //   supabase secrets set SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { requireStaff } from "../_shared/require-staff.ts";
 
 const RESEND_FROM = "HIBCW Alerts <noreply@support.kiaahilo.org>";
 
@@ -61,6 +63,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
       status: 405, headers: { ...CORS, "Content-Type": "application/json" },
     });
   }
+  // Only signed-in HIBCW staff may trigger emails (see _shared/require-staff.ts)
+  const access = await requireStaff(req, CORS);
+  if (access.denied) return access.denied;
+
 
   let body: {
     district: string;
@@ -83,6 +89,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
   if (!district || !message) {
     return new Response(JSON.stringify({ error: "district and message are required" }), {
       status: 400, headers: { ...CORS, "Content-Type": "application/json" },
+    });
+  }
+
+  // Captains may only alert their own district; admins may alert any.
+  if (access.staff.role === "captain" && access.staff.district !== district) {
+    return new Response(JSON.stringify({ error: "Captains can only send alerts to their own district." }), {
+      status: 403, headers: { ...CORS, "Content-Type": "application/json" },
     });
   }
 
